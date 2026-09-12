@@ -133,7 +133,7 @@ collection:
       afterResponse: |-
         if (insomnia.response.code >= 200 && insomnia.response.code < 300) {
           const purchase_intent = insomnia.response.json()?.purchase_intent;
-          insomnia.test('Public lookup returns a purchase intent without owner activity', () => {
+          insomnia.test('Lookup returns a purchase intent without embedded activity', () => {
             insomnia.expect(purchase_intent?.id).to.equal(insomnia.variables.get('purchase_intent_id'));
             insomnia.expect(purchase_intent).not.to.have.property('activity');
           });

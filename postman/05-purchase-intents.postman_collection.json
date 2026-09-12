@@ -2,7 +2,7 @@
   "info": {
     "name": "Inttegro API — Purchase Intents",
     "description": "Create controlled, shareable hosted Buy links for catalog products, then manage their availability and usage. Uses the shared Inttegro API global environment. Error reference: https://studio.inttegro.com/error-codes#purchase-intents\n\nGenerated from insomnia/05-purchase-intents.insomnia.yaml. Edit the Insomnia source and run npm run postman:generate.",
-    "version": "0.1.0-beta7",
+    "version": "0.1.0-beta8",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
@@ -168,7 +168,7 @@
                 "exec": [
                   "if (pm.response.code >= 200 && pm.response.code < 300) {",
                   "  const purchase_intent = pm.response.json()?.purchase_intent;",
-                  "  pm.test('Public lookup returns a purchase intent without owner activity', () => {",
+                  "  pm.test('Lookup returns a purchase intent without embedded activity', () => {",
                   "    pm.expect(purchase_intent?.id).to.equal(pm.variables.get('purchase_intent_id'));",
                   "    pm.expect(purchase_intent).not.to.have.property('activity');",
                   "  });",

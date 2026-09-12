@@ -3,8 +3,8 @@ openapi: 3.0.3
 info:
     title: Inttegro API
     description: Machine-readable reference for the public Inttegro API
-    version: 0.1.0-beta7
-    x-inttegro-collection-version: 0.1.0-beta7
+    version: 0.1.0-beta8
+    x-inttegro-collection-version: 0.1.0-beta8
     contact:
         name: Inttegro Engineering
         url: "https://inttegro.com"
@@ -7389,7 +7389,7 @@ paths:
                 lookup requires no API key and returns active or expired intents; canceled
                 and used single-use intents are returned as not found. When the owning
                 application authenticates the request, lookup is application-scoped, returns
-                all lifecycle states, and may include recent activity.
+                all lifecycle states.
             operationId: lookupPurchaseIntent
             tags:
                 - Purchase Intents
@@ -10605,131 +10605,6 @@ components:
             properties:
                 purchase_intent:
                     $ref: '#/components/schemas/PurchaseIntent'
-        PurchaseIntentActivityLog:
-            type: object
-            description: Recent authenticated-owner activity for the purchase intent.
-            additionalProperties: false
-            properties:
-                recent:
-                    type: array
-                    items:
-                        $ref: '#/components/schemas/PurchaseIntentActivity'
-        PurchaseIntentActivity:
-            type: object
-            required:
-                - created_at
-                - id
-                - purchase_intent_id
-                - type
-            properties:
-                amount:
-                    $ref: '#/components/schemas/Amount'
-                attribution:
-                    $ref: '#/components/schemas/PurchaseIntentActivityAttribution'
-                created_at:
-                    type: string
-                    format: date-time
-                error_code:
-                    type: string
-                    example: "payment_failed"
-                id:
-                    type: string
-                    description: Activity event ID with saleevt_ prefix
-                    example: "saleevt_abc123"
-                order_id:
-                    type: string
-                    example: "or_abc123"
-                payment_id:
-                    type: string
-                    example: "py_abc123"
-                product_id:
-                    type: string
-                    example: "prod_abc123"
-                purchase_intent_id:
-                    type: string
-                    description: Purchase intent ID with sale_ prefix
-                    example: "sale_ABCXYZ"
-                quantity:
-                    type: integer
-                    minimum: 0
-                    example: 2
-                source:
-                    type: string
-                type:
-                    type: string
-                    enum: [expired_viewed, order_created, payment_failed, payment_started, viewed]
-                variant_product_id:
-                    type: string
-                    example: "prod_variant123"
-                visitor:
-                    $ref: '#/components/schemas/PurchaseIntentActivityVisitor'
-        PurchaseIntentActivityAttribution:
-            type: object
-            properties:
-                campaign:
-                    type: string
-                    example: "july-drop"
-                channel:
-                    type: string
-                    example: "social"
-                content:
-                    type: string
-                    example: "story-1"
-                landing_url:
-                    type: string
-                    example: "https://pages.inttegro.com/buy/sale_ABCXYZ?utm_source=instagram"
-                medium:
-                    type: string
-                    example: "social"
-                referrer:
-                    type: string
-                    example: "https://instagram.com/"
-                referrer_host:
-                    type: string
-                    example: "instagram.com"
-                source:
-                    type: string
-                    example: "instagram"
-                term:
-                    type: string
-                    example: "waist beads"
-        PurchaseIntentActivityVisitor:
-            type: object
-            properties:
-                browser:
-                    type: string
-                    example: "Safari"
-                city:
-                    type: string
-                    example: "Accra"
-                country:
-                    type: string
-                    example: "GH"
-                device:
-                    type: string
-                    example: "mobile"
-                ip_address:
-                    type: string
-                    description: Request IP address when retained for the activity type
-                    example: "203.0.113.7"
-                os:
-                    type: string
-                    example: "iOS"
-                region:
-                    type: string
-                    example: "Greater Accra"
-                session_id:
-                    type: string
-                    example: "ps_9f9489e9-1a67-42f0-bb44-13101ea6f174"
-                timezone:
-                    type: string
-                    example: "Africa/Accra"
-                user_agent:
-                    type: string
-                    example: "Mozilla/5.0"
-                visitor_id:
-                    type: string
-                    example: "pv_b0c6f1b8-e917-4a88-b891-f6b18ce0f540"
         PurchaseIntentMerchant:
             type: object
             description: Merchant identity captured for the hosted checkout. Individual fields are omitted when unavailable.
@@ -10909,8 +10784,6 @@ components:
                 - status
                 - usage
             properties:
-                activity:
-                    $ref: '#/components/schemas/PurchaseIntentActivityLog'
                 allow_variants:
                     type: boolean
                     description: Whether the intent was configured with a variant set
