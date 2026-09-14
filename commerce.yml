@@ -3,8 +3,8 @@ openapi: 3.0.3
 info:
     title: Inttegro API
     description: Machine-readable reference for the public Inttegro API
-    version: 0.1.0-beta10
-    x-inttegro-collection-version: 0.1.0-beta10
+    version: 0.1.0-beta11
+    x-inttegro-collection-version: 0.1.0-beta11
     contact:
         name: Inttegro Engineering
         url: "https://inttegro.com"
