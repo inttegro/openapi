@@ -57,7 +57,19 @@ collection:
             insomnia.expect(refund?.id).to.be.a('string').and.match(/^rf_/);
             insomnia.expect(refund?.order_id).to.equal(insomnia.variables.get('order_id'));
             insomnia.expect(refund?.status).to.equal('pending');
-            insomnia.expect(refund?.settlement_mode).to.be.oneOf(['provider', 'external']);
+            insomnia.expect(refund).not.to.have.property('settlement_mode');
+            insomnia.expect(refund?.settlement?.type).to.be.oneOf(['offline', 'payment_method']);
+            if (refund?.settlement?.type === 'offline') {
+              insomnia.expect(refund.settlement).not.to.have.property('payment_method');
+            } else {
+              insomnia.expect(refund?.settlement?.payment_method?.id).to.match(/^pm_/);
+              insomnia.expect(refund?.settlement?.payment_method?.type).to.be.oneOf(['mobile_money', 'bank_account']);
+              const method = refund.settlement.payment_method;
+              const details = method.type === 'mobile_money' ? method.mobile_money : method.bank_account?.ghana_bank_account;
+              insomnia.expect(details?.account_number).to.match(/^\*{4}[0-9]{4}$/);
+              insomnia.expect(details?.last4).to.match(/^[0-9]{4}$/);
+              insomnia.expect(details?.account_number).to.equal(`****${details?.last4}`);
+            }
             insomnia.expect(refund?.order_amount).to.be.an('object');
             insomnia.expect(refund?.line_items).to.be.an('array');
             insomnia.expect(refund?.line_items?.length).to.be.greaterThan(0);
@@ -91,7 +103,19 @@ collection:
             insomnia.expect(jsonBody).to.have.all.keys('refund');
             insomnia.expect(refund?.id).to.equal(insomnia.variables.get('refund_id'));
             insomnia.expect(refund?.status).to.equal('canceled');
-            insomnia.expect(refund?.settlement_mode).to.be.oneOf(['provider', 'external']);
+            insomnia.expect(refund).not.to.have.property('settlement_mode');
+            insomnia.expect(refund?.settlement?.type).to.be.oneOf(['offline', 'payment_method']);
+            if (refund?.settlement?.type === 'offline') {
+              insomnia.expect(refund.settlement).not.to.have.property('payment_method');
+            } else {
+              insomnia.expect(refund?.settlement?.payment_method?.id).to.match(/^pm_/);
+              insomnia.expect(refund?.settlement?.payment_method?.type).to.be.oneOf(['mobile_money', 'bank_account']);
+              const method = refund.settlement.payment_method;
+              const details = method.type === 'mobile_money' ? method.mobile_money : method.bank_account?.ghana_bank_account;
+              insomnia.expect(details?.account_number).to.match(/^\*{4}[0-9]{4}$/);
+              insomnia.expect(details?.last4).to.match(/^[0-9]{4}$/);
+              insomnia.expect(details?.account_number).to.equal(`****${details?.last4}`);
+            }
             insomnia.expect(refund?.cancel_reason).to.equal('Customer no longer wants the refund');
             insomnia.expect(refund?.canceled_at).to.be.a('string');
             insomnia.expect(refund?.total).to.be.an('object');
@@ -127,7 +151,19 @@ collection:
             insomnia.expect(jsonBody).to.have.all.keys('refund');
             insomnia.expect(jsonBody?.refund?.id).to.equal(insomnia.variables.get('refund_id'));
             insomnia.expect(jsonBody?.refund?.status).to.be.oneOf(['canceled', 'pending', 'processing', 'succeeded', 'failed']);
-            insomnia.expect(jsonBody?.refund?.settlement_mode).to.be.oneOf(['provider', 'external']);
+            insomnia.expect(jsonBody?.refund).not.to.have.property('settlement_mode');
+            insomnia.expect(jsonBody?.refund?.settlement?.type).to.be.oneOf(['offline', 'payment_method']);
+            if (jsonBody?.refund?.settlement?.type === 'offline') {
+              insomnia.expect(jsonBody.refund.settlement).not.to.have.property('payment_method');
+            } else {
+              insomnia.expect(jsonBody?.refund?.settlement?.payment_method?.id).to.match(/^pm_/);
+              insomnia.expect(jsonBody?.refund?.settlement?.payment_method?.type).to.be.oneOf(['mobile_money', 'bank_account']);
+              const method = jsonBody.refund.settlement.payment_method;
+              const details = method.type === 'mobile_money' ? method.mobile_money : method.bank_account?.ghana_bank_account;
+              insomnia.expect(details?.account_number).to.match(/^\*{4}[0-9]{4}$/);
+              insomnia.expect(details?.last4).to.match(/^[0-9]{4}$/);
+              insomnia.expect(details?.account_number).to.equal(`****${details?.last4}`);
+            }
           });
         }
   - name: List refunds
@@ -157,7 +193,19 @@ collection:
             insomnia.expect(page?.number).to.equal(1);
             insomnia.expect(page?.refunds).to.be.an('array');
             for (const refund of page?.refunds ?? []) {
-              insomnia.expect(refund?.settlement_mode).to.be.oneOf(['provider', 'external']);
+              insomnia.expect(refund).not.to.have.property('settlement_mode');
+              insomnia.expect(refund?.settlement?.type).to.be.oneOf(['offline', 'payment_method']);
+              if (refund?.settlement?.type === 'offline') {
+                insomnia.expect(refund.settlement).not.to.have.property('payment_method');
+              } else {
+                insomnia.expect(refund?.settlement?.payment_method?.id).to.match(/^pm_/);
+                insomnia.expect(refund?.settlement?.payment_method?.type).to.be.oneOf(['mobile_money', 'bank_account']);
+                const method = refund.settlement.payment_method;
+                const details = method.type === 'mobile_money' ? method.mobile_money : method.bank_account?.ghana_bank_account;
+                insomnia.expect(details?.account_number).to.match(/^\*{4}[0-9]{4}$/);
+                insomnia.expect(details?.last4).to.match(/^[0-9]{4}$/);
+                insomnia.expect(details?.account_number).to.equal(`****${details?.last4}`);
+              }
             }
             insomnia.expect(page?.size).to.equal(page?.refunds?.length);
           });

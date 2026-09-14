@@ -3,8 +3,8 @@ openapi: 3.0.3
 info:
     title: Inttegro API
     description: Machine-readable reference for the public Inttegro API
-    version: 0.1.0-beta12
-    x-inttegro-collection-version: 0.1.0-beta12
+    version: 0.1.0-beta13
+    x-inttegro-collection-version: 0.1.0-beta13
     contact:
         name: Inttegro Engineering
         url: "https://inttegro.com"
@@ -13390,13 +13390,112 @@ components:
                 retryable:
                     type: boolean
                     description: Whether the underlying condition may be resolved before creating a new, intentional refund request. It never instructs clients to repeat an uncertain money movement.
-        RefundSettlementMode:
-            type: string
-            description: |
-                How the refund is settled. `provider` refunds use Inttegro's provider-backed refund workflow. `external` refunds are manual records for money returned outside Inttegro and only become succeeded after trusted operator confirmation.
-            enum:
-                - provider
-                - external
+        RefundSettlement:
+            description: Immutable destination snapshot for the refund. `payment_method` returns money to the original payment method; `offline` records settlement for an order paid outside Inttegro.
+            oneOf:
+                - $ref: '#/components/schemas/RefundOfflineSettlement'
+                - $ref: '#/components/schemas/RefundPaymentMethodSettlement'
+            discriminator:
+                propertyName: type
+                mapping:
+                    offline: '#/components/schemas/RefundOfflineSettlement'
+                    payment_method: '#/components/schemas/RefundPaymentMethodSettlement'
+        RefundOfflineSettlement:
+            type: object
+            additionalProperties: false
+            required: [type]
+            properties:
+                type:
+                    type: string
+                    enum: [offline]
+                    description: The order was paid offline, so no Inttegro payment method is attached.
+        RefundPaymentMethodSettlement:
+            type: object
+            additionalProperties: false
+            required: [payment_method, type]
+            properties:
+                payment_method:
+                    $ref: '#/components/schemas/RefundSettlementPaymentMethod'
+                type:
+                    type: string
+                    enum: [payment_method]
+                    description: The refund returns to the original payment method used for the order.
+        RefundSettlementPaymentMethod:
+            description: Caller-safe immutable snapshot of the original payment method. Account values are masked and management-only payment-method data is never included.
+            oneOf:
+                - $ref: '#/components/schemas/RefundSettlementMobileMoneyPaymentMethod'
+                - $ref: '#/components/schemas/RefundSettlementBankAccountPaymentMethod'
+            discriminator:
+                propertyName: type
+                mapping:
+                    bank_account: '#/components/schemas/RefundSettlementBankAccountPaymentMethod'
+                    mobile_money: '#/components/schemas/RefundSettlementMobileMoneyPaymentMethod'
+        RefundSettlementMobileMoneyPaymentMethod:
+            type: object
+            additionalProperties: false
+            required: [id, mobile_money, type]
+            properties:
+                id:
+                    type: string
+                    description: Public identifier of the original payment method.
+                    example: pm_xyz789
+                mobile_money:
+                    type: object
+                    additionalProperties: false
+                    required: [account_number, last4, network]
+                    properties:
+                        account_number:
+                            type: string
+                            pattern: '^\*{4}[0-9]{4}$'
+                            description: Masked mobile-money account number. The full number is never returned.
+                            example: '****7831'
+                        last4:
+                            type: string
+                            pattern: '^[0-9]{4}$'
+                            description: Last four numeric digits of the original account number.
+                            example: '7831'
+                        network:
+                            type: string
+                            enum: [airtel, mtn, telecel, vodafone]
+                            example: mtn
+                type:
+                    type: string
+                    enum: [mobile_money]
+        RefundSettlementBankAccountPaymentMethod:
+            type: object
+            additionalProperties: false
+            required: [bank_account, id, type]
+            properties:
+                bank_account:
+                    type: object
+                    additionalProperties: false
+                    required: [ghana_bank_account, type]
+                    properties:
+                        ghana_bank_account:
+                            type: object
+                            additionalProperties: false
+                            required: [account_number, last4]
+                            properties:
+                                account_number:
+                                    type: string
+                                    pattern: '^\*{4}[0-9]{4}$'
+                                    description: Masked bank-account number. The full number is never returned.
+                                    example: '****7890'
+                                last4:
+                                    type: string
+                                    pattern: '^[0-9]{4}$'
+                                    description: Last four numeric digits of the original bank-account number.
+                                    example: '7890'
+                        type:
+                            type: string
+                            enum: [ghana_bank_account]
+                id:
+                    type: string
+                    description: Public identifier of the original payment method.
+                    example: pm_xyz789
+                type:
+                    type: string
+                    enum: [bank_account]
         CreateRefundLineItem:
             type: object
             additionalProperties: false
@@ -13513,7 +13612,7 @@ components:
                     $ref: '#/components/schemas/Amount'
         Refund:
             type: object
-            required: [created_at, id, line_items, order_id, reason, settlement_mode, status, total]
+            required: [created_at, id, line_items, order_id, reason, settlement, status, total]
             properties:
                 cancel_reason:
                     type: string
@@ -13558,8 +13657,8 @@ components:
                     maxLength: 2048
                 reference:
                     type: string
-                settlement_mode:
-                    $ref: '#/components/schemas/RefundSettlementMode'
+                settlement:
+                    $ref: '#/components/schemas/RefundSettlement'
                 status:
                     type: string
                     enum: [canceled, failed, pending, processing, succeeded]
