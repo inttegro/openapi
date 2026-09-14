@@ -3,8 +3,8 @@ openapi: 3.0.3
 info:
     title: Inttegro API
     description: Machine-readable reference for the public Inttegro API
-    version: 0.1.0-beta10
-    x-inttegro-collection-version: 0.1.0-beta10
+    version: 0.1.0-beta11
+    x-inttegro-collection-version: 0.1.0-beta11
     contact:
         name: Inttegro Engineering
         url: "https://inttegro.com"
@@ -4467,29 +4467,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            type: object
-                            required:
-                                - destination_id
-                                - reference
-                            properties:
-                                destination_id:
-                                    type: string
-                                    description: Financial account that should receive the payout
-                                    example: "fa_1234567890abcdef"
-                                execute_after:
-                                    type: string
-                                    format: date-time
-                                    description: Optional future time after which execution may begin
-                                    example: "2026-08-05T09:00:00Z"
-                                max_amount:
-                                    type: integer
-                                    minimum: 1
-                                    description: Maximum amount, in the smallest currency unit, that this payout may transfer
-                                    example: 250000
-                                reference:
-                                    type: string
-                                    description: Merchant reference carried on the payout
-                                    example: "PAYOUT-APR-15"
+                            $ref: '#/components/schemas/SchedulePayoutRequest'
             responses:
                 '200':
                     description: Payout scheduled successfully
@@ -4499,10 +4477,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                type: object
-                                properties:
-                                    payout:
-                                        $ref: '#/components/schemas/Payout'
+                                $ref: '#/components/schemas/PayoutResponse'
                 '400':
                     description: Bad request - invalid schedule parameters
                     headers:
@@ -4541,14 +4516,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            type: object
-                            required:
-                                - payout_id
-                            properties:
-                                payout_id:
-                                    type: string
-                                    description: Payout identifier returned when the payout was created
-                                    example: "po_yQ2wXm5Dc7Pk9Ls1Vn0RgHaB"
+                            $ref: '#/components/schemas/LookupPayoutRequest'
             responses:
                 '200':
                     description: Payout found successfully
@@ -4558,10 +4526,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                type: object
-                                properties:
-                                    payout:
-                                        $ref: '#/components/schemas/Payout'
+                                $ref: '#/components/schemas/PayoutResponse'
                 '400':
                     description: Bad request - invalid payout identifier
                     headers:
@@ -4603,12 +4568,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            type: object
-                            required:
-                                - destinations
-                            properties:
-                                destinations:
-                                    $ref: '#/components/schemas/PayoutDestinations'
+                            $ref: '#/components/schemas/SetPayoutDestinationsRequest'
             responses:
                 '200':
                     description: Payout destinations set successfully
@@ -4618,10 +4578,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                type: object
-                                properties:
-                                    settings:
-                                        $ref: '#/components/schemas/PayoutSettingsMutation'
+                                $ref: '#/components/schemas/PayoutSettingsMutationResponse'
                 '401':
                     description: Unauthorized - Missing or invalid authentication
                     headers:
@@ -4671,10 +4628,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                type: object
-                                properties:
-                                    settings:
-                                        $ref: '#/components/schemas/PayoutSettingsLookup'
+                                $ref: '#/components/schemas/PayoutSettingsLookupResponse'
                 '401':
                     description: Unauthorized - Missing or invalid authentication
                     headers:
@@ -4730,10 +4684,8 @@ paths:
                     content:
                         application/json:
                             schema:
-                                type: object
-                                properties:
-                                    settings:
-                                        $ref: '#/components/schemas/PayoutSettingsMutation'
+                                allOf:
+                                    - $ref: '#/components/schemas/PayoutSettingsMutationResponse'
                                 example:
                                     settings:
                                         id: "ps_1234567890abcdef"
@@ -4804,10 +4756,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                type: object
-                                properties:
-                                    settings:
-                                        $ref: '#/components/schemas/PayoutSettingsMutation'
+                                $ref: '#/components/schemas/PayoutSettingsMutationResponse'
                 '401':
                     description: Unauthorized - Missing or invalid authentication
                     headers:
@@ -4843,21 +4792,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            type: object
-                            required:
-                                - page_number
-                            properties:
-                                page_number:
-                                    type: integer
-                                    minimum: 1
-                                    maximum: 10
-                                    description: 1-based page index to fetch (1-10 inclusive)
-                                page_size:
-                                    type: integer
-                                    minimum: 1
-                                    maximum: 256
-                                    default: 256
-                                    description: Maximum number of payouts to return (1-256)
+                            $ref: '#/components/schemas/PagePayoutsRequest'
             responses:
                 '200':
                     description: Page retrieved successfully
@@ -4867,24 +4802,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                type: object
-                                properties:
-                                    page:
-                                        type: object
-                                        required:
-                                            - number
-                                            - size
-                                        properties:
-                                            number:
-                                                type: integer
-                                                description: Page number returned
-                                            size:
-                                                type: integer
-                                                description: Number of payouts returned
-                                            payouts:
-                                                type: array
-                                                items:
-                                                    $ref: '#/components/schemas/Payout'
+                                $ref: '#/components/schemas/PayoutPageResponse'
                 '401':
                     description: Unauthorized - missing or invalid API key
                     headers:
@@ -4925,14 +4843,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            type: object
-                            required:
-                                - payout_id
-                            properties:
-                                payout_id:
-                                    type: string
-                                    description: Scheduled payout ID
-                                    example: "po_yQ2wXm5Dc7Pk9Ls1Vn0RgHaB"
+                            $ref: '#/components/schemas/CancelPayoutRequest'
             responses:
                 '200':
                     description: Payout canceled successfully
@@ -4942,10 +4853,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                type: object
-                                properties:
-                                    payout:
-                                        $ref: '#/components/schemas/Payout'
+                                $ref: '#/components/schemas/PayoutResponse'
                 '401':
                     description: Unauthorized - missing or invalid API key
                     headers:
@@ -8067,9 +7975,13 @@ components:
                 type: string
         PayoutDestinations:
             type: object
-            description: Currency-to-financial-account destination assignments.
-            additionalProperties:
-                type: string
+            description: Supported currency-to-financial-account destination assignments.
+            additionalProperties: false
+            properties:
+                ghs:
+                    type: string
+                    description: Financial account that receives Ghana cedi payouts. Send an empty string to remove the assignment.
+                    example: "fa_1234567890abcdef"
         ProductDimensionDetails:
             type: object
             description: Named string measurements or descriptors for a product dimension.
@@ -14417,6 +14329,7 @@ components:
         Payout:
             type: object
             description: A payout scheduled from your Inttegro balance to a destination financial account
+            additionalProperties: false
             required:
                 - destination_id
                 - execute_after
@@ -14443,23 +14356,7 @@ components:
                     description: Financial account receiving the funds
                     example: "fa_1234567890abcdef"
                 error:
-                    type: object
-                    description: Public failure details when execution fails
-                    required:
-                        - cause
-                        - message
-                        - occurred_at
-                        - type
-                    properties:
-                        cause:
-                            type: string
-                        message:
-                            type: string
-                        occurred_at:
-                            type: string
-                            format: date-time
-                        type:
-                            type: string
+                    $ref: '#/components/schemas/PayoutError'
                 execute_after:
                     type: string
                     format: date-time
@@ -14518,9 +14415,76 @@ components:
                     type: string
                     format: date-time
                     description: When the payout succeeded
+        PayoutError:
+            type: object
+            description: Public failure details returned when payout execution fails.
+            additionalProperties: false
+            required:
+                - cause
+                - message
+                - occurred_at
+                - type
+            properties:
+                cause:
+                    type: string
+                    description: Public explanation of the underlying failure cause.
+                message:
+                    type: string
+                    description: Human-readable failure message.
+                occurred_at:
+                    type: string
+                    format: date-time
+                    description: When the failure occurred.
+                type:
+                    type: string
+                    description: Stable machine-readable failure category.
+        PayoutSettingsLookupScheduleAgingSpec:
+            type: object
+            description: Rules that determine when balance transactions become eligible for payout.
+            additionalProperties: false
+            required:
+                - abide
+                - label
+                - t_plus
+            properties:
+                abide:
+                    type: string
+                    description: How strictly the aging period is applied.
+                label:
+                    type: string
+                    description: Human-readable aging rule label.
+                t_plus:
+                    type: string
+                    description: Required transaction age.
+                    example: "168h"
+        PayoutSettingsLookupSchedule:
+            type: object
+            description: Active payout schedule returned when settings are retrieved.
+            additionalProperties: false
+            required:
+                - aging_spec
+                - description
+                - interval
+                - name
+                - schedule_on
+                - type
+            properties:
+                aging_spec:
+                    $ref: '#/components/schemas/PayoutSettingsLookupScheduleAgingSpec'
+                description:
+                    type: string
+                interval:
+                    type: string
+                name:
+                    type: string
+                schedule_on:
+                    type: string
+                type:
+                    type: string
         PayoutSettingsLookup:
             type: object
             description: Complete payout settings read model
+            additionalProperties: false
             required:
                 - destinations
             properties:
@@ -14530,90 +14494,189 @@ components:
                     type: boolean
                     description: Present only when foreign exchange is enabled in stored settings
                 schedule:
-                    type: object
-                    description: Active payout schedule
-                    required:
-                        - aging_spec
-                        - description
-                        - interval
-                        - name
-                        - schedule_on
-                        - type
-                    properties:
-                        aging_spec:
-                            type: object
-                            required:
-                                - abide
-                                - label
-                                - t_plus
-                            properties:
-                                abide:
-                                    type: string
-                                label:
-                                    type: string
-                                t_plus:
-                                    type: string
-                                    example: "168h"
-                        description:
-                            type: string
-                        interval:
-                            type: string
-                        name:
-                            type: string
-                        schedule_on:
-                            type: string
-                        type:
-                            type: string
+                    $ref: '#/components/schemas/PayoutSettingsLookupSchedule'
+        PayoutSettingsMutationScheduleSpec:
+            type: object
+            description: Public payout schedule specification returned after a settings mutation.
+            additionalProperties: false
+            required:
+                - abide
+                - id
+                - label
+                - t_plus
+            properties:
+                abide:
+                    type: string
+                id:
+                    type: string
+                label:
+                    type: string
+                t_plus:
+                    type: string
+                    example: "168h"
+        PayoutSettingsMutationSchedule:
+            type: object
+            description: Updated payout schedule returned after a settings mutation.
+            additionalProperties: false
+            required:
+                - description
+                - id
+                - interval
+                - name
+                - schedule_on
+                - spec
+                - type
+            properties:
+                description:
+                    type: string
+                id:
+                    type: string
+                interval:
+                    type: string
+                name:
+                    type: string
+                schedule_on:
+                    type: string
+                spec:
+                    $ref: '#/components/schemas/PayoutSettingsMutationScheduleSpec'
+                type:
+                    type: string
         PayoutSettingsMutation:
             type: object
             description: Payout settings fields returned after a mutation
+            additionalProperties: false
             properties:
                 destinations:
                     $ref: '#/components/schemas/PayoutDestinations'
+                fx_enabled:
+                    type: boolean
+                    description: Updated foreign-exchange setting, returned by FX mutations.
                 id:
                     type: string
                     description: Payout settings identifier
                 schedule:
-                    type: object
-                    description: Updated payout schedule
-                    required:
-                        - description
-                        - id
-                        - interval
-                        - name
-                        - schedule_on
-                        - spec
-                        - type
-                    properties:
-                        description:
-                            type: string
-                        id:
-                            type: string
-                        interval:
-                            type: string
-                        name:
-                            type: string
-                        schedule_on:
-                            type: string
-                        spec:
-                            type: object
-                            required:
-                                - abide
-                                - id
-                                - label
-                                - t_plus
-                            properties:
-                                abide:
-                                    type: string
-                                id:
-                                    type: string
-                                label:
-                                    type: string
-                                t_plus:
-                                    type: string
-                                    example: "168h"
-                        type:
-                            type: string
+                    $ref: '#/components/schemas/PayoutSettingsMutationSchedule'
+        SchedulePayoutRequest:
+            type: object
+            description: Parameters for scheduling a payout.
+            additionalProperties: false
+            required:
+                - destination_id
+                - reference
+            properties:
+                destination_id:
+                    type: string
+                    description: Financial account that should receive the payout.
+                    example: "fa_1234567890abcdef"
+                execute_after:
+                    type: string
+                    format: date-time
+                    description: Optional future time after which execution may begin.
+                    example: "2026-08-05T09:00:00Z"
+                max_amount:
+                    type: integer
+                    minimum: 1
+                    description: Maximum amount, in the smallest currency unit, that this payout may transfer.
+                    example: 250000
+                reference:
+                    type: string
+                    description: Merchant reference carried on the payout.
+                    example: "PAYOUT-APR-15"
+        LookupPayoutRequest:
+            type: object
+            description: Parameters for retrieving a payout.
+            additionalProperties: false
+            required:
+                - payout_id
+            properties:
+                payout_id:
+                    type: string
+                    description: Payout identifier returned when the payout was created.
+                    example: "po_yQ2wXm5Dc7Pk9Ls1Vn0RgHaB"
+        CancelPayoutRequest:
+            type: object
+            description: Parameters for canceling a scheduled payout.
+            additionalProperties: false
+            required:
+                - payout_id
+            properties:
+                payout_id:
+                    type: string
+                    description: Scheduled payout identifier.
+                    example: "po_yQ2wXm5Dc7Pk9Ls1Vn0RgHaB"
+        SetPayoutDestinationsRequest:
+            type: object
+            description: Supported payout destination assignments to update.
+            additionalProperties: false
+            required:
+                - destinations
+            properties:
+                destinations:
+                    $ref: '#/components/schemas/PayoutDestinations'
+        PagePayoutsRequest:
+            type: object
+            description: Pagination parameters for payouts.
+            additionalProperties: false
+            required:
+                - page_number
+            properties:
+                page_number:
+                    type: integer
+                    minimum: 1
+                    maximum: 10
+                    description: 1-based page index to fetch (1-10 inclusive).
+                page_size:
+                    type: integer
+                    minimum: 1
+                    maximum: 256
+                    default: 256
+                    description: Maximum number of payouts to return (1-256).
+        PayoutPage:
+            type: object
+            description: A page of payouts ordered from newest to oldest.
+            additionalProperties: false
+            required:
+                - number
+                - size
+            properties:
+                number:
+                    type: integer
+                    description: Page number returned.
+                size:
+                    type: integer
+                    description: Number of payouts returned.
+                payouts:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/Payout'
+        PayoutResponse:
+            type: object
+            description: Response envelope containing a payout.
+            additionalProperties: false
+            properties:
+                payout:
+                    $ref: '#/components/schemas/Payout'
+        PayoutSettingsLookupResponse:
+            type: object
+            description: Response envelope containing complete payout settings.
+            additionalProperties: false
+            properties:
+                settings:
+                    $ref: '#/components/schemas/PayoutSettingsLookup'
+        PayoutSettingsMutationResponse:
+            type: object
+            description: Response envelope containing updated payout settings.
+            additionalProperties: false
+            properties:
+                settings:
+                    $ref: '#/components/schemas/PayoutSettingsMutation'
+        PayoutPageResponse:
+            type: object
+            description: Response envelope containing a page of payouts.
+            additionalProperties: false
+            properties:
+                page:
+                    $ref: '#/components/schemas/PayoutPage'
         PaymentMethodOwnerInput:
             type: object
             required:
