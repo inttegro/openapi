@@ -57,6 +57,7 @@ collection:
             insomnia.expect(refund?.id).to.be.a('string').and.match(/^rf_/);
             insomnia.expect(refund?.order_id).to.equal(insomnia.variables.get('order_id'));
             insomnia.expect(refund?.status).to.equal('pending');
+            insomnia.expect(refund?.order_amount).to.be.an('object');
             insomnia.expect(refund?.line_items).to.be.an('array');
             insomnia.expect(refund?.line_items?.length).to.be.greaterThan(0);
           });
@@ -77,7 +78,8 @@ collection:
       mimeType: application/json
       text: |-
         {
-          "refund_id": "{{ refund_id }}"
+          "refund_id": "{{ refund_id }}",
+          "reason": "Customer no longer wants the refund"
         }
     scripts:
       afterResponse: |-
@@ -88,6 +90,7 @@ collection:
             insomnia.expect(jsonBody).to.have.all.keys('refund');
             insomnia.expect(refund?.id).to.equal(insomnia.variables.get('refund_id'));
             insomnia.expect(refund?.status).to.equal('canceled');
+            insomnia.expect(refund?.cancel_reason).to.equal('Customer no longer wants the refund');
             insomnia.expect(refund?.canceled_at).to.be.a('string');
             insomnia.expect(refund?.total).to.be.an('object');
             insomnia.expect(refund).not.to.have.property('refund_amount');

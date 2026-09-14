@@ -3,8 +3,8 @@ openapi: 3.0.3
 info:
     title: Inttegro API
     description: Machine-readable reference for the public Inttegro API
-    version: 0.1.0-beta8
-    x-inttegro-collection-version: 0.1.0-beta8
+    version: 0.1.0-beta10
+    x-inttegro-collection-version: 0.1.0-beta10
     contact:
         name: Inttegro Engineering
         url: "https://inttegro.com"
@@ -2879,7 +2879,10 @@ paths:
             description: |
                 Cancels a pending refund before processing claims it. Cancellation releases the
                 merchant balance hold and restores the refundable capacity reserved against its
-                order line items. Repeating cancellation returns the same canceled refund.
+                order line items. An optional cancellation reason is retained with the refund.
+                Repeating cancellation returns the same canceled refund without replacing the
+                first successful reason or actor. Actor provenance is derived from authentication,
+                stored for audit, and omitted from the public request and Refund representation.
             operationId: cancelRefund
             tags:
                 - Refunds
@@ -13513,6 +13516,11 @@ components:
                     type: string
                     description: Refund to cancel before processing begins.
                     example: rf_1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcd
+                reason:
+                    type: string
+                    minLength: 1
+                    maxLength: 2048
+                    description: Optional explanation for canceling the refund. Leading and trailing whitespace is removed.
                 request_meta:
                     $ref: '#/components/schemas/RefundRequestMeta'
         LookupRefundRequest:
@@ -13562,6 +13570,10 @@ components:
             type: object
             required: [created_at, id, line_items, order_id, reason, status, total]
             properties:
+                cancel_reason:
+                    type: string
+                    maxLength: 2048
+                    description: Omitted unless a reason was supplied when the refund was canceled.
                 canceled_at:
                     type: string
                     format: date-time
@@ -13584,6 +13596,9 @@ components:
                         $ref: '#/components/schemas/RefundLineItem'
                 order_id:
                     type: string
+                order_amount:
+                    $ref: '#/components/schemas/Amount'
+                    description: Total amount of the originating order captured when the refund was created.
                 processing_at:
                     type: string
                     format: date-time

@@ -2,7 +2,7 @@
   "info": {
     "name": "Inttegro API — Refunds",
     "description": "Create, cancel, and inspect refunds for paid order line items. Uses the shared Inttegro API global environment. Error reference: https://studio.inttegro.com/error-codes#refunds\n\nGenerated from insomnia/13-refunds.insomnia.yaml. Edit the Insomnia source and run npm run postman:generate.",
-    "version": "0.1.0-beta8",
+    "version": "0.1.0-beta10",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
@@ -53,6 +53,7 @@
                   "    pm.expect(refund?.id).to.be.a('string').and.match(/^rf_/);",
                   "    pm.expect(refund?.order_id).to.equal(pm.variables.get('order_id'));",
                   "    pm.expect(refund?.status).to.equal('pending');",
+                  "    pm.expect(refund?.order_amount).to.be.an('object');",
                   "    pm.expect(refund?.line_items).to.be.an('array');",
                   "    pm.expect(refund?.line_items?.length).to.be.greaterThan(0);",
                   "  });",
@@ -85,7 +86,7 @@
             "description": "Public reference: https://studio.inttegro.com/refunds#cancel-a-refund",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"refund_id\": \"{{refund_id}}\"\n}",
+              "raw": "{\n  \"refund_id\": \"{{refund_id}}\",\n  \"reason\": \"Customer no longer wants the refund\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -106,6 +107,7 @@
                   "    pm.expect(jsonBody).to.have.all.keys('refund');",
                   "    pm.expect(refund?.id).to.equal(pm.variables.get('refund_id'));",
                   "    pm.expect(refund?.status).to.equal('canceled');",
+                  "    pm.expect(refund?.cancel_reason).to.equal('Customer no longer wants the refund');",
                   "    pm.expect(refund?.canceled_at).to.be.a('string');",
                   "    pm.expect(refund?.total).to.be.an('object');",
                   "    pm.expect(refund).not.to.have.property('refund_amount');",
