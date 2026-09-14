@@ -3,8 +3,8 @@ openapi: 3.0.3
 info:
     title: Inttegro API
     description: Machine-readable reference for the public Inttegro API
-    version: 0.1.0-beta11
-    x-inttegro-collection-version: 0.1.0-beta11
+    version: 0.1.0-beta12
+    x-inttegro-collection-version: 0.1.0-beta12
     contact:
         name: Inttegro Engineering
         url: "https://inttegro.com"
@@ -13364,6 +13364,39 @@ components:
                 - item_not_received
                 - item_not_as_described
                 - custom
+        RefundFailureReason:
+            type: string
+            description: Stable, caller-safe reason that terminal refund processing failed. `unknown` is the fail-closed fallback for an unclassified internal failure.
+            enum:
+                - insufficient_balance
+                - original_payment_method_unavailable
+                - original_payment_not_refundable
+                - refund_not_supported
+                - amount_not_supported
+                - refund_declined
+                - refund_not_permitted
+                - temporarily_unavailable
+                - unknown
+        RefundFailure:
+            type: object
+            additionalProperties: false
+            required: [detail, reason, retryable]
+            properties:
+                detail:
+                    type: string
+                    description: Safe explanation intended for the merchant. Raw provider and internal diagnostic messages are never returned.
+                reason:
+                    $ref: '#/components/schemas/RefundFailureReason'
+                retryable:
+                    type: boolean
+                    description: Whether the underlying condition may be resolved before creating a new, intentional refund request. It never instructs clients to repeat an uncertain money movement.
+        RefundSettlementMode:
+            type: string
+            description: |
+                How the refund is settled. `provider` refunds use Inttegro's provider-backed refund workflow. `external` refunds are manual records for money returned outside Inttegro and only become succeeded after trusted operator confirmation.
+            enum:
+                - provider
+                - external
         CreateRefundLineItem:
             type: object
             additionalProperties: false
@@ -13480,7 +13513,7 @@ components:
                     $ref: '#/components/schemas/Amount'
         Refund:
             type: object
-            required: [created_at, id, line_items, order_id, reason, status, total]
+            required: [created_at, id, line_items, order_id, reason, settlement_mode, status, total]
             properties:
                 cancel_reason:
                     type: string
@@ -13499,6 +13532,9 @@ components:
                     type: string
                     format: date-time
                     description: Omitted unless processing failed.
+                failure:
+                    $ref: '#/components/schemas/RefundFailure'
+                    description: Sanitized terminal failure information. Present only when `status` is `failed`. An uncertain provider outcome remains `processing` and does not produce this object.
                 id:
                     type: string
                 line_items:
@@ -13522,6 +13558,8 @@ components:
                     maxLength: 2048
                 reference:
                     type: string
+                settlement_mode:
+                    $ref: '#/components/schemas/RefundSettlementMode'
                 status:
                     type: string
                     enum: [canceled, failed, pending, processing, succeeded]

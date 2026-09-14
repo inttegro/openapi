@@ -2,7 +2,7 @@
   "info": {
     "name": "Inttegro API — Refunds",
     "description": "Create, cancel, and inspect refunds for paid order line items. Uses the shared Inttegro API global environment. Error reference: https://studio.inttegro.com/error-codes#refunds\n\nGenerated from insomnia/13-refunds.insomnia.yaml. Edit the Insomnia source and run npm run postman:generate.",
-    "version": "0.1.0-beta11",
+    "version": "0.1.0-beta12",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
@@ -53,6 +53,7 @@
                   "    pm.expect(refund?.id).to.be.a('string').and.match(/^rf_/);",
                   "    pm.expect(refund?.order_id).to.equal(pm.variables.get('order_id'));",
                   "    pm.expect(refund?.status).to.equal('pending');",
+                  "    pm.expect(refund?.settlement_mode).to.be.oneOf(['provider', 'external']);",
                   "    pm.expect(refund?.order_amount).to.be.an('object');",
                   "    pm.expect(refund?.line_items).to.be.an('array');",
                   "    pm.expect(refund?.line_items?.length).to.be.greaterThan(0);",
@@ -107,6 +108,7 @@
                   "    pm.expect(jsonBody).to.have.all.keys('refund');",
                   "    pm.expect(refund?.id).to.equal(pm.variables.get('refund_id'));",
                   "    pm.expect(refund?.status).to.equal('canceled');",
+                  "    pm.expect(refund?.settlement_mode).to.be.oneOf(['provider', 'external']);",
                   "    pm.expect(refund?.cancel_reason).to.equal('Customer no longer wants the refund');",
                   "    pm.expect(refund?.canceled_at).to.be.a('string');",
                   "    pm.expect(refund?.total).to.be.an('object');",
@@ -161,6 +163,7 @@
                   "    pm.expect(jsonBody).to.have.all.keys('refund');",
                   "    pm.expect(jsonBody?.refund?.id).to.equal(pm.variables.get('refund_id'));",
                   "    pm.expect(jsonBody?.refund?.status).to.be.oneOf(['canceled', 'pending', 'processing', 'succeeded', 'failed']);",
+                  "    pm.expect(jsonBody?.refund?.settlement_mode).to.be.oneOf(['provider', 'external']);",
                   "  });",
                   "}"
                 ]
@@ -207,6 +210,9 @@
                   "    pm.expect(page).to.have.all.keys('number', 'refunds', 'size');",
                   "    pm.expect(page?.number).to.equal(1);",
                   "    pm.expect(page?.refunds).to.be.an('array');",
+                  "    for (const refund of page?.refunds ?? []) {",
+                  "      pm.expect(refund?.settlement_mode).to.be.oneOf(['provider', 'external']);",
+                  "    }",
                   "    pm.expect(page?.size).to.equal(page?.refunds?.length);",
                   "  });",
                   "}"
