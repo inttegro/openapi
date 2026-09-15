@@ -3,8 +3,8 @@ openapi: 3.0.3
 info:
     title: Inttegro API
     description: Machine-readable reference for the public Inttegro API
-    version: 0.1.0-beta13
-    x-inttegro-collection-version: 0.1.0-beta13
+    version: 0.1.0-beta14
+    x-inttegro-collection-version: 0.1.0-beta14
     contact:
         name: Inttegro Engineering
         url: "https://inttegro.com"
@@ -14900,6 +14900,7 @@ components:
                 - id
                 - active
                 - customer_id
+                - fingerprint
                 - type
                 - created_at
             properties:
@@ -14969,6 +14970,9 @@ components:
                     type: string
                     format: date-time
                     description: When this payment method expires. Omitted when no expiry is available.
+                fingerprint:
+                    type: string
+                    description: Customer-scoped fingerprint for this payment method within the merchant application. Matching nonempty values for the same customer indicate the same underlying method was added more than once. May be empty for records awaiting fingerprint backfill or methods lacking reliable fingerprint material. It does not identify the method across customers or applications.
                 id:
                     type: string
                     description: Unique identifier for this payment method

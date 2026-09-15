@@ -59,6 +59,7 @@ collection:
           const payment_method_id = jsonBody?.payment_method?.id;
           insomnia.test('Returns payment_method.id', () => {
             insomnia.expect(payment_method_id).to.be.a('string').and.not.be.empty;
+            insomnia.expect(jsonBody?.payment_method?.fingerprint).to.be.a('string');
           });
           if (payment_method_id) insomnia.globals.set("payment_method_id", payment_method_id);
         }
