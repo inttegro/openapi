@@ -2,7 +2,7 @@
   "info": {
     "name": "Inttegro API — Payment Methods",
     "description": "Tokenize and manage saved payment methods. Uses the shared Inttegro API global environment.\n\nGenerated from insomnia/03-payment-methods.insomnia.yaml. Edit the Insomnia source and run npm run postman:generate.",
-    "version": "0.1.0-beta13",
+    "version": "0.1.0-beta14",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
@@ -50,6 +50,7 @@
                   "  const payment_method_id = jsonBody?.payment_method?.id;",
                   "  pm.test('Returns payment_method.id', () => {",
                   "    pm.expect(payment_method_id).to.be.a('string').and.not.be.empty;",
+                  "    pm.expect(jsonBody?.payment_method?.fingerprint).to.be.a('string');",
                   "  });",
                   "  if (payment_method_id) pm.environment.set(\"payment_method_id\", payment_method_id);",
                   "}"
