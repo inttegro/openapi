@@ -19,7 +19,7 @@ paths:
         post:
             summary: Initiate OTP transaction
             description: |
-                Generate a one-time password and deliver it by SMS. Store the returned transaction ID
+                Generate a one-time password and deliver it by SMS or email. Store the returned transaction ID
                 and use it with the recipient's submitted code at the verification endpoint. Retry an
                 uncertain initiation with the same idempotency key and body.
             operationId: initiateOTP
@@ -16058,24 +16058,26 @@ components:
             properties:
                 async_delivery:
                     type: boolean
-                    description: Return after accepting the transaction while SMS delivery continues asynchronously.
+                    description: Return after accepting the transaction while delivery continues asynchronously.
                     default: false
                 message_template:
                     type: string
-                    description: SMS text containing the required `{token}` placeholder and optional `{service}` placeholder.
+                    description: SMS body or email copy containing the required `{token}` placeholder and optional `{service}` placeholder. Email sends this as the plain-text fallback and renders the copy around a prominent code in the HTML version. Defaults are transport-specific.
                     example: "Your {service} code is {token}."
+                preferred_gateway:
+                    type: string
+                    description: Optional SMS gateway; not valid for email OTP delivery. Email uses the configured default provider.
+                    example: "arkesel"
                 purpose:
                     type: string
                     description: Your label for the verification flow.
                 recipient:
                     type: string
-                    description: Phone number in international format (E.164)
+                    description: Phone number in international format (E.164) or bare email address. Transport is inferred from the address unless specified.
                     example: "+233241234567"
                 sender:
                     type: string
-                    description: Optional sender identifier shown to the recipient (3-12 characters).
-                    minLength: 3
-                    maxLength: 12
+                    description: Optional SMS sender identifier (3-12 characters). Email OTP always uses noreply@inttegro.com; omit this field for email or supply exactly that address.
                     example: "Acme"
                 service_name:
                     type: string
@@ -16098,6 +16100,10 @@ components:
                     minimum: 5
                     maximum: 10
                     example: 6
+                transport:
+                    type: string
+                    description: Optional delivery transport. When omitted, an email address selects email and a phone number selects SMS.
+                    enum: [sms, email]
                 validity_duration_in_minutes:
                     type: integer
                     description: How long the token remains valid (3-10080 minutes)
@@ -16121,7 +16127,7 @@ components:
                     example: "ot_3f8a9c7e2d1b4a6f"
                 recipient:
                     type: string
-                    description: Phone number that received the OTP
+                    description: Phone number or bare email address that received the OTP; must match the stored transaction transport.
                     example: "+233241234567"
                 token:
                     type: string
@@ -16190,16 +16196,17 @@ components:
                     example: "+233241234567"
                 sender_id:
                     type: string
+                    description: SMS sender identifier or approved email From address.
                     example: "Acme"
                 sent_at:
                     type: string
                     format: date-time
                 sent_via:
                     type: string
-                    enum: [sms]
+                    enum: [sms, email]
                 status:
                     type: string
-                    enum: [delivered, failed, submitted]
+                    enum: [accepted, delivered, failed, queued, sent, submitted]
         OTPVerificationAttempt:
             type: object
             description: Details of a verification attempt
