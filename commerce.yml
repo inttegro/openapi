@@ -246,6 +246,17 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/ErrorEnvelope'
+                '429':
+                    description: Chime cooldown is active.
+                    headers:
+                        Retry-After:
+                            description: Seconds until the same cooldown key can be used again.
+                            schema:
+                                type: integer
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorEnvelope'
                 '500':
                     description: Chime send failed unexpectedly
                     headers:
@@ -15358,6 +15369,22 @@ components:
                     type: string
                     description: Purpose of this chime for categorization and analytics
                     example: "verification"
+                cooldown:
+                    type: object
+                    description: Optional application-scoped delivery cooldown. A repeat send with the same key is rejected until the duration elapses.
+                    additionalProperties: false
+                    required: [key, duration_seconds]
+                    properties:
+                        key:
+                            type: string
+                            minLength: 1
+                            maxLength: 120
+                            description: Stable identifier for the notification being sent.
+                        duration_seconds:
+                            type: integer
+                            minimum: 1
+                            maximum: 86400
+                            description: Rolling cooldown from the first accepted send attempt.
                 custom_data:
                     $ref: '#/components/schemas/CustomData'
                 request_meta:
