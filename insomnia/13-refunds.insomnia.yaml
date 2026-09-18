@@ -164,6 +164,25 @@ collection:
               insomnia.expect(details?.last4).to.match(/^[0-9]{4}$/);
               insomnia.expect(details?.account_number).to.equal(`****${details?.last4}`);
             }
+            for (const line of jsonBody?.refund?.line_items ?? []) {
+              if (!line?.order_line_item) continue;
+              insomnia.expect(line.order_line_item.id).to.equal(line.order_line_item_id);
+              switch (line.order_line_item.type) {
+                case 'product':
+                  insomnia.expect(line.order_line_item.quantity).to.be.greaterThan(0);
+                  insomnia.expect(line.order_line_item.product?.name).to.be.a('string').and.not.be.empty;
+                  if (line.order_line_item.product?.id) insomnia.expect(line.order_line_item.product.id).to.match(/^prod_/);
+                  break;
+                case 'fee':
+                  insomnia.expect(line.order_line_item.fee).to.be.an('object');
+                  break;
+                case 'shipping':
+                  insomnia.expect(line.order_line_item.shipping).to.be.an('object');
+                  break;
+                default:
+                  throw new Error(`Unexpected refund order line type: ${line.order_line_item.type}`);
+              }
+            }
           });
         }
   - name: List refunds

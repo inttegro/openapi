@@ -3,8 +3,8 @@ openapi: 3.0.3
 info:
     title: Inttegro API
     description: Machine-readable reference for the public Inttegro API
-    version: 0.1.0-beta14
-    x-inttegro-collection-version: 0.1.0-beta14
+    version: 0.1.0-beta17
+    x-inttegro-collection-version: 0.1.0-beta17
     contact:
         name: Inttegro Engineering
         url: "https://inttegro.com"
@@ -13612,6 +13612,10 @@ components:
                     description: Server-generated refund line-item identifier.
                 order_line_item_id:
                     type: string
+                    deprecated: true
+                    description: Deprecated compatibility identifier. Use `order_line_item.id` when `order_line_item` is present.
+                order_line_item:
+                    $ref: '#/components/schemas/RefundOrderLineItem'
                 original_amount_paid:
                     $ref: '#/components/schemas/Amount'
                 reason:
@@ -13621,6 +13625,85 @@ components:
                     maxLength: 2048
                 refund_amount:
                     $ref: '#/components/schemas/Amount'
+        RefundOrderLineItem:
+            description: Immutable display snapshot of the refunded order line. Omitted when the originating order cannot be resolved.
+            oneOf:
+                - $ref: '#/components/schemas/RefundOrderProductLineItem'
+                - $ref: '#/components/schemas/RefundOrderFeeLineItem'
+                - $ref: '#/components/schemas/RefundOrderShippingLineItem'
+            discriminator:
+                propertyName: type
+                mapping:
+                    product: '#/components/schemas/RefundOrderProductLineItem'
+                    fee: '#/components/schemas/RefundOrderFeeLineItem'
+                    shipping: '#/components/schemas/RefundOrderShippingLineItem'
+        RefundOrderProductLineItem:
+            type: object
+            additionalProperties: false
+            required: [id, product, quantity, type]
+            properties:
+                id:
+                    type: string
+                    description: Immutable order-line identifier with the `oli_` prefix.
+                    example: oli_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMN
+                type:
+                    type: string
+                    enum: [product]
+                quantity:
+                    type: integer
+                    minimum: 1
+                product:
+                    type: object
+                    additionalProperties: false
+                    required: [name]
+                    properties:
+                        id:
+                            type: string
+                            description: Source catalog product identifier. Omitted for inline products.
+                            example: prod_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMN
+                        name:
+                            type: string
+                            description: Product name captured on the order.
+        RefundOrderFeeLineItem:
+            type: object
+            additionalProperties: false
+            required: [fee, id, type]
+            properties:
+                id:
+                    type: string
+                    description: Immutable order-line identifier with the `oli_` prefix.
+                    example: oli_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMN
+                type:
+                    type: string
+                    enum: [fee]
+                fee:
+                    type: object
+                    additionalProperties: false
+                    properties:
+                        label:
+                            type: string
+                        description:
+                            type: string
+        RefundOrderShippingLineItem:
+            type: object
+            additionalProperties: false
+            required: [id, shipping, type]
+            properties:
+                id:
+                    type: string
+                    description: Immutable order-line identifier with the `oli_` prefix.
+                    example: oli_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMN
+                type:
+                    type: string
+                    enum: [shipping]
+                shipping:
+                    type: object
+                    additionalProperties: false
+                    properties:
+                        label:
+                            type: string
+                        description:
+                            type: string
         Refund:
             type: object
             required: [created_at, id, line_items, order_id, reason, settlement, status, total]
