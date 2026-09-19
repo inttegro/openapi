@@ -40,7 +40,7 @@ collection:
       text: |-
         {
           "message_template": "Your {service} code is {token}.",
-          "purpose": "transaction_confirm",
+          "purpose": "transaction_confirmation",
           "recipient": "{{ customer_phone }}",
           "sender": "{{ otp_sender }}",
           "service_name": "{{ otp_service_name }}",

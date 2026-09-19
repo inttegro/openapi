@@ -3,8 +3,8 @@ openapi: 3.0.3
 info:
     title: Inttegro API
     description: Machine-readable reference for the public Inttegro API
-    version: 0.1.0-beta17
-    x-inttegro-collection-version: 0.1.0-beta17
+    version: 0.1.0-beta19
+    x-inttegro-collection-version: 0.1.0-beta19
     contact:
         name: Inttegro Engineering
         url: "https://inttegro.com"
@@ -16163,7 +16163,7 @@ components:
                     example: "invalid_recipient"
         InitiateOTPRequest:
             type: object
-            required: [recipient, service_name, token_size]
+            required: [purpose, recipient, service_name, token_size]
             additionalProperties: false
             properties:
                 async_delivery:
@@ -16172,22 +16172,21 @@ components:
                     default: false
                 message_template:
                     type: string
-                    description: SMS body or email copy containing the required `{token}` placeholder and optional `{service}` placeholder. Email sends this as the plain-text fallback and renders the copy around a prominent code in the HTML version. Defaults are transport-specific.
+                    description: SMS body or email copy containing the required `{token}` placeholder and optional `{service}` placeholder. Email templates must contain `{token}` exactly once. A custom template replaces the purpose-specific default body, while `purpose` still controls the email subject and heading. Email sends this as the plain-text fallback and renders the copy around a prominent code in the HTML version. Defaults are transport-specific.
                     example: "Your {service} code is {token}."
                 preferred_gateway:
                     type: string
                     description: Optional SMS gateway; not valid for email OTP delivery. Email uses the configured default provider.
                     example: "arkesel"
                 purpose:
-                    type: string
-                    description: Your label for the verification flow.
+                    $ref: '#/components/schemas/OTPPurpose'
                 recipient:
                     type: string
                     description: Phone number in international format (E.164) or bare email address. Transport is inferred from the address unless specified.
                     example: "+233241234567"
                 sender:
                     type: string
-                    description: Optional SMS sender identifier (3-12 characters). Email OTP always uses noreply@inttegro.com; omit this field for email or supply exactly that address.
+                    description: Optional SMS sender identifier (3-12 characters). Email OTP always uses `{service_name} <noreply@inttegro.com>`; omit this field for email or supply exactly the bare `noreply@inttegro.com` address.
                     example: "Acme"
                 service_name:
                     type: string
@@ -16266,6 +16265,10 @@ components:
             properties:
                 transaction:
                     $ref: '#/components/schemas/OTPTransaction'
+        OTPPurpose:
+            type: string
+            description: Customer action protected by the OTP. Controls safe, purpose-specific default email copy. Unknown values are rejected; use `unspecified` explicitly for a general verification request.
+            enum: [account_creation, account_recovery, email_verification, financial_account_verification, password_reset, payment_confirmation, payment_method_verification, payout_confirmation, phone_verification, sensitive_action, sign_in, transaction_confirmation, unspecified]
         OTPTransaction:
             type: object
             description: OTP transaction object returned by initiate, verify, and lookup endpoints

@@ -2,7 +2,7 @@
   "info": {
     "name": "Inttegro API — One-Time Passwords",
     "description": "Initiate, verify, and retrieve SMS one-time-password transactions. Uses the shared Inttegro API global environment. Error reference: https://studio.inttegro.com/error-codes#one-time-passwords\n\nGenerated from insomnia/10-otp.insomnia.yaml. Edit the Insomnia source and run npm run postman:generate.",
-    "version": "0.1.0-beta17",
+    "version": "0.1.0-beta19",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
@@ -31,7 +31,7 @@
             "description": "Public reference: https://studio.inttegro.com/otps#initiate-otp-transaction",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"message_template\": \"Your {service} code is {token}.\",\n  \"purpose\": \"transaction_confirm\",\n  \"recipient\": \"{{customer_phone}}\",\n  \"sender\": \"{{otp_sender}}\",\n  \"service_name\": \"{{otp_service_name}}\",\n  \"token_alphabet_type\": \"numeric\",\n  \"token_size\": 6,\n  \"validity_duration_in_minutes\": 10\n}",
+              "raw": "{\n  \"message_template\": \"Your {service} code is {token}.\",\n  \"purpose\": \"transaction_confirmation\",\n  \"recipient\": \"{{customer_phone}}\",\n  \"sender\": \"{{otp_sender}}\",\n  \"service_name\": \"{{otp_service_name}}\",\n  \"token_alphabet_type\": \"numeric\",\n  \"token_size\": 6,\n  \"validity_duration_in_minutes\": 10\n}",
               "options": {
                 "raw": {
                   "language": "json"
