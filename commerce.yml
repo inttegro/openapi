@@ -3,8 +3,8 @@ openapi: 3.0.3
 info:
     title: Inttegro API
     description: Machine-readable reference for the public Inttegro API
-    version: 0.1.0-beta19
-    x-inttegro-collection-version: 0.1.0-beta19
+    version: 0.1.0-beta20
+    x-inttegro-collection-version: 0.1.0-beta20
     contact:
         name: Inttegro Engineering
         url: "https://inttegro.com"
@@ -2609,7 +2609,7 @@ paths:
                             schema:
                                 $ref: '#/components/schemas/Error'
                 '503':
-                    description: Transient delivery failure. Possible codes include `order_delivery_auth_failed` and `order_delivery_failed`.
+                    description: Transient delivery failure. Possible codes include `order_delivery_auth_failed`, `order_delivery_failed`, and `order_delivery_history_failed`.
                     headers:
                         X-Request-Id:
                             $ref: '#/components/headers/RequestId'
@@ -2696,7 +2696,7 @@ paths:
                             schema:
                                 $ref: '#/components/schemas/Error'
                 '503':
-                    description: Transient delivery failure. Possible codes include `order_delivery_auth_failed` and `order_delivery_failed`.
+                    description: Transient delivery failure. Possible codes include `order_delivery_auth_failed`, `order_delivery_failed`, and `order_delivery_history_failed`.
                     headers:
                         X-Request-Id:
                             $ref: '#/components/headers/RequestId'
@@ -12109,6 +12109,10 @@ components:
             type: object
             description: Chime delivery accepted for one channel.
             properties:
+                accepted_at:
+                    type: string
+                    format: date-time
+                    description: Authoritative time at which Chime accepted this channel delivery.
                 channel:
                     type: string
                     enum: [email, sms]
@@ -12131,6 +12135,42 @@ components:
                     type: string
                     description: Provider or Chime error for this channel.
                     example: "chime api returned status=503"
+        OrderDocumentDeliverySummary:
+            type: object
+            description: Bounded aggregate of Chime-accepted sends for one generated order document.
+            required: [channels, latest_sent_at, total_count]
+            properties:
+                channels:
+                    type: object
+                    description: Accepted send totals grouped by delivery channel. Channels with no accepted sends are omitted.
+                    properties:
+                        email:
+                            $ref: '#/components/schemas/OrderDocumentDeliveryChannelSummary'
+                        sms:
+                            $ref: '#/components/schemas/OrderDocumentDeliveryChannelSummary'
+                latest_sent_at:
+                    type: string
+                    format: date-time
+                    description: Latest authoritative Chime acceptance time across all channels.
+                total_count:
+                    type: integer
+                    format: int64
+                    minimum: 1
+                    description: Total channel deliveries accepted for this document.
+        OrderDocumentDeliveryChannelSummary:
+            type: object
+            description: Bounded aggregate of Chime-accepted sends through one channel.
+            required: [count, latest_sent_at]
+            properties:
+                count:
+                    type: integer
+                    format: int64
+                    minimum: 1
+                    description: Number of deliveries accepted through this channel.
+                latest_sent_at:
+                    type: string
+                    format: date-time
+                    description: Latest authoritative Chime acceptance time for this channel.
 
         PaymentMethodPageRequest:
             type: object
@@ -12829,6 +12869,8 @@ components:
                 - created_at
                 - format
             properties:
+                delivery_summary:
+                    $ref: '#/components/schemas/OrderDocumentDeliverySummary'
                 id:
                     type: string
                 application_id:
@@ -13061,6 +13103,8 @@ components:
                     type: object
                     required: [format]
                     properties:
+                        delivery_summary:
+                            $ref: '#/components/schemas/OrderDocumentDeliverySummary'
                         number:
                             type: string
                         format:
@@ -13072,7 +13116,7 @@ components:
                                 pdf:
                                     $ref: '#/components/schemas/OrderDocumentFormat'
                                 receipt:
-                                    $ref: '#/components/schemas/OrderDocumentFormat'
+                                    $ref: '#/components/schemas/OrderReceiptDocumentFormat'
                 number:
                     type: string
                     description: Human-readable order number
@@ -13295,6 +13339,16 @@ components:
             required:
                 - url
             properties:
+                url:
+                    type: string
+                    format: uri
+        OrderReceiptDocumentFormat:
+            type: object
+            required:
+                - url
+            properties:
+                delivery_summary:
+                    $ref: '#/components/schemas/OrderDocumentDeliverySummary'
                 url:
                     type: string
                     format: uri
