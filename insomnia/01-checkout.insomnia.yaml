@@ -344,6 +344,29 @@ collection:
           "page_number": 0,
           "page_size": 25
         }
+  - name: Search orders
+    url: '{{ base_url }}/orders/search'
+    method: POST
+    meta:
+      id: req_624d7f66c75239e81b35f05f4a766656
+      description: 'OpenAPI operation: POST /orders/search'
+    headers:
+    - name: Content-Type
+      value: application/json
+    body:
+      mimeType: application/json
+      text: |-
+        {
+          "text": "INV-1042 Ama Mensah",
+          "filters": [
+            {"field": "status", "operator": "in", "values": ["paid", "requires_payment"]}
+          ],
+          "facets": [
+            {"field": "status", "limit": 10}
+          ],
+          "sort": {"field": "relevance", "direction": "desc"},
+          "page_size": 25
+        }
 - name: Public checkout
   meta:
     id: fld_79b956d2f8b949c39cc2ed5f047c91cc

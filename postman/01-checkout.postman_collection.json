@@ -2,7 +2,7 @@
   "info": {
     "name": "Inttegro API — Checkout and Orders",
     "description": "Create hosted checkout sessions and manage the complete order lifecycle. Uses the shared Inttegro API global environment.\n\nGenerated from insomnia/01-checkout.insomnia.yaml. Edit the Insomnia source and run npm run postman:generate.",
-    "version": "0.1.0-beta20",
+    "version": "0.1.0-beta21",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
@@ -431,6 +431,32 @@
             "body": {
               "mode": "raw",
               "raw": "{\n  \"page_number\": 0,\n  \"page_size\": 25\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Search orders",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/orders/search"
+            },
+            "description": "OpenAPI operation: POST /orders/search",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"text\": \"INV-1042 Ama Mensah\",\n  \"filters\": [\n    {\"field\": \"status\", \"operator\": \"in\", \"values\": [\"paid\", \"requires_payment\"]}\n  ],\n  \"facets\": [\n    {\"field\": \"status\", \"limit\": 10}\n  ],\n  \"sort\": {\"field\": \"relevance\", \"direction\": \"desc\"},\n  \"page_size\": 25\n}",
               "options": {
                 "raw": {
                   "language": "json"

@@ -2,7 +2,7 @@
   "info": {
     "name": "Inttegro API — Financial Accounts",
     "description": "Connect and manage collection and payout accounts. Uses the shared Inttegro API global environment.\n\nGenerated from insomnia/06-financial-accounts.insomnia.yaml. Edit the Insomnia source and run npm run postman:generate.",
-    "version": "0.1.0-beta20",
+    "version": "0.1.0-beta21",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
@@ -368,6 +368,32 @@
             "body": {
               "mode": "raw",
               "raw": "{\n  \"page_number\": 1,\n  \"page_size\": 50\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Search financial accounts",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/financial_accounts/search"
+            },
+            "description": "OpenAPI operation: POST /financial_accounts/search",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"filters\": [\n    {\"field\": \"status\", \"operator\": \"eq\", \"values\": [\"active\"]},\n    {\"field\": \"currency\", \"operator\": \"in\", \"values\": [\"ghs\", \"usd\"]}\n  ],\n  \"facets\": [\n    {\"field\": \"type\", \"limit\": 10}\n  ],\n  \"sort\": {\"field\": \"updated_at\", \"direction\": \"desc\"},\n  \"page_size\": 25\n}",
               "options": {
                 "raw": {
                   "language": "json"

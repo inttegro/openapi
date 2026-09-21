@@ -277,6 +277,29 @@ collection:
           "page_number": 1,
           "page_size": 50
         }
+  - name: Search financial accounts
+    url: '{{ base_url }}/financial_accounts/search'
+    method: POST
+    meta:
+      id: req_00e40c39e33b70b28b608e8c4451812a
+      description: 'OpenAPI operation: POST /financial_accounts/search'
+    headers:
+    - name: Content-Type
+      value: application/json
+    body:
+      mimeType: application/json
+      text: |-
+        {
+          "filters": [
+            {"field": "status", "operator": "eq", "values": ["active"]},
+            {"field": "currency", "operator": "in", "values": ["ghs", "usd"]}
+          ],
+          "facets": [
+            {"field": "type", "limit": 10}
+          ],
+          "sort": {"field": "updated_at", "direction": "desc"},
+          "page_size": 25
+        }
 environments:
   name: Base Environment
   meta:

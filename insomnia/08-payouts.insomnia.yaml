@@ -161,6 +161,28 @@ collection:
           "page_number": 1,
           "page_size": 25
         }
+  - name: Search payouts
+    url: '{{ base_url }}/payouts/search'
+    method: POST
+    meta:
+      id: req_77f560e05c24c7b0dbea32b202a2c7b0
+      description: 'OpenAPI operation: POST /payouts/search'
+    headers:
+    - name: Content-Type
+      value: application/json
+    body:
+      mimeType: application/json
+      text: |-
+        {
+          "filters": [
+            {"field": "status", "operator": "in", "values": ["scheduled", "processing"]}
+          ],
+          "facets": [
+            {"field": "currency", "limit": 10}
+          ],
+          "sort": {"field": "updated_at", "direction": "desc"},
+          "page_size": 25
+        }
 environments:
   name: Base Environment
   meta:

@@ -159,6 +159,28 @@ collection:
             }
           });
         }
+  - name: Search customers
+    url: '{{ base_url }}/customers/search'
+    method: POST
+    meta:
+      id: req_f7e6602e54c638aee16f210aa91677d6
+      description: 'OpenAPI operation: POST /customers/search'
+    headers:
+    - name: Content-Type
+      value: application/json
+    body:
+      mimeType: application/json
+      text: |-
+        {
+          "text": "Ama Mensah",
+          "filters": [
+            {"field": "kind", "operator": "in", "values": ["registered", "guest"]}
+          ],
+          "facets": [
+            {"field": "kind", "limit": 10}
+          ],
+          "page_size": 25
+        }
 environments:
   name: Base Environment
   meta:

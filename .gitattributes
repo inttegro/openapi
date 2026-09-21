@@ -1,1 +1,4 @@
 commerce.yml whitespace=-indent-with-non-tab
+insomnia/*.yaml whitespace=-indent-with-non-tab
+postman/*.json whitespace=-indent-with-non-tab
+postman/workflows/*.json whitespace=-indent-with-non-tab

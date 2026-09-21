@@ -370,6 +370,29 @@ collection:
         {
           "price_id": "{{ price_id }}"
         }
+  - name: Search products
+    url: '{{ base_url }}/products/search'
+    method: POST
+    meta:
+      id: req_cd92253dd84d824ffb0d19c4faa26d8c
+      description: 'OpenAPI operation: POST /products/search'
+    headers:
+    - name: Content-Type
+      value: application/json
+    body:
+      mimeType: application/json
+      text: |-
+        {
+          "text": "utility sneakers",
+          "filters": [
+            {"field": "status", "operator": "eq", "values": ["active"]}
+          ],
+          "facets": [
+            {"field": "category", "limit": 10}
+          ],
+          "sort": {"field": "published_at", "direction": "desc"},
+          "page_size": 25
+        }
 environments:
   name: Base Environment
   meta:

@@ -3,8 +3,8 @@ openapi: 3.0.3
 info:
     title: Inttegro API
     description: Machine-readable reference for the public Inttegro API
-    version: 0.1.0-beta20
-    x-inttegro-collection-version: 0.1.0-beta20
+    version: 0.1.0-beta21
+    x-inttegro-collection-version: 0.1.0-beta21
     contact:
         name: Inttegro Engineering
         url: "https://inttegro.com"
@@ -7918,6 +7918,290 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/ErrorEnvelope'
+    /customers/search:
+        post:
+            summary: Search customers
+            description: |
+                Search customers owned by the authenticated application. Customer searches support
+                the route-local `kind` filter and facet. Results are projections for discovery;
+                retrieve a customer by ID before making decisions that require canonical state.
+            operationId: searchCustomers
+            tags:
+                - Customers
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/ResourceSearchRequest'
+                        example:
+                            text: Ama Mensah
+                            filters:
+                                - field: kind
+                                  operator: in
+                                  values: [registered, guest]
+                            facets:
+                                - field: kind
+                                  limit: 10
+                            page_size: 25
+            responses:
+                '200':
+                    description: Customer search completed successfully
+                    headers:
+                        X-Request-Id:
+                            $ref: '#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ResourceSearchResponse'
+                '400':
+                    description: Search parameters or cursor are invalid
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorEnvelope'
+                '401':
+                    description: Unauthorized - invalid or missing API key
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorEnvelope'
+                '503':
+                    description: Customer search is temporarily unavailable
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorEnvelope'
+    /financial_accounts/search:
+        post:
+            summary: Search financial accounts
+            description: |
+                Search financial accounts owned by the authenticated application. Financial-account
+                searches support the route-local `type`, `status`, and `currency` filters and facets.
+                Results are projections for discovery; retrieve an account by ID before acting on it.
+            operationId: searchFinancialAccounts
+            tags:
+                - Financial Accounts
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/ResourceSearchRequest'
+                        example:
+                            filters:
+                                - field: status
+                                  operator: eq
+                                  values: [active]
+                                - field: currency
+                                  operator: in
+                                  values: [ghs, usd]
+                            facets:
+                                - field: type
+                                  limit: 10
+                            sort:
+                                field: updated_at
+                                direction: desc
+                            page_size: 25
+            responses:
+                '200':
+                    description: Financial-account search completed successfully
+                    headers:
+                        X-Request-Id:
+                            $ref: '#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ResourceSearchResponse'
+                '400':
+                    description: Search parameters or cursor are invalid
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorEnvelope'
+                '401':
+                    description: Unauthorized - invalid or missing API key
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorEnvelope'
+                '503':
+                    description: Financial-account search is temporarily unavailable
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorEnvelope'
+    /orders/search:
+        post:
+            summary: Search orders
+            description: |
+                Search orders owned by the authenticated application. Order searches support the
+                route-local `status` filter and facet. Results are projections for discovery;
+                retrieve an order by ID before making decisions that require canonical state.
+            operationId: searchOrders
+            tags:
+                - Orders
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/ResourceSearchRequest'
+                        example:
+                            text: INV-1042 Ama Mensah
+                            filters:
+                                - field: status
+                                  operator: in
+                                  values: [paid, requires_payment]
+                            facets:
+                                - field: status
+                                  limit: 10
+                            sort:
+                                field: relevance
+                                direction: desc
+                            page_size: 25
+            responses:
+                '200':
+                    description: Order search completed successfully
+                    headers:
+                        X-Request-Id:
+                            $ref: '#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ResourceSearchResponse'
+                '400':
+                    description: Search parameters or cursor are invalid
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorEnvelope'
+                '401':
+                    description: Unauthorized - invalid or missing API key
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorEnvelope'
+                '503':
+                    description: Order search is temporarily unavailable
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorEnvelope'
+    /payouts/search:
+        post:
+            summary: Search payouts
+            description: |
+                Search payouts owned by the authenticated application. Payout searches support the
+                route-local `status` and `currency` filters and facets. Results are projections for
+                discovery; retrieve a payout by ID before acting on it.
+            operationId: searchPayouts
+            tags:
+                - Payouts
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/ResourceSearchRequest'
+                        example:
+                            filters:
+                                - field: status
+                                  operator: in
+                                  values: [scheduled, processing]
+                            facets:
+                                - field: currency
+                                  limit: 10
+                            sort:
+                                field: updated_at
+                                direction: desc
+                            page_size: 25
+            responses:
+                '200':
+                    description: Payout search completed successfully
+                    headers:
+                        X-Request-Id:
+                            $ref: '#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ResourceSearchResponse'
+                '400':
+                    description: Search parameters or cursor are invalid
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorEnvelope'
+                '401':
+                    description: Unauthorized - invalid or missing API key
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorEnvelope'
+                '503':
+                    description: Payout search is temporarily unavailable
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorEnvelope'
+    /products/search:
+        post:
+            summary: Search products
+            description: |
+                Search products owned by the authenticated application. Product searches support
+                the route-local `type`, `status`, and `category` filters and facets, and may sort by
+                `relevance`, `updated_at`, or `published_at`. Results are projections for discovery;
+                retrieve a product by ID before making decisions that require canonical state.
+            operationId: searchProducts
+            tags:
+                - Products
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/ResourceSearchRequest'
+                        example:
+                            text: utility sneakers
+                            filters:
+                                - field: status
+                                  operator: eq
+                                  values: [active]
+                            facets:
+                                - field: category
+                                  limit: 10
+                            sort:
+                                field: published_at
+                                direction: desc
+                            page_size: 25
+            responses:
+                '200':
+                    description: Product search completed successfully
+                    headers:
+                        X-Request-Id:
+                            $ref: '#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ResourceSearchResponse'
+                '400':
+                    description: Search parameters or cursor are invalid
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorEnvelope'
+                '401':
+                    description: Unauthorized - invalid or missing API key
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorEnvelope'
+                '503':
+                    description: Product search is temporarily unavailable
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorEnvelope'
 components:
     securitySchemes:
         bearerAuth:
@@ -7944,6 +8228,275 @@ components:
                 type: string
             description: Stable key used to replay safe retries without applying the mutation twice.
     schemas:
+        ResourceSearchRequest:
+            type: object
+            additionalProperties: false
+            description: |
+                A resource-local search request. Send `text`, at least one filter, or both. Field
+                names are unqualified and depend on the endpoint. The application and resource type
+                are derived by Inttegro and cannot be supplied by the caller. To continue a search,
+                repeat the same request and add the returned `next_cursor`.
+            anyOf:
+                - required: [text]
+                - required: [filters]
+            properties:
+                text:
+                    type: string
+                    minLength: 1
+                    maxLength: 512
+                    description: Words, identifiers, or names to search for.
+                filters:
+                    type: array
+                    maxItems: 20
+                    uniqueItems: true
+                    items:
+                        $ref: '#/components/schemas/ResourceSearchFilter'
+                facets:
+                    type: array
+                    maxItems: 10
+                    uniqueItems: true
+                    items:
+                        $ref: '#/components/schemas/ResourceSearchFacet'
+                sort:
+                    $ref: '#/components/schemas/ResourceSearchSort'
+                page_size:
+                    type: integer
+                    minimum: 1
+                    maximum: 100
+                    default: 20
+                cursor:
+                    type: string
+                    maxLength: 8192
+                    description: Opaque continuation value returned as `next_cursor` by the preceding page.
+        ResourceSearchFilter:
+            type: object
+            additionalProperties: false
+            required: [field, operator, values]
+            properties:
+                field:
+                    type: string
+                    description: Unqualified route-local field name documented by the selected endpoint.
+                operator:
+                    type: string
+                    enum: [eq, in]
+                    description: "`eq` requires exactly one value; `in` matches any supplied value."
+                values:
+                    type: array
+                    minItems: 1
+                    maxItems: 20
+                    uniqueItems: true
+                    items:
+                        type: string
+                        minLength: 1
+                        maxLength: 256
+        ResourceSearchFacet:
+            type: object
+            additionalProperties: false
+            required: [field]
+            properties:
+                field:
+                    type: string
+                    description: Unqualified route-local field to group and count.
+                limit:
+                    type: integer
+                    minimum: 1
+                    maximum: 50
+                    default: 10
+        ResourceSearchSort:
+            type: object
+            additionalProperties: false
+            required: [field, direction]
+            properties:
+                field:
+                    type: string
+                    enum: [relevance, updated_at, published_at]
+                    description: "`published_at` is supported only by product search."
+                direction:
+                    type: string
+                    enum: [asc, desc]
+                    description: Relevance supports descending order only.
+        ResourceSearchResponse:
+            type: object
+            additionalProperties: false
+            required: [search]
+            properties:
+                search:
+                    $ref: '#/components/schemas/ResourceSearchPage'
+        ResourceSearchPage:
+            type: object
+            additionalProperties: false
+            required: [resource_types, sort, page_size, result_count, has_more, total, resource_totals, results, facets, freshness]
+            properties:
+                resource_types:
+                    type: array
+                    minItems: 1
+                    maxItems: 1
+                    items:
+                        $ref: '#/components/schemas/SearchResourceType'
+                sort:
+                    $ref: '#/components/schemas/ResourceSearchSort'
+                page_size:
+                    type: integer
+                    minimum: 1
+                    maximum: 100
+                result_count:
+                    type: integer
+                    minimum: 0
+                    maximum: 100
+                has_more:
+                    type: boolean
+                total:
+                    $ref: '#/components/schemas/ResourceSearchTotal'
+                resource_totals:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/ResourceSearchResourceTotal'
+                results:
+                    type: array
+                    description: Search projections for discovery, not canonical resource snapshots.
+                    maxItems: 100
+                    items:
+                        $ref: '#/components/schemas/ResourceSearchResult'
+                facets:
+                    type: array
+                    maxItems: 10
+                    items:
+                        $ref: '#/components/schemas/ResourceSearchFacetResult'
+                next_cursor:
+                    type: string
+                    maxLength: 8192
+                freshness:
+                    $ref: '#/components/schemas/ResourceSearchFreshness'
+        SearchResourceType:
+            type: string
+            enum: [customer, financial_account, order, payout, product]
+        ResourceSearchTotal:
+            type: object
+            additionalProperties: false
+            required: [value, relation]
+            properties:
+                value:
+                    type: integer
+                    format: int64
+                    minimum: 0
+                relation:
+                    type: string
+                    enum: [exact, lower_bound]
+        ResourceSearchResourceTotal:
+            type: object
+            additionalProperties: false
+            required: [resource_type, value, relation]
+            properties:
+                resource_type:
+                    $ref: '#/components/schemas/SearchResourceType'
+                value:
+                    type: integer
+                    format: int64
+                    minimum: 0
+                relation:
+                    type: string
+                    enum: [exact, lower_bound]
+        ResourceSearchResourceReference:
+            type: object
+            additionalProperties: false
+            required: [type, id]
+            properties:
+                type:
+                    $ref: '#/components/schemas/SearchResourceType'
+                id:
+                    type: string
+        ResourceSearchAmount:
+            type: object
+            additionalProperties: false
+            required: [currency, value]
+            properties:
+                currency:
+                    type: string
+                    description: ISO 4217 currency code.
+                value:
+                    type: integer
+                    format: int64
+                    minimum: 0
+                    description: Amount in the currency's minor unit.
+        ResourceSearchResult:
+            type: object
+            additionalProperties: false
+            required: [resource, title, updated_at]
+            properties:
+                resource:
+                    $ref: '#/components/schemas/ResourceSearchResourceReference'
+                title:
+                    type: string
+                summary:
+                    type: string
+                status:
+                    type: string
+                customer_name:
+                    type: string
+                amount:
+                    $ref: '#/components/schemas/ResourceSearchAmount'
+                url:
+                    type: string
+                    format: uri
+                updated_at:
+                    type: string
+                    format: date-time
+        ResourceSearchFacetBucket:
+            type: object
+            additionalProperties: false
+            required: [value, count]
+            properties:
+                value:
+                    type: string
+                count:
+                    type: integer
+                    format: int64
+                    minimum: 0
+        ResourceSearchFacetResult:
+            type: object
+            additionalProperties: false
+            required: [field, buckets]
+            properties:
+                field:
+                    type: string
+                    description: The same unqualified route-local field requested by the caller.
+                buckets:
+                    type: array
+                    maxItems: 50
+                    items:
+                        $ref: '#/components/schemas/ResourceSearchFacetBucket'
+        ResourceSearchResourceFreshness:
+            type: object
+            additionalProperties: false
+            required: [resource_type, state]
+            properties:
+                resource_type:
+                    $ref: '#/components/schemas/SearchResourceType'
+                state:
+                    type: string
+                    enum: [current, delayed, partial, unknown, unavailable]
+                observed_at:
+                    type: string
+                    format: date-time
+                last_indexed_at:
+                    type: string
+                    format: date-time
+        ResourceSearchFreshness:
+            type: object
+            additionalProperties: false
+            required: [state]
+            properties:
+                state:
+                    type: string
+                    enum: [current, delayed, partial, unknown, unavailable]
+                observed_at:
+                    type: string
+                    format: date-time
+                resources:
+                    type: array
+                    maxItems: 1
+                    items:
+                        $ref: '#/components/schemas/ResourceSearchResourceFreshness'
         CustomData:
             type: object
             description: Merchant-defined string values attached to a resource. SDKs expose this as a semantic collection rather than a raw map.
