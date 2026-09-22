@@ -1,9 +1,9 @@
 {
   "version": 3,
-  "collection_version": "0.1.0-beta21",
-  "openapi_sha256": "716c67cf60fc13121b0980d2a758f37e0a3dbbb65f52519452510b5c50fc86a7",
-  "insomnia_sha256": "1aec49e4e93da4a51b89d71fe0581789ffd23905440a749c13b3e115e3c6a036",
-  "postman_sha256": "939f151175f0785dfcb2c0a04c60e8041b5d86ca256b5c605f598357d93a21fc",
+  "collection_version": "0.1.0-beta22",
+  "openapi_sha256": "89d1fc55e03ba0253988626c6b033ad506e68a2bfa37c7ca99fcb352e2937bf2",
+  "insomnia_sha256": "efad2e616922690e534d73666a0ef3e80ea359824f5281465266d59695de53cb",
+  "postman_sha256": "430707bdda98d7059fcd5acc8375234874a695beaa34402d06651b29e8d8e381",
   "operation_count": 126,
   "insomnia_request_count": 126,
   "postman_request_count": 126
