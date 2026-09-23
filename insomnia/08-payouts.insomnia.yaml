@@ -69,6 +69,22 @@ collection:
         {
           "payout_id": "{{ payout_id }}"
         }
+    scripts:
+      afterResponse: |-
+        if (insomnia.response.code >= 200 && insomnia.response.code < 300) {
+          const jsonBody = insomnia.response.json();
+          const transactions = jsonBody?.payout?.balance_transactions;
+          if (transactions !== undefined) {
+            insomnia.test('Returns every payout balance transaction contribution', () => {
+              insomnia.expect(transactions).to.be.an('array');
+              for (const transaction of transactions) {
+                insomnia.expect(transaction.id).to.be.a('string').and.not.be.empty;
+                insomnia.expect(transaction.amount).to.have.all.keys('currency', 'value');
+                insomnia.expect(transaction.allocated_amount).to.have.all.keys('currency', 'value');
+              }
+            });
+          }
+        }
   - name: Cancel a payout
     url: '{{ base_url }}/payouts/cancel'
     method: POST

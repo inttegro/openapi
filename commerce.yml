@@ -3,8 +3,8 @@ openapi: 3.0.3
 info:
     title: Inttegro API
     description: Machine-readable reference for the public Inttegro API
-    version: 0.1.0-beta22
-    x-inttegro-collection-version: 0.1.0-beta22
+    version: 0.1.0-beta23
+    x-inttegro-collection-version: 0.1.0-beta23
     contact:
         name: Inttegro Engineering
         url: "https://inttegro.com"
@@ -15284,9 +15284,13 @@ components:
                     $ref: '#/components/schemas/Amount'
                 balance_transactions:
                     type: array
-                    description: Balance transaction IDs linked to this payout
+                    description: |
+                        Balance transactions that contributed to this payout. Each item includes
+                        the source transaction's original amount and the exact portion allocated
+                        to this payout. The difference between those two amounts is not necessarily
+                        still available because refunds or other payouts may also consume the source.
                     items:
-                        type: string
+                        $ref: '#/components/schemas/PayoutBalanceTransaction'
                 canceled_at:
                     type: string
                     format: date-time
@@ -15357,6 +15361,20 @@ components:
                     type: string
                     format: date-time
                     description: When the payout succeeded
+        PayoutBalanceTransaction:
+            type: object
+            description: A sparse view of one balance transaction's contribution to a payout.
+            additionalProperties: false
+            required: [allocated_amount, amount, id]
+            properties:
+                allocated_amount:
+                    $ref: '#/components/schemas/Amount'
+                amount:
+                    $ref: '#/components/schemas/Amount'
+                id:
+                    type: string
+                    description: Unique balance transaction identifier.
+                    example: bt_1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcd
         PayoutError:
             type: object
             description: Public failure details returned when payout execution fails.
