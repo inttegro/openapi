@@ -51,7 +51,7 @@ collection:
 - name: Balance transactions
   meta:
     id: fld_84e7274fb3af07e83c4ce4581d331f28
-    description: Retrieve and page balance ledger entries.
+    description: Retrieve and page payment, refund, and payout balance ledger entries through their discriminated public shapes.
   authentication:
     type: bearer
     token: '{{ api_key }}'
@@ -88,15 +88,15 @@ collection:
           insomnia.expect(insomnia.response.code).to.equal(200);
           const transaction = insomnia.response.json()?.transaction;
           insomnia.expect(transaction?.id).to.equal(insomnia.variables.get('balance_transaction_id'));
-          insomnia.expect(transaction?.order_id).to.be.a('string');
           insomnia.expect(transaction?.created_at).to.be.a('string');
           insomnia.expect(transaction?.amount?.currency).to.be.a('string');
           insomnia.expect(transaction?.amount?.value).to.be.a('number').and.be.at.least(0);
-          insomnia.expect(transaction?.type).to.be.oneOf(['payment', 'refund']);
+          insomnia.expect(transaction?.type).to.be.oneOf(['payment', 'refund', 'payout']);
           for (const field of ['application_id', 'sign', 'source_id', 'source_type']) {
             insomnia.expect(transaction).not.to.have.property(field);
           }
           if (transaction?.type === 'payment') {
+            insomnia.expect(transaction?.order_id).to.be.a('string');
             insomnia.expect(transaction?.payment_id).to.be.a('string');
             insomnia.expect(transaction).not.to.have.property('refund_id');
             insomnia.expect(transaction?.allocations).to.be.an('array');
@@ -121,10 +121,16 @@ collection:
                 allocation.type === 'payout' ? 'refund' : 'payout',
               );
             }
-          } else {
+          } else if (transaction?.type === 'refund') {
+            insomnia.expect(transaction?.order_id).to.be.a('string');
             insomnia.expect(transaction?.refund_id).to.be.a('string');
             insomnia.expect(transaction).not.to.have.property('payment_id');
             for (const field of ['allocations', 'available_amount', 'pending_amount', 'spent_amount']) {
+              insomnia.expect(transaction).not.to.have.property(field);
+            }
+          } else {
+            insomnia.expect(transaction?.payout_id).to.be.a('string');
+            for (const field of ['order_id', 'payment_id', 'refund_id', 'allocations', 'available_amount', 'pending_amount', 'spent_amount']) {
               insomnia.expect(transaction).not.to.have.property(field);
             }
           }

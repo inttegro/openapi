@@ -2,7 +2,7 @@
   "info": {
     "name": "Inttegro API — Balances",
     "description": "Read balance snapshots and balance ledger entries. Uses the shared Inttegro API global environment.\n\nGenerated from insomnia/07-balances.insomnia.yaml. Edit the Insomnia source and run npm run postman:generate.",
-    "version": "0.1.0-beta23",
+    "version": "0.1.0-beta25",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
@@ -131,15 +131,15 @@
                   "  pm.expect(pm.response.code).to.equal(200);",
                   "  const transaction = pm.response.json()?.transaction;",
                   "  pm.expect(transaction?.id).to.equal(pm.variables.get('balance_transaction_id'));",
-                  "  pm.expect(transaction?.order_id).to.be.a('string');",
                   "  pm.expect(transaction?.created_at).to.be.a('string');",
                   "  pm.expect(transaction?.amount?.currency).to.be.a('string');",
                   "  pm.expect(transaction?.amount?.value).to.be.a('number').and.be.at.least(0);",
-                  "  pm.expect(transaction?.type).to.be.oneOf(['payment', 'refund']);",
+                  "  pm.expect(transaction?.type).to.be.oneOf(['payment', 'refund', 'payout']);",
                   "  for (const field of ['application_id', 'sign', 'source_id', 'source_type']) {",
                   "    pm.expect(transaction).not.to.have.property(field);",
                   "  }",
                   "  if (transaction?.type === 'payment') {",
+                  "    pm.expect(transaction?.order_id).to.be.a('string');",
                   "    pm.expect(transaction?.payment_id).to.be.a('string');",
                   "    pm.expect(transaction).not.to.have.property('refund_id');",
                   "    pm.expect(transaction?.allocations).to.be.an('array');",
@@ -164,10 +164,16 @@
                   "        allocation.type === 'payout' ? 'refund' : 'payout',",
                   "      );",
                   "    }",
-                  "  } else {",
+                  "  } else if (transaction?.type === 'refund') {",
+                  "    pm.expect(transaction?.order_id).to.be.a('string');",
                   "    pm.expect(transaction?.refund_id).to.be.a('string');",
                   "    pm.expect(transaction).not.to.have.property('payment_id');",
                   "    for (const field of ['allocations', 'available_amount', 'pending_amount', 'spent_amount']) {",
+                  "      pm.expect(transaction).not.to.have.property(field);",
+                  "    }",
+                  "  } else {",
+                  "    pm.expect(transaction?.payout_id).to.be.a('string');",
+                  "    for (const field of ['order_id', 'payment_id', 'refund_id', 'allocations', 'available_amount', 'pending_amount', 'spent_amount']) {",
                   "      pm.expect(transaction).not.to.have.property(field);",
                   "    }",
                   "  }",
@@ -260,7 +266,7 @@
           ]
         }
       ],
-      "description": "Retrieve and page balance ledger entries.",
+      "description": "Retrieve and page payment, refund, and payout balance ledger entries through their discriminated public shapes.",
       "auth": {
         "type": "bearer",
         "bearer": [

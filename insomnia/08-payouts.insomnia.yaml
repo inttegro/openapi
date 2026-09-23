@@ -74,6 +74,11 @@ collection:
         if (insomnia.response.code >= 200 && insomnia.response.code < 300) {
           const jsonBody = insomnia.response.json();
           const transactions = jsonBody?.payout?.balance_transactions;
+          if (jsonBody?.payout?.status === 'succeeded') {
+            insomnia.test('Returns the payout debit balance transaction ID', () => {
+              insomnia.expect(jsonBody?.payout?.balance_transaction_id).to.be.a('string').and.not.be.empty;
+            });
+          }
           if (transactions !== undefined) {
             insomnia.test('Returns every payout balance transaction contribution', () => {
               insomnia.expect(transactions).to.be.an('array');
