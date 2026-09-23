@@ -3,8 +3,8 @@ openapi: 3.0.3
 info:
     title: Inttegro API
     description: Machine-readable reference for the public Inttegro API
-    version: 0.1.0-beta21
-    x-inttegro-collection-version: 0.1.0-beta21
+    version: 0.1.0-beta23
+    x-inttegro-collection-version: 0.1.0-beta23
     contact:
         name: Inttegro Engineering
         url: "https://inttegro.com"
@@ -14434,6 +14434,7 @@ components:
                     example: 145000
         BalanceTransactionAmount:
             type: object
+            additionalProperties: false
             required: [currency, value]
             properties:
                 currency:
@@ -14445,22 +14446,113 @@ components:
                     minimum: 0
                     description: Unsigned amount in the currency's smallest unit
                     example: 20000
+        BalanceTransactionAllocationStatus:
+            type: string
+            description: Public effect of an allocation on the source payment balance transaction. Internal reservation and reconciliation states are not exposed.
+            enum: [pending, completed]
+        BalanceTransactionAllocation:
+            description: A caller-safe allocation of part of a payment balance transaction to a refund or payout.
+            oneOf:
+                - $ref: '#/components/schemas/BalanceTransactionRefundAllocation'
+                - $ref: '#/components/schemas/BalanceTransactionPayoutAllocation'
+            discriminator:
+                propertyName: type
+                mapping:
+                    payout: '#/components/schemas/BalanceTransactionPayoutAllocation'
+                    refund: '#/components/schemas/BalanceTransactionRefundAllocation'
+        BalanceTransactionAllocationBase:
+            type: object
+            required: [created_at, id, status, type, updated_at]
+            properties:
+                completed_at:
+                    type: string
+                    format: date-time
+                    description: When the allocated amount became permanently consumed. Present only when `status` is `completed`.
+                created_at:
+                    type: string
+                    format: date-time
+                    description: When the amount first became unavailable for another refund or payout.
+                id:
+                    type: string
+                    description: Stable public allocation identifier for reconciliation and support.
+                    example: bta_0123456789abcdefghijklmnopqrstuvwxyzABCD
+                status:
+                    $ref: '#/components/schemas/BalanceTransactionAllocationStatus'
+                type:
+                    type: string
+                    enum: [payout, refund]
+                updated_at:
+                    type: string
+                    format: date-time
+                    description: When the public allocation status last changed.
+        BalanceTransactionRefundAllocation:
+            allOf:
+                - $ref: '#/components/schemas/BalanceTransactionAllocationBase'
+                - type: object
+                  required: [refund]
+                  properties:
+                      type:
+                          type: string
+                          enum: [refund]
+                      refund:
+                          type: object
+                          additionalProperties: false
+                          required: [amount, id]
+                          properties:
+                              amount:
+                                  $ref: '#/components/schemas/BalanceTransactionAmount'
+                              id:
+                                  type: string
+                                  example: rf_1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcd
+        BalanceTransactionPayoutAllocation:
+            allOf:
+                - $ref: '#/components/schemas/BalanceTransactionAllocationBase'
+                - type: object
+                  required: [payout]
+                  properties:
+                      type:
+                          type: string
+                          enum: [payout]
+                      payout:
+                          type: object
+                          additionalProperties: false
+                          required: [amount, id]
+                          properties:
+                              amount:
+                                  $ref: '#/components/schemas/BalanceTransactionAmount'
+                              id:
+                                  type: string
+                                  example: po_zyxwvutsrqponmlkjihgfedcbaABCDEFGHIJKLMN
         BalanceTransaction:
             type: object
             description: |
                 Merchant balance entry caused by a payment or refund. `type` describes the
                 semantic source, not direction. A payment transaction contains `payment_id`;
                 a refund transaction contains `refund_id`. Exactly one matching reference is present.
+                Payment transactions also expose their complete current allocation state and
+                disjoint available, pending, and spent amounts. Allocation fields are omitted from
+                refund transactions because refund transactions are consumers rather than sources.
             required: [amount, created_at, id, order_id, type]
             properties:
                 amount:
                     $ref: '#/components/schemas/BalanceTransactionAmount'
+                allocations:
+                    type: array
+                    description: All current pending and completed allocations of this payment transaction. Released allocations are omitted. Present only when `type` is `payment`.
+                    items:
+                        $ref: '#/components/schemas/BalanceTransactionAllocation'
+                available_amount:
+                    allOf:
+                        - $ref: '#/components/schemas/BalanceTransactionAmount'
+                    description: Amount still available for a refund or payout. Present only when `type` is `payment`.
                 available_at:
                     type: string
                     format: date-time
                 claimed_at:
                     type: string
                     format: date-time
+                    deprecated: true
+                    description: Legacy whole-transaction payout claim timestamp. New integrations should inspect `allocations`.
                 created_at:
                     type: string
                     format: date-time
@@ -14473,12 +14565,20 @@ components:
                 paid_at:
                     type: string
                     format: date-time
+                    deprecated: true
+                    description: Legacy whole-transaction payout completion timestamp. New integrations should inspect `allocations`.
+                pending_amount:
+                    allOf:
+                        - $ref: '#/components/schemas/BalanceTransactionAmount'
+                    description: Amount temporarily unavailable because a refund or payout is unresolved. Present only when `type` is `payment`.
                 payment_id:
                     type: string
                     description: Present when `type` is `payment`; omitted when `type` is `refund`.
                     example: py_ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmn
                 payout_id:
                     type: string
+                    deprecated: true
+                    description: Legacy payout owning the whole transaction remainder. New integrations should inspect `allocations` because one transaction can participate in many payouts.
                     example: po_zyxwvutsrqponmlkjihgfedcbaABCDEFGHIJKLMN
                 payout_configuration:
                     type: object
@@ -14499,6 +14599,10 @@ components:
                     type: string
                     description: Present when `type` is `refund`; omitted when `type` is `payment`.
                     example: rf_1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcd
+                spent_amount:
+                    allOf:
+                        - $ref: '#/components/schemas/BalanceTransactionAmount'
+                    description: Amount permanently consumed by completed refunds and payouts. Present only when `type` is `payment`.
                 type:
                     type: string
                     enum: [payment, refund]
@@ -15180,9 +15284,13 @@ components:
                     $ref: '#/components/schemas/Amount'
                 balance_transactions:
                     type: array
-                    description: Balance transaction IDs linked to this payout
+                    description: |
+                        Balance transactions that contributed to this payout. Each item includes
+                        the source transaction's original amount and the exact portion allocated
+                        to this payout. The difference between those two amounts is not necessarily
+                        still available because refunds or other payouts may also consume the source.
                     items:
-                        type: string
+                        $ref: '#/components/schemas/PayoutBalanceTransaction'
                 canceled_at:
                     type: string
                     format: date-time
@@ -15253,6 +15361,20 @@ components:
                     type: string
                     format: date-time
                     description: When the payout succeeded
+        PayoutBalanceTransaction:
+            type: object
+            description: A sparse view of one balance transaction's contribution to a payout.
+            additionalProperties: false
+            required: [allocated_amount, amount, id]
+            properties:
+                allocated_amount:
+                    $ref: '#/components/schemas/Amount'
+                amount:
+                    $ref: '#/components/schemas/Amount'
+                id:
+                    type: string
+                    description: Unique balance transaction identifier.
+                    example: bt_1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcd
         PayoutError:
             type: object
             description: Public failure details returned when payout execution fails.
