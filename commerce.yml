@@ -3,8 +3,8 @@ openapi: 3.0.3
 info:
     title: Inttegro API
     description: Machine-readable reference for the public Inttegro API
-    version: 0.1.0-beta25
-    x-inttegro-collection-version: 0.1.0-beta25
+    version: 0.1.0-beta28
+    x-inttegro-collection-version: 0.1.0-beta28
     contact:
         name: Inttegro Engineering
         url: "https://inttegro.com"
@@ -10394,7 +10394,7 @@ components:
                     example: "cu_abc123xyz"
         Customer:
             type: object
-            required: [balance, created_at, guest, id, name]
+            required: [balance, created_at, fingerprint, guest, id, name]
             properties:
                 balance:
                     $ref: '#/components/schemas/CustomerBalance'
@@ -10407,6 +10407,9 @@ components:
                     $ref: '#/components/schemas/CustomData'
                 email_address:
                     type: string
+                fingerprint:
+                    type: string
+                    description: Application-scoped value for spotting possible duplicate customer records. Matching nonempty fingerprints within the same application indicate that the records likely belong to the same buyer. Compare fingerprints only within that application, and continue to use each customer ID for API operations.
                 guest:
                     type: boolean
                 id:

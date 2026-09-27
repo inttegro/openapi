@@ -64,6 +64,12 @@ collection:
           insomnia.test('Returns required customer.guest', () => {
             insomnia.expect(jsonBody?.customer?.guest).to.be.a('boolean');
           });
+          insomnia.test('Returns required customer.fingerprint', () => {
+            insomnia.expect(jsonBody?.customer?.fingerprint).to.be.a('string').and.not.be.empty;
+          });
+          insomnia.test('Keeps identity resolution state internal', () => {
+            insomnia.expect(jsonBody?.customer).not.to.have.property('identity_resolution');
+          });
           if (customer_id) insomnia.globals.set("customer_id", customer_id);
         }
   - name: Lookup customer
@@ -90,6 +96,9 @@ collection:
           });
           insomnia.test('Returns required customer.guest', () => {
             insomnia.expect(jsonBody?.customer?.guest).to.be.a('boolean');
+          });
+          insomnia.test('Returns required customer.fingerprint', () => {
+            insomnia.expect(jsonBody?.customer?.fingerprint).to.be.a('string').and.not.be.empty;
           });
         }
   - name: Update customer
@@ -125,6 +134,7 @@ collection:
           const customer = insomnia.response.json()?.customer;
           insomnia.expect(customer?.guest).to.be.a('boolean');
           insomnia.expect(customer?.balance).to.be.an('object');
+          insomnia.expect(customer?.fingerprint).to.be.a('string').and.not.be.empty;
           insomnia.expect(customer?.updated_at).to.be.a('string');
           insomnia.expect(customer?.reference).to.equal('user_123456_updated');
           insomnia.expect(customer?.custom_data).to.deep.equal({ loyalty_tier: 'platinum' });
@@ -155,6 +165,7 @@ collection:
             insomnia.expect(customers).to.be.an('array');
             for (const customer of customers) {
               insomnia.expect(customer?.balance).to.be.an('object');
+              insomnia.expect(customer?.fingerprint).to.be.a('string').and.not.be.empty;
               insomnia.expect(customer?.guest).to.be.a('boolean');
             }
           });
