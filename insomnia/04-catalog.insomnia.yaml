@@ -96,7 +96,7 @@ collection:
     method: POST
     meta:
       id: req_12345083dabf30e819783fa191cba34e
-      description: 'Public reference: https://studio.inttegro.com/products#add-a-price-to-a-product'
+      description: 'Public reference: https://studio.inttegro.com/products#add-a-price-to-a-product. Price currency must be a recognized Inttegro currency code.'
     headers:
     - name: Content-Type
       value: application/json
@@ -109,7 +109,8 @@ collection:
           "product_id": "{{ product_id }}",
           "label": "Wholesale",
           "about": "Preferred rate for repeat buyers",
-          "amount": {
+          "type": "fixed_amount",
+          "fixed_amount": {
             "currency": "ghs",
             "value": 85000
           }
@@ -240,7 +241,7 @@ collection:
     method: POST
     meta:
       id: req_5abe8256745950f437a871b7b00f5ef5
-      description: 'Public reference: https://studio.inttegro.com/prices#create-a-price'
+      description: 'Public reference: https://studio.inttegro.com/prices#create-a-price. Use the explicit type with fixed_amount or customer_selected_amount; the legacy top-level amount form is not accepted. Customer-selected prices require a catalog product_id, and their currency must be a recognized Inttegro currency code.'
     headers:
     - name: Content-Type
       value: application/json
@@ -250,12 +251,25 @@ collection:
       mimeType: application/json
       text: |-
         {
-          "amount": {
+          "type": "customer_selected_amount",
+          "customer_selected_amount": {
             "currency": "ghs",
-            "value": 2999
+            "minimum": 1000,
+            "maximum": 500000,
+            "suggested_amounts": [
+              {
+                "id": "supporter",
+                "value": 5000
+              },
+              {
+                "id": "champion",
+                "value": 10000,
+                "recommended": true
+              }
+            ]
           },
-          "label": "Monthly",
-          "about": "Standard monthly subscription price",
+          "label": "Support our work",
+          "about": "Choose how much to contribute",
           "product_id": "{{ product_id }}"
         }
     scripts:
@@ -265,6 +279,11 @@ collection:
           const price_id = jsonBody?.price?.id;
           insomnia.test('Returns price.id', () => {
             insomnia.expect(price_id).to.be.a('string').and.not.be.empty;
+          });
+          insomnia.test('Returns a customer-selected price definition', () => {
+            insomnia.expect(jsonBody?.price?.type).to.equal('customer_selected_amount');
+            insomnia.expect(jsonBody?.price?.customer_selected_amount?.minimum).to.equal(1000);
+            insomnia.expect(jsonBody?.price?.customer_selected_amount?.suggested_amounts).to.be.an('array').with.length(2);
           });
           if (price_id) insomnia.globals.set("price_id", price_id);
         }

@@ -3,8 +3,8 @@ openapi: 3.0.3
 info:
     title: Inttegro API
     description: Machine-readable reference for the public Inttegro API
-    version: 0.1.0-beta28
-    x-inttegro-collection-version: 0.1.0-beta28
+    version: 0.1.0-beta29
+    x-inttegro-collection-version: 0.1.0-beta29
     contact:
         name: Inttegro Engineering
         url: "https://inttegro.com"
@@ -6683,6 +6683,7 @@ paths:
                 Key points:
                 - The target product must belong to your authenticated application
                 - Archived products cannot accept new prices
+                - Customer-selected price definitions are available only to Commerce internal services and Upper private beta organizations and applications
                 - The response returns the created price only
             operationId: addProductPrice
             tags:
@@ -7428,13 +7429,14 @@ paths:
         post:
             summary: Create a price
             description: |
-                Creates a new price in your catalog. Prices define the cost of products and can optionally
-                be associated with a product. Multiple prices can exist for the same product to support
-                different currencies, markets, or customer segments.
+                Creates a new price in your catalog. Fixed prices may optionally be associated with a product;
+                customer-selected prices must be associated with a product. Multiple prices can exist for the
+                same product to support different currencies, markets, or customer segments.
 
                 Key points:
                 - Price amounts are immutable after creation (create new price to change amount)
-                - Product association (product_id) is optional at creation but immutable once set
+                - Product association (product_id) is optional for fixed prices, required for customer-selected prices, and immutable once set
+                - Customer-selected price definitions are available only to Commerce internal services and Upper private beta organizations and applications
                 - Label and about fields can be updated later
                 - Amount must be a positive integer representing the smallest currency unit (cents, pence, etc.)
             operationId: createPrice
@@ -10730,7 +10732,25 @@ components:
             type: object
             required:
                 - product_id
-                - amount
+            oneOf:
+                - title: Fixed amount
+                  required: [type, fixed_amount]
+                  properties:
+                      type:
+                          enum: [fixed_amount]
+                  not:
+                      anyOf:
+                          - required: [amount]
+                          - required: [customer_selected_amount]
+                - title: Customer-selected amount
+                  required: [type, customer_selected_amount, product_id]
+                  properties:
+                      type:
+                          enum: [customer_selected_amount]
+                  not:
+                      anyOf:
+                          - required: [amount]
+                          - required: [fixed_amount]
             properties:
                 product_id:
                     type: string
@@ -10746,8 +10766,16 @@ components:
                     maxLength: 500
                     description: Optional internal description for the new price
                     example: "Preferred rate for repeat buyers"
-                amount:
+                type:
+                    type: string
+                    enum: [fixed_amount, customer_selected_amount]
+                    description: Price definition discriminator.
+                fixed_amount:
+                    description: Required when type is fixed_amount.
                     $ref: '#/components/schemas/AmountParams'
+                customer_selected_amount:
+                    description: Required when type is customer_selected_amount. Available only to Commerce internal services and Upper private beta organizations and applications.
+                    $ref: '#/components/schemas/CustomerSelectedAmountParams'
         AddProductPriceResponse:
             type: object
             properties:
@@ -10760,7 +10788,26 @@ components:
             required:
                 - id
                 - active
-                - nominal
+                - type
+            oneOf:
+                - title: Fixed amount
+                  required: [nominal, fixed_amount]
+                  properties:
+                      type:
+                          enum: [fixed_amount]
+                  not:
+                      anyOf:
+                          - required: [amount]
+                          - required: [customer_selected_amount]
+                - title: Customer-selected amount
+                  required: [customer_selected_amount]
+                  properties:
+                      type:
+                          enum: [customer_selected_amount]
+                  not:
+                      anyOf:
+                          - required: [nominal]
+                          - required: [fixed_amount]
             properties:
                 id:
                     type: string
@@ -10775,9 +10822,20 @@ components:
                     nullable: true
                     description: Short label for this price
                     example: "Wholesale"
+                type:
+                    type: string
+                    enum: [fixed_amount, customer_selected_amount]
+                    description: Price definition discriminator
                 nominal:
-                    description: Price amount
+                    deprecated: true
+                    description: Legacy fixed price amount. Present only for fixed_amount prices.
                     $ref: '#/components/schemas/Amount'
+                fixed_amount:
+                    description: Fixed price amount. Present only for fixed_amount prices.
+                    $ref: '#/components/schemas/Amount'
+                customer_selected_amount:
+                    description: Customer-selected amount configuration. Present only for customer_selected_amount prices.
+                    $ref: '#/components/schemas/CustomerSelectedAmount'
         ProductActionRequest:
             type: object
             required:
@@ -11567,12 +11625,29 @@ components:
                     $ref: '#/components/schemas/Error'
         CatalogPriceParams:
             type: object
-            required:
-                - amount
+            oneOf:
+                - title: Fixed amount
+                  required: [type, fixed_amount]
+                  properties:
+                      type:
+                          enum: [fixed_amount]
+                  not:
+                      anyOf:
+                          - required: [amount]
+                          - required: [customer_selected_amount]
+                - title: Customer-selected amount
+                  required: [type, customer_selected_amount, product_id]
+                  properties:
+                      type:
+                          enum: [customer_selected_amount]
+                  not:
+                      anyOf:
+                          - required: [amount]
+                          - required: [fixed_amount]
             properties:
                 product_id:
                     type: string
-                    description: Optional product ID to associate this price with. Once set, cannot be changed.
+                    description: Product ID to associate this price with. Optional for fixed prices, required for customer_selected_amount prices, and immutable once set.
                     example: "prod_abc123"
                 label:
                     type: string
@@ -11582,15 +11657,43 @@ components:
                     type: string
                     description: Longer description of this price (max 500 characters)
                     example: "Standard pricing for individual customers"
-                amount:
+                type:
+                    type: string
+                    enum: [fixed_amount, customer_selected_amount]
+                    description: Price definition discriminator.
+                fixed_amount:
+                    description: Required when type is fixed_amount.
                     $ref: '#/components/schemas/AmountParams'
+                customer_selected_amount:
+                    description: Required when type is customer_selected_amount. Available only to Commerce internal services and Upper private beta organizations and applications.
+                    $ref: '#/components/schemas/CustomerSelectedAmountParams'
         CatalogPrice:
             type: object
             required:
                 - id
                 - active
-                - nominal
+                - type
                 - created_at
+            oneOf:
+                - title: Fixed amount
+                  required: [nominal, fixed_amount]
+                  properties:
+                      type:
+                          enum: [fixed_amount]
+                  not:
+                      required: [customer_selected_amount]
+                - title: Customer-selected amount
+                  required: [customer_selected_amount]
+                  anyOf:
+                      - required: [product_id]
+                      - required: [product]
+                  properties:
+                      type:
+                          enum: [customer_selected_amount]
+                  not:
+                      anyOf:
+                          - required: [nominal]
+                          - required: [fixed_amount]
             properties:
                 id:
                     type: string
@@ -11610,9 +11713,20 @@ components:
                     type: boolean
                     description: Whether this price is active and usable in new flows
                     example: true
+                type:
+                    type: string
+                    enum: [fixed_amount, customer_selected_amount]
+                    description: Price definition discriminator
                 nominal:
-                    description: Price amount
+                    deprecated: true
+                    description: Legacy fixed price amount. Present only for fixed_amount prices.
                     $ref: '#/components/schemas/Amount'
+                fixed_amount:
+                    description: Fixed price amount. Present only for fixed_amount prices.
+                    $ref: '#/components/schemas/Amount'
+                customer_selected_amount:
+                    description: Customer-selected amount configuration. Present only for customer_selected_amount prices.
+                    $ref: '#/components/schemas/CustomerSelectedAmount'
                 product_id:
                     type: string
                     description: Product ID when the operation returns the relationship by reference
@@ -11638,6 +11752,77 @@ components:
                     nullable: true
                     description: Archive timestamp (if archived)
                     example: null
+        SuggestedAmountParams:
+            type: object
+            required: [id, value]
+            properties:
+                id:
+                    type: string
+                    maxLength: 100
+                    description: Stable merchant-defined identifier for this suggestion
+                    example: "supporter"
+                value:
+                    type: integer
+                    minimum: 1
+                    description: Suggested amount in the currency's smallest unit
+                    example: 50000
+                recommended:
+                    type: boolean
+                    default: false
+                    description: Whether this is the single recommended suggestion
+        SuggestedAmount:
+            type: object
+            required: [id, value]
+            properties:
+                id:
+                    type: string
+                    description: Stable merchant-defined identifier for this suggestion
+                value:
+                    type: integer
+                    description: Suggested amount in the currency's smallest unit
+                recommended:
+                    type: boolean
+                    description: Whether this is the recommended suggestion
+        CustomerSelectedAmountParams:
+            type: object
+            required: [currency, minimum]
+            properties:
+                currency:
+                    description: Currency accepted for customer-selected amounts
+                    $ref: '#/components/schemas/Currency'
+                minimum:
+                    type: integer
+                    minimum: 1
+                    description: Minimum selectable amount in the currency's smallest unit
+                    example: 10000
+                maximum:
+                    type: integer
+                    minimum: 1
+                    description: Optional maximum selectable amount; it must be at least minimum
+                    example: 500000
+                suggested_amounts:
+                    type: array
+                    description: Convenient choices, not an allow-list. IDs and values must be unique and at most one can be recommended.
+                    items:
+                        $ref: '#/components/schemas/SuggestedAmountParams'
+        CustomerSelectedAmount:
+            type: object
+            required: [currency, minimum]
+            properties:
+                currency:
+                    description: Currency accepted for customer-selected amounts
+                    $ref: '#/components/schemas/Currency'
+                minimum:
+                    type: integer
+                    description: Minimum selectable amount in the currency's smallest unit
+                maximum:
+                    type: integer
+                    description: Optional maximum selectable amount
+                suggested_amounts:
+                    type: array
+                    description: Convenient choices, not an allow-list
+                    items:
+                        $ref: '#/components/schemas/SuggestedAmount'
         PageFinancialAccountsRequest:
             type: object
             required:
@@ -11869,11 +12054,12 @@ components:
                 - $ref: '#/components/schemas/InlineProductDetails'
                 - $ref: '#/components/schemas/CatalogProductWithPriceData'
                 - $ref: '#/components/schemas/CatalogProductWithPriceReference'
+                - $ref: '#/components/schemas/CatalogProductWithCustomerSelectedPrice'
             description: |
                 Provide either inline product data or a `product_id` reference to an existing catalog
                 product. Catalog-backed product line items can use an explicit `price` or an existing
-                `price_id`. Inttegro never falls back to a product's default unit price during order
-                creation.
+                `price_id`, or a validated `customer_selected_price`. Inttegro never falls back to a
+                product's default unit price during order creation.
         InlineProductDetails:
             type: object
             required:
@@ -11941,6 +12127,36 @@ components:
                     type: string
                     description: Existing catalog product ID to snapshot onto the order line item
                     example: "prod_abc123xyz"
+                quantity:
+                    type: integer
+                    minimum: 1
+                    description: How many units of the catalog product the customer is purchasing
+                    example: 1
+        CustomerSelectedPriceInput:
+            type: object
+            description: Available only to Commerce internal services and Upper private beta organizations and applications.
+            required: [price_id, selected_amount]
+            properties:
+                price_id:
+                    type: string
+                    description: Existing customer_selected_amount price belonging to the catalog product
+                    example: "pr_donation"
+                selected_amount:
+                    $ref: '#/components/schemas/AmountParams'
+                    description: Concrete unit amount selected for this order; it must satisfy the referenced price's currency and range
+        CatalogProductWithCustomerSelectedPrice:
+            type: object
+            required:
+                - customer_selected_price
+                - product_id
+                - quantity
+            properties:
+                customer_selected_price:
+                    $ref: '#/components/schemas/CustomerSelectedPriceInput'
+                product_id:
+                    type: string
+                    description: Existing catalog product ID to snapshot onto the order line item
+                    example: "prod_devcongress_donation"
                 quantity:
                     type: integer
                     minimum: 1

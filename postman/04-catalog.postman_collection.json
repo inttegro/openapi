@@ -2,7 +2,7 @@
   "info": {
     "name": "Inttegro API — Catalog",
     "description": "Create and manage products and prices. Uses the shared Inttegro API global environment.\n\nGenerated from insomnia/04-catalog.insomnia.yaml. Edit the Insomnia source and run npm run postman:generate.",
-    "version": "0.1.0-beta28",
+    "version": "0.1.0-beta29",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
@@ -103,10 +103,10 @@
             "url": {
               "raw": "{{base_url}}/products/add_price"
             },
-            "description": "Public reference: https://studio.inttegro.com/products#add-a-price-to-a-product",
+            "description": "Public reference: https://studio.inttegro.com/products#add-a-price-to-a-product. Price currency must be a recognized Inttegro currency code.",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"product_id\": \"{{product_id}}\",\n  \"label\": \"Wholesale\",\n  \"about\": \"Preferred rate for repeat buyers\",\n  \"amount\": {\n    \"currency\": \"ghs\",\n    \"value\": 85000\n  }\n}",
+              "raw": "{\n  \"product_id\": \"{{product_id}}\",\n  \"label\": \"Wholesale\",\n  \"about\": \"Preferred rate for repeat buyers\",\n  \"type\": \"fixed_amount\",\n  \"fixed_amount\": {\n    \"currency\": \"ghs\",\n    \"value\": 85000\n  }\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -349,10 +349,10 @@
             "url": {
               "raw": "{{base_url}}/prices/create"
             },
-            "description": "Public reference: https://studio.inttegro.com/prices#create-a-price",
+            "description": "Public reference: https://studio.inttegro.com/prices#create-a-price. Use the explicit type with fixed_amount or customer_selected_amount; the legacy top-level amount form is not accepted. Customer-selected prices require a catalog product_id, and their currency must be a recognized Inttegro currency code.",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"amount\": {\n    \"currency\": \"ghs\",\n    \"value\": 2999\n  },\n  \"label\": \"Monthly\",\n  \"about\": \"Standard monthly subscription price\",\n  \"product_id\": \"{{product_id}}\"\n}",
+              "raw": "{\n  \"type\": \"customer_selected_amount\",\n  \"customer_selected_amount\": {\n    \"currency\": \"ghs\",\n    \"minimum\": 1000,\n    \"maximum\": 500000,\n    \"suggested_amounts\": [\n      {\n        \"id\": \"supporter\",\n        \"value\": 5000\n      },\n      {\n        \"id\": \"champion\",\n        \"value\": 10000,\n        \"recommended\": true\n      }\n    ]\n  },\n  \"label\": \"Support our work\",\n  \"about\": \"Choose how much to contribute\",\n  \"product_id\": \"{{product_id}}\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -371,6 +371,11 @@
                   "  const price_id = jsonBody?.price?.id;",
                   "  pm.test('Returns price.id', () => {",
                   "    pm.expect(price_id).to.be.a('string').and.not.be.empty;",
+                  "  });",
+                  "  pm.test('Returns a customer-selected price definition', () => {",
+                  "    pm.expect(jsonBody?.price?.type).to.equal('customer_selected_amount');",
+                  "    pm.expect(jsonBody?.price?.customer_selected_amount?.minimum).to.equal(1000);",
+                  "    pm.expect(jsonBody?.price?.customer_selected_amount?.suggested_amounts).to.be.an('array').with.length(2);",
                   "  });",
                   "  if (price_id) pm.environment.set(\"price_id\", price_id);",
                   "}"
