@@ -3,8 +3,8 @@ openapi: 3.0.3
 info:
     title: Inttegro API
     description: Machine-readable reference for the public Inttegro API
-    version: 0.1.0-beta29
-    x-inttegro-collection-version: 0.1.0-beta29
+    version: 0.1.0-beta30
+    x-inttegro-collection-version: 0.1.0-beta30
     contact:
         name: Inttegro Engineering
         url: "https://inttegro.com"
@@ -1403,10 +1403,10 @@ paths:
         post:
             summary: Look up a checkout order
             description: |
-                Retrieve the current public checkout representation of a finalized Order. This is a
-                capability endpoint: possession of the Order ID allows the holder to inspect the
-                checkout and attempt payment, but does not allow changing the Order's customer,
-                merchant, amount, currency, line items, or shipping address.
+                Retrieve either the current public checkout representation of a finalized Order or
+                the client-safe amount-selection policy for a Purchase Intent. Exactly one reference
+                is required. An Order remains immutable; selecting an amount against a compatible
+                Purchase Intent creates the finalized Order through `/checkout/select_amount`.
             operationId: lookupCheckoutOrder
             tags: [Checkout]
             security: []
@@ -1415,17 +1415,17 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CheckoutOrderReferenceRequest'
+                            $ref: '#/components/schemas/CheckoutLookupRequest'
             responses:
                 '200':
-                    description: Checkout order found
+                    description: Checkout Order or amount-selection policy found
                     headers:
                         X-Request-Id:
                             $ref: '#/components/headers/RequestId'
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/CheckoutOrderResponse'
+                                $ref: '#/components/schemas/CheckoutLookupResponse'
                 '400':
                     description: Invalid checkout lookup request
                     headers:
@@ -1436,10 +1436,77 @@ paths:
                             schema:
                                 $ref: '#/components/schemas/ErrorEnvelope'
                 '422':
-                    description: Checkout order was not found or is not finalized
+                    description: Checkout reference was not found or cannot be used
                     headers:
                         X-Request-Id:
                             $ref: '#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorEnvelope'
+    /checkout/select_amount:
+        post:
+            summary: Select an amount and prepare a checkout Order
+            description: |
+                Validate a payer-selected amount against the Purchase Intent policy and create the
+                finalized Order used by the existing Checkout payment flow. Suggested amounts are
+                conveniences, not an allow-list. Retry an uncertain request with the same
+                idempotency key and body.
+            operationId: selectCheckoutAmount
+            tags: [Checkout]
+            security: []
+            parameters:
+                - $ref: '#/components/parameters/IdempotencyKey'
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/CheckoutSelectAmountRequest'
+            responses:
+                '200':
+                    description: Finalized Checkout Order created or replayed
+                    headers:
+                        X-Request-Id:
+                            $ref: '#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/CheckoutOrderResponse'
+                '400':
+                    description: Invalid amount-selection request
+                    headers:
+                        X-Request-Id:
+                            $ref: '#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorEnvelope'
+                '409':
+                    description: Another request is currently using the same idempotency key
+                    headers:
+                        X-Request-Id:
+                            $ref: '#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorEnvelope'
+                '422':
+                    description: Purchase Intent or selected amount cannot be used
+                    headers:
+                        X-Request-Id:
+                            $ref: '#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorEnvelope'
+                '503':
+                    description: Checkout Order preparation failed transiently
+                    headers:
+                        X-Request-Id:
+                            $ref: '#/components/headers/RequestId'
+                        Retry-After:
+                            $ref: '#/components/headers/RetryAfter'
                     content:
                         application/json:
                             schema:
@@ -13356,6 +13423,44 @@ components:
                     minLength: 1
                     description: The finalized Order to inspect or pay.
                     example: "or_a1b2c3d4e5f6"
+        CheckoutLookupRequest:
+            oneOf:
+                - $ref: '#/components/schemas/CheckoutOrderReferenceRequest'
+                - type: object
+                  additionalProperties: false
+                  required:
+                      - purchase_intent_id
+                  properties:
+                      purchase_intent_id:
+                          type: string
+                          minLength: 1
+                          description: Purchase Intent whose customer-selected amount policy should be loaded.
+                          example: "sale_a1b2c3d4e5f6"
+        CheckoutSelectAmountRequest:
+            type: object
+            additionalProperties: false
+            required:
+                - purchase_intent_id
+                - selected_amount
+            properties:
+                purchase_intent_id:
+                    type: string
+                    minLength: 1
+                    example: "sale_a1b2c3d4e5f6"
+                selected_amount:
+                    type: object
+                    additionalProperties: false
+                    required:
+                        - currency
+                        - value
+                    properties:
+                        currency:
+                            $ref: '#/components/schemas/Currency'
+                        value:
+                            type: integer
+                            minimum: 1
+                            description: Payer-selected amount in the currency's smallest unit.
+                            example: 5000
         CheckoutPaymentAddress:
             type: object
             additionalProperties: false
@@ -13494,6 +13599,49 @@ components:
                     $ref: '#/components/schemas/CheckoutOrder'
                 error:
                     $ref: '#/components/schemas/Error'
+        CheckoutLookupResponse:
+            type: object
+            description: Exactly one of `order` or `amount_selection` is returned on success.
+            properties:
+                order:
+                    $ref: '#/components/schemas/CheckoutOrder'
+                amount_selection:
+                    $ref: '#/components/schemas/CheckoutAmountSelection'
+                error:
+                    $ref: '#/components/schemas/Error'
+        CheckoutAmountSelection:
+            type: object
+            additionalProperties: false
+            required:
+                - purchase_intent_id
+                - price_id
+                - product_id
+                - merchant_name
+                - product_name
+                - customer_selected_amount
+            properties:
+                purchase_intent_id:
+                    type: string
+                    example: "sale_a1b2c3d4e5f6"
+                price_id:
+                    type: string
+                    example: "price_123"
+                product_id:
+                    type: string
+                    example: "prod_123"
+                merchant_name:
+                    type: string
+                    example: "Kora Market"
+                product_name:
+                    type: string
+                    example: "Open contribution"
+                product_about:
+                    type: string
+                expires_at:
+                    type: string
+                    format: date-time
+                customer_selected_amount:
+                    $ref: '#/components/schemas/CustomerSelectedAmount'
         CheckoutOrder:
             type: object
             description: |
