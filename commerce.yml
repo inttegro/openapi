@@ -3,8 +3,8 @@ openapi: 3.0.3
 info:
     title: Inttegro API
     description: Machine-readable reference for the public Inttegro API
-    version: 0.1.0-beta30
-    x-inttegro-collection-version: 0.1.0-beta30
+    version: 0.1.0-beta31
+    x-inttegro-collection-version: 0.1.0-beta31
     contact:
         name: Inttegro Engineering
         url: "https://inttegro.com"
@@ -15279,6 +15279,9 @@ components:
                     $ref: '#/components/schemas/CustomData'
                 description:
                     type: string
+                fingerprint:
+                    type: string
+                    description: Application-scoped value for recognizing the same underlying financial account within the authenticated application. Matching nonempty fingerprints can be used to detect duplicate connections. Compare fingerprints only within the same application. Omitted when reliable fingerprint material is unavailable.
                 id:
                     type: string
                     example: fa_1234567890abcdef
@@ -15392,6 +15395,9 @@ components:
                 disconnected_at:
                     type: string
                     format: date-time
+                fingerprint:
+                    type: string
+                    description: Application-scoped value for recognizing the same underlying financial account within the authenticated application. Matching nonempty fingerprints can be used to detect duplicate connections. Compare fingerprints only within the same application. Omitted when reliable fingerprint material is unavailable.
                 id:
                     type: string
                 label:
