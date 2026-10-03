@@ -3,8 +3,8 @@ openapi: 3.0.3
 info:
     title: Inttegro API
     description: Machine-readable reference for the public Inttegro API
-    version: 0.1.0-beta34
-    x-inttegro-collection-version: 0.1.0-beta34
+    version: 0.1.0-beta35
+    x-inttegro-collection-version: 0.1.0-beta35
     contact:
         name: Inttegro Engineering
         url: "https://inttegro.com"
@@ -15384,7 +15384,7 @@ components:
                             type: string
         FinancialAccountCommonResponse:
             type: object
-            required: [created_at, currency, id, type]
+            required: [created_at, currency, fingerprint, id, type]
             properties:
                 archived_at:
                     type: string
@@ -15400,7 +15400,7 @@ components:
                     type: string
                 fingerprint:
                     type: string
-                    description: Application-scoped value for recognizing the same underlying financial account within the authenticated application. Matching nonempty fingerprints can be used to detect duplicate connections. Compare fingerprints only within the same application. Omitted when reliable fingerprint material is unavailable.
+                    description: A stable identifier for the underlying financial account within your application. Use it to recognize when the same account has been connected more than once.
                 id:
                     type: string
                     example: fa_1234567890abcdef
@@ -15502,7 +15502,7 @@ components:
                           $ref: '#/components/schemas/FinancialAccountWalletRawResponse'
         FinancialAccountCompactResponse:
             type: object
-            required: [created_at, currency, id, type]
+            required: [created_at, currency, fingerprint, id, type]
             properties:
                 created_at:
                     type: string
@@ -15516,7 +15516,7 @@ components:
                     format: date-time
                 fingerprint:
                     type: string
-                    description: Application-scoped value for recognizing the same underlying financial account within the authenticated application. Matching nonempty fingerprints can be used to detect duplicate connections. Compare fingerprints only within the same application. Omitted when reliable fingerprint material is unavailable.
+                    description: A stable identifier for the underlying financial account within your application. Use it to recognize when the same account has been connected more than once.
                 id:
                     type: string
                 label:
