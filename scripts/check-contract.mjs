@@ -23,6 +23,7 @@ const PUBLIC_CHECKOUT_OPERATIONS = new Set([
   "POST /checkout/lookup",
   "POST /checkout/pay",
   "POST /checkout/request_confirmation",
+  "POST /checkout/select_amount",
   "POST /checkout/confirm_payment",
 ]);
 

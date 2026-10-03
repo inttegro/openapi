@@ -394,6 +394,29 @@ collection:
         {
           "order_id": "{{ order_id }}"
         }
+  - name: Select checkout amount
+    url: '{{ base_url }}/checkout/select_amount'
+    method: POST
+    meta:
+      id: req_b89d29d67ae54366a050cb36b7927914
+      description: |-
+        OpenAPI operation: POST /checkout/select_amount
+        Send exactly one checkout reference. This example creates an Order from a Purchase Intent. To change a still-pristine existing Order, send order_id instead of purchase_intent_id.
+    headers:
+    - name: Content-Type
+      value: application/json
+    - name: Idempotency-Key
+      value: call-checkout-select-amount-{{ purchase_intent_id }}
+    body:
+      mimeType: application/json
+      text: |-
+        {
+          "purchase_intent_id": "{{ purchase_intent_id }}",
+          "selected_amount": {
+            "currency": "ghs",
+            "value": 5000
+          }
+        }
   - name: Pay a public checkout order
     url: '{{ base_url }}/checkout/pay'
     method: POST
