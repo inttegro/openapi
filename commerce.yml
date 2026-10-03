@@ -3,8 +3,8 @@ openapi: 3.0.3
 info:
     title: Inttegro API
     description: Machine-readable reference for the public Inttegro API
-    version: 0.1.0-beta31
-    x-inttegro-collection-version: 0.1.0-beta31
+    version: 0.1.0-beta34
+    x-inttegro-collection-version: 0.1.0-beta34
     contact:
         name: Inttegro Engineering
         url: "https://inttegro.com"
@@ -1401,12 +1401,14 @@ paths:
                                 $ref: '#/components/schemas/Error'
     /checkout/lookup:
         post:
-            summary: Look up a checkout order
+            summary: Look up checkout
             description: |
                 Retrieve either the current public checkout representation of a finalized Order or
-                the client-safe amount-selection policy for a Purchase Intent. Exactly one reference
-                is required. An Order remains immutable; selecting an amount against a compatible
-                Purchase Intent creates the finalized Order through `/checkout/select_amount`.
+                the client-safe amount-selection policy for a Purchase Intent. Send exactly one
+                reference. A Purchase Intent lookup supports collecting an amount before creating
+                an Order. An Order lookup can also return its amount-selection policy when that
+                finalized Order still has an editable customer-selected price and payment has not
+                begun.
             operationId: lookupCheckoutOrder
             tags: [Checkout]
             security: []
@@ -1448,8 +1450,11 @@ paths:
         post:
             summary: Select an amount and prepare a checkout Order
             description: |
-                Validate a payer-selected amount against the Purchase Intent policy and create the
-                finalized Order used by the existing Checkout payment flow. Suggested amounts are
+                Send exactly one checkout reference with the payer-selected amount. A
+                `purchase_intent_id` validates the Purchase Intent policy and creates the finalized
+                Order used by Checkout. An `order_id` validates the amount against that Order's
+                customer-selected price policy and updates the same Order while payment remains
+                pristine. The Order cannot be changed after payment begins. Suggested amounts are
                 conveniences, not an allow-list. Retry an uncertain request with the same
                 idempotency key and body.
             operationId: selectCheckoutAmount
@@ -1465,7 +1470,7 @@ paths:
                             $ref: '#/components/schemas/CheckoutSelectAmountRequest'
             responses:
                 '200':
-                    description: Finalized Checkout Order created or replayed
+                    description: Finalized Checkout Order created, updated, or replayed
                     headers:
                         X-Request-Id:
                             $ref: '#/components/headers/RequestId'
@@ -11085,6 +11090,8 @@ components:
                     format: date-time
                     description: Future RFC3339 timestamp after which the Buy link stops accepting purchases
                     example: "2030-12-01T09:00:00Z"
+                presentation:
+                    $ref: '#/components/schemas/CreatePurchaseIntentPresentation'
         UpdatePurchaseIntentRequest:
             type: object
             anyOf:
@@ -11132,6 +11139,71 @@ components:
                         clears an existing elapsed expires_at value. It does not remove
                         the order claim from a used single-use intent.
                     example: true
+                presentation:
+                    $ref: '#/components/schemas/UpdatePurchaseIntentPresentation'
+        CreatePurchaseIntentPresentation:
+            type: object
+            description: Optional merchant-authored copy for the hosted Buy page. Omit it to use product-aware defaults.
+            required:
+                - buy_page
+            properties:
+                buy_page:
+                    type: object
+                    required:
+                        - text
+                    properties:
+                        text:
+                            type: object
+                            minProperties: 1
+                            properties:
+                                checkout_section_title:
+                                    type: string
+                                    minLength: 1
+                                    maxLength: 80
+                                    description: Plain, single-line title shown above the Buy page form
+                                    example: Support this cause
+                                amount_field_label:
+                                    type: string
+                                    minLength: 1
+                                    maxLength: 64
+                                    description: Plain, single-line label for a customer-selected amount field
+                                    example: Your contribution
+                                primary_action_label:
+                                    type: string
+                                    minLength: 1
+                                    maxLength: 48
+                                    description: Plain, single-line label used for the ready primary action. Validation and loading labels remain system-owned.
+                                    example: Continue to contribute
+        UpdatePurchaseIntentPresentation:
+            type: object
+            description: Sparse Buy page copy update. Omit a field to preserve it, or send null to restore the product-aware default.
+            required:
+                - buy_page
+            properties:
+                buy_page:
+                    type: object
+                    required:
+                        - text
+                    properties:
+                        text:
+                            type: object
+                            minProperties: 1
+                            properties:
+                                checkout_section_title:
+                                    type: string
+                                    nullable: true
+                                    minLength: 1
+                                    maxLength: 80
+                                amount_field_label:
+                                    type: string
+                                    nullable: true
+                                    minLength: 1
+                                    maxLength: 64
+                                primary_action_label:
+                                    type: string
+                                    nullable: true
+                                    minLength: 1
+                                    maxLength: 48
         CancelPurchaseIntentRequest:
             type: object
             anyOf:
@@ -11415,6 +11487,8 @@ components:
                     $ref: '#/components/schemas/PurchaseIntentMerchant'
                 price:
                     $ref: '#/components/schemas/PurchaseIntentPrice'
+                presentation:
+                    $ref: '#/components/schemas/PurchaseIntentPresentation'
                 product:
                     $ref: '#/components/schemas/PurchaseIntentProduct'
                 quantity:
@@ -11446,6 +11520,24 @@ components:
                     $ref: '#/components/schemas/PurchaseIntentUsage'
                 variant_set:
                     $ref: '#/components/schemas/PurchaseIntentVariantSet'
+        PurchaseIntentPresentation:
+            type: object
+            additionalProperties: false
+            properties:
+                buy_page:
+                    type: object
+                    additionalProperties: false
+                    properties:
+                        text:
+                            type: object
+                            additionalProperties: false
+                            properties:
+                                checkout_section_title:
+                                    type: string
+                                amount_field_label:
+                                    type: string
+                                primary_action_label:
+                                    type: string
         Product:
             type: object
             required:
@@ -13437,30 +13529,47 @@ components:
                           description: Purchase Intent whose customer-selected amount policy should be loaded.
                           example: "sale_a1b2c3d4e5f6"
         CheckoutSelectAmountRequest:
+            oneOf:
+                - type: object
+                  additionalProperties: false
+                  required:
+                      - purchase_intent_id
+                      - selected_amount
+                  properties:
+                      purchase_intent_id:
+                          type: string
+                          minLength: 1
+                          description: Purchase Intent used to create a new Checkout Order.
+                          example: "sale_a1b2c3d4e5f6"
+                      selected_amount:
+                          $ref: '#/components/schemas/CheckoutSelectedAmount'
+                - type: object
+                  additionalProperties: false
+                  required:
+                      - order_id
+                      - selected_amount
+                  properties:
+                      order_id:
+                          type: string
+                          minLength: 1
+                          description: Existing finalized Order whose amount should be changed before payment begins.
+                          example: "or_a1b2c3d4e5f6"
+                      selected_amount:
+                          $ref: '#/components/schemas/CheckoutSelectedAmount'
+        CheckoutSelectedAmount:
             type: object
             additionalProperties: false
             required:
-                - purchase_intent_id
-                - selected_amount
+                - currency
+                - value
             properties:
-                purchase_intent_id:
-                    type: string
-                    minLength: 1
-                    example: "sale_a1b2c3d4e5f6"
-                selected_amount:
-                    type: object
-                    additionalProperties: false
-                    required:
-                        - currency
-                        - value
-                    properties:
-                        currency:
-                            $ref: '#/components/schemas/Currency'
-                        value:
-                            type: integer
-                            minimum: 1
-                            description: Payer-selected amount in the currency's smallest unit.
-                            example: 5000
+                currency:
+                    $ref: '#/components/schemas/Currency'
+                value:
+                    type: integer
+                    minimum: 1
+                    description: Payer-selected amount in the currency's smallest unit.
+                    example: 5000
         CheckoutPaymentAddress:
             type: object
             additionalProperties: false
@@ -13601,7 +13710,10 @@ components:
                     $ref: '#/components/schemas/Error'
         CheckoutLookupResponse:
             type: object
-            description: Exactly one of `order` or `amount_selection` is returned on success.
+            description: |
+                A Purchase Intent lookup returns `amount_selection`. An Order lookup returns
+                `order` and also returns `amount_selection` while that Order's amount can still be
+                changed.
             properties:
                 order:
                     $ref: '#/components/schemas/CheckoutOrder'
@@ -13613,16 +13725,23 @@ components:
             type: object
             additionalProperties: false
             required:
-                - purchase_intent_id
                 - price_id
                 - product_id
                 - merchant_name
                 - product_name
                 - customer_selected_amount
+            oneOf:
+                - required: [purchase_intent_id]
+                - required: [order_id]
             properties:
                 purchase_intent_id:
                     type: string
+                    description: Purchase Intent reference present when selection creates an Order.
                     example: "sale_a1b2c3d4e5f6"
+                order_id:
+                    type: string
+                    description: Order reference present when selection changes an existing Order.
+                    example: "or_a1b2c3d4e5f6"
                 price_id:
                     type: string
                     example: "price_123"

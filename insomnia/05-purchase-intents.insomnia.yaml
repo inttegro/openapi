@@ -49,7 +49,15 @@ collection:
           "usage": {
             "multi_use": true
           },
-          "expires_at": "{{ future_timestamp }}"
+          "expires_at": "{{ future_timestamp }}",
+          "presentation": {
+            "buy_page": {
+              "text": {
+                "checkout_section_title": "Complete your order",
+                "primary_action_label": "Continue"
+              }
+            }
+          }
         }
     scripts:
       afterResponse: |-
@@ -92,6 +100,14 @@ collection:
           "quantity": {
             "min": 2,
             "max": 8
+          },
+          "presentation": {
+            "buy_page": {
+              "text": {
+                "amount_field_label": "Your amount",
+                "primary_action_label": null
+              }
+            }
           },
           "reactivate": true
         }

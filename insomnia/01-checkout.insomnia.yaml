@@ -399,7 +399,9 @@ collection:
     method: POST
     meta:
       id: req_b89d29d67ae54366a050cb36b7927914
-      description: 'OpenAPI operation: POST /checkout/select_amount'
+      description: |-
+        OpenAPI operation: POST /checkout/select_amount
+        Send exactly one checkout reference. This example creates an Order from a Purchase Intent. To change a still-pristine existing Order, send order_id instead of purchase_intent_id.
     headers:
     - name: Content-Type
       value: application/json
