@@ -3,8 +3,8 @@ openapi: 3.0.3
 info:
     title: Inttegro API
     description: Machine-readable reference for the public Inttegro API
-    version: 0.1.0-beta35
-    x-inttegro-collection-version: 0.1.0-beta35
+    version: 0.1.0-beta36
+    x-inttegro-collection-version: 0.1.0-beta36
     contact:
         name: Inttegro Engineering
         url: "https://inttegro.com"
@@ -4353,9 +4353,9 @@ paths:
         post:
             summary: Retrieve your balance
             description: |
-                Fetch the latest GHS balance snapshot for your application. The response separates
-                payout-eligible funds from funds that are still pending, held back from payout, or
-                assigned to refund activity at the snapshot cutoff.
+                Fetch the latest GHS balance snapshot plus live operational holds for your application.
+                The response separates payout-eligible funds, funds that are still pending, deliberate
+                refund and reserved buckets, and funds committed to in-flight payouts or refunds.
             operationId: lookupBalances
             tags:
                 - Balances
@@ -14891,10 +14891,12 @@ components:
                     $ref: '#/components/schemas/BalanceSnapshot'
         CurrencyBalanceSnapshot:
             type: object
-            required: [available, includes_transactions_before, pending, refund, reserved]
+            required: [available, held, includes_transactions_before, pending, refund, reserved]
             properties:
                 available:
                     $ref: '#/components/schemas/BalanceValue'
+                held:
+                    $ref: '#/components/schemas/BalanceHolds'
                 includes_transactions_before:
                     type: string
                     format: date-time
@@ -14904,11 +14906,29 @@ components:
                 refund:
                     allOf:
                         - $ref: '#/components/schemas/BalanceValue'
-                    description: Funds assigned to refund activity at the snapshot cutoff
+                    description: Funds intentionally earmarked for future refund obligations at the snapshot cutoff
                 reserved:
                     allOf:
                         - $ref: '#/components/schemas/BalanceValue'
-                    description: Funds held back from payout at the snapshot cutoff
+                    description: Funds intentionally reserved for policy, risk, or remediation purposes at the snapshot cutoff
+        BalanceHolds:
+            type: object
+            additionalProperties: false
+            description: Live operational commitments read from the canonical balance position.
+            required: [as_of, payout, refund]
+            properties:
+                as_of:
+                    type: string
+                    format: date-time
+                    description: When these strongly consistent hold amounts were read.
+                payout:
+                    allOf:
+                        - $ref: '#/components/schemas/BalanceValue'
+                    description: Funds committed to in-flight or unresolved payouts.
+                refund:
+                    allOf:
+                        - $ref: '#/components/schemas/BalanceValue'
+                    description: Funds committed to in-flight or unresolved refunds.
         BalanceValue:
             type: object
             required: [amount]
@@ -15899,9 +15919,9 @@ components:
                     description: When the payout succeeded
         PayoutBalanceTransaction:
             type: object
-            description: A sparse view of one balance transaction's contribution to a payout.
+            description: A historical view of one balance transaction's contribution to a payout. Released contributions remain present so clients can inspect the payout's original composition.
             additionalProperties: false
-            required: [allocated_amount, amount, id]
+            required: [allocated_amount, amount, id, status]
             properties:
                 allocated_amount:
                     $ref: '#/components/schemas/Amount'
@@ -15911,6 +15931,10 @@ components:
                     type: string
                     description: Unique balance transaction identifier.
                     example: bt_1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcd
+                status:
+                    type: string
+                    enum: [reserved, completed, released]
+                    description: Whether this contribution is still reserved for the payout, was consumed by a successful payout, or was released after the payout did not complete.
         PayoutError:
             type: object
             description: Public failure details returned when payout execution fails.

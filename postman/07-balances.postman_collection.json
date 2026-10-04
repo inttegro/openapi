@@ -1,8 +1,8 @@
 {
   "info": {
     "name": "Inttegro API — Balances",
-    "description": "Read balance snapshots and balance ledger entries. Uses the shared Inttegro API global environment.\n\nGenerated from insomnia/07-balances.insomnia.yaml. Edit the Insomnia source and run npm run postman:generate.",
-    "version": "0.1.0-beta35",
+    "description": "Read balance snapshots, live operational holds, and balance ledger entries. Uses the shared Inttegro API global environment.\n\nGenerated from insomnia/07-balances.insomnia.yaml. Edit the Insomnia source and run npm run postman:generate.",
+    "version": "0.1.0-beta36",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
@@ -48,6 +48,10 @@
                   "  for (const field of ['available', 'pending', 'refund', 'reserved']) {",
                   "    pm.expect(balances.ghs[field].amount).to.be.a('number');",
                   "  }",
+                  "  for (const field of ['payout', 'refund']) {",
+                  "    pm.expect(balances.ghs.held[field].amount).to.be.a('number');",
+                  "  }",
+                  "  pm.expect(balances.ghs.held.as_of).to.be.a('string');",
                   "  pm.expect(balances.ghs.includes_transactions_before).to.be.a('string');",
                   "});"
                 ]
