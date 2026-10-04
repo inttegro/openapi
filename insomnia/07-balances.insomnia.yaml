@@ -3,7 +3,7 @@ schema_version: '5.1'
 name: Inttegro API — Balances
 meta:
   id: wrk_bd7a529b5b969e2c2fd1042a34e9dc06
-  description: Read balance snapshots and balance ledger entries. Uses the shared Inttegro API global environment.
+  description: Read balance snapshots, live operational holds, and balance ledger entries. Uses the shared Inttegro API global environment.
 collection:
 - name: Balances
   meta:
@@ -46,6 +46,10 @@ collection:
           for (const field of ['available', 'pending', 'refund', 'reserved']) {
             insomnia.expect(balances.ghs[field].amount).to.be.a('number');
           }
+          for (const field of ['payout', 'refund']) {
+            insomnia.expect(balances.ghs.held[field].amount).to.be.a('number');
+          }
+          insomnia.expect(balances.ghs.held.as_of).to.be.a('string');
           insomnia.expect(balances.ghs.includes_transactions_before).to.be.a('string');
         });
 - name: Balance transactions

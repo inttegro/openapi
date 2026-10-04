@@ -86,6 +86,7 @@ collection:
                 insomnia.expect(transaction.id).to.be.a('string').and.not.be.empty;
                 insomnia.expect(transaction.amount).to.have.all.keys('currency', 'value');
                 insomnia.expect(transaction.allocated_amount).to.have.all.keys('currency', 'value');
+                insomnia.expect(transaction.status).to.be.oneOf(['reserved', 'completed', 'released']);
               }
             });
           }
