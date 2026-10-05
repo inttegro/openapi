@@ -3,8 +3,8 @@ openapi: 3.0.3
 info:
     title: Inttegro API
     description: Machine-readable reference for the public Inttegro API
-    version: 0.1.0-beta36
-    x-inttegro-collection-version: 0.1.0-beta36
+    version: 0.1.0-beta37
+    x-inttegro-collection-version: 0.1.0-beta37
     contact:
         name: Inttegro Engineering
         url: "https://inttegro.com"
@@ -15859,6 +15859,8 @@ components:
                     example: "fa_1234567890abcdef"
                 error:
                     $ref: '#/components/schemas/PayoutError'
+                    deprecated: true
+                    description: Deprecated compatibility projection of `failure`. New integrations should use `failure`.
                 execute_after:
                     type: string
                     format: date-time
@@ -15874,7 +15876,10 @@ components:
                 failed_at:
                     type: string
                     format: date-time
-                    description: When the payout entered its unsuccessful terminal state
+                    description: When the payout entered the `failed` state.
+                failure:
+                    $ref: '#/components/schemas/PayoutFailure'
+                    description: Caller-safe failure information. Present only when `status` is `failed`.
                 id:
                     type: string
                     description: Unique payout identifier
@@ -15911,7 +15916,7 @@ components:
                     description: Source identifier associated with the payout
                 status:
                     type: string
-                    enum: [initialized, scheduled, processing, executing, succeeded, invalid, canceled]
+                    enum: [initialized, scheduled, processing, executing, succeeded, failed, canceled]
                     description: Current payout lifecycle state
                 succeeded_at:
                     type: string
@@ -15937,7 +15942,8 @@ components:
                     description: Whether this contribution is still reserved for the payout, was consumed by a successful payout, or was released after the payout did not complete.
         PayoutError:
             type: object
-            description: Public failure details returned when payout execution fails.
+            deprecated: true
+            description: Deprecated compatibility projection of `PayoutFailure`.
             additionalProperties: false
             required:
                 - cause
@@ -15958,6 +15964,22 @@ components:
                 type:
                     type: string
                     description: Stable machine-readable failure category.
+        PayoutFailure:
+            type: object
+            description: Stable, caller-safe information about a terminal payout failure.
+            additionalProperties: false
+            required: [detail, reason, retryable]
+            properties:
+                detail:
+                    type: string
+                    description: Human-readable explanation safe to show to an operator.
+                reason:
+                    type: string
+                    enum: [provider_declined, delivery_failed, temporarily_unavailable, unknown]
+                    description: Stable category describing why the payout failed.
+                retryable:
+                    type: boolean
+                    description: Whether creating a new payout attempt may succeed without changing the destination or request.
         PayoutSettingsLookupScheduleAgingSpec:
             type: object
             description: Rules that determine when balance transactions become eligible for payout.
