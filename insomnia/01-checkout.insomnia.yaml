@@ -299,7 +299,9 @@ collection:
     method: POST
     meta:
       id: req_f527be43cb09f4aa441f0fb536748616
-      description: 'Public reference: https://studio.inttegro.com/orders#lookup-an-order'
+      description: |-
+        Public reference: https://studio.inttegro.com/orders#lookup-an-order
+        Paid-order receipt metadata is returned at payment.receipt; invoice.format contains only the invoice web and PDF representations.
     headers:
     - name: Content-Type
       value: application/json
@@ -384,7 +386,9 @@ collection:
     method: POST
     meta:
       id: req_86406f777146480684c6ea920a00d953
-      description: 'OpenAPI operation: POST /checkout/lookup'
+      description: |-
+        OpenAPI operation: POST /checkout/lookup
+        Paid-order receipt metadata is returned at payment.receipt; invoice.format contains only the invoice web and PDF representations.
     headers:
     - name: Content-Type
       value: application/json
