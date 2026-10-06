@@ -3,8 +3,8 @@ openapi: 3.0.3
 info:
     title: Inttegro API
     description: Machine-readable reference for the public Inttegro API
-    version: 0.1.0-beta37
-    x-inttegro-collection-version: 0.1.0-beta37
+    version: 0.1.0-beta38
+    x-inttegro-collection-version: 0.1.0-beta38
     contact:
         name: Inttegro Engineering
         url: "https://inttegro.com"
@@ -13940,12 +13940,6 @@ components:
                                 url:
                                     type: string
                                     format: uri
-                        receipt:
-                            type: object
-                            properties:
-                                url:
-                                    type: string
-                                    format: uri
                 beneficiary:
                     type: object
                     properties:
@@ -14154,8 +14148,6 @@ components:
                                     $ref: '#/components/schemas/OrderDocumentFormat'
                                 pdf:
                                     $ref: '#/components/schemas/OrderDocumentFormat'
-                                receipt:
-                                    $ref: '#/components/schemas/OrderReceiptDocumentFormat'
                 number:
                     type: string
                     description: Human-readable order number
@@ -14237,6 +14229,8 @@ components:
                                             type: string
                                         address:
                                             $ref: '#/components/schemas/OrderAddress'
+                        receipt:
+                            $ref: '#/components/schemas/OrderReceipt'
                         customer:
                             type: object
                             additionalProperties: false
@@ -14381,16 +14375,23 @@ components:
                 url:
                     type: string
                     format: uri
-        OrderReceiptDocumentFormat:
+        OrderReceipt:
             type: object
-            required:
-                - url
+            description: Receipt issued for a paid order payment.
+            required: [format]
             properties:
+                number:
+                    type: string
                 delivery_summary:
                     $ref: '#/components/schemas/OrderDocumentDeliverySummary'
-                url:
-                    type: string
-                    format: uri
+                format:
+                    type: object
+                    required: [web, pdf]
+                    properties:
+                        web:
+                            $ref: '#/components/schemas/OrderDocumentFormat'
+                        pdf:
+                            $ref: '#/components/schemas/OrderDocumentFormat'
         PaymentResponse:
             type: object
             description: Response after initiating payment
