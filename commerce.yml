@@ -3233,6 +3233,7 @@ paths:
                                             - id
                                             - name
                                             - created_at
+                                            - capabilities
                                         properties:
                                             id:
                                                 type: string
@@ -3245,6 +3246,8 @@ paths:
                                             created_at:
                                                 type: string
                                                 format: date-time
+                                            capabilities:
+                                                $ref: '#/components/schemas/ApplicationCapabilityProjection'
                                             secret_key:
                                                 type: object
                                                 properties:
@@ -3259,8 +3262,8 @@ paths:
                                                         type: string
                                             relationship:
                                                 type: object
-                                                description: Relationship receipt for the created child app.
-                                                required: [actor_app_id, child_app_id, child_standing, created_at, creator_app_id, id, kind, placement_parent_app_id, policy_version, relationship_policy, retained_creator_authority_exists, status, subject_app_id]
+                                                description: Identifies the created app's direct placement relationship.
+                                                required: [created_at, id, kind, parent, status]
                                                 properties:
                                                     id:
                                                         type: string
@@ -3268,9 +3271,18 @@ paths:
                                                         type: string
                                                         enum:
                                                             - placement
-                                                    policy_version:
-                                                        type: string
-                                                        example: app_relationship_authority.v1
+                                                    parent:
+                                                        type: object
+                                                        additionalProperties: false
+                                                        required: [id, name]
+                                                        description: Application that directly contains the created app.
+                                                        properties:
+                                                            id:
+                                                                type: string
+                                                            name:
+                                                                type: string
+                                                            alias:
+                                                                type: string
                                                     status:
                                                         type: string
                                                         enum:
@@ -3278,36 +3290,6 @@ paths:
                                                             - inactive
                                                             - suspended
                                                             - revoked
-                                                    actor_app_id:
-                                                        type: string
-                                                    creator_app_id:
-                                                        type: string
-                                                    placement_parent_app_id:
-                                                        type: string
-                                                    subject_app_id:
-                                                        type: string
-                                                    child_app_id:
-                                                        type: string
-                                                    child_standing:
-                                                        type: string
-                                                    relationship_policy:
-                                                        type: object
-                                                        required: [child_standing, credentials, management]
-                                                        properties:
-                                                            child_standing:
-                                                                type: string
-                                                            management:
-                                                                type: string
-                                                                enum:
-                                                                    - parent
-                                                                    - child
-                                                            credentials:
-                                                                type: string
-                                                                enum:
-                                                                    - child
-                                                                    - parent
-                                                    retained_creator_authority_exists:
-                                                        type: boolean
                                                     created_at:
                                                         type: string
                                                         format: date-time
@@ -3329,6 +3311,73 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/Error'
+    /apps/capabilities:
+        post:
+            summary: Retrieve the authenticated application's commerce capabilities
+            description: Returns the current payment and payout capability states for the authenticated application. Restricted states include the public reason and the requirements currently due.
+            operationId: lookupApplicationCapabilities
+            tags:
+                - Apps
+            requestBody:
+                required: false
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            additionalProperties: false
+            responses:
+                '200':
+                    description: Application capabilities retrieved successfully.
+                    headers:
+                        X-Request-Id:
+                            $ref: '#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ApplicationCapabilitiesResponse'
+                '400':
+                    description: Application capabilities request was invalid.
+                    headers:
+                        X-Request-Id:
+                            $ref: '#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorEnvelope'
+                '401':
+                    description: Authorization is required.
+                    headers:
+                        X-Request-Id:
+                            $ref: '#/components/headers/RequestId'
+                '403':
+                    description: Application-scoped authorization is required or the capability endpoint is not enabled for this application.
+                    headers:
+                        X-Request-Id:
+                            $ref: '#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorEnvelope'
+                '500':
+                    description: The application's required capability configuration is unavailable or invalid.
+                    headers:
+                        X-Request-Id:
+                            $ref: '#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorEnvelope'
+                '503':
+                    description: Application capabilities are temporarily unavailable.
+                    headers:
+                        X-Request-Id:
+                            $ref: '#/components/headers/RequestId'
+                        Retry-After:
+                            $ref: '#/components/headers/RetryAfter'
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorEnvelope'
     /apps/lookup:
         post:
             summary: Retrieve the authenticated application
@@ -3355,6 +3404,7 @@ paths:
                                             - id
                                             - name
                                             - created_at
+                                            - capabilities
                                         properties:
                                             id:
                                                 type: string
@@ -3373,6 +3423,41 @@ paths:
                                             archived_at:
                                                 type: string
                                                 format: date-time
+                                            capabilities:
+                                                $ref: '#/components/schemas/ApplicationCapabilityProjection'
+                                            relationship:
+                                                type: object
+                                                description: Identifies the authenticated app's direct placement relationship. Omitted for root apps.
+                                                required: [created_at, id, kind, parent, status]
+                                                properties:
+                                                    id:
+                                                        type: string
+                                                    kind:
+                                                        type: string
+                                                        enum:
+                                                            - placement
+                                                    parent:
+                                                        type: object
+                                                        additionalProperties: false
+                                                        required: [id, name]
+                                                        description: Application that directly contains the authenticated app.
+                                                        properties:
+                                                            id:
+                                                                type: string
+                                                            name:
+                                                                type: string
+                                                            alias:
+                                                                type: string
+                                                    status:
+                                                        type: string
+                                                        enum:
+                                                            - active
+                                                            - inactive
+                                                            - suspended
+                                                            - revoked
+                                                    created_at:
+                                                        type: string
+                                                        format: date-time
                 '401':
                     description: Unauthorized - invalid or missing API key
                     headers:
@@ -3440,6 +3525,7 @@ paths:
                                             - id
                                             - name
                                             - created_at
+                                            - capabilities
                                         properties:
                                             id:
                                                 type: string
@@ -3455,6 +3541,8 @@ paths:
                                             updated_at:
                                                 type: string
                                                 format: date-time
+                                            capabilities:
+                                                $ref: '#/components/schemas/ApplicationCapabilityProjection'
                 '401':
                     description: Unauthorized - invalid or missing API key
                     headers:
@@ -8302,6 +8390,107 @@ components:
                 type: string
             description: Stable key used to replay safe retries without applying the mutation twice.
     schemas:
+        ApplicationCapabilityRequirement:
+            type: object
+            additionalProperties: false
+            required: [code, description, due_at]
+            properties:
+                code:
+                    type: string
+                    pattern: '^[a-z][a-z0-9_]*$'
+                    description: Stable public identifier for the requirement.
+                description:
+                    type: string
+                    description: Public explanation of what must be completed.
+                due_at:
+                    type: string
+                    format: date-time
+                    nullable: true
+                    description: Requirement deadline, or null when no deadline applies.
+        ApplicationCapabilityRequirements:
+            type: object
+            additionalProperties: false
+            required: [currently_due]
+            properties:
+                currently_due:
+                    type: array
+                    minItems: 1
+                    items:
+                        $ref: '#/components/schemas/ApplicationCapabilityRequirement'
+        EnabledApplicationCapability:
+            type: object
+            additionalProperties: false
+            required: [status, status_changed_at]
+            properties:
+                status:
+                    type: string
+                    enum: [enabled]
+                status_changed_at:
+                    type: string
+                    format: date-time
+        RestrictedApplicationCapability:
+            type: object
+            additionalProperties: false
+            required: [status, status_reason, status_changed_at, requirements]
+            properties:
+                status:
+                    type: string
+                    enum: [restricted]
+                status_reason:
+                    type: string
+                    enum: [setup_incomplete, account_under_review, account_restricted, account_inactive]
+                status_changed_at:
+                    type: string
+                    format: date-time
+                requirements:
+                    $ref: '#/components/schemas/ApplicationCapabilityRequirements'
+        PendingReviewApplicationCapability:
+            type: object
+            additionalProperties: false
+            required: [status, status_reason, status_changed_at]
+            properties:
+                status:
+                    type: string
+                    enum: [pending_review]
+                status_reason:
+                    type: string
+                    enum: [setup_incomplete, account_under_review, account_restricted, account_inactive]
+                status_changed_at:
+                    type: string
+                    format: date-time
+        ApplicationCapabilitiesResponse:
+            type: object
+            additionalProperties: false
+            required: [capabilities]
+            properties:
+                capabilities:
+                    type: object
+                    additionalProperties: false
+                    required: [payments, payouts]
+                    properties:
+                        payments:
+                            oneOf:
+                                - $ref: '#/components/schemas/EnabledApplicationCapability'
+                                - $ref: '#/components/schemas/RestrictedApplicationCapability'
+                        payouts:
+                            oneOf:
+                                - $ref: '#/components/schemas/EnabledApplicationCapability'
+                                - $ref: '#/components/schemas/RestrictedApplicationCapability'
+                                - $ref: '#/components/schemas/PendingReviewApplicationCapability'
+        ApplicationCapabilityProjection:
+            type: object
+            description: Public capability states currently available to the application. Newly created applications can return an empty object until capabilities become available. New capability keys may appear over time.
+            properties:
+                payments:
+                    oneOf:
+                        - $ref: '#/components/schemas/EnabledApplicationCapability'
+                        - $ref: '#/components/schemas/RestrictedApplicationCapability'
+                payouts:
+                    oneOf:
+                        - $ref: '#/components/schemas/EnabledApplicationCapability'
+                        - $ref: '#/components/schemas/RestrictedApplicationCapability'
+                        - $ref: '#/components/schemas/PendingReviewApplicationCapability'
+            additionalProperties: true
         ResourceSearchRequest:
             type: object
             additionalProperties: false
