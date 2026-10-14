@@ -16041,6 +16041,9 @@ components:
                     type: string
                     format: date-time
                     description: When the payout was canceled
+                cancellation:
+                    $ref: '#/components/schemas/PayoutCancellation'
+                    description: Caller-safe explanation and next step for a canceled payout. Present only when `status` is `canceled`.
                 custom_data:
                     $ref: '#/components/schemas/CustomData'
                 destination_id:
@@ -16130,6 +16133,22 @@ components:
                     type: string
                     enum: [reserved, completed, released]
                     description: Whether this contribution is still reserved for the payout, was consumed by a successful payout, or was released after the payout did not complete.
+        PayoutCancellation:
+            type: object
+            description: Stable, caller-safe information and guidance for a canceled payout.
+            additionalProperties: false
+            required: [detail, reason, remediation]
+            properties:
+                detail:
+                    type: string
+                    description: Human-readable explanation safe to show to an operator.
+                reason:
+                    type: string
+                    enum: [requested, no_eligible_funds, unknown]
+                    description: Stable category describing why the payout was canceled.
+                remediation:
+                    type: string
+                    description: Recommended next step safe to show to an operator.
         PayoutError:
             type: object
             deprecated: true
