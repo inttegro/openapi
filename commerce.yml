@@ -16238,19 +16238,38 @@ components:
             additionalProperties: false
             required:
                 - destinations
-                - minimum_amount
+                - limits
             properties:
                 destinations:
                     $ref: '#/components/schemas/PayoutDestinations'
                 fx_enabled:
                     type: boolean
                     description: Present only when foreign exchange is enabled in stored settings
-                minimum_amount:
-                    allOf:
-                        - $ref: '#/components/schemas/Amount'
-                    description: Platform payout minimum. The value is in the currency's smallest unit and applies to every payout destination.
+                limits:
+                    $ref: '#/components/schemas/PayoutSettingsLimits'
                 schedule:
                     $ref: '#/components/schemas/PayoutSettingsLookupSchedule'
+        PayoutSettingsLimits:
+            type: object
+            description: Platform limits applied to payouts.
+            additionalProperties: false
+            required:
+                - amount
+            properties:
+                amount:
+                    $ref: '#/components/schemas/PayoutAmountLimits'
+        PayoutAmountLimits:
+            type: object
+            description: Inclusive payout amount range. Values use the currency's smallest unit.
+            additionalProperties: false
+            required:
+                - min
+                - max
+            properties:
+                min:
+                    $ref: '#/components/schemas/Amount'
+                max:
+                    $ref: '#/components/schemas/Amount'
         PayoutSettingsMutationScheduleSpec:
             type: object
             description: Public payout schedule specification returned after a settings mutation.
@@ -16302,7 +16321,7 @@ components:
             description: Payout settings fields returned after a mutation
             additionalProperties: false
             required:
-                - minimum_amount
+                - limits
             properties:
                 destinations:
                     $ref: '#/components/schemas/PayoutDestinations'
@@ -16312,10 +16331,8 @@ components:
                 id:
                     type: string
                     description: Payout settings identifier
-                minimum_amount:
-                    allOf:
-                        - $ref: '#/components/schemas/Amount'
-                    description: Platform payout minimum. The value is in the currency's smallest unit and applies to every payout destination.
+                limits:
+                    $ref: '#/components/schemas/PayoutSettingsLimits'
                 schedule:
                     $ref: '#/components/schemas/PayoutSettingsMutationSchedule'
         SchedulePayoutRequest:
