@@ -16238,12 +16238,17 @@ components:
             additionalProperties: false
             required:
                 - destinations
+                - minimum_amount
             properties:
                 destinations:
                     $ref: '#/components/schemas/PayoutDestinations'
                 fx_enabled:
                     type: boolean
                     description: Present only when foreign exchange is enabled in stored settings
+                minimum_amount:
+                    allOf:
+                        - $ref: '#/components/schemas/Amount'
+                    description: Platform payout minimum. The value is in the currency's smallest unit and applies to every payout destination.
                 schedule:
                     $ref: '#/components/schemas/PayoutSettingsLookupSchedule'
         PayoutSettingsMutationScheduleSpec:
@@ -16296,6 +16301,8 @@ components:
             type: object
             description: Payout settings fields returned after a mutation
             additionalProperties: false
+            required:
+                - minimum_amount
             properties:
                 destinations:
                     $ref: '#/components/schemas/PayoutDestinations'
@@ -16305,6 +16312,10 @@ components:
                 id:
                     type: string
                     description: Payout settings identifier
+                minimum_amount:
+                    allOf:
+                        - $ref: '#/components/schemas/Amount'
+                    description: Platform payout minimum. The value is in the currency's smallest unit and applies to every payout destination.
                 schedule:
                     $ref: '#/components/schemas/PayoutSettingsMutationSchedule'
         SchedulePayoutRequest:
@@ -16326,7 +16337,7 @@ components:
                     example: "2026-08-05T09:00:00Z"
                 max_amount:
                     type: integer
-                    minimum: 1
+                    minimum: 25000
                     description: Maximum amount, in the smallest currency unit, that this payout may transfer.
                     example: 250000
                 reference:
