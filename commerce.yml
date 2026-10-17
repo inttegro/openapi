@@ -3,8 +3,8 @@ openapi: 3.0.3
 info:
     title: Inttegro API
     description: Machine-readable reference for the public Inttegro API
-    version: 0.1.0-beta38
-    x-inttegro-collection-version: 0.1.0-beta38
+    version: 0.1.0-beta42
+    x-inttegro-collection-version: 0.1.0-beta42
     contact:
         name: Inttegro Engineering
         url: "https://inttegro.com"
@@ -1404,12 +1404,11 @@ paths:
             summary: Look up checkout
             description: |
                 Retrieve either the current public checkout representation of a finalized Order or
-                the client-safe amount-selection policy for a Purchase Intent. Send exactly one
-                reference. A Purchase Intent lookup supports collecting an amount before creating
-                an Order. An Order lookup can also return its amount-selection policy when that
-                finalized Order still has an editable customer-selected price and payment has not
-                begun.
-            operationId: lookupCheckoutOrder
+                the canonical public Purchase Intent. Send exactly one reference. A Purchase Intent
+                response includes its resolved product and price, including customer-selected amount
+                policy when the price permits the customer to choose an amount. An Order response
+                includes editable pricing policy on each eligible line while payment has not begun.
+            operationId: lookupCheckoutResource
             tags: [Checkout]
             security: []
             requestBody:
@@ -1420,7 +1419,7 @@ paths:
                             $ref: '#/components/schemas/CheckoutLookupRequest'
             responses:
                 '200':
-                    description: Checkout Order or amount-selection policy found
+                    description: Checkout Order or Purchase Intent found
                     headers:
                         X-Request-Id:
                             $ref: '#/components/headers/RequestId'
@@ -1448,14 +1447,13 @@ paths:
                                 $ref: '#/components/schemas/ErrorEnvelope'
     /checkout/select_amount:
         post:
-            summary: Select an amount and prepare a checkout Order
+            summary: Update customer-selected amounts on a checkout Order
             description: |
-                Send exactly one checkout reference with the payer-selected amount. A
-                `purchase_intent_id` validates the Purchase Intent policy and creates the finalized
-                Order used by Checkout. An `order_id` validates the amount against that Order's
-                customer-selected price policy and updates the same Order while payment remains
-                pristine. The Order cannot be changed after payment begins. Suggested amounts are
-                conveniences, not an allow-list. Retry an uncertain request with the same
+                Update customer-selected product amounts on an existing finalized Order while its
+                payment remains pristine. The Order cannot be changed after payment begins.
+                Suggested amounts are conveniences, not an allow-list. Purchase Intent checkouts
+                should send their selected amount directly to `/checkout/pay`, which creates the
+                Order and starts payment together. Retry an uncertain request with the same
                 idempotency key and body.
             operationId: selectCheckoutAmount
             tags: [Checkout]
@@ -1518,16 +1516,17 @@ paths:
                                 $ref: '#/components/schemas/ErrorEnvelope'
     /checkout/pay:
         post:
-            summary: Pay a checkout order
+            summary: Pay a checkout
             description: |
-                Attempt payment for a finalized Order without API-key authentication. The Order ID
-                identifies the immutable customer and commercial terms. A saved `payment_method_id`
-                must belong to that customer. Alternatively, provide new mobile-money details; new
-                billing details describe that payment method and do not replace the Order's shipping
-                address.
+                Send exactly one checkout reference. With `order_id`, Checkout pays the existing
+                finalized Order. With `purchase_intent_id`, Checkout validates the selected product,
+                quantity, and amount, creates the finalized Order, and starts payment as one
+                idempotent operation when the payer submits payment. Purchase Intent payments must
+                include `customer_data` and new `payment_method_data`; saved payment methods can be
+                used only with an existing Order.
 
                 Retry an uncertain request with the same idempotency key and body.
-            operationId: payCheckoutOrder
+            operationId: payCheckout
             tags: [Checkout]
             security: []
             parameters:
@@ -1567,7 +1566,7 @@ paths:
                             schema:
                                 $ref: '#/components/schemas/ErrorEnvelope'
                 '422':
-                    description: The idempotency key was reused with a different request
+                    description: Purchase Intent selection is invalid or the idempotency key was reused with a different request
                     headers:
                         X-Request-Id:
                             $ref: '#/components/headers/RequestId'
@@ -13708,6 +13707,8 @@ components:
             oneOf:
                 - $ref: '#/components/schemas/CheckoutOrderReferenceRequest'
                 - type: object
+                  deprecated: true
+                  description: Legacy Purchase Intent amount selection. New integrations should use `/checkout/pay`.
                   additionalProperties: false
                   required:
                       - purchase_intent_id
@@ -13736,15 +13737,31 @@ components:
                   additionalProperties: false
                   required:
                       - order_id
-                      - selected_amount
+                      - line_items
                   properties:
                       order_id:
                           type: string
                           minLength: 1
                           description: Existing finalized Order whose amount should be changed before payment begins.
                           example: "or_a1b2c3d4e5f6"
-                      selected_amount:
-                          $ref: '#/components/schemas/CheckoutSelectedAmount'
+                      line_items:
+                          type: array
+                          minItems: 1
+                          description: Customer-selected amounts keyed by the Order line-item IDs returned by checkout lookup.
+                          items:
+                              type: object
+                              additionalProperties: false
+                              required:
+                                  - id
+                                  - selected_amount
+                              properties:
+                                  id:
+                                      type: string
+                                      minLength: 1
+                                      description: Product line-item ID whose amount should be changed.
+                                      example: "oli_a1b2c3d4e5f6"
+                                  selected_amount:
+                                      $ref: '#/components/schemas/CheckoutSelectedAmount'
         CheckoutSelectedAmount:
             type: object
             additionalProperties: false
@@ -13830,24 +13847,71 @@ components:
                     description: |
                         Billing details for this new payment method. They do not replace the
                         Order customer's identity or the Order's shipping address.
-        CheckoutPayRequest:
+        CheckoutCustomerData:
             type: object
             additionalProperties: false
             required:
-                - order_id
+                - name
+            anyOf:
+                - required: [email_address]
+                - required: [phone_number]
+            properties:
+                name:
+                    type: string
+                    minLength: 1
+                    description: Customer name recorded on the Order created from the Purchase Intent.
+                email_address:
+                    type: string
+                    minLength: 1
+                phone_number:
+                    type: string
+                    minLength: 1
+        CheckoutPayRequest:
+            type: object
+            additionalProperties: false
+            oneOf:
+                - title: Existing Order
+                  required: [order_id]
+                  not:
+                      anyOf:
+                          - required: [purchase_intent_id]
+                          - required: [variant_product_id]
+                          - required: [quantity]
+                          - required: [selected_amount]
+                          - required: [customer_data]
+                - title: Purchase Intent
+                  required: [purchase_intent_id, customer_data, payment_method_data]
+                  not:
+                      anyOf:
+                          - required: [order_id]
+                          - required: [payment_method_id]
             not:
                 required: [payment_method_id, payment_method_data]
-                properties:
-                    payment_method_id:
-                        type: string
-                    payment_method_data:
-                        type: object
             properties:
                 order_id:
                     type: string
                     minLength: 1
                     description: The finalized Order to pay.
                     example: "or_a1b2c3d4e5f6"
+                purchase_intent_id:
+                    type: string
+                    minLength: 1
+                    description: Purchase Intent to turn into an Order and pay in this request.
+                    example: "sale_a1b2c3d4e5f6"
+                variant_product_id:
+                    type: string
+                    minLength: 1
+                    description: Selected variant when the Purchase Intent offers product variants.
+                quantity:
+                    type: integer
+                    minimum: 1
+                    description: Quantity selected by the payer. Defaults to the Purchase Intent minimum.
+                selected_amount:
+                    allOf:
+                        - $ref: '#/components/schemas/CheckoutSelectedAmount'
+                    description: Amount selected by the payer when the Purchase Intent accepts customer-selected pricing.
+                customer_data:
+                    $ref: '#/components/schemas/CheckoutCustomerData'
                 payment_method_id:
                     type: string
                     minLength: 1
@@ -13899,57 +13963,18 @@ components:
                     $ref: '#/components/schemas/Error'
         CheckoutLookupResponse:
             type: object
+            additionalProperties: false
             description: |
-                A Purchase Intent lookup returns `amount_selection`. An Order lookup returns
-                `order` and also returns `amount_selection` while that Order's amount can still be
-                changed.
+                Returns exactly one resource matching the supplied checkout reference. Purchase
+                Intent responses use the same public resource shape as Purchase Intent lookup.
+            oneOf:
+                - required: [order]
+                - required: [purchase_intent]
             properties:
                 order:
                     $ref: '#/components/schemas/CheckoutOrder'
-                amount_selection:
-                    $ref: '#/components/schemas/CheckoutAmountSelection'
-                error:
-                    $ref: '#/components/schemas/Error'
-        CheckoutAmountSelection:
-            type: object
-            additionalProperties: false
-            required:
-                - price_id
-                - product_id
-                - merchant_name
-                - product_name
-                - customer_selected_amount
-            oneOf:
-                - required: [purchase_intent_id]
-                - required: [order_id]
-            properties:
-                purchase_intent_id:
-                    type: string
-                    description: Purchase Intent reference present when selection creates an Order.
-                    example: "sale_a1b2c3d4e5f6"
-                order_id:
-                    type: string
-                    description: Order reference present when selection changes an existing Order.
-                    example: "or_a1b2c3d4e5f6"
-                price_id:
-                    type: string
-                    example: "price_123"
-                product_id:
-                    type: string
-                    example: "prod_123"
-                merchant_name:
-                    type: string
-                    example: "Kora Market"
-                product_name:
-                    type: string
-                    example: "Open contribution"
-                product_about:
-                    type: string
-                expires_at:
-                    type: string
-                    format: date-time
-                customer_selected_amount:
-                    $ref: '#/components/schemas/CustomerSelectedAmount'
+                purchase_intent:
+                    $ref: '#/components/schemas/PurchaseIntent'
         CheckoutOrder:
             type: object
             description: |
