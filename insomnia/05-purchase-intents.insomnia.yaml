@@ -133,7 +133,7 @@ collection:
     method: POST
     meta:
       id: req_cba29a8d3ae9b7976236bf8103482596
-      description: 'Public reference: https://studio.inttegro.com/purchase-intents#lookup-a-purchase-intent'
+      description: 'Public lookup returns current merchant profile and branding resolved from purchase_intent.application_id. Reference: https://studio.inttegro.com/purchase-intents#lookup-a-purchase-intent'
     authentication:
       type: none
     headers:
@@ -152,6 +152,14 @@ collection:
           insomnia.test('Lookup returns a purchase intent without embedded activity', () => {
             insomnia.expect(purchase_intent?.id).to.equal(insomnia.variables.get('purchase_intent_id'));
             insomnia.expect(purchase_intent).not.to.have.property('activity');
+          });
+          insomnia.test('Merchant presentation is resolved at lookup time', () => {
+            insomnia.expect(purchase_intent?.application_id).to.be.a('string').and.not.be.empty;
+            insomnia.expect(purchase_intent?.merchant?.profile?.name).to.be.a('string').and.not.be.empty;
+            insomnia.expect(purchase_intent?.merchant?.branding?.color_scheme?.primary).to.be.a('string').and.not.be.empty;
+            insomnia.expect(purchase_intent?.merchant).not.to.have.property('app_id');
+            insomnia.expect(purchase_intent?.merchant).not.to.have.property('organization_id');
+            insomnia.expect(purchase_intent?.merchant).not.to.have.property('organization_name');
           });
         }
   - name: List purchase intents
