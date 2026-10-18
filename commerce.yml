@@ -3,8 +3,8 @@ openapi: 3.0.3
 info:
     title: Inttegro API
     description: Machine-readable reference for the public Inttegro API
-    version: 0.1.0-beta42
-    x-inttegro-collection-version: 0.1.0-beta42
+    version: 0.1.0-beta44
+    x-inttegro-collection-version: 0.1.0-beta44
     contact:
         name: Inttegro Engineering
         url: "https://inttegro.com"
@@ -11474,17 +11474,115 @@ components:
                     $ref: '#/components/schemas/PurchaseIntent'
         PurchaseIntentMerchant:
             type: object
-            description: Merchant identity captured for the hosted checkout. Individual fields are omitted when unavailable.
+            additionalProperties: false
+            description: Current public merchant presentation resolved from the purchase intent's application. It is hydrated at lookup time and is not stored on the purchase intent.
+            required:
+                - branding
+                - profile
             properties:
-                app_name:
+                branding:
+                    $ref: '#/components/schemas/PurchaseIntentMerchantBranding'
+                profile:
+                    $ref: '#/components/schemas/PurchaseIntentMerchantProfile'
+        PurchaseIntentMerchantAsset:
+            type: object
+            additionalProperties: false
+            required:
+                - url
+            properties:
+                alt_text:
                     type: string
+                    description: Accessible description of the merchant asset
                     example: "Tea House"
-                organization_id:
+                url:
                     type: string
-                    example: "org_abc123"
-                organization_name:
+                    format: uri
+                    description: Public URL of the merchant asset
+                    example: "https://assets.example.com/tea-house.png"
+        PurchaseIntentMerchantBranding:
+            type: object
+            additionalProperties: false
+            required:
+                - accent_color
+                - color_scheme
+            properties:
+                accent_color:
                     type: string
-                    example: "Tea House Ltd"
+                    description: Merchant accent color as a normalized six-digit hexadecimal value
+                    example: "#16a34a"
+                color_scheme:
+                    $ref: '#/components/schemas/PurchaseIntentMerchantColorScheme'
+                icon:
+                    $ref: '#/components/schemas/PurchaseIntentMerchantAsset'
+                logo:
+                    $ref: '#/components/schemas/PurchaseIntentMerchantAsset'
+        PurchaseIntentMerchantColorScheme:
+            type: object
+            additionalProperties: false
+            required:
+                - border
+                - link
+                - muted_text
+                - primary
+                - primary_foreground
+                - surface
+                - surface_muted
+                - text
+            properties:
+                border:
+                    type: string
+                    example: "#b9e3c8"
+                link:
+                    type: string
+                    example: "#128650"
+                muted_text:
+                    type: string
+                    example: "#096d2f"
+                primary:
+                    type: string
+                    example: "#16a34a"
+                primary_foreground:
+                    type: string
+                    example: "#ffffff"
+                surface:
+                    type: string
+                    example: "#f1faf5"
+                surface_muted:
+                    type: string
+                    example: "#e3f4e9"
+                text:
+                    type: string
+                    example: "#041d0d"
+        PurchaseIntentMerchantProfile:
+            type: object
+            additionalProperties: false
+            required:
+                - name
+            properties:
+                name:
+                    type: string
+                    description: Current public application alias, falling back to its current application name
+                    example: "Tea House"
+                support:
+                    $ref: '#/components/schemas/PurchaseIntentMerchantSupport'
+                website_url:
+                    type: string
+                    format: uri
+                    description: Public merchant website URL
+                    example: "https://teahouse.example"
+        PurchaseIntentMerchantSupport:
+            type: object
+            additionalProperties: false
+            properties:
+                email:
+                    type: string
+                    format: email
+                    description: Public merchant support email address
+                    example: "support@teahouse.example"
+                phone:
+                    type: string
+                    description: Public merchant support phone number
+                    example: "+233200000000"
         PurchaseIntentOriginalPrice:
             type: object
             required:
@@ -11645,6 +11743,7 @@ components:
             additionalProperties: false
             required:
                 - allow_variants
+                - application_id
                 - created_at
                 - id
                 - quantity
@@ -11655,6 +11754,10 @@ components:
                     type: boolean
                     description: Whether the intent was configured with a variant set
                     example: false
+                application_id:
+                    type: string
+                    description: Application that owns the purchase intent. This is routing metadata, not merchant presentation.
+                    example: "app_abc123"
                 created_at:
                     type: string
                     format: date-time
