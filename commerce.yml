@@ -3,8 +3,8 @@ openapi: 3.0.3
 info:
     title: Inttegro API
     description: Machine-readable reference for the public Inttegro API
-    version: 0.1.0-beta44
-    x-inttegro-collection-version: 0.1.0-beta44
+    version: 0.1.0-beta45
+    x-inttegro-collection-version: 0.1.0-beta45
     contact:
         name: Inttegro Engineering
         url: "https://inttegro.com"
@@ -16385,7 +16385,11 @@ components:
                 - amount
             properties:
                 amount:
-                    $ref: '#/components/schemas/PayoutAmountLimits'
+                    type: object
+                    description: Inclusive payout amount ranges keyed by lowercase ISO currency code.
+                    minProperties: 1
+                    additionalProperties:
+                        $ref: '#/components/schemas/PayoutAmountLimits'
         PayoutAmountLimits:
             type: object
             description: Inclusive payout amount range. Values use the currency's smallest unit.
@@ -16395,9 +16399,20 @@ components:
                 - max
             properties:
                 min:
-                    $ref: '#/components/schemas/Amount'
+                    $ref: '#/components/schemas/PayoutLimitValue'
                 max:
-                    $ref: '#/components/schemas/Amount'
+                    $ref: '#/components/schemas/PayoutLimitValue'
+        PayoutLimitValue:
+            type: object
+            description: A payout limit in the currency's smallest unit. The enclosing map key identifies the currency.
+            additionalProperties: false
+            required:
+                - value
+            properties:
+                value:
+                    type: integer
+                    format: int64
+                    minimum: 1
         PayoutSettingsMutationScheduleSpec:
             type: object
             description: Public payout schedule specification returned after a settings mutation.
