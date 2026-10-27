@@ -3,8 +3,8 @@ openapi: 3.0.3
 info:
     title: Inttegro API
     description: Machine-readable reference for the public Inttegro API
-    version: 0.1.0-beta45
-    x-inttegro-collection-version: 0.1.0-beta45
+    version: 0.1.0-beta47
+    x-inttegro-collection-version: 0.1.0-beta47
     contact:
         name: Inttegro Engineering
         url: "https://inttegro.com"
@@ -3893,7 +3893,7 @@ paths:
     /financial_accounts/create:
         post:
             summary: Create a financial account
-            description: Create a wallet, Ghana bank account, or Dosh account managed through Inttegro.
+            description: Create a wallet, Ghana bank account, or Dosh account managed through Inttegro. Ghana bank accounts are resolved with the provider before they are persisted.
             operationId: createFinancialAccount
             tags: [Financial Accounts]
             parameters:
@@ -3924,6 +3924,15 @@ paths:
                             $ref: '#/components/headers/RequestId'
                 '400':
                     description: Bad request - invalid account details
+                    headers:
+                        X-Request-Id:
+                            $ref: '#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                '503':
+                    description: Service unavailable - bank account verification is temporarily unavailable
                     headers:
                         X-Request-Id:
                             $ref: '#/components/headers/RequestId'
@@ -4039,7 +4048,7 @@ paths:
     /financial_accounts/connect:
         post:
             summary: Connect a financial account
-            description: Connect an existing wallet, Ghana bank account, or Dosh account for collections or payouts.
+            description: Connect an existing wallet, Ghana bank account, or Dosh account for collections or payouts. Ghana bank accounts are resolved with the provider before they are persisted.
             operationId: connectFinancialAccount
             tags: [Financial Accounts]
             parameters:
@@ -4070,6 +4079,15 @@ paths:
                             $ref: '#/components/headers/RequestId'
                 '400':
                     description: Bad request - invalid account details
+                    headers:
+                        X-Request-Id:
+                            $ref: '#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                '503':
+                    description: Service unavailable - bank account verification is temporarily unavailable
                     headers:
                         X-Request-Id:
                             $ref: '#/components/headers/RequestId'
@@ -15746,6 +15764,8 @@ components:
                     $ref: '#/components/schemas/FinancialInstitution'
                 label:
                     type: string
+                account_name_enquiry:
+                    $ref: '#/components/schemas/FinancialAccountNameEnquiry'
                 pull_configuration:
                     $ref: '#/components/schemas/FinancialAccountPullConfiguration'
                 push_configuration:
@@ -15759,6 +15779,19 @@ components:
                     enum: [wallet, bank_account, dosh_account]
                 verification:
                     $ref: '#/components/schemas/FinancialAccountVerification'
+        FinancialAccountNameEnquiry:
+            type: object
+            additionalProperties: false
+            required: [completed_at, provider_id]
+            description: Evidence that the provider resolved the bank account holder name before the account was persisted. This confirms account resolution, not ownership.
+            properties:
+                completed_at:
+                    type: string
+                    format: date-time
+                provider_id:
+                    type: string
+                provider_reference:
+                    type: string
         FinancialAccountVerification:
             type: object
             required: [initiated_at, request]
