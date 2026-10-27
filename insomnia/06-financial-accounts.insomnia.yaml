@@ -29,7 +29,7 @@ collection:
     method: POST
     meta:
       id: req_9ecfaaca325ffa9329aca8c00d8d6009
-      description: 'Public reference: https://studio.inttegro.com/financial-accounts#connect-a-financial-account'
+      description: 'Public reference: https://studio.inttegro.com/financial-accounts#connect-a-financial-account. Ghana bank accounts are resolved with the provider before they are persisted.'
     headers:
     - name: Content-Type
       value: application/json
@@ -114,7 +114,7 @@ collection:
     method: POST
     meta:
       id: req_ef5359a57d64d92aeb7964a94d7b5de5
-      description: 'Public reference: https://studio.inttegro.com/financial-accounts#create-a-financial-account'
+      description: 'Public reference: https://studio.inttegro.com/financial-accounts#create-a-financial-account. Ghana bank accounts are resolved with the provider before they are persisted.'
     headers:
     - name: Content-Type
       value: application/json

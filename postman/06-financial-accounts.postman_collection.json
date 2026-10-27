@@ -2,7 +2,7 @@
   "info": {
     "name": "Inttegro API — Financial Accounts",
     "description": "Connect and manage collection and payout accounts. Uses the shared Inttegro API global environment.\n\nGenerated from insomnia/06-financial-accounts.insomnia.yaml. Edit the Insomnia source and run npm run postman:generate.",
-    "version": "0.1.0-beta45",
+    "version": "0.1.0-beta47",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
@@ -28,7 +28,7 @@
             "url": {
               "raw": "{{base_url}}/financial_accounts/connect"
             },
-            "description": "Public reference: https://studio.inttegro.com/financial-accounts#connect-a-financial-account",
+            "description": "Public reference: https://studio.inttegro.com/financial-accounts#connect-a-financial-account. Ghana bank accounts are resolved with the provider before they are persisted.",
             "body": {
               "mode": "raw",
               "raw": "{\n  \"label\": \"Konadu Tailoring Collections\",\n  \"reference\": \"KONADU-MOMO-SETTLEMENT\",\n  \"description\": \"Primary settlement wallet for Konadu B2C operations.\",\n  \"type\": \"wallet\",\n  \"currency\": \"ghs\",\n  \"owner\": {\n    \"name\": \"{{customer_name}}\",\n    \"address\": {\n      \"country\": \"GH\"\n    }\n  },\n  \"wallet\": {\n    \"type\": \"mobile_money\",\n    \"mobile_money\": {\n      \"network\": \"mtn\",\n      \"account_number\": \"{{mobile_money_account_number}}\"\n    }\n  },\n  \"push_configuration\": {\n    \"enabled\": true\n  },\n  \"pull_configuration\": {\n    \"enabled\": false\n  }\n}",
@@ -139,7 +139,7 @@
             "url": {
               "raw": "{{base_url}}/financial_accounts/create"
             },
-            "description": "Public reference: https://studio.inttegro.com/financial-accounts#create-a-financial-account",
+            "description": "Public reference: https://studio.inttegro.com/financial-accounts#create-a-financial-account. Ghana bank accounts are resolved with the provider before they are persisted.",
             "body": {
               "mode": "raw",
               "raw": "{\n  \"label\": \"Marketplace Seller Sub-Account\",\n  \"reference\": \"SELLER-001-COLLECTION\",\n  \"description\": \"Dedicated collection account for seller 001.\",\n  \"type\": \"wallet\",\n  \"currency\": \"ghs\",\n  \"owner\": {\n    \"name\": \"{{customer_name}}\",\n    \"address\": {\n      \"country\": \"GH\"\n    }\n  },\n  \"wallet\": {\n    \"type\": \"mobile_money\",\n    \"mobile_money\": {\n      \"network\": \"mtn\",\n      \"account_number\": \"{{mobile_money_account_number}}\"\n    }\n  }\n}",
