@@ -10220,7 +10220,7 @@ components:
                         scheme:
                             type: string
                             description: Authentication scheme used
-                            example: "zcommerce_defined_auth"
+                            example: "inttegro_defined_auth"
                         request:
                             type: object
                             additionalProperties: false
