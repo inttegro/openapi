@@ -4885,7 +4885,7 @@ paths:
                                             schedule_on: "never"
                                             description: "Manual payout schedule. Used when automatic payouts are disabled."
                                             spec:
-                                                id: "PAYOUT_SCHEDULE_SPEC_MANUAL_11_21_2025"
+                                                public_id: "bt_aging_spec_168_hourly"
                                                 t_plus: "168h"
                                                 label: "manual"
                                                 abide: "strictly"
@@ -8070,7 +8070,7 @@ paths:
                                             currencies: ["ghs", "usd"]
                                             payment_methods: ["mobile_money", "bank_account", "payment_card", "motito"]
                                             payout_schedules: ["weekly", "manual"]
-                                            bt_aging_specs: ["twenty_four_hourly", "forty_eight_hourly", "hundred_sixty_eight_hourly"]
+                                            bt_aging_specs: ["bt_aging_spec_immediate", "bt_aging_spec_24_hourly", "bt_aging_spec_48_hourly", "bt_aging_spec_168_hourly"]
                                             legal_entity_types:
                                                 - "individual"
                                                 - "business"
@@ -16356,12 +16356,17 @@ components:
             additionalProperties: false
             required:
                 - abide
+                - public_id
                 - label
                 - t_plus
             properties:
                 abide:
                     type: string
                     description: How strictly the aging period is applied.
+                public_id:
+                    type: string
+                    description: Public identifier for the balance transaction aging specification.
+                    example: "bt_aging_spec_168_hourly"
                 label:
                     type: string
                     description: Human-readable aging rule label.
@@ -16452,14 +16457,16 @@ components:
             additionalProperties: false
             required:
                 - abide
-                - id
+                - public_id
                 - label
                 - t_plus
             properties:
                 abide:
                     type: string
-                id:
+                public_id:
                     type: string
+                    description: Public identifier for the balance transaction aging specification.
+                    example: "bt_aging_spec_168_hourly"
                 label:
                     type: string
                 t_plus:
