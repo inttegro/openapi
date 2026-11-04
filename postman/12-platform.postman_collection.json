@@ -2,7 +2,7 @@
   "info": {
     "name": "Inttegro API — Platform",
     "description": "Manage applications and keys and retrieve reference data. Uses the shared Inttegro API global environment. Error reference: https://studio.inttegro.com/error-codes#applications\n\nGenerated from insomnia/12-platform.insomnia.yaml. Edit the Insomnia source and run npm run postman:generate.",
-    "version": "0.1.0-beta38",
+    "version": "0.1.0-beta48",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
@@ -79,6 +79,49 @@
                   "    pm.expect(jsonBody).to.have.all.keys('app');",
                   "    pm.expect(jsonBody?.app?.id).to.be.a('string').and.not.be.empty;",
                   "    pm.expect(jsonBody?.app).not.to.have.property('secret_key');",
+                  "  });",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Retrieve app capabilities",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/apps/capabilities"
+            },
+            "description": "Public reference: https://studio.inttegro.com/apps#retrieve-app-capabilities",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const jsonBody = pm.response.json();",
+                  "  pm.test('Returns public capability states for the authenticated app', () => {",
+                  "    pm.expect(jsonBody).to.have.all.keys('capabilities');",
+                  "    pm.expect(jsonBody?.capabilities).to.be.an('object');",
                   "  });",
                   "}"
                 ]

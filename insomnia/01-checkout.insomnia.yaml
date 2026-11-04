@@ -405,40 +405,47 @@ collection:
       id: req_b89d29d67ae54366a050cb36b7927914
       description: |-
         OpenAPI operation: POST /checkout/select_amount
-        Send exactly one checkout reference. This example creates an Order from a Purchase Intent. To change a still-pristine existing Order, send order_id instead of purchase_intent_id.
+        Updates a customer-selected amount on an existing Order before payment begins. Purchase Intent checkouts submit their selected amount directly to /checkout/pay.
     headers:
     - name: Content-Type
       value: application/json
     - name: Idempotency-Key
-      value: call-checkout-select-amount-{{ purchase_intent_id }}
+      value: call-checkout-select-amount-{{ order_id }}
     body:
       mimeType: application/json
       text: |-
         {
-          "purchase_intent_id": "{{ purchase_intent_id }}",
-          "selected_amount": {
-            "currency": "ghs",
-            "value": 5000
-          }
+          "order_id": "{{ order_id }}",
+          "line_items": [{
+            "id": "{{ order_line_item_id }}",
+            "selected_amount": {
+              "currency": "ghs",
+              "value": 5000
+            }
+          }]
         }
-  - name: Pay a public checkout order
+  - name: Pay a Purchase Intent checkout
     url: '{{ base_url }}/checkout/pay'
     method: POST
     meta:
       id: req_c282b42c7dbd4ba3a590509ba5e13d1d
       description: |-
         OpenAPI operation: POST /checkout/pay
-        This example supplies payer billing details for a new payment method without changing shipping or saving the method.
+        Creates the Order and starts payment only when the payer submits this request. This example uses a fixed-price Purchase Intent and a new payment method.
     headers:
     - name: Content-Type
       value: application/json
     - name: Idempotency-Key
-      value: call-checkout-pay-{{ order_id }}
+      value: call-checkout-pay-{{ purchase_intent_id }}
     body:
       mimeType: application/json
       text: |-
         {
-          "order_id": "{{ order_id }}",
+          "purchase_intent_id": "{{ purchase_intent_id }}",
+          "customer_data": {
+            "name": "Ama Mensah",
+            "phone_number": "+233544998605"
+          },
           "payment_method_data": {
             "type": "mobile_money",
             "mobile_money": {

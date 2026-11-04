@@ -3,8 +3,8 @@ openapi: 3.0.3
 info:
     title: Inttegro API
     description: Machine-readable reference for the public Inttegro API
-    version: 0.1.0-beta38
-    x-inttegro-collection-version: 0.1.0-beta38
+    version: 0.1.0-beta48
+    x-inttegro-collection-version: 0.1.0-beta48
     contact:
         name: Inttegro Engineering
         url: "https://inttegro.com"
@@ -1404,12 +1404,11 @@ paths:
             summary: Look up checkout
             description: |
                 Retrieve either the current public checkout representation of a finalized Order or
-                the client-safe amount-selection policy for a Purchase Intent. Send exactly one
-                reference. A Purchase Intent lookup supports collecting an amount before creating
-                an Order. An Order lookup can also return its amount-selection policy when that
-                finalized Order still has an editable customer-selected price and payment has not
-                begun.
-            operationId: lookupCheckoutOrder
+                the canonical public Purchase Intent. Send exactly one reference. A Purchase Intent
+                response includes its resolved product and price, including customer-selected amount
+                policy when the price permits the customer to choose an amount. An Order response
+                includes editable pricing policy on each eligible line while payment has not begun.
+            operationId: lookupCheckoutResource
             tags: [Checkout]
             security: []
             requestBody:
@@ -1420,7 +1419,7 @@ paths:
                             $ref: '#/components/schemas/CheckoutLookupRequest'
             responses:
                 '200':
-                    description: Checkout Order or amount-selection policy found
+                    description: Checkout Order or Purchase Intent found
                     headers:
                         X-Request-Id:
                             $ref: '#/components/headers/RequestId'
@@ -1448,14 +1447,13 @@ paths:
                                 $ref: '#/components/schemas/ErrorEnvelope'
     /checkout/select_amount:
         post:
-            summary: Select an amount and prepare a checkout Order
+            summary: Update customer-selected amounts on a checkout Order
             description: |
-                Send exactly one checkout reference with the payer-selected amount. A
-                `purchase_intent_id` validates the Purchase Intent policy and creates the finalized
-                Order used by Checkout. An `order_id` validates the amount against that Order's
-                customer-selected price policy and updates the same Order while payment remains
-                pristine. The Order cannot be changed after payment begins. Suggested amounts are
-                conveniences, not an allow-list. Retry an uncertain request with the same
+                Update customer-selected product amounts on an existing finalized Order while its
+                payment remains pristine. The Order cannot be changed after payment begins.
+                Suggested amounts are conveniences, not an allow-list. Purchase Intent checkouts
+                should send their selected amount directly to `/checkout/pay`, which creates the
+                Order and starts payment together. Retry an uncertain request with the same
                 idempotency key and body.
             operationId: selectCheckoutAmount
             tags: [Checkout]
@@ -1518,16 +1516,17 @@ paths:
                                 $ref: '#/components/schemas/ErrorEnvelope'
     /checkout/pay:
         post:
-            summary: Pay a checkout order
+            summary: Pay a checkout
             description: |
-                Attempt payment for a finalized Order without API-key authentication. The Order ID
-                identifies the immutable customer and commercial terms. A saved `payment_method_id`
-                must belong to that customer. Alternatively, provide new mobile-money details; new
-                billing details describe that payment method and do not replace the Order's shipping
-                address.
+                Send exactly one checkout reference. With `order_id`, Checkout pays the existing
+                finalized Order. With `purchase_intent_id`, Checkout validates the selected product,
+                quantity, and amount, creates the finalized Order, and starts payment as one
+                idempotent operation when the payer submits payment. Purchase Intent payments must
+                include `customer_data` and new `payment_method_data`; saved payment methods can be
+                used only with an existing Order.
 
                 Retry an uncertain request with the same idempotency key and body.
-            operationId: payCheckoutOrder
+            operationId: payCheckout
             tags: [Checkout]
             security: []
             parameters:
@@ -1567,7 +1566,7 @@ paths:
                             schema:
                                 $ref: '#/components/schemas/ErrorEnvelope'
                 '422':
-                    description: The idempotency key was reused with a different request
+                    description: Purchase Intent selection is invalid or the idempotency key was reused with a different request
                     headers:
                         X-Request-Id:
                             $ref: '#/components/headers/RequestId'
@@ -3894,7 +3893,7 @@ paths:
     /financial_accounts/create:
         post:
             summary: Create a financial account
-            description: Create a wallet, Ghana bank account, or Dosh account managed through Inttegro.
+            description: Create a wallet, Ghana bank account, or Dosh account managed through Inttegro. Ghana bank accounts are resolved with the provider before they are persisted.
             operationId: createFinancialAccount
             tags: [Financial Accounts]
             parameters:
@@ -3925,6 +3924,15 @@ paths:
                             $ref: '#/components/headers/RequestId'
                 '400':
                     description: Bad request - invalid account details
+                    headers:
+                        X-Request-Id:
+                            $ref: '#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                '503':
+                    description: Service unavailable - bank account verification is temporarily unavailable
                     headers:
                         X-Request-Id:
                             $ref: '#/components/headers/RequestId'
@@ -4040,7 +4048,7 @@ paths:
     /financial_accounts/connect:
         post:
             summary: Connect a financial account
-            description: Connect an existing wallet, Ghana bank account, or Dosh account for collections or payouts.
+            description: Connect an existing wallet, Ghana bank account, or Dosh account for collections or payouts. Ghana bank accounts are resolved with the provider before they are persisted.
             operationId: connectFinancialAccount
             tags: [Financial Accounts]
             parameters:
@@ -4071,6 +4079,15 @@ paths:
                             $ref: '#/components/headers/RequestId'
                 '400':
                     description: Bad request - invalid account details
+                    headers:
+                        X-Request-Id:
+                            $ref: '#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                '503':
+                    description: Service unavailable - bank account verification is temporarily unavailable
                     headers:
                         X-Request-Id:
                             $ref: '#/components/headers/RequestId'
@@ -4868,7 +4885,7 @@ paths:
                                             schedule_on: "never"
                                             description: "Manual payout schedule. Used when automatic payouts are disabled."
                                             spec:
-                                                id: "PAYOUT_SCHEDULE_SPEC_MANUAL_11_21_2025"
+                                                public_id: "bt_aging_spec_168_hourly"
                                                 t_plus: "168h"
                                                 label: "manual"
                                                 abide: "strictly"
@@ -8053,7 +8070,7 @@ paths:
                                             currencies: ["ghs", "usd"]
                                             payment_methods: ["mobile_money", "bank_account", "payment_card", "motito"]
                                             payout_schedules: ["weekly", "manual"]
-                                            bt_aging_specs: ["twenty_four_hourly", "forty_eight_hourly", "hundred_sixty_eight_hourly"]
+                                            bt_aging_specs: ["bt_aging_spec_immediate", "bt_aging_spec_24_hourly", "bt_aging_spec_48_hourly", "bt_aging_spec_168_hourly"]
                                             legal_entity_types:
                                                 - "individual"
                                                 - "business"
@@ -10203,7 +10220,7 @@ components:
                         scheme:
                             type: string
                             description: Authentication scheme used
-                            example: "zcommerce_defined_auth"
+                            example: "inttegro_defined_auth"
                         request:
                             type: object
                             additionalProperties: false
@@ -11475,17 +11492,115 @@ components:
                     $ref: '#/components/schemas/PurchaseIntent'
         PurchaseIntentMerchant:
             type: object
-            description: Merchant identity captured for the hosted checkout. Individual fields are omitted when unavailable.
+            additionalProperties: false
+            description: Current public merchant presentation resolved from the purchase intent's application. It is hydrated at lookup time and is not stored on the purchase intent.
+            required:
+                - branding
+                - profile
             properties:
-                app_name:
+                branding:
+                    $ref: '#/components/schemas/PurchaseIntentMerchantBranding'
+                profile:
+                    $ref: '#/components/schemas/PurchaseIntentMerchantProfile'
+        PurchaseIntentMerchantAsset:
+            type: object
+            additionalProperties: false
+            required:
+                - url
+            properties:
+                alt_text:
                     type: string
+                    description: Accessible description of the merchant asset
                     example: "Tea House"
-                organization_id:
+                url:
                     type: string
-                    example: "org_abc123"
-                organization_name:
+                    format: uri
+                    description: Public URL of the merchant asset
+                    example: "https://assets.example.com/tea-house.png"
+        PurchaseIntentMerchantBranding:
+            type: object
+            additionalProperties: false
+            required:
+                - accent_color
+                - color_scheme
+            properties:
+                accent_color:
                     type: string
-                    example: "Tea House Ltd"
+                    description: Merchant accent color as a normalized six-digit hexadecimal value
+                    example: "#16a34a"
+                color_scheme:
+                    $ref: '#/components/schemas/PurchaseIntentMerchantColorScheme'
+                icon:
+                    $ref: '#/components/schemas/PurchaseIntentMerchantAsset'
+                logo:
+                    $ref: '#/components/schemas/PurchaseIntentMerchantAsset'
+        PurchaseIntentMerchantColorScheme:
+            type: object
+            additionalProperties: false
+            required:
+                - border
+                - link
+                - muted_text
+                - primary
+                - primary_foreground
+                - surface
+                - surface_muted
+                - text
+            properties:
+                border:
+                    type: string
+                    example: "#b9e3c8"
+                link:
+                    type: string
+                    example: "#128650"
+                muted_text:
+                    type: string
+                    example: "#096d2f"
+                primary:
+                    type: string
+                    example: "#16a34a"
+                primary_foreground:
+                    type: string
+                    example: "#ffffff"
+                surface:
+                    type: string
+                    example: "#f1faf5"
+                surface_muted:
+                    type: string
+                    example: "#e3f4e9"
+                text:
+                    type: string
+                    example: "#041d0d"
+        PurchaseIntentMerchantProfile:
+            type: object
+            additionalProperties: false
+            required:
+                - name
+            properties:
+                name:
+                    type: string
+                    description: Current public application alias, falling back to its current application name
+                    example: "Tea House"
+                support:
+                    $ref: '#/components/schemas/PurchaseIntentMerchantSupport'
+                website_url:
+                    type: string
+                    format: uri
+                    description: Public merchant website URL
+                    example: "https://teahouse.example"
+        PurchaseIntentMerchantSupport:
+            type: object
+            additionalProperties: false
+            properties:
+                email:
+                    type: string
+                    format: email
+                    description: Public merchant support email address
+                    example: "support@teahouse.example"
+                phone:
+                    type: string
+                    description: Public merchant support phone number
+                    example: "+233200000000"
         PurchaseIntentOriginalPrice:
             type: object
             required:
@@ -11646,6 +11761,7 @@ components:
             additionalProperties: false
             required:
                 - allow_variants
+                - application_id
                 - created_at
                 - id
                 - quantity
@@ -11656,6 +11772,10 @@ components:
                     type: boolean
                     description: Whether the intent was configured with a variant set
                     example: false
+                application_id:
+                    type: string
+                    description: Application that owns the purchase intent. This is routing metadata, not merchant presentation.
+                    example: "app_abc123"
                 created_at:
                     type: string
                     format: date-time
@@ -13708,6 +13828,8 @@ components:
             oneOf:
                 - $ref: '#/components/schemas/CheckoutOrderReferenceRequest'
                 - type: object
+                  deprecated: true
+                  description: Legacy Purchase Intent amount selection. New integrations should use `/checkout/pay`.
                   additionalProperties: false
                   required:
                       - purchase_intent_id
@@ -13736,15 +13858,31 @@ components:
                   additionalProperties: false
                   required:
                       - order_id
-                      - selected_amount
+                      - line_items
                   properties:
                       order_id:
                           type: string
                           minLength: 1
                           description: Existing finalized Order whose amount should be changed before payment begins.
                           example: "or_a1b2c3d4e5f6"
-                      selected_amount:
-                          $ref: '#/components/schemas/CheckoutSelectedAmount'
+                      line_items:
+                          type: array
+                          minItems: 1
+                          description: Customer-selected amounts keyed by the Order line-item IDs returned by checkout lookup.
+                          items:
+                              type: object
+                              additionalProperties: false
+                              required:
+                                  - id
+                                  - selected_amount
+                              properties:
+                                  id:
+                                      type: string
+                                      minLength: 1
+                                      description: Product line-item ID whose amount should be changed.
+                                      example: "oli_a1b2c3d4e5f6"
+                                  selected_amount:
+                                      $ref: '#/components/schemas/CheckoutSelectedAmount'
         CheckoutSelectedAmount:
             type: object
             additionalProperties: false
@@ -13830,24 +13968,71 @@ components:
                     description: |
                         Billing details for this new payment method. They do not replace the
                         Order customer's identity or the Order's shipping address.
-        CheckoutPayRequest:
+        CheckoutCustomerData:
             type: object
             additionalProperties: false
             required:
-                - order_id
+                - name
+            anyOf:
+                - required: [email_address]
+                - required: [phone_number]
+            properties:
+                name:
+                    type: string
+                    minLength: 1
+                    description: Customer name recorded on the Order created from the Purchase Intent.
+                email_address:
+                    type: string
+                    minLength: 1
+                phone_number:
+                    type: string
+                    minLength: 1
+        CheckoutPayRequest:
+            type: object
+            additionalProperties: false
+            oneOf:
+                - title: Existing Order
+                  required: [order_id]
+                  not:
+                      anyOf:
+                          - required: [purchase_intent_id]
+                          - required: [variant_product_id]
+                          - required: [quantity]
+                          - required: [selected_amount]
+                          - required: [customer_data]
+                - title: Purchase Intent
+                  required: [purchase_intent_id, customer_data, payment_method_data]
+                  not:
+                      anyOf:
+                          - required: [order_id]
+                          - required: [payment_method_id]
             not:
                 required: [payment_method_id, payment_method_data]
-                properties:
-                    payment_method_id:
-                        type: string
-                    payment_method_data:
-                        type: object
             properties:
                 order_id:
                     type: string
                     minLength: 1
                     description: The finalized Order to pay.
                     example: "or_a1b2c3d4e5f6"
+                purchase_intent_id:
+                    type: string
+                    minLength: 1
+                    description: Purchase Intent to turn into an Order and pay in this request.
+                    example: "sale_a1b2c3d4e5f6"
+                variant_product_id:
+                    type: string
+                    minLength: 1
+                    description: Selected variant when the Purchase Intent offers product variants.
+                quantity:
+                    type: integer
+                    minimum: 1
+                    description: Quantity selected by the payer. Defaults to the Purchase Intent minimum.
+                selected_amount:
+                    allOf:
+                        - $ref: '#/components/schemas/CheckoutSelectedAmount'
+                    description: Amount selected by the payer when the Purchase Intent accepts customer-selected pricing.
+                customer_data:
+                    $ref: '#/components/schemas/CheckoutCustomerData'
                 payment_method_id:
                     type: string
                     minLength: 1
@@ -13899,57 +14084,18 @@ components:
                     $ref: '#/components/schemas/Error'
         CheckoutLookupResponse:
             type: object
+            additionalProperties: false
             description: |
-                A Purchase Intent lookup returns `amount_selection`. An Order lookup returns
-                `order` and also returns `amount_selection` while that Order's amount can still be
-                changed.
+                Returns exactly one resource matching the supplied checkout reference. Purchase
+                Intent responses use the same public resource shape as Purchase Intent lookup.
+            oneOf:
+                - required: [order]
+                - required: [purchase_intent]
             properties:
                 order:
                     $ref: '#/components/schemas/CheckoutOrder'
-                amount_selection:
-                    $ref: '#/components/schemas/CheckoutAmountSelection'
-                error:
-                    $ref: '#/components/schemas/Error'
-        CheckoutAmountSelection:
-            type: object
-            additionalProperties: false
-            required:
-                - price_id
-                - product_id
-                - merchant_name
-                - product_name
-                - customer_selected_amount
-            oneOf:
-                - required: [purchase_intent_id]
-                - required: [order_id]
-            properties:
-                purchase_intent_id:
-                    type: string
-                    description: Purchase Intent reference present when selection creates an Order.
-                    example: "sale_a1b2c3d4e5f6"
-                order_id:
-                    type: string
-                    description: Order reference present when selection changes an existing Order.
-                    example: "or_a1b2c3d4e5f6"
-                price_id:
-                    type: string
-                    example: "price_123"
-                product_id:
-                    type: string
-                    example: "prod_123"
-                merchant_name:
-                    type: string
-                    example: "Kora Market"
-                product_name:
-                    type: string
-                    example: "Open contribution"
-                product_about:
-                    type: string
-                expires_at:
-                    type: string
-                    format: date-time
-                customer_selected_amount:
-                    $ref: '#/components/schemas/CustomerSelectedAmount'
+                purchase_intent:
+                    $ref: '#/components/schemas/PurchaseIntent'
         CheckoutOrder:
             type: object
             description: |
@@ -15618,6 +15764,8 @@ components:
                     $ref: '#/components/schemas/FinancialInstitution'
                 label:
                     type: string
+                account_name_enquiry:
+                    $ref: '#/components/schemas/FinancialAccountNameEnquiry'
                 pull_configuration:
                     $ref: '#/components/schemas/FinancialAccountPullConfiguration'
                 push_configuration:
@@ -15631,6 +15779,19 @@ components:
                     enum: [wallet, bank_account, dosh_account]
                 verification:
                     $ref: '#/components/schemas/FinancialAccountVerification'
+        FinancialAccountNameEnquiry:
+            type: object
+            additionalProperties: false
+            required: [completed_at, provider_id]
+            description: Evidence that the provider resolved the bank account holder name before the account was persisted. This confirms account resolution, not ownership.
+            properties:
+                completed_at:
+                    type: string
+                    format: date-time
+                provider_id:
+                    type: string
+                provider_reference:
+                    type: string
         FinancialAccountVerification:
             type: object
             required: [initiated_at, request]
@@ -16195,12 +16356,17 @@ components:
             additionalProperties: false
             required:
                 - abide
+                - public_id
                 - label
                 - t_plus
             properties:
                 abide:
                     type: string
                     description: How strictly the aging period is applied.
+                public_id:
+                    type: string
+                    description: Public identifier for the balance transaction aging specification.
+                    example: "bt_aging_spec_168_hourly"
                 label:
                     type: string
                     description: Human-readable aging rule label.
@@ -16257,7 +16423,11 @@ components:
                 - amount
             properties:
                 amount:
-                    $ref: '#/components/schemas/PayoutAmountLimits'
+                    type: object
+                    description: Inclusive payout amount ranges keyed by lowercase ISO currency code.
+                    minProperties: 1
+                    additionalProperties:
+                        $ref: '#/components/schemas/PayoutAmountLimits'
         PayoutAmountLimits:
             type: object
             description: Inclusive payout amount range. Values use the currency's smallest unit.
@@ -16267,23 +16437,36 @@ components:
                 - max
             properties:
                 min:
-                    $ref: '#/components/schemas/Amount'
+                    $ref: '#/components/schemas/PayoutLimitValue'
                 max:
-                    $ref: '#/components/schemas/Amount'
+                    $ref: '#/components/schemas/PayoutLimitValue'
+        PayoutLimitValue:
+            type: object
+            description: A payout limit in the currency's smallest unit. The enclosing map key identifies the currency.
+            additionalProperties: false
+            required:
+                - value
+            properties:
+                value:
+                    type: integer
+                    format: int64
+                    minimum: 1
         PayoutSettingsMutationScheduleSpec:
             type: object
             description: Public payout schedule specification returned after a settings mutation.
             additionalProperties: false
             required:
                 - abide
-                - id
+                - public_id
                 - label
                 - t_plus
             properties:
                 abide:
                     type: string
-                id:
+                public_id:
                     type: string
+                    description: Public identifier for the balance transaction aging specification.
+                    example: "bt_aging_spec_168_hourly"
                 label:
                     type: string
                 t_plus:

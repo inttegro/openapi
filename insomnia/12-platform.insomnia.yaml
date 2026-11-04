@@ -72,6 +72,27 @@ collection:
             insomnia.expect(jsonBody?.app).not.to.have.property('secret_key');
           });
         }
+  - name: Retrieve app capabilities
+    url: '{{ base_url }}/apps/capabilities'
+    method: POST
+    meta:
+      id: req_0c47118c1d3947bb970d230ae32f17e7
+      description: 'Public reference: https://studio.inttegro.com/apps#retrieve-app-capabilities'
+    headers:
+    - name: Content-Type
+      value: application/json
+    body:
+      mimeType: application/json
+      text: '{}'
+    scripts:
+      afterResponse: |-
+        if (insomnia.response.code === 200) {
+          const jsonBody = insomnia.response.json();
+          insomnia.test('Returns public capability states for the authenticated app', () => {
+            insomnia.expect(jsonBody).to.have.all.keys('capabilities');
+            insomnia.expect(jsonBody?.capabilities).to.be.an('object');
+          });
+        }
   - name: Update an app
     url: '{{ base_url }}/apps/update'
     method: POST
