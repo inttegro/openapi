@@ -125,6 +125,7 @@ collection:
         if (insomnia.response.code >= 200 && insomnia.response.code < 300) {
           const jsonBody = insomnia.response.json();
           const amountLimits = jsonBody?.settings?.limits?.amount;
+          const agingSpec = jsonBody?.settings?.schedule?.aging_spec;
           insomnia.test('Returns payout amount limits by currency', () => {
             insomnia.expect(amountLimits).to.be.an('object').and.not.be.empty;
             for (const [currency, limits] of Object.entries(amountLimits)) {
@@ -135,6 +136,10 @@ collection:
               insomnia.expect(limits.min.value).to.be.a('number');
               insomnia.expect(limits.max.value).to.be.a('number');
             }
+          });
+          insomnia.test('Returns the payout aging specification public ID', () => {
+            insomnia.expect(agingSpec?.public_id).to.be.a('string').and.not.be.empty;
+            insomnia.expect(agingSpec).not.to.have.property('id');
           });
         }
   - name: Set payout destinations
