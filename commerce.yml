@@ -3,8 +3,8 @@ openapi: 3.0.3
 info:
     title: Inttegro API
     description: Machine-readable reference for the public Inttegro API
-    version: 0.1.0-beta49
-    x-inttegro-collection-version: 0.1.0-beta49
+    version: 0.1.0-beta50
+    x-inttegro-collection-version: 0.1.0-beta50
     contact:
         name: Inttegro Engineering
         url: "https://inttegro.com"
@@ -6970,7 +6970,7 @@ paths:
                 attribute, and custom-data fields of an existing product. If `type` is supplied,
                 it must equal the existing type. `images` and `media` are mutually exclusive.
                 Inline `price` updates are not supported; use the Prices API. An ID-only request
-                succeeds without changing the product, and archived products can still be updated.
+                succeeds without changing the product. Archived products cannot be updated.
             operationId: updateProduct
             tags:
                 - Products
@@ -7011,7 +7011,7 @@ paths:
                             schema:
                                 $ref: '#/components/schemas/Error'
                 '422':
-                    description: Unprocessable entity - validation failed or immutable field changed
+                    description: Unprocessable entity - validation failed, immutable field changed, or product is archived
                     headers:
                         X-Request-Id:
                             $ref: '#/components/headers/RequestId'
@@ -7023,8 +7023,8 @@ paths:
         post:
             summary: Publish a product
             description: |
-                Mark a product active and record its publication time. Publishing can also reactivate
-                an archived product; the archive timestamp remains part of its history.
+                Mark a non-archived product active and record its publication time. Archived products
+                cannot be republished.
             operationId: publishProduct
             tags:
                 - Products
@@ -7065,7 +7065,7 @@ paths:
                             schema:
                                 $ref: '#/components/schemas/Error'
                 '422':
-                    description: Product is already published
+                    description: Product is already published or is archived
                     headers:
                         X-Request-Id:
                             $ref: '#/components/headers/RequestId'
@@ -7077,8 +7077,8 @@ paths:
         post:
             summary: Unpublish a product
             description: |
-                Mark a product inactive for catalog lifecycle purposes. Existing prices and purchase
-                intents are not disabled by this operation.
+                Mark a non-archived product inactive for catalog lifecycle purposes. Existing prices
+                and purchase intents are not disabled by this operation.
             operationId: unpublishProduct
             tags:
                 - Products
@@ -7119,7 +7119,7 @@ paths:
                             schema:
                                 $ref: '#/components/schemas/Error'
                 '422':
-                    description: Product is already unpublished
+                    description: Product is already unpublished or is archived
                     headers:
                         X-Request-Id:
                             $ref: '#/components/headers/RequestId'
@@ -7131,9 +7131,9 @@ paths:
         post:
             summary: Archive a product
             description: |
-                Archive a product and mark it inactive. Archive blocks `/products/add_price`, but the
-                current API still permits lookup, update, publish, catalog-ID order snapshots, and
-                purchase-intent resolution for the product.
+                Archive a product and mark it inactive. Archive blocks product mutations including
+                `/products/update`, `/products/publish`, `/products/unpublish`, and `/products/add_price`.
+                Historical lookup and existing order snapshots remain available.
             operationId: archiveProduct
             tags:
                 - Products
@@ -10826,6 +10826,10 @@ components:
                     $ref: '#/components/schemas/ProductMediaFileReference'
                 web_page_url:
                     type: string
+                    format: uri
+                    maxLength: 2048
+                    pattern: '^[Hh][Tt][Tt][Pp][Ss]?://'
+                    description: Public HTTP or HTTPS URL for the product's canonical landing page. Credentials and local or private literal addresses are rejected.
                 brand_logo:
                     $ref: '#/components/schemas/ProductMediaFileReference'
                 infographic:
@@ -10836,10 +10840,12 @@ components:
                     $ref: '#/components/schemas/ProductMediaFileReference'
                 gallery:
                     type: array
+                    maxItems: 50
                     items:
                         $ref: '#/components/schemas/ProductMediaFileReference'
                 downloads:
                     type: array
+                    maxItems: 50
                     items:
                         $ref: '#/components/schemas/ProductMediaFileReference'
         ProductShipmentInput:
@@ -11002,6 +11008,7 @@ components:
                     $ref: '#/components/schemas/ProductMedia'
                 images:
                     type: array
+                    maxItems: 50
                     description: Legacy image list of Inttegro file or file-link references. Mutually exclusive with `media`.
                     items:
                         $ref: '#/components/schemas/ProductMediaFileReference'
