@@ -2,7 +2,7 @@
   "info": {
     "name": "Inttegro API — Catalog",
     "description": "Create and manage products and prices. Uses the shared Inttegro API global environment.\n\nGenerated from insomnia/04-catalog.insomnia.yaml. Edit the Insomnia source and run npm run postman:generate.",
-    "version": "0.1.0-beta48",
+    "version": "0.1.0-beta49",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
@@ -28,10 +28,10 @@
             "url": {
               "raw": "{{base_url}}/products/create"
             },
-            "description": "Public reference: https://studio.inttegro.com/products#create-a-product",
+            "description": "Public reference: https://studio.inttegro.com/products#create-a-product. Upload product media first and use managed file references.",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Premium Cotton T-Shirt\",\n  \"type\": \"physical\",\n  \"description\": \"Comfortable everyday wear\",\n  \"about\": \"Our premium cotton t-shirt is made from 100% organic cotton...\",\n  \"category\": \"clothing\",\n  \"attributes\": [\n    {\n      \"name\": \"Size\",\n      \"value\": \"Medium\"\n    },\n    {\n      \"name\": \"Color\",\n      \"value\": \"Blue\"\n    }\n  ],\n  \"media\": {\n    \"hero_image\": \"https://example.com/products/premium-shirt/hero.jpg\",\n    \"gallery\": [\n      \"https://example.com/products/premium-shirt/front.jpg\",\n      \"https://example.com/products/premium-shirt/back.jpg\"\n    ]\n  },\n  \"custom_data\": {\n    \"season\": \"summer\",\n    \"material\": \"organic_cotton\"\n  }\n}",
+              "raw": "{\n  \"name\": \"Premium Cotton T-Shirt\",\n  \"type\": \"physical\",\n  \"description\": \"Comfortable everyday wear\",\n  \"about\": \"Our premium cotton t-shirt is made from 100% organic cotton...\",\n  \"category\": \"clothing\",\n  \"attributes\": [\n    {\n      \"name\": \"Size\",\n      \"value\": \"Medium\"\n    },\n    {\n      \"name\": \"Color\",\n      \"value\": \"Blue\"\n    }\n  ],\n  \"media\": {\n    \"hero_image\": \"{{file_id}}\"\n  },\n  \"custom_data\": {\n    \"season\": \"summer\",\n    \"material\": \"organic_cotton\"\n  }\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -158,7 +158,7 @@
             "url": {
               "raw": "{{base_url}}/products/update"
             },
-            "description": "Public reference: https://studio.inttegro.com/products#update-a-product",
+            "description": "Public reference: https://studio.inttegro.com/products#update-a-product. File-backed media must use managed references.",
             "body": {
               "mode": "raw",
               "raw": "{\n  \"product_id\": \"{{product_id}}\",\n  \"description\": \"Premium everyday comfort\",\n  \"category\": \"apparel\"\n}",

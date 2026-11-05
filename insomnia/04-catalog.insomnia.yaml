@@ -29,7 +29,7 @@ collection:
     method: POST
     meta:
       id: req_f425e96e754cec2194c451d2e3407a24
-      description: 'Public reference: https://studio.inttegro.com/products#create-a-product'
+      description: 'Public reference: https://studio.inttegro.com/products#create-a-product. Upload product media first and use managed file references.'
     headers:
     - name: Content-Type
       value: application/json
@@ -55,11 +55,7 @@ collection:
             }
           ],
           "media": {
-            "hero_image": "https://example.com/products/premium-shirt/hero.jpg",
-            "gallery": [
-              "https://example.com/products/premium-shirt/front.jpg",
-              "https://example.com/products/premium-shirt/back.jpg"
-            ]
+            "hero_image": "{{ file_id }}"
           },
           "custom_data": {
             "season": "summer",
@@ -136,7 +132,7 @@ collection:
     method: POST
     meta:
       id: req_af182e02c8057e11132b44425369b485
-      description: 'Public reference: https://studio.inttegro.com/products#update-a-product'
+      description: 'Public reference: https://studio.inttegro.com/products#update-a-product. File-backed media must use managed references.'
     headers:
     - name: Content-Type
       value: application/json
