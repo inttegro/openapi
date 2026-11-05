@@ -29,7 +29,7 @@ collection:
     method: POST
     meta:
       id: req_f425e96e754cec2194c451d2e3407a24
-      description: 'Public reference: https://studio.inttegro.com/products#create-a-product. Upload product media first and use managed file references.'
+      description: 'Public reference: https://studio.inttegro.com/products#create-a-product. Upload product media first and use managed file references; gallery and downloads each accept at most 50 entries.'
     headers:
     - name: Content-Type
       value: application/json
@@ -132,7 +132,7 @@ collection:
     method: POST
     meta:
       id: req_af182e02c8057e11132b44425369b485
-      description: 'Public reference: https://studio.inttegro.com/products#update-a-product. File-backed media must use managed references.'
+      description: 'Public reference: https://studio.inttegro.com/products#update-a-product. File-backed media must use managed references; gallery and downloads each accept at most 50 entries.'
     headers:
     - name: Content-Type
       value: application/json
