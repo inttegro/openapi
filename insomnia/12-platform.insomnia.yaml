@@ -126,18 +126,18 @@ collection:
 - name: Children policies
   meta:
     id: fld_7a6c6df36d3b4df2a17e6e97e5146801
-    description: Look up the active children policy for a children_policy_v1 private-beta application.
+    description: Look up and page children policy versions during private beta.
   authentication:
     type: bearer
     token: '{{ api_key }}'
     prefix: Bearer
   children:
-  - name: Lookup the active children policy
+  - name: Lookup a children policy
     url: '{{ base_url }}/children_policies/lookup'
     method: POST
     meta:
       id: req_7c314a7f63fc4f818bcbfa0ea7617d72
-      description: Public private-beta lookup. Historical selectors remain internal and are intentionally omitted.
+      description: Omit version to return the latest active version.
     headers:
     - name: Content-Type
       value: application/json
@@ -153,13 +153,42 @@ collection:
             insomnia.expect(jsonBody).to.have.all.keys('children_policy');
             insomnia.expect(children_policy_id).to.be.a('string').and.match(/^cp_/);
             insomnia.expect(jsonBody?.children_policy?.capabilities).to.be.an('object');
+            for (const spec of jsonBody?.children_policy?.capabilities?.payouts?.bt_aging_spec ?? []) {
+              insomnia.expect(spec).to.have.all.keys('public_id', 't_plus');
+              insomnia.expect(spec).not.to.have.property('id');
+            }
           });
           if (children_policy_id) insomnia.globals.set('children_policy_id', children_policy_id);
+        }
+  - name: Page children policy versions
+    url: '{{ base_url }}/children_policies/page'
+    method: POST
+    meta:
+      id: req_127a8c78b9d04ee4b3e6a59e568a5414
+      description: Returns immutable versions newest first.
+    headers:
+    - name: Content-Type
+      value: application/json
+    body:
+      mimeType: application/json
+      text: |-
+        {
+          "number": 1,
+          "size": 20
+        }
+    scripts:
+      afterResponse: |-
+        if (insomnia.response.code === 200) {
+          const jsonBody = insomnia.response.json();
+          insomnia.test('Returns a page of children policy versions', () => {
+            insomnia.expect(jsonBody).to.have.all.keys('page');
+            insomnia.expect(jsonBody?.page?.versions).to.be.an('array');
+          });
         }
 - name: Operating policies
   meta:
     id: fld_7ddb297f7de642348a28b7a07f47a432
-    description: Create, retrieve, and version reusable operating policies for a children_policy_v1 application.
+    description: Create, retrieve, and version reusable operating policies during private beta.
   authentication:
     type: bearer
     token: '{{ api_key }}'
@@ -217,6 +246,11 @@ collection:
             insomnia.expect(jsonBody).to.have.all.keys('operating_policy');
             insomnia.expect(operating_policy_id).to.be.a('string').and.match(/^op_/);
             insomnia.expect(jsonBody?.operating_policy?.version).to.equal(1);
+            const agingSpec = jsonBody?.operating_policy?.capabilities?.payouts?.bt_aging_spec;
+            if (agingSpec) {
+              insomnia.expect(agingSpec).to.have.all.keys('public_id', 't_plus');
+              insomnia.expect(agingSpec).not.to.have.property('id');
+            }
           });
           if (operating_policy_id) insomnia.globals.set('operating_policy_id', operating_policy_id);
         }
@@ -225,7 +259,7 @@ collection:
     method: POST
     meta:
       id: req_f60b91b58a9d47ecbb75ba460e40a8fb
-      description: Returns the active version. Historical selectors remain internal.
+      description: Omit version to return the latest active version.
     headers:
     - name: Content-Type
       value: application/json
@@ -244,12 +278,38 @@ collection:
             insomnia.expect(jsonBody?.operating_policy?.id).to.equal(insomnia.variables.get('operating_policy_id'));
           });
         }
+  - name: Page operating policy versions
+    url: '{{ base_url }}/operating_policies/page'
+    method: POST
+    meta:
+      id: req_f614a0ddecb34f3ab1b1d8b2982f3427
+      description: Returns one operating policy's immutable versions newest first.
+    headers:
+    - name: Content-Type
+      value: application/json
+    body:
+      mimeType: application/json
+      text: |-
+        {
+          "operating_policy_id": "{{ operating_policy_id }}",
+          "number": 1,
+          "size": 20
+        }
+    scripts:
+      afterResponse: |-
+        if (insomnia.response.code === 200) {
+          const jsonBody = insomnia.response.json();
+          insomnia.test('Returns a page of operating policy versions', () => {
+            insomnia.expect(jsonBody).to.have.all.keys('page');
+            insomnia.expect(jsonBody?.page?.versions).to.be.an('array');
+          });
+        }
   - name: Create a new operating policy version
     url: '{{ base_url }}/operating_policies/update'
     method: POST
     meta:
       id: req_6a5403c094c04ffb9397be79064dbdee
-      description: Uses optimistic concurrency and leaves prior immutable versions available to internal forensics.
+      description: Uses optimistic concurrency and preserves prior immutable versions.
     headers:
     - name: Content-Type
       value: application/json

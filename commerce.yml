@@ -3,8 +3,8 @@ openapi: 3.0.3
 info:
     title: Inttegro API
     description: Machine-readable reference for the public Inttegro API
-    version: 0.1.0-beta51
-    x-inttegro-collection-version: 0.1.0-beta51
+    version: 0.1.0-beta60
+    x-inttegro-collection-version: 0.1.0-beta60
     contact:
         name: Inttegro Engineering
         url: "https://inttegro.com"
@@ -3572,12 +3572,10 @@ paths:
                                 $ref: '#/components/schemas/Error'
     /children_policies/lookup:
         post:
-            summary: Look up the active children policy
+            summary: Look up a children policy version
             description: |
-                Returns the latest children policy assigned to the authenticated application.
-                This private-beta operation requires the `children_policy_v1` gate. Historical
-                selectors are reserved for internal Commerce services and are not part of the
-                public request.
+                Returns a children policy version. Omit `version` to return the latest active
+                version. This feature is available to selected accounts during private beta.
             operationId: lookupChildrenPolicy
             tags:
                 - Children Policies
@@ -3589,7 +3587,7 @@ paths:
                             $ref: '#/components/schemas/LookupChildrenPolicyRequest'
             responses:
                 '200':
-                    description: Active children policy returned successfully.
+                    description: Children policy version returned successfully.
                     headers:
                         X-Request-Id:
                             $ref: '#/components/headers/RequestId'
@@ -3606,7 +3604,7 @@ paths:
                 '401':
                     description: Authorization is required.
                 '403':
-                    description: The authenticated caller does not have `children_policy_v1` access.
+                    description: This feature is not available to the account.
                     content:
                         application/json:
                             schema:
@@ -3629,14 +3627,64 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/ErrorEnvelope'
+    /children_policies/page:
+        post:
+            summary: Page children policy versions
+            description: |
+                Returns immutable children policy versions newest first. This feature is available
+                to selected accounts during private beta.
+            operationId: pageChildrenPolicyVersions
+            tags:
+                - Children Policies
+            requestBody:
+                required: false
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/PageChildrenPolicyVersionsRequest'
+            responses:
+                '200':
+                    description: Children policy versions returned successfully.
+                    headers:
+                        X-Request-Id:
+                            $ref: '#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ChildrenPolicyVersionsPageResponse'
+                '400':
+                    description: Invalid children policy page request.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorEnvelope'
+                '401':
+                    description: Authorization is required.
+                '403':
+                    description: This feature is not available to the account.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorEnvelope'
+                '404':
+                    description: No children policy is assigned to the application.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorEnvelope'
+                '422':
+                    description: The children policy versions could not be returned safely.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorEnvelope'
     /operating_policies/create:
         post:
             summary: Create an operating policy
             description: |
                 Creates the first immutable version of a reusable operating policy owned by the
-                authenticated application. This private-beta operation requires the
-                `children_policy_v1` gate, and the selected capabilities must fit the owner's
-                active children policy.
+                application. The selected capabilities must fit its active children policy. This
+                feature is available to selected accounts during private beta.
             operationId: createOperatingPolicy
             tags:
                 - Operating Policies
@@ -3665,7 +3713,7 @@ paths:
                 '401':
                     description: Authorization is required.
                 '403':
-                    description: The authenticated caller does not have `children_policy_v1` access.
+                    description: This feature is not available to the account.
                     content:
                         application/json:
                             schema:
@@ -3692,9 +3740,8 @@ paths:
         post:
             summary: Look up an operating policy
             description: |
-                Returns the latest active version of one operating policy owned by the
-                authenticated application. Historical versions remain internal. This private-beta
-                operation requires the `children_policy_v1` gate.
+                Returns one operating policy version. Omit `version` to return the latest active
+                version. This feature is available to selected accounts during private beta.
             operationId: lookupOperatingPolicy
             tags:
                 - Operating Policies
@@ -3723,7 +3770,7 @@ paths:
                 '401':
                     description: Authorization is required.
                 '403':
-                    description: The authenticated caller does not have `children_policy_v1` access.
+                    description: This feature is not available to the account.
                     content:
                         application/json:
                             schema:
@@ -3746,13 +3793,64 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/ErrorEnvelope'
+    /operating_policies/page:
+        post:
+            summary: Page operating policy versions
+            description: |
+                Returns one operating policy's immutable versions newest first. This feature is
+                available to selected accounts during private beta.
+            operationId: pageOperatingPolicyVersions
+            tags:
+                - Operating Policies
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/PageOperatingPolicyVersionsRequest'
+            responses:
+                '200':
+                    description: Operating policy versions returned successfully.
+                    headers:
+                        X-Request-Id:
+                            $ref: '#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/OperatingPolicyVersionsPageResponse'
+                '400':
+                    description: Invalid operating policy page request.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorEnvelope'
+                '401':
+                    description: Authorization is required.
+                '403':
+                    description: This feature is not available to the account.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorEnvelope'
+                '404':
+                    description: Operating policy not found.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorEnvelope'
+                '422':
+                    description: The operating policy versions could not be returned safely.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorEnvelope'
     /operating_policies/update:
         post:
             summary: Create a new operating policy version
             description: |
                 Creates and activates a new immutable version of an operating policy. Supply the
-                current `expected_version` to prevent lost updates. This private-beta operation
-                requires the `children_policy_v1` gate.
+                current `expected_version` to prevent lost updates. This feature is available to
+                selected accounts during private beta.
             operationId: updateOperatingPolicy
             tags:
                 - Operating Policies
@@ -3781,7 +3879,7 @@ paths:
                 '401':
                     description: Authorization is required.
                 '403':
-                    description: The authenticated caller does not have `children_policy_v1` access.
+                    description: This feature is not available to the account.
                     content:
                         application/json:
                             schema:
@@ -8888,7 +8986,6 @@ components:
             additionalProperties: false
             required:
                 - id
-                - owner_application_id
                 - version
                 - active_version
                 - name
@@ -8900,9 +8997,6 @@ components:
                 id:
                     type: string
                     pattern: '^cp_'
-                owner_application_id:
-                    type: string
-                    pattern: '^app_'
                 version:
                     type: integer
                     minimum: 1
@@ -8927,7 +9021,24 @@ components:
         LookupChildrenPolicyRequest:
             type: object
             additionalProperties: false
-            description: Public lookup accepts no selectors and always returns the authenticated application's active policy.
+            properties:
+                version:
+                    type: integer
+                    minimum: 1
+                    description: Immutable version to return. Omit to return the latest active version.
+        PageChildrenPolicyVersionsRequest:
+            type: object
+            additionalProperties: false
+            properties:
+                number:
+                    type: integer
+                    minimum: 1
+                    default: 1
+                size:
+                    type: integer
+                    minimum: 1
+                    maximum: 100
+                    default: 20
         ChildrenPolicyResponse:
             type: object
             additionalProperties: false
@@ -8935,6 +9046,37 @@ components:
             properties:
                 children_policy:
                     $ref: '#/components/schemas/ChildrenPolicy'
+        ChildrenPolicyVersionsPage:
+            type: object
+            additionalProperties: false
+            required: [number, size, count, total, has_more, versions]
+            properties:
+                number:
+                    type: integer
+                    minimum: 1
+                size:
+                    type: integer
+                    minimum: 1
+                    maximum: 100
+                count:
+                    type: integer
+                    minimum: 0
+                total:
+                    type: integer
+                    minimum: 1
+                has_more:
+                    type: boolean
+                versions:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/ChildrenPolicy'
+        ChildrenPolicyVersionsPageResponse:
+            type: object
+            additionalProperties: false
+            required: [page]
+            properties:
+                page:
+                    $ref: '#/components/schemas/ChildrenPolicyVersionsPage'
         OperatingPolicyPaymentsCapabilitiesInput:
             type: object
             additionalProperties: false
@@ -9041,8 +9183,7 @@ components:
                     $ref: '#/components/schemas/OperatingPolicyCapabilitiesInput'
         OperatingPolicySelection:
             description: |
-                Mutually exclusive named-template or inline operating policy selection. Available
-                only to internal Commerce services and `children_policy_v1` private-beta callers.
+                Mutually exclusive named-template or inline operating policy selection.
             oneOf:
                 - $ref: '#/components/schemas/OperatingPolicySelectionByID'
                 - $ref: '#/components/schemas/InlineOperatingPolicySelection'
@@ -9066,7 +9207,7 @@ components:
             type: object
             additionalProperties: false
             required: [capabilities, source]
-            description: Immutable operating policy snapshot applied to the application. This field is returned only to `children_policy_v1` callers.
+            description: Immutable operating policy snapshot applied to the application.
             properties:
                 capabilities:
                     $ref: '#/components/schemas/OperatingPolicyCapabilities'
@@ -9139,6 +9280,27 @@ components:
                 operating_policy_id:
                     type: string
                     pattern: '^op_'
+                version:
+                    type: integer
+                    minimum: 1
+                    description: Immutable version to return. Omit to return the latest active version.
+        PageOperatingPolicyVersionsRequest:
+            type: object
+            additionalProperties: false
+            required: [operating_policy_id]
+            properties:
+                operating_policy_id:
+                    type: string
+                    pattern: '^op_'
+                number:
+                    type: integer
+                    minimum: 1
+                    default: 1
+                size:
+                    type: integer
+                    minimum: 1
+                    maximum: 100
+                    default: 20
         UpdateOperatingPolicyRequest:
             type: object
             additionalProperties: false
@@ -9167,6 +9329,37 @@ components:
             properties:
                 operating_policy:
                     $ref: '#/components/schemas/OperatingPolicy'
+        OperatingPolicyVersionsPage:
+            type: object
+            additionalProperties: false
+            required: [number, size, count, total, has_more, versions]
+            properties:
+                number:
+                    type: integer
+                    minimum: 1
+                size:
+                    type: integer
+                    minimum: 1
+                    maximum: 100
+                count:
+                    type: integer
+                    minimum: 0
+                total:
+                    type: integer
+                    minimum: 1
+                has_more:
+                    type: boolean
+                versions:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/OperatingPolicy'
+        OperatingPolicyVersionsPageResponse:
+            type: object
+            additionalProperties: false
+            required: [page]
+            properties:
+                page:
+                    $ref: '#/components/schemas/OperatingPolicyVersionsPage'
         ResourceSearchRequest:
             type: object
             additionalProperties: false
