@@ -3,8 +3,8 @@ openapi: 3.0.3
 info:
     title: Inttegro API
     description: Machine-readable reference for the public Inttegro API
-    version: 0.1.0-beta48
-    x-inttegro-collection-version: 0.1.0-beta48
+    version: 0.1.0-beta49
+    x-inttegro-collection-version: 0.1.0-beta49
     contact:
         name: Inttegro Engineering
         url: "https://inttegro.com"
@@ -10811,31 +10811,37 @@ components:
                             minimum: 0
                         details:
                             $ref: '#/components/schemas/ProductDimensionDetails'
+        ProductMediaFileReference:
+            type: string
+            maxLength: 256
+            pattern: '^(file|flink)_[A-Za-z0-9][A-Za-z0-9_-]*$'
+            description: An Inttegro Files API file or file-link reference. Remote URLs are not accepted.
+            example: file_2xC7k9gK5yQnZ4w8P1sT6vR3
         ProductMedia:
             type: object
             properties:
                 hero_image:
-                    type: string
+                    $ref: '#/components/schemas/ProductMediaFileReference'
                 thumbnail:
-                    type: string
+                    $ref: '#/components/schemas/ProductMediaFileReference'
                 web_page_url:
                     type: string
                 brand_logo:
-                    type: string
+                    $ref: '#/components/schemas/ProductMediaFileReference'
                 infographic:
-                    type: string
+                    $ref: '#/components/schemas/ProductMediaFileReference'
                 promo_video:
-                    type: string
+                    $ref: '#/components/schemas/ProductMediaFileReference'
                 demo_video:
-                    type: string
+                    $ref: '#/components/schemas/ProductMediaFileReference'
                 gallery:
                     type: array
                     items:
-                        type: string
+                        $ref: '#/components/schemas/ProductMediaFileReference'
                 downloads:
                     type: array
                     items:
-                        type: string
+                        $ref: '#/components/schemas/ProductMediaFileReference'
         ProductShipmentInput:
             type: object
             required: [type]
@@ -10996,9 +11002,9 @@ components:
                     $ref: '#/components/schemas/ProductMedia'
                 images:
                     type: array
-                    description: Legacy image list. Mutually exclusive with `media`.
+                    description: Legacy image list of Inttegro file or file-link references. Mutually exclusive with `media`.
                     items:
-                        type: string
+                        $ref: '#/components/schemas/ProductMediaFileReference'
                 attributes:
                     type: array
                     description: Product attributes
