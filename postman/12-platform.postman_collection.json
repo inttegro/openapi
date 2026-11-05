@@ -2,7 +2,7 @@
   "info": {
     "name": "Inttegro API — Platform",
     "description": "Manage applications and keys and retrieve reference data. Uses the shared Inttegro API global environment. Error reference: https://studio.inttegro.com/error-codes#applications\n\nGenerated from insomnia/12-platform.insomnia.yaml. Edit the Insomnia source and run npm run postman:generate.",
-    "version": "0.1.0-beta50",
+    "version": "0.1.0-beta51",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
@@ -215,6 +215,217 @@
           }
         }
       ]
+    },
+    {
+      "name": "Children policies",
+      "item": [
+        {
+          "name": "Lookup the active children policy",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/children_policies/lookup"
+            },
+            "description": "Public private-beta lookup. Historical selectors remain internal and are intentionally omitted.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const jsonBody = pm.response.json();",
+                  "  const children_policy_id = jsonBody?.children_policy?.id;",
+                  "  pm.test('Returns the active children policy', () => {",
+                  "    pm.expect(jsonBody).to.have.all.keys('children_policy');",
+                  "    pm.expect(children_policy_id).to.be.a('string').and.match(/^cp_/);",
+                  "    pm.expect(jsonBody?.children_policy?.capabilities).to.be.an('object');",
+                  "  });",
+                  "  if (children_policy_id) pm.environment.set('children_policy_id', children_policy_id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "description": "Look up the active children policy for a children_policy_v1 private-beta application.",
+      "auth": {
+        "type": "bearer",
+        "bearer": [
+          {
+            "key": "token",
+            "value": "{{api_key}}",
+            "type": "string"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Operating policies",
+      "item": [
+        {
+          "name": "Create an operating policy",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/operating_policies/create"
+            },
+            "description": "Creates version one under the authenticated application's active children policy.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Ghana payments\",\n  \"description\": \"Accept GHS payments without payouts\",\n  \"capabilities\": {\n    \"payments\": {\n      \"currencies\": [\"ghs\"],\n      \"limits\": {\n        \"amount\": {\n          \"min\": 1,\n          \"max\": 9999999\n        }\n      }\n    },\n    \"payouts\": {\n      \"enabled\": false,\n      \"bt_aging_spec\": {\n        \"id\": \"bt_aging_spec_24_hourly\"\n      }\n    },\n    \"payment_methods\": {\n      \"mobile_money\": {\n        \"enabled\": true,\n        \"confirms_use\": true\n      },\n      \"card\": {\n        \"enabled\": true,\n        \"confirms_use\": true\n      }\n    }\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const jsonBody = pm.response.json();",
+                  "  const operating_policy_id = jsonBody?.operating_policy?.id;",
+                  "  pm.test('Returns version one of the operating policy', () => {",
+                  "    pm.expect(jsonBody).to.have.all.keys('operating_policy');",
+                  "    pm.expect(operating_policy_id).to.be.a('string').and.match(/^op_/);",
+                  "    pm.expect(jsonBody?.operating_policy?.version).to.equal(1);",
+                  "  });",
+                  "  if (operating_policy_id) pm.environment.set('operating_policy_id', operating_policy_id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Lookup an operating policy",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/operating_policies/lookup"
+            },
+            "description": "Returns the active version. Historical selectors remain internal.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"operating_policy_id\": \"{{operating_policy_id}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const jsonBody = pm.response.json();",
+                  "  pm.test('Returns the requested operating policy', () => {",
+                  "    pm.expect(jsonBody).to.have.all.keys('operating_policy');",
+                  "    pm.expect(jsonBody?.operating_policy?.id).to.equal(pm.variables.get('operating_policy_id'));",
+                  "  });",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create a new operating policy version",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/operating_policies/update"
+            },
+            "description": "Uses optimistic concurrency and leaves prior immutable versions available to internal forensics.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"operating_policy_id\": \"{{operating_policy_id}}\",\n  \"expected_version\": 1,\n  \"description\": \"Accept GHS payments without payouts; reviewed for production\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const jsonBody = pm.response.json();",
+                  "  pm.test('Returns the newly active immutable version', () => {",
+                  "    pm.expect(jsonBody).to.have.all.keys('operating_policy');",
+                  "    pm.expect(jsonBody?.operating_policy?.id).to.equal(pm.variables.get('operating_policy_id'));",
+                  "    pm.expect(jsonBody?.operating_policy?.active_version).to.equal(jsonBody?.operating_policy?.version);",
+                  "  });",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "description": "Create, retrieve, and version reusable operating policies for a children_policy_v1 application.",
+      "auth": {
+        "type": "bearer",
+        "bearer": [
+          {
+            "key": "token",
+            "value": "{{api_key}}",
+            "type": "string"
+          }
+        ]
+      }
     },
     {
       "name": "API keys",
