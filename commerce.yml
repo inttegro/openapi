@@ -13082,7 +13082,13 @@ components:
                     description: HTML email body template.
                     example: "<p>Thanks {{customer_name}}.</p>"
                 from:
-                    $ref: '#/components/schemas/MessageTemplateMailbox'
+                    allOf:
+                        - $ref: '#/components/schemas/MessageTemplateMailbox'
+                    description: >-
+                        Optional sender identity. When omitted, Mercurio stores and uses the
+                        configured default sender. A supplied address must be a literal sender
+                        approved for the authenticated application; template expressions are not
+                        accepted in the sender address.
                 reply_to:
                     $ref: '#/components/schemas/MessageTemplateMailbox'
                 headers:
