@@ -11,7 +11,7 @@ environments:
     id: env_4441cc5f612fb445ed9428bf08deba0e
   data:
     base_url: https://api.inttegro.com
-    collection_version: 0.1.0-beta50
+    collection_version: 0.1.0-beta51
     api_key: ''
     idempotency_key: ''
     future_timestamp: ''
@@ -58,3 +58,5 @@ environments:
     upload_url: ''
     upload_file_path: ./replace-with-a-local-file
     app_id: ''
+    children_policy_id: ''
+    operating_policy_id: ''

@@ -123,6 +123,154 @@ collection:
             insomnia.expect(jsonBody?.app).not.to.have.property('secret_key');
           });
         }
+- name: Children policies
+  meta:
+    id: fld_7a6c6df36d3b4df2a17e6e97e5146801
+    description: Look up the active children policy for a children_policy_v1 private-beta application.
+  authentication:
+    type: bearer
+    token: '{{ api_key }}'
+    prefix: Bearer
+  children:
+  - name: Lookup the active children policy
+    url: '{{ base_url }}/children_policies/lookup'
+    method: POST
+    meta:
+      id: req_7c314a7f63fc4f818bcbfa0ea7617d72
+      description: Public private-beta lookup. Historical selectors remain internal and are intentionally omitted.
+    headers:
+    - name: Content-Type
+      value: application/json
+    body:
+      mimeType: application/json
+      text: '{}'
+    scripts:
+      afterResponse: |-
+        if (insomnia.response.code === 200) {
+          const jsonBody = insomnia.response.json();
+          const children_policy_id = jsonBody?.children_policy?.id;
+          insomnia.test('Returns the active children policy', () => {
+            insomnia.expect(jsonBody).to.have.all.keys('children_policy');
+            insomnia.expect(children_policy_id).to.be.a('string').and.match(/^cp_/);
+            insomnia.expect(jsonBody?.children_policy?.capabilities).to.be.an('object');
+          });
+          if (children_policy_id) insomnia.globals.set('children_policy_id', children_policy_id);
+        }
+- name: Operating policies
+  meta:
+    id: fld_7ddb297f7de642348a28b7a07f47a432
+    description: Create, retrieve, and version reusable operating policies for a children_policy_v1 application.
+  authentication:
+    type: bearer
+    token: '{{ api_key }}'
+    prefix: Bearer
+  children:
+  - name: Create an operating policy
+    url: '{{ base_url }}/operating_policies/create'
+    method: POST
+    meta:
+      id: req_d38c446b36084744a32c2da0e6c6e746
+      description: Creates version one under the authenticated application's active children policy.
+    headers:
+    - name: Content-Type
+      value: application/json
+    body:
+      mimeType: application/json
+      text: |-
+        {
+          "name": "Ghana payments",
+          "description": "Accept GHS payments without payouts",
+          "capabilities": {
+            "payments": {
+              "currencies": ["ghs"],
+              "limits": {
+                "amount": {
+                  "min": 1,
+                  "max": 9999999
+                }
+              }
+            },
+            "payouts": {
+              "enabled": false,
+              "bt_aging_spec": {
+                "id": "bt_aging_spec_24_hourly"
+              }
+            },
+            "payment_methods": {
+              "mobile_money": {
+                "enabled": true,
+                "confirms_use": true
+              },
+              "card": {
+                "enabled": true,
+                "confirms_use": true
+              }
+            }
+          }
+        }
+    scripts:
+      afterResponse: |-
+        if (insomnia.response.code === 200) {
+          const jsonBody = insomnia.response.json();
+          const operating_policy_id = jsonBody?.operating_policy?.id;
+          insomnia.test('Returns version one of the operating policy', () => {
+            insomnia.expect(jsonBody).to.have.all.keys('operating_policy');
+            insomnia.expect(operating_policy_id).to.be.a('string').and.match(/^op_/);
+            insomnia.expect(jsonBody?.operating_policy?.version).to.equal(1);
+          });
+          if (operating_policy_id) insomnia.globals.set('operating_policy_id', operating_policy_id);
+        }
+  - name: Lookup an operating policy
+    url: '{{ base_url }}/operating_policies/lookup'
+    method: POST
+    meta:
+      id: req_f60b91b58a9d47ecbb75ba460e40a8fb
+      description: Returns the active version. Historical selectors remain internal.
+    headers:
+    - name: Content-Type
+      value: application/json
+    body:
+      mimeType: application/json
+      text: |-
+        {
+          "operating_policy_id": "{{ operating_policy_id }}"
+        }
+    scripts:
+      afterResponse: |-
+        if (insomnia.response.code === 200) {
+          const jsonBody = insomnia.response.json();
+          insomnia.test('Returns the requested operating policy', () => {
+            insomnia.expect(jsonBody).to.have.all.keys('operating_policy');
+            insomnia.expect(jsonBody?.operating_policy?.id).to.equal(insomnia.variables.get('operating_policy_id'));
+          });
+        }
+  - name: Create a new operating policy version
+    url: '{{ base_url }}/operating_policies/update'
+    method: POST
+    meta:
+      id: req_6a5403c094c04ffb9397be79064dbdee
+      description: Uses optimistic concurrency and leaves prior immutable versions available to internal forensics.
+    headers:
+    - name: Content-Type
+      value: application/json
+    body:
+      mimeType: application/json
+      text: |-
+        {
+          "operating_policy_id": "{{ operating_policy_id }}",
+          "expected_version": 1,
+          "description": "Accept GHS payments without payouts; reviewed for production"
+        }
+    scripts:
+      afterResponse: |-
+        if (insomnia.response.code === 200) {
+          const jsonBody = insomnia.response.json();
+          insomnia.test('Returns the newly active immutable version', () => {
+            insomnia.expect(jsonBody).to.have.all.keys('operating_policy');
+            insomnia.expect(jsonBody?.operating_policy?.id).to.equal(insomnia.variables.get('operating_policy_id'));
+            insomnia.expect(jsonBody?.operating_policy?.active_version).to.equal(jsonBody?.operating_policy?.version);
+          });
+        }
 - name: API keys
   meta:
     id: fld_48a53f0774c8ceff574a1fdcb0d470db

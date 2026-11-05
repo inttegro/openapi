@@ -3,8 +3,8 @@ openapi: 3.0.3
 info:
     title: Inttegro API
     description: Machine-readable reference for the public Inttegro API
-    version: 0.1.0-beta50
-    x-inttegro-collection-version: 0.1.0-beta50
+    version: 0.1.0-beta51
+    x-inttegro-collection-version: 0.1.0-beta51
     contact:
         name: Inttegro Engineering
         url: "https://inttegro.com"
@@ -3191,6 +3191,8 @@ paths:
                                 placement_parent_application_id:
                                     type: string
                                     description: Optional application under which the new app should be placed.
+                                operating_policy:
+                                    $ref: '#/components/schemas/OperatingPolicySelection'
                                 relationship_policy:
                                     type: object
                                     additionalProperties: false
@@ -3247,6 +3249,8 @@ paths:
                                                 format: date-time
                                             capabilities:
                                                 $ref: '#/components/schemas/ApplicationCapabilityProjection'
+                                            operating_policy:
+                                                $ref: '#/components/schemas/ApplicationOperatingPolicy'
                                             secret_key:
                                                 type: object
                                                 properties:
@@ -3424,6 +3428,8 @@ paths:
                                                 format: date-time
                                             capabilities:
                                                 $ref: '#/components/schemas/ApplicationCapabilityProjection'
+                                            operating_policy:
+                                                $ref: '#/components/schemas/ApplicationOperatingPolicy'
                                             relationship:
                                                 type: object
                                                 description: Identifies the authenticated app's direct placement relationship. Omitted for root apps.
@@ -3505,6 +3511,8 @@ paths:
                                 legal_entity_type:
                                     type: string
                                     description: Caller-defined legal-entity label. Send an empty string to clear it.
+                                operating_policy:
+                                    $ref: '#/components/schemas/OperatingPolicySelection'
             responses:
                 '200':
                     description: Application updated successfully.
@@ -3542,6 +3550,8 @@ paths:
                                                 format: date-time
                                             capabilities:
                                                 $ref: '#/components/schemas/ApplicationCapabilityProjection'
+                                            operating_policy:
+                                                $ref: '#/components/schemas/ApplicationOperatingPolicy'
                 '401':
                     description: Unauthorized - invalid or missing API key
                     headers:
@@ -3560,6 +3570,246 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/Error'
+    /children_policies/lookup:
+        post:
+            summary: Look up the active children policy
+            description: |
+                Returns the latest children policy assigned to the authenticated application.
+                This private-beta operation requires the `children_policy_v1` gate. Historical
+                selectors are reserved for internal Commerce services and are not part of the
+                public request.
+            operationId: lookupChildrenPolicy
+            tags:
+                - Children Policies
+            requestBody:
+                required: false
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/LookupChildrenPolicyRequest'
+            responses:
+                '200':
+                    description: Active children policy returned successfully.
+                    headers:
+                        X-Request-Id:
+                            $ref: '#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ChildrenPolicyResponse'
+                '400':
+                    description: Invalid children policy lookup request.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorEnvelope'
+                '401':
+                    description: Authorization is required.
+                '403':
+                    description: The authenticated caller does not have `children_policy_v1` access.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorEnvelope'
+                '404':
+                    description: No children policy is assigned to the application.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorEnvelope'
+                '422':
+                    description: The children policy could not be returned safely.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorEnvelope'
+                '503':
+                    description: Children policy validation or storage is temporarily unavailable.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorEnvelope'
+    /operating_policies/create:
+        post:
+            summary: Create an operating policy
+            description: |
+                Creates the first immutable version of a reusable operating policy owned by the
+                authenticated application. This private-beta operation requires the
+                `children_policy_v1` gate, and the selected capabilities must fit the owner's
+                active children policy.
+            operationId: createOperatingPolicy
+            tags:
+                - Operating Policies
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/CreateOperatingPolicyRequest'
+            responses:
+                '200':
+                    description: Operating policy created successfully.
+                    headers:
+                        X-Request-Id:
+                            $ref: '#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/OperatingPolicyResponse'
+                '400':
+                    description: Invalid operating policy request.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorEnvelope'
+                '401':
+                    description: Authorization is required.
+                '403':
+                    description: The authenticated caller does not have `children_policy_v1` access.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorEnvelope'
+                '409':
+                    description: The governing children policy changed before creation completed.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorEnvelope'
+                '422':
+                    description: The operating policy does not fit the active children policy.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorEnvelope'
+                '503':
+                    description: Operating policy validation or storage is temporarily unavailable.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorEnvelope'
+    /operating_policies/lookup:
+        post:
+            summary: Look up an operating policy
+            description: |
+                Returns the latest active version of one operating policy owned by the
+                authenticated application. Historical versions remain internal. This private-beta
+                operation requires the `children_policy_v1` gate.
+            operationId: lookupOperatingPolicy
+            tags:
+                - Operating Policies
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/LookupOperatingPolicyRequest'
+            responses:
+                '200':
+                    description: Operating policy returned successfully.
+                    headers:
+                        X-Request-Id:
+                            $ref: '#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/OperatingPolicyResponse'
+                '400':
+                    description: Invalid operating policy lookup request.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorEnvelope'
+                '401':
+                    description: Authorization is required.
+                '403':
+                    description: The authenticated caller does not have `children_policy_v1` access.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorEnvelope'
+                '404':
+                    description: Operating policy not found.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorEnvelope'
+                '422':
+                    description: The operating policy could not be returned safely.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorEnvelope'
+                '503':
+                    description: Operating policy validation or storage is temporarily unavailable.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorEnvelope'
+    /operating_policies/update:
+        post:
+            summary: Create a new operating policy version
+            description: |
+                Creates and activates a new immutable version of an operating policy. Supply the
+                current `expected_version` to prevent lost updates. This private-beta operation
+                requires the `children_policy_v1` gate.
+            operationId: updateOperatingPolicy
+            tags:
+                - Operating Policies
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/UpdateOperatingPolicyRequest'
+            responses:
+                '200':
+                    description: New operating policy version activated successfully.
+                    headers:
+                        X-Request-Id:
+                            $ref: '#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/OperatingPolicyResponse'
+                '400':
+                    description: Invalid operating policy update request.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorEnvelope'
+                '401':
+                    description: Authorization is required.
+                '403':
+                    description: The authenticated caller does not have `children_policy_v1` access.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorEnvelope'
+                '404':
+                    description: Operating policy not found.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorEnvelope'
+                '409':
+                    description: The expected or governing children policy version is stale.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorEnvelope'
+                '422':
+                    description: The new operating policy version is invalid.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorEnvelope'
+                '503':
+                    description: Operating policy validation or storage is temporarily unavailable.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorEnvelope'
     /keys/generate:
         post:
             summary: Generate a secret key
@@ -8508,6 +8758,415 @@ components:
                         - $ref: '#/components/schemas/RestrictedApplicationCapability'
                         - $ref: '#/components/schemas/PendingReviewApplicationCapability'
             additionalProperties: true
+        PolicyAmountRange:
+            type: object
+            additionalProperties: false
+            required: [min, max]
+            properties:
+                min:
+                    type: integer
+                    format: int64
+                    minimum: 0
+                    description: Inclusive minimum amount in minor currency units.
+                max:
+                    type: integer
+                    format: int64
+                    minimum: 1
+                    description: Inclusive maximum amount in minor currency units.
+        PolicyLimits:
+            type: object
+            additionalProperties: false
+            required: [amount]
+            properties:
+                amount:
+                    $ref: '#/components/schemas/PolicyAmountRange'
+        PolicyBTAgingSpec:
+            type: object
+            additionalProperties: false
+            required: [public_id, t_plus]
+            properties:
+                public_id:
+                    type: string
+                    enum:
+                        - bt_aging_spec_immediate
+                        - bt_aging_spec_24_hourly
+                        - bt_aging_spec_48_hourly
+                        - bt_aging_spec_168_hourly
+                t_plus:
+                    type: string
+                    pattern: '^(0|[1-9][0-9]*)h$'
+                    description: Platform-owned whole-hour aging duration.
+        PolicyBTAgingSpecReference:
+            type: object
+            additionalProperties: false
+            required: [id]
+            properties:
+                id:
+                    type: string
+                    enum:
+                        - bt_aging_spec_immediate
+                        - bt_aging_spec_24_hourly
+                        - bt_aging_spec_48_hourly
+                        - bt_aging_spec_168_hourly
+                    description: Public aging-specification identifier. The platform determines `t_plus`.
+        ChildrenPolicyPaymentsCapabilities:
+            type: object
+            additionalProperties: false
+            minProperties: 1
+            properties:
+                currencies:
+                    type: array
+                    minItems: 1
+                    uniqueItems: true
+                    items:
+                        type: string
+                        pattern: '^[a-z]{3}$'
+                limits:
+                    $ref: '#/components/schemas/PolicyLimits'
+        ChildrenPolicyPayoutsCapabilities:
+            type: object
+            additionalProperties: false
+            minProperties: 1
+            properties:
+                enabled:
+                    type: array
+                    minItems: 1
+                    uniqueItems: true
+                    items:
+                        type: boolean
+                limits:
+                    $ref: '#/components/schemas/PolicyLimits'
+                bt_aging_spec:
+                    type: array
+                    minItems: 1
+                    uniqueItems: true
+                    items:
+                        $ref: '#/components/schemas/PolicyBTAgingSpec'
+        ChildrenPolicyPaymentMethodCapabilities:
+            type: object
+            additionalProperties: false
+            required: [enabled, confirms_use]
+            properties:
+                enabled:
+                    type: array
+                    minItems: 1
+                    uniqueItems: true
+                    items:
+                        type: boolean
+                confirms_use:
+                    type: array
+                    minItems: 1
+                    uniqueItems: true
+                    items:
+                        type: boolean
+        ChildrenPolicyPaymentMethodsCapabilities:
+            type: object
+            additionalProperties: false
+            minProperties: 1
+            properties:
+                mobile_money:
+                    $ref: '#/components/schemas/ChildrenPolicyPaymentMethodCapabilities'
+                bank_account:
+                    $ref: '#/components/schemas/ChildrenPolicyPaymentMethodCapabilities'
+                motito:
+                    $ref: '#/components/schemas/ChildrenPolicyPaymentMethodCapabilities'
+                card:
+                    $ref: '#/components/schemas/ChildrenPolicyPaymentMethodCapabilities'
+        ChildrenPolicyCapabilities:
+            type: object
+            additionalProperties: false
+            minProperties: 1
+            properties:
+                payments:
+                    $ref: '#/components/schemas/ChildrenPolicyPaymentsCapabilities'
+                payouts:
+                    $ref: '#/components/schemas/ChildrenPolicyPayoutsCapabilities'
+                payment_methods:
+                    $ref: '#/components/schemas/ChildrenPolicyPaymentMethodsCapabilities'
+        ChildrenPolicy:
+            type: object
+            additionalProperties: false
+            required:
+                - id
+                - owner_application_id
+                - version
+                - active_version
+                - name
+                - capabilities
+                - created_at
+                - updated_at
+                - version_created_at
+            properties:
+                id:
+                    type: string
+                    pattern: '^cp_'
+                owner_application_id:
+                    type: string
+                    pattern: '^app_'
+                version:
+                    type: integer
+                    minimum: 1
+                active_version:
+                    type: integer
+                    minimum: 1
+                name:
+                    type: string
+                description:
+                    type: string
+                capabilities:
+                    $ref: '#/components/schemas/ChildrenPolicyCapabilities'
+                created_at:
+                    type: string
+                    format: date-time
+                updated_at:
+                    type: string
+                    format: date-time
+                version_created_at:
+                    type: string
+                    format: date-time
+        LookupChildrenPolicyRequest:
+            type: object
+            additionalProperties: false
+            description: Public lookup accepts no selectors and always returns the authenticated application's active policy.
+        ChildrenPolicyResponse:
+            type: object
+            additionalProperties: false
+            required: [children_policy]
+            properties:
+                children_policy:
+                    $ref: '#/components/schemas/ChildrenPolicy'
+        OperatingPolicyPaymentsCapabilitiesInput:
+            type: object
+            additionalProperties: false
+            minProperties: 1
+            properties:
+                currencies:
+                    type: array
+                    minItems: 1
+                    uniqueItems: true
+                    items:
+                        type: string
+                        pattern: '^[a-z]{3}$'
+                limits:
+                    $ref: '#/components/schemas/PolicyLimits'
+        OperatingPolicyPayoutsCapabilitiesInput:
+            type: object
+            additionalProperties: false
+            minProperties: 1
+            properties:
+                enabled:
+                    type: boolean
+                limits:
+                    $ref: '#/components/schemas/PolicyLimits'
+                bt_aging_spec:
+                    $ref: '#/components/schemas/PolicyBTAgingSpecReference'
+        OperatingPolicyPaymentMethodCapabilities:
+            type: object
+            additionalProperties: false
+            required: [enabled, confirms_use]
+            properties:
+                enabled:
+                    type: boolean
+                confirms_use:
+                    type: boolean
+        OperatingPolicyPaymentMethodsCapabilities:
+            type: object
+            additionalProperties: false
+            minProperties: 1
+            properties:
+                mobile_money:
+                    $ref: '#/components/schemas/OperatingPolicyPaymentMethodCapabilities'
+                bank_account:
+                    $ref: '#/components/schemas/OperatingPolicyPaymentMethodCapabilities'
+                motito:
+                    $ref: '#/components/schemas/OperatingPolicyPaymentMethodCapabilities'
+                card:
+                    $ref: '#/components/schemas/OperatingPolicyPaymentMethodCapabilities'
+        OperatingPolicyCapabilitiesInput:
+            type: object
+            additionalProperties: false
+            minProperties: 1
+            properties:
+                payments:
+                    $ref: '#/components/schemas/OperatingPolicyPaymentsCapabilitiesInput'
+                payouts:
+                    $ref: '#/components/schemas/OperatingPolicyPayoutsCapabilitiesInput'
+                payment_methods:
+                    $ref: '#/components/schemas/OperatingPolicyPaymentMethodsCapabilities'
+        OperatingPolicyPaymentsCapabilities:
+            type: object
+            additionalProperties: false
+            properties:
+                currencies:
+                    type: array
+                    items:
+                        type: string
+                limits:
+                    $ref: '#/components/schemas/PolicyLimits'
+        OperatingPolicyPayoutsCapabilities:
+            type: object
+            additionalProperties: false
+            properties:
+                enabled:
+                    type: boolean
+                limits:
+                    $ref: '#/components/schemas/PolicyLimits'
+                bt_aging_spec:
+                    $ref: '#/components/schemas/PolicyBTAgingSpec'
+        OperatingPolicyCapabilities:
+            type: object
+            additionalProperties: false
+            properties:
+                payments:
+                    $ref: '#/components/schemas/OperatingPolicyPaymentsCapabilities'
+                payouts:
+                    $ref: '#/components/schemas/OperatingPolicyPayoutsCapabilities'
+                payment_methods:
+                    $ref: '#/components/schemas/OperatingPolicyPaymentMethodsCapabilities'
+        OperatingPolicySelectionByID:
+            type: object
+            additionalProperties: false
+            required: [id]
+            properties:
+                id:
+                    type: string
+                    pattern: '^op_'
+                    description: Active operating policy owned by the placement parent.
+        InlineOperatingPolicySelection:
+            type: object
+            additionalProperties: false
+            required: [capabilities]
+            properties:
+                capabilities:
+                    $ref: '#/components/schemas/OperatingPolicyCapabilitiesInput'
+        OperatingPolicySelection:
+            description: |
+                Mutually exclusive named-template or inline operating policy selection. Available
+                only to internal Commerce services and `children_policy_v1` private-beta callers.
+            oneOf:
+                - $ref: '#/components/schemas/OperatingPolicySelectionByID'
+                - $ref: '#/components/schemas/InlineOperatingPolicySelection'
+        OperatingPolicySource:
+            type: object
+            additionalProperties: false
+            required: [type]
+            properties:
+                type:
+                    type: string
+                    enum: [inline, template]
+                id:
+                    type: string
+                    pattern: '^op_'
+                    description: Template identifier when `type` is `template`.
+                version:
+                    type: integer
+                    minimum: 1
+                    description: Template version when `type` is `template`.
+        ApplicationOperatingPolicy:
+            type: object
+            additionalProperties: false
+            required: [capabilities, source]
+            description: Immutable operating policy snapshot applied to the application. This field is returned only to `children_policy_v1` callers.
+            properties:
+                capabilities:
+                    $ref: '#/components/schemas/OperatingPolicyCapabilities'
+                source:
+                    $ref: '#/components/schemas/OperatingPolicySource'
+        OperatingPolicy:
+            type: object
+            additionalProperties: false
+            required:
+                - id
+                - version
+                - active_version
+                - name
+                - capabilities
+                - children_policy_id
+                - children_policy_version
+                - created_at
+                - updated_at
+                - version_created_at
+            properties:
+                id:
+                    type: string
+                    pattern: '^op_'
+                version:
+                    type: integer
+                    minimum: 1
+                active_version:
+                    type: integer
+                    minimum: 1
+                name:
+                    type: string
+                description:
+                    type: string
+                capabilities:
+                    $ref: '#/components/schemas/OperatingPolicyCapabilities'
+                children_policy_id:
+                    type: string
+                    pattern: '^cp_'
+                children_policy_version:
+                    type: integer
+                    minimum: 1
+                created_at:
+                    type: string
+                    format: date-time
+                updated_at:
+                    type: string
+                    format: date-time
+                version_created_at:
+                    type: string
+                    format: date-time
+        CreateOperatingPolicyRequest:
+            type: object
+            additionalProperties: false
+            required: [name, capabilities]
+            properties:
+                name:
+                    type: string
+                    minLength: 1
+                    maxLength: 100
+                description:
+                    type: string
+                    maxLength: 500
+                capabilities:
+                    $ref: '#/components/schemas/OperatingPolicyCapabilitiesInput'
+        LookupOperatingPolicyRequest:
+            type: object
+            additionalProperties: false
+            required: [operating_policy_id]
+            properties:
+                operating_policy_id:
+                    type: string
+                    pattern: '^op_'
+        UpdateOperatingPolicyRequest:
+            type: object
+            additionalProperties: false
+            required: [operating_policy_id, expected_version]
+            minProperties: 3
+            properties:
+                operating_policy_id:
+                    type: string
+                    pattern: '^op_'
+                expected_version:
+                    type: integer
+                    minimum: 1
+                name:
+                    type: string
+                    minLength: 1
+                    maxLength: 100
+                description:
+                    type: string
+                    maxLength: 500
+                capabilities:
+                    $ref: '#/components/schemas/OperatingPolicyCapabilitiesInput'
+        OperatingPolicyResponse:
+            type: object
+            additionalProperties: false
+            required: [operating_policy]
+            properties:
+                operating_policy:
+                    $ref: '#/components/schemas/OperatingPolicy'
         ResourceSearchRequest:
             type: object
             additionalProperties: false
