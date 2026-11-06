@@ -53,6 +53,13 @@ collection:
             insomnia.expect(app_id).to.be.a('string').and.not.be.empty;
             insomnia.expect(jsonBody?.app?.relationship).to.be.an('object');
             insomnia.expect(jsonBody?.app?.secret_key?.token).to.be.a('string').and.not.be.empty;
+            if (jsonBody?.app?.children_policy) {
+              insomnia.expect(jsonBody.app.children_policy.id).to.match(/^cp_/);
+            }
+            if (jsonBody?.app?.operating_policy) {
+              insomnia.expect(jsonBody.app.operating_policy.source).not.to.have.property('children_policy_id');
+              insomnia.expect(jsonBody.app.relationship).not.to.have.property('operating_policy');
+            }
           });
           if (app_id) insomnia.globals.set("app_id", app_id);
         }
@@ -70,6 +77,13 @@ collection:
             insomnia.expect(jsonBody).to.have.all.keys('app');
             insomnia.expect(jsonBody?.app?.id).to.be.a('string').and.not.be.empty;
             insomnia.expect(jsonBody?.app).not.to.have.property('secret_key');
+            if (jsonBody?.app?.children_policy) {
+              insomnia.expect(jsonBody.app.children_policy.id).to.match(/^cp_/);
+            }
+            if (jsonBody?.app?.operating_policy) {
+              insomnia.expect(jsonBody.app.operating_policy.source).not.to.have.property('children_policy_id');
+              insomnia.expect(jsonBody?.app?.relationship).not.to.have.property('operating_policy');
+            }
           });
         }
   - name: Retrieve app capabilities
@@ -121,6 +135,12 @@ collection:
             insomnia.expect(jsonBody).to.have.all.keys('app');
             insomnia.expect(jsonBody?.app?.name).to.equal('Acme Checkout API');
             insomnia.expect(jsonBody?.app).not.to.have.property('secret_key');
+            if (jsonBody?.app?.children_policy) {
+              insomnia.expect(jsonBody.app.children_policy.id).to.match(/^cp_/);
+            }
+            if (jsonBody?.app?.operating_policy) {
+              insomnia.expect(jsonBody.app.operating_policy.source).not.to.have.property('children_policy_id');
+            }
           });
         }
 - name: Children policies
@@ -154,8 +174,8 @@ collection:
             insomnia.expect(children_policy_id).to.be.a('string').and.match(/^cp_/);
             insomnia.expect(jsonBody?.children_policy?.capabilities).to.be.an('object');
             for (const spec of jsonBody?.children_policy?.capabilities?.payouts?.bt_aging_spec ?? []) {
-              insomnia.expect(spec).to.have.all.keys('public_id', 't_plus');
-              insomnia.expect(spec).not.to.have.property('id');
+              insomnia.expect(spec).to.have.all.keys('id', 't_plus');
+              insomnia.expect(spec).not.to.have.property('public_id');
             }
           });
           if (children_policy_id) insomnia.globals.set('children_policy_id', children_policy_id);
@@ -248,8 +268,8 @@ collection:
             insomnia.expect(jsonBody?.operating_policy?.version).to.equal(1);
             const agingSpec = jsonBody?.operating_policy?.capabilities?.payouts?.bt_aging_spec;
             if (agingSpec) {
-              insomnia.expect(agingSpec).to.have.all.keys('public_id', 't_plus');
-              insomnia.expect(agingSpec).not.to.have.property('id');
+              insomnia.expect(agingSpec).to.have.all.keys('id', 't_plus');
+              insomnia.expect(agingSpec).not.to.have.property('public_id');
             }
           });
           if (operating_policy_id) insomnia.globals.set('operating_policy_id', operating_policy_id);

@@ -3,8 +3,8 @@ openapi: 3.0.3
 info:
     title: Inttegro API
     description: Machine-readable reference for the public Inttegro API
-    version: 0.1.0-beta60
-    x-inttegro-collection-version: 0.1.0-beta60
+    version: 0.1.0-beta62
+    x-inttegro-collection-version: 0.1.0-beta62
     contact:
         name: Inttegro Engineering
         url: "https://inttegro.com"
@@ -3192,6 +3192,7 @@ paths:
                                     type: string
                                     description: Optional application under which the new app should be placed.
                                 operating_policy:
+                                    x-inttegro-availability: private-beta
                                     $ref: '#/components/schemas/OperatingPolicySelection'
                                 relationship_policy:
                                     type: object
@@ -3249,7 +3250,13 @@ paths:
                                                 format: date-time
                                             capabilities:
                                                 $ref: '#/components/schemas/ApplicationCapabilityProjection'
+                                            children_policy:
+                                                description: Active children policy assigned to the application. Omitted when the private beta is unavailable to the caller.
+                                                x-inttegro-availability: private-beta
+                                                $ref: '#/components/schemas/ChildrenPolicy'
                                             operating_policy:
+                                                description: Immutable operating policy applied to the application. Omitted for root applications and when the private beta is unavailable to the caller.
+                                                x-inttegro-availability: private-beta
                                                 $ref: '#/components/schemas/ApplicationOperatingPolicy'
                                             secret_key:
                                                 type: object
@@ -3428,7 +3435,13 @@ paths:
                                                 format: date-time
                                             capabilities:
                                                 $ref: '#/components/schemas/ApplicationCapabilityProjection'
+                                            children_policy:
+                                                description: Active children policy assigned to the application. Omitted when the private beta is unavailable to the caller.
+                                                x-inttegro-availability: private-beta
+                                                $ref: '#/components/schemas/ChildrenPolicy'
                                             operating_policy:
+                                                description: Immutable operating policy applied to the application. Omitted for root applications and when the private beta is unavailable to the caller.
+                                                x-inttegro-availability: private-beta
                                                 $ref: '#/components/schemas/ApplicationOperatingPolicy'
                                             relationship:
                                                 type: object
@@ -3512,6 +3525,7 @@ paths:
                                     type: string
                                     description: Caller-defined legal-entity label. Send an empty string to clear it.
                                 operating_policy:
+                                    x-inttegro-availability: private-beta
                                     $ref: '#/components/schemas/OperatingPolicySelection'
             responses:
                 '200':
@@ -3550,7 +3564,13 @@ paths:
                                                 format: date-time
                                             capabilities:
                                                 $ref: '#/components/schemas/ApplicationCapabilityProjection'
+                                            children_policy:
+                                                description: Active children policy assigned to the application. Omitted when the private beta is unavailable to the caller.
+                                                x-inttegro-availability: private-beta
+                                                $ref: '#/components/schemas/ChildrenPolicy'
                                             operating_policy:
+                                                description: Immutable operating policy applied to the application. Omitted for root applications and when the private beta is unavailable to the caller.
+                                                x-inttegro-availability: private-beta
                                                 $ref: '#/components/schemas/ApplicationOperatingPolicy'
                 '401':
                     description: Unauthorized - invalid or missing API key
@@ -8881,9 +8901,9 @@ components:
         PolicyBTAgingSpec:
             type: object
             additionalProperties: false
-            required: [public_id, t_plus]
+            required: [id, t_plus]
             properties:
-                public_id:
+                id:
                     type: string
                     enum:
                         - bt_aging_spec_immediate

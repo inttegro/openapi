@@ -2,7 +2,7 @@
   "info": {
     "name": "Inttegro API — Platform",
     "description": "Manage applications and keys and retrieve reference data. Uses the shared Inttegro API global environment. Error reference: https://studio.inttegro.com/error-codes#applications\n\nGenerated from insomnia/12-platform.insomnia.yaml. Edit the Insomnia source and run npm run postman:generate.",
-    "version": "0.1.0-beta60",
+    "version": "0.1.0-beta62",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
@@ -49,6 +49,13 @@
                   "    pm.expect(app_id).to.be.a('string').and.not.be.empty;",
                   "    pm.expect(jsonBody?.app?.relationship).to.be.an('object');",
                   "    pm.expect(jsonBody?.app?.secret_key?.token).to.be.a('string').and.not.be.empty;",
+                  "    if (jsonBody?.app?.children_policy) {",
+                  "      pm.expect(jsonBody.app.children_policy.id).to.match(/^cp_/);",
+                  "    }",
+                  "    if (jsonBody?.app?.operating_policy) {",
+                  "      pm.expect(jsonBody.app.operating_policy.source).not.to.have.property('children_policy_id');",
+                  "      pm.expect(jsonBody.app.relationship).not.to.have.property('operating_policy');",
+                  "    }",
                   "  });",
                   "  if (app_id) pm.environment.set(\"app_id\", app_id);",
                   "}"
@@ -79,6 +86,13 @@
                   "    pm.expect(jsonBody).to.have.all.keys('app');",
                   "    pm.expect(jsonBody?.app?.id).to.be.a('string').and.not.be.empty;",
                   "    pm.expect(jsonBody?.app).not.to.have.property('secret_key');",
+                  "    if (jsonBody?.app?.children_policy) {",
+                  "      pm.expect(jsonBody.app.children_policy.id).to.match(/^cp_/);",
+                  "    }",
+                  "    if (jsonBody?.app?.operating_policy) {",
+                  "      pm.expect(jsonBody.app.operating_policy.source).not.to.have.property('children_policy_id');",
+                  "      pm.expect(jsonBody?.app?.relationship).not.to.have.property('operating_policy');",
+                  "    }",
                   "  });",
                   "}"
                 ]
@@ -171,6 +185,12 @@
                   "    pm.expect(jsonBody).to.have.all.keys('app');",
                   "    pm.expect(jsonBody?.app?.name).to.equal('Acme Checkout API');",
                   "    pm.expect(jsonBody?.app).not.to.have.property('secret_key');",
+                  "    if (jsonBody?.app?.children_policy) {",
+                  "      pm.expect(jsonBody.app.children_policy.id).to.match(/^cp_/);",
+                  "    }",
+                  "    if (jsonBody?.app?.operating_policy) {",
+                  "      pm.expect(jsonBody.app.operating_policy.source).not.to.have.property('children_policy_id');",
+                  "    }",
                   "  });",
                   "}"
                 ]
@@ -258,8 +278,8 @@
                   "    pm.expect(children_policy_id).to.be.a('string').and.match(/^cp_/);",
                   "    pm.expect(jsonBody?.children_policy?.capabilities).to.be.an('object');",
                   "    for (const spec of jsonBody?.children_policy?.capabilities?.payouts?.bt_aging_spec ?? []) {",
-                  "      pm.expect(spec).to.have.all.keys('public_id', 't_plus');",
-                  "      pm.expect(spec).not.to.have.property('id');",
+                  "      pm.expect(spec).to.have.all.keys('id', 't_plus');",
+                  "      pm.expect(spec).not.to.have.property('public_id');",
                   "    }",
                   "  });",
                   "  if (children_policy_id) pm.environment.set('children_policy_id', children_policy_id);",
@@ -368,8 +388,8 @@
                   "    pm.expect(jsonBody?.operating_policy?.version).to.equal(1);",
                   "    const agingSpec = jsonBody?.operating_policy?.capabilities?.payouts?.bt_aging_spec;",
                   "    if (agingSpec) {",
-                  "      pm.expect(agingSpec).to.have.all.keys('public_id', 't_plus');",
-                  "      pm.expect(agingSpec).not.to.have.property('id');",
+                  "      pm.expect(agingSpec).to.have.all.keys('id', 't_plus');",
+                  "      pm.expect(agingSpec).not.to.have.property('public_id');",
                   "    }",
                   "  });",
                   "  if (operating_policy_id) pm.environment.set('operating_policy_id', operating_policy_id);",
