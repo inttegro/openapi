@@ -3,8 +3,8 @@ openapi: 3.0.3
 info:
     title: Inttegro API
     description: Machine-readable reference for the public Inttegro API
-    version: 0.1.0-beta62
-    x-inttegro-collection-version: 0.1.0-beta62
+    version: 0.1.0-beta63
+    x-inttegro-collection-version: 0.1.0-beta63
     contact:
         name: Inttegro Engineering
         url: "https://inttegro.com"
@@ -8775,6 +8775,42 @@ components:
                 type: string
             description: Stable key used to replay safe retries without applying the mutation twice.
     schemas:
+        RequestPropertySelection:
+            type: object
+            additionalProperties: false
+            description: Public properties to include in or exclude from one named response resource. Supply exactly one of `pick` or `omit`.
+            properties:
+                pick:
+                    type: array
+                    minItems: 1
+                    uniqueItems: true
+                    items:
+                        type: string
+                        minLength: 1
+                    description: Include only these property paths and the ancestors needed to contain them.
+                omit:
+                    type: array
+                    minItems: 1
+                    uniqueItems: true
+                    items:
+                        type: string
+                        minLength: 1
+                    description: Exclude these property paths and all of their descendants.
+            oneOf:
+                - required: [pick]
+                - required: [omit]
+        RequestResponse:
+            type: object
+            additionalProperties: false
+            description: Caller-controlled preferences for computing and representing the successful response.
+            required: [projection]
+            properties:
+                projection:
+                    type: object
+                    minProperties: 1
+                    additionalProperties:
+                        $ref: '#/components/schemas/RequestPropertySelection'
+                    description: Public property selections keyed by the endpoint's response resource names.
         ApplicationCapabilityRequirement:
             type: object
             additionalProperties: false
@@ -11272,6 +11308,8 @@ components:
                         idempotency_key:
                             type: string
                             description: Unique key to prevent duplicate order creation
+                        response:
+                            $ref: '#/components/schemas/RequestResponse'
                 checkout_settings:
                     type: object
                     description: Checkout and payment flow configuration. Strongly recommended to provide both redirect_url and cancel_url for a delightful customer experience.
@@ -11348,6 +11386,8 @@ components:
                         idempotency_key:
                             type: string
                             description: Unique key to prevent duplicate order creation
+                        response:
+                            $ref: '#/components/schemas/RequestResponse'
                 checkout_settings:
                     type: object
                     description: Checkout and payment flow configuration. Strongly recommended to provide both redirect_url and cancel_url for a delightful customer experience.
@@ -15853,6 +15893,8 @@ components:
                     minLength: 1
                     maxLength: 255
                     description: Stable retry key carried inside `request_meta`. It must match the `Idempotency-Key` header when both are provided.
+                response:
+                    $ref: '#/components/schemas/RequestResponse'
         CreateRefundRequest:
             type: object
             additionalProperties: false
@@ -18100,6 +18142,8 @@ components:
                             type: string
                             description: Unique key to prevent duplicate sends
                             example: "chime_send_20231214_abc123"
+                        response:
+                            $ref: '#/components/schemas/RequestResponse'
         ChimeRecipient:
             oneOf:
                 - $ref: '#/components/schemas/ChimeInlineRecipient'
@@ -18463,6 +18507,8 @@ components:
                         idempotency_key:
                             type: string
                             description: Stable retry key. It must match the Idempotency-Key header when both are provided.
+                        response:
+                            $ref: '#/components/schemas/RequestResponse'
                 recipients:
                     type: array
                     description: Recipient objects for this scheduled chime. Each item must include `transport` and either inline contact details or `customer_id`.
@@ -18632,6 +18678,8 @@ components:
                         idempotency_key:
                             type: string
                             description: Stable retry key. It must match the Idempotency-Key header when both are provided.
+                        response:
+                            $ref: '#/components/schemas/RequestResponse'
                 message_template:
                     oneOf:
                         - type: string
