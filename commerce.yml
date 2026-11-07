@@ -15852,7 +15852,7 @@ components:
                     type: string
                     minLength: 1
                     maxLength: 255
-                    description: Body-level compatibility key. Prefer the `Idempotency-Key` header for new integrations.
+                    description: Stable retry key carried inside `request_meta`. It must match the `Idempotency-Key` header when both are provided.
         CreateRefundRequest:
             type: object
             additionalProperties: false
