@@ -2,7 +2,7 @@
   "info": {
     "name": "Inttegro API — Catalog",
     "description": "Create and manage products and prices. Uses the shared Inttegro API global environment.\n\nGenerated from insomnia/04-catalog.insomnia.yaml. Edit the Insomnia source and run npm run postman:generate.",
-    "version": "0.1.0-beta63",
+    "version": "0.1.0-beta64",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
@@ -126,10 +126,10 @@
                   "  pm.test('Returns price.id', () => {",
                   "    pm.expect(price_id).to.be.a('string').and.not.be.empty;",
                   "  });",
-                  "  pm.test('Returns a catalog price with a nominal amount', () => {",
+                  "  pm.test('Returns a catalog price with a fixed amount', () => {",
                   "    pm.expect(jsonBody?.price?.active).to.be.a('boolean');",
-                  "    pm.expect(jsonBody?.price?.nominal?.currency).to.be.a('string').and.not.be.empty;",
-                  "    pm.expect(jsonBody?.price?.nominal?.value).to.be.a('number');",
+                  "    pm.expect(jsonBody?.price?.fixed_amount?.currency).to.be.a('string').and.not.be.empty;",
+                  "    pm.expect(jsonBody?.price?.fixed_amount?.value).to.be.a('number');",
                   "    pm.expect(jsonBody?.price?.product_id).to.be.a('string').and.not.be.empty;",
                   "  });",
                   "  if (price_id) pm.environment.set(\"price_id\", price_id);",
