@@ -3,8 +3,8 @@ openapi: 3.0.3
 info:
     title: Inttegro API
     description: Machine-readable reference for the public Inttegro API
-    version: 0.1.0-beta63
-    x-inttegro-collection-version: 0.1.0-beta63
+    version: 0.1.0-beta64
+    x-inttegro-collection-version: 0.1.0-beta64
     contact:
         name: Inttegro Engineering
         url: "https://inttegro.com"
@@ -11994,7 +11994,7 @@ components:
                 - type
             oneOf:
                 - title: Fixed amount
-                  required: [nominal, fixed_amount]
+                  required: [fixed_amount]
                   properties:
                       type:
                           enum: [fixed_amount]
@@ -12009,7 +12009,6 @@ components:
                           enum: [customer_selected_amount]
                   not:
                       anyOf:
-                          - required: [nominal]
                           - required: [fixed_amount]
             properties:
                 id:
@@ -12029,10 +12028,6 @@ components:
                     type: string
                     enum: [fixed_amount, customer_selected_amount]
                     description: Price definition discriminator
-                nominal:
-                    deprecated: true
-                    description: Legacy fixed price amount. Present only for fixed_amount prices.
-                    $ref: '#/components/schemas/Amount'
                 fixed_amount:
                     description: Fixed price amount. Present only for fixed_amount prices.
                     $ref: '#/components/schemas/Amount'
@@ -13069,7 +13064,7 @@ components:
                 - created_at
             oneOf:
                 - title: Fixed amount
-                  required: [nominal, fixed_amount]
+                  required: [fixed_amount]
                   properties:
                       type:
                           enum: [fixed_amount]
@@ -13085,7 +13080,6 @@ components:
                           enum: [customer_selected_amount]
                   not:
                       anyOf:
-                          - required: [nominal]
                           - required: [fixed_amount]
             properties:
                 id:
@@ -13110,10 +13104,6 @@ components:
                     type: string
                     enum: [fixed_amount, customer_selected_amount]
                     description: Price definition discriminator
-                nominal:
-                    deprecated: true
-                    description: Legacy fixed price amount. Present only for fixed_amount prices.
-                    $ref: '#/components/schemas/Amount'
                 fixed_amount:
                     description: Fixed price amount. Present only for fixed_amount prices.
                     $ref: '#/components/schemas/Amount'
