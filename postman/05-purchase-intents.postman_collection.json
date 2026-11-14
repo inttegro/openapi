@@ -2,7 +2,7 @@
   "info": {
     "name": "Inttegro API — Purchase Intents",
     "description": "Create controlled, shareable hosted Buy links for catalog products, then manage their availability and usage. Uses the shared Inttegro API global environment. Error reference: https://studio.inttegro.com/error-codes#purchase-intents\n\nGenerated from insomnia/05-purchase-intents.insomnia.yaml. Edit the Insomnia source and run npm run postman:generate.",
-    "version": "0.1.0-beta64",
+    "version": "0.1.0-beta67",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
@@ -28,7 +28,7 @@
             "url": {
               "raw": "{{base_url}}/purchase_intents/create"
             },
-            "description": "Public reference: https://studio.inttegro.com/purchase-intents#create-a-purchase-intent",
+            "description": "Public reference: https://studio.inttegro.com/purchase-intents#create-a-purchase-intent. Products require a price selector; bundles accept an optional fixed offer price and otherwise follow their current catalog price.",
             "body": {
               "mode": "raw",
               "raw": "{\n  \"product_id\": \"{{product_id}}\",\n  \"price_id\": \"{{price_id}}\",\n  \"quantity\": {\n    \"max\": 5,\n    \"min\": 1\n  },\n  \"usage\": {\n    \"multi_use\": true\n  },\n  \"expires_at\": \"{{future_timestamp}}\",\n  \"presentation\": {\n    \"buy_page\": {\n      \"text\": {\n        \"checkout_section_title\": \"Complete your order\",\n        \"primary_action_label\": \"Continue\"\n      }\n    }\n  }\n}",
