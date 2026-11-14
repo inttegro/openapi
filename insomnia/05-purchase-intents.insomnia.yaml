@@ -30,7 +30,7 @@ collection:
     method: POST
     meta:
       id: req_0e251f24e9acaf6bf90dacc5c4c677f0
-      description: 'Public reference: https://studio.inttegro.com/purchase-intents#create-a-purchase-intent'
+      description: 'Public reference: https://studio.inttegro.com/purchase-intents#create-a-purchase-intent. Products require a price selector; bundles accept an optional fixed offer price and otherwise follow their current catalog price.'
     headers:
     - name: Content-Type
       value: application/json

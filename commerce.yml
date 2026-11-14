@@ -3,8 +3,8 @@ openapi: 3.0.3
 info:
     title: Inttegro API
     description: Machine-readable reference for the public Inttegro API
-    version: 0.1.0-beta64
-    x-inttegro-collection-version: 0.1.0-beta64
+    version: 0.1.0-beta67
+    x-inttegro-collection-version: 0.1.0-beta67
     contact:
         name: Inttegro Engineering
         url: "https://inttegro.com"
@@ -7634,7 +7634,7 @@ paths:
         post:
             summary: Create a purchase intent
             description: |
-                Creates a controlled, shareable Buy link for a catalog product without
+                Creates a controlled, shareable Buy link for a catalog product or bundle without
                 requiring you to build a product page, cart, or checkout UI. The returned
                 `sale_...` ID becomes `https://pages.inttegro.com/buy/{purchase_intent_id}`.
                 An order is created only when a customer checks out from that link.
@@ -12099,15 +12099,24 @@ components:
                 - quantity
             allOf:
                 - oneOf:
-                    - required:
-                        - product
-                    - required:
-                        - product_id
+                    - required: [product]
+                    - required: [product_id]
+                    - required: [bundle]
+                    - required: [bundle_id]
                 - oneOf:
-                    - required:
-                        - price
-                    - required:
-                        - price_id
+                    - allOf:
+                        - anyOf:
+                            - required: [product]
+                            - required: [product_id]
+                        - oneOf:
+                            - required: [price]
+                            - required: [price_id]
+                    - allOf:
+                        - anyOf:
+                            - required: [bundle]
+                            - required: [bundle_id]
+                        - not:
+                              required: [price, price_id]
             properties:
                 product:
                     type: object
@@ -12127,9 +12136,23 @@ components:
                     type: string
                     description: App-owned product ID to sell through the Buy link when not using product
                     example: "prod_abc123"
+                bundle:
+                    type: object
+                    description: Bundle selection. Components are resolved from the live catalog. Omit price and price_id to use the current catalog bundle price.
+                    required:
+                        - id
+                    properties:
+                        id:
+                            type: string
+                            description: App-owned bundle ID to sell through the Buy link
+                            example: "pbd_abc123"
+                bundle_id:
+                    type: string
+                    description: App-owned bundle ID to sell through the Buy link when not using bundle
+                    example: "pbd_abc123"
                 price:
                     type: object
-                    description: Price selection for the Buy link. Send exactly one of id or nominal and at most one of original or original_id.
+                    description: Price selection for the Buy-link offer. Products require it; bundles may omit it to use the current catalog default. Send exactly one of id or nominal and at most one of original or original_id.
                     allOf:
                         - oneOf:
                             - required:
@@ -12146,7 +12169,7 @@ components:
                     properties:
                         id:
                             type: string
-                            description: Active, unarchived app-owned price ID that belongs to the selected product
+                            description: Active, unarchived app-owned price ID. It must belong to a selected product; for a bundle it must be fixed and use the bundle catalog currency.
                             example: "pr_xyz789"
                         nominal:
                             description: Inline offer amount when no price ID is provided
@@ -12163,7 +12186,7 @@ components:
                             properties:
                                 id:
                                     type: string
-                                    description: App-owned comparison price ID that belongs to the selected product
+                                    description: App-owned fixed comparison price ID. It must belong to a selected product; for a bundle it must use the bundle catalog currency.
                                     example: "pr_original123"
                                 nominal:
                                     description: Inline original price amount
@@ -12174,7 +12197,7 @@ components:
                             example: "pr_original123"
                 price_id:
                     type: string
-                    description: Active, unarchived app-owned price ID that belongs to the selected product
+                    description: Active, unarchived app-owned price ID. It must belong to a selected product; for a bundle it must be fixed and use the bundle catalog currency.
                     example: "pr_xyz789"
                 quantity:
                     type: object
@@ -12563,6 +12586,59 @@ components:
                     $ref: '#/components/schemas/Amount'
                 original:
                     $ref: '#/components/schemas/PurchaseIntentOriginalPrice'
+        PurchaseIntentBundleComponent:
+            type: object
+            additionalProperties: false
+            required:
+                - name
+                - quantity
+            properties:
+                about:
+                    type: string
+                category:
+                    type: string
+                image_url:
+                    type: string
+                    format: uri
+                name:
+                    type: string
+                price_id:
+                    type: string
+                product_id:
+                    type: string
+                quantity:
+                    type: integer
+                    minimum: 1
+                reference:
+                    type: string
+                type:
+                    type: string
+        PurchaseIntentBundle:
+            type: object
+            additionalProperties: false
+            required:
+                - id
+            properties:
+                about:
+                    type: string
+                components:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/PurchaseIntentBundleComponent'
+                id:
+                    type: string
+                    description: Current app-owned bundle referenced by the Buy link
+                    example: "pbd_abc123"
+                media:
+                    $ref: '#/components/schemas/ProductMedia'
+                name:
+                    type: string
+                price:
+                    allOf:
+                        - $ref: '#/components/schemas/PurchaseIntentPrice'
+                    description: Current bundle catalog price reference. The top-level price is the effective Buy-link offer.
+                reference:
+                    type: string
         PurchaseIntentProduct:
             allOf:
                 - $ref: '#/components/schemas/PriceEmbeddedProduct'
@@ -12696,6 +12772,8 @@ components:
                     type: string
                     description: Application that owns the purchase intent. This is routing metadata, not merchant presentation.
                     example: "app_abc123"
+                bundle:
+                    $ref: '#/components/schemas/PurchaseIntentBundle'
                 created_at:
                     type: string
                     format: date-time
@@ -12715,7 +12793,9 @@ components:
                 merchant:
                     $ref: '#/components/schemas/PurchaseIntentMerchant'
                 price:
-                    $ref: '#/components/schemas/PurchaseIntentPrice'
+                    allOf:
+                        - $ref: '#/components/schemas/PurchaseIntentPrice'
+                    description: Effective Buy-link offer price. For a bundle without an explicit override, this is the current catalog default.
                 presentation:
                     $ref: '#/components/schemas/PurchaseIntentPresentation'
                 product:
