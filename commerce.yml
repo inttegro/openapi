@@ -375,6 +375,34 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/ErrorEnvelope'
+    /chimes/settings:
+        post:
+            summary: Retrieve effective Chime delivery settings
+            description: Returns the non-secret email and SMS defaults applied by the Chimes delivery service.
+            operationId: lookupChimeSettings
+            tags: [Chimes]
+            responses:
+                '200':
+                    description: Chime delivery settings found
+                    headers:
+                        X-Request-Id:
+                            $ref: '#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ChimeSettingsResponse'
+                '400':
+                    description: Invalid Chime settings request
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorEnvelope'
+                '401':
+                    description: Authorization is required
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorEnvelope'
     /chimes/schedule:
         post:
             summary: Schedule Chimes
@@ -18296,6 +18324,51 @@ components:
                             description: Chimes in this page
                             items:
                                 $ref: '#/components/schemas/Chime'
+        ChimeSettingsResponse:
+            type: object
+            additionalProperties: false
+            required: [settings]
+            properties:
+                settings:
+                    $ref: '#/components/schemas/ChimeSettings'
+        ChimeSettings:
+            type: object
+            additionalProperties: false
+            required: [sms, email]
+            properties:
+                sms:
+                    $ref: '#/components/schemas/ChimeSMSSettings'
+                email:
+                    $ref: '#/components/schemas/ChimeEmailSettings'
+        ChimeSMSSettings:
+            type: object
+            additionalProperties: false
+            required: [default_sender, min_sender_char_len, max_sender_char_len]
+            properties:
+                default_sender:
+                    type: string
+                    description: Platform fallback sender ID for SMS delivery.
+                min_sender_char_len:
+                    type: integer
+                    minimum: 0
+                max_sender_char_len:
+                    type: integer
+                    minimum: 0
+        ChimeEmailSettings:
+            type: object
+            additionalProperties: false
+            required: [default_from, allowed_from]
+            properties:
+                default_from:
+                    type: string
+                    format: email
+                    description: Platform fallback From address for email delivery.
+                allowed_from:
+                    type: array
+                    description: From addresses authorized for reusable message templates.
+                    items:
+                        type: string
+                        format: email
         Chime:
             type: object
             description: A notification sent to one recipient
