@@ -111,6 +111,21 @@ collection:
           insomnia.expect(page).to.include.all.keys('number', 'size', 'chimes');
           insomnia.expect(page.chimes).to.be.an('array');
         });
+  - name: Retrieve Chime Settings
+    url: '{{ base_url }}/chimes/settings'
+    method: POST
+    meta:
+      id: req_9e81202a2d3844d7adf09093212a3fea
+      description: 'Public reference: https://studio.inttegro.com/chimes#delivery-settings'
+    scripts:
+      afterResponse: |-
+        insomnia.test('Returns effective Chime delivery settings', () => {
+          insomnia.expect(insomnia.response.code).to.equal(200);
+          const settings = insomnia.response.json()?.settings;
+          insomnia.expect(settings).to.include.all.keys('sms', 'email');
+          insomnia.expect(settings.sms).to.include.all.keys('default_sender', 'min_sender_char_len', 'max_sender_char_len');
+          insomnia.expect(settings.email).to.include.all.keys('default_from', 'allowed_from');
+        });
   - name: Schedule Chime
     url: '{{ base_url }}/chimes/schedule'
     method: POST

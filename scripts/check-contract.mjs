@@ -44,6 +44,7 @@ const errors = [
   ...compareOperationCoverage(operations, insomniaRequests, "Insomnia", true),
   ...compareOperationCoverage(operations, postmanRequests, "Postman", false),
   ...validatePublicCheckoutOperations(operations),
+  ...validateSuccessResponseSchemas(spec, operations),
   ...validateRequestExamples(spec, operations, insomniaRequests),
   ...validateRequestExamples(spec, operations, postmanRequests),
 ];
@@ -383,6 +384,37 @@ function validatePublicCheckoutOperations(operations) {
       errors.push(
         `${key} must declare security: [] because checkout is a public capability`,
       );
+    }
+  }
+
+  return errors;
+}
+
+function validateSuccessResponseSchemas(document, operations) {
+  const errors = [];
+
+  for (const { key, operation } of operations.values()) {
+    for (const [status, inputResponse] of Object.entries(
+      operation.responses ?? {},
+    )) {
+      if (!/^2\d\d$/.test(status)) {
+        continue;
+      }
+
+      const response = inputResponse.$ref
+        ? resolveRef(document, inputResponse.$ref)
+        : inputResponse;
+      const inputSchema = response?.content?.["application/json"]?.schema;
+      if (!inputSchema) {
+        continue;
+      }
+
+      const schema = materializeSchema(inputSchema, document);
+      if (Object.hasOwn(schema.properties ?? {}, "error")) {
+        errors.push(
+          `${key} ${status} success schema exposes a top-level error; use a success-only schema and a status-specific error response`,
+        );
+      }
     }
   }
 

@@ -2,7 +2,7 @@
   "info": {
     "name": "Inttegro API — Messaging",
     "description": "Send notifications and manage reusable message templates. Uses the shared Inttegro API global environment. Error reference: https://studio.inttegro.com/error-codes#chimes\n\nGenerated from insomnia/09-messaging.insomnia.yaml. Edit the Insomnia source and run npm run postman:generate.",
-    "version": "0.1.0-beta67",
+    "version": "0.1.0-beta68",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
@@ -139,6 +139,34 @@
                   "  const page = pm.response.json()?.page;",
                   "  pm.expect(page).to.include.all.keys('number', 'size', 'chimes');",
                   "  pm.expect(page.chimes).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Retrieve Chime Settings",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/chimes/settings"
+            },
+            "description": "Public reference: https://studio.inttegro.com/chimes#delivery-settings"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Returns effective Chime delivery settings', () => {",
+                  "  pm.expect(pm.response.code).to.equal(200);",
+                  "  const settings = pm.response.json()?.settings;",
+                  "  pm.expect(settings).to.include.all.keys('sms', 'email');",
+                  "  pm.expect(settings.sms).to.include.all.keys('default_sender', 'min_sender_char_len', 'max_sender_char_len');",
+                  "  pm.expect(settings.email).to.include.all.keys('default_from', 'allowed_from');",
                   "});"
                 ]
               }
