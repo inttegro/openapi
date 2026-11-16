@@ -4,7 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "npm run lint:openapi && node scripts/check-contract.mjs",
+    "test": "npm run lint:openapi && npm run test:simile-soundness && node scripts/check-contract.mjs",
+    "test:simile-soundness": "node scripts/check-simile-soundness.mjs",
     "contract:update": "npm run postman:generate && node scripts/check-contract.mjs --update",
     "lint:openapi": "redocly lint commerce.yml",
     "postman:check": "node scripts/generate-postman.mjs --check",
