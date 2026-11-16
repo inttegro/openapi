@@ -8108,8 +8108,9 @@ components:
             additionalProperties: false
             required: [min, max]
             x-simile-constraints:
-                - ordered:
-                      paths: [/min, /max]
+                - bounded:
+                      path: /min
+                      maximum: { path: /max }
             properties:
                 min:
                     type: integer
@@ -8243,6 +8244,14 @@ components:
                 - created_at
                 - updated_at
                 - version_created_at
+            # A policy version is an immutable snapshot beneath the active head; its
+            # version number and creation time therefore cannot move past that head.
+            x-simile-constraints:
+                - bounded:
+                      path: /version
+                      maximum: { path: /active_version }
+                - ordered:
+                      paths: [/created_at, /version_created_at, /updated_at]
             properties:
                 id:
                     type: string
@@ -8300,6 +8309,13 @@ components:
             type: object
             additionalProperties: false
             required: [number, size, count, total, has_more, versions]
+            # The count is the number of version snapshots actually returned,
+            # not the requested page capacity.
+            x-simile-constraints:
+                - aggregate:
+                      target: /count
+                      operation: count
+                      source: /versions/*
             properties:
                 number:
                     type: integer
@@ -8494,6 +8510,14 @@ components:
                 - created_at
                 - updated_at
                 - version_created_at
+            # Historical operating-policy snapshots are bounded by the active head
+            # and by the head's externally visible creation/update timeline.
+            x-simile-constraints:
+                - bounded:
+                      path: /version
+                      maximum: { path: /active_version }
+                - ordered:
+                      paths: [/created_at, /version_created_at, /updated_at]
             properties:
                 id:
                     type: string
@@ -8600,6 +8624,12 @@ components:
             type: object
             additionalProperties: false
             required: [number, size, count, total, has_more, versions]
+            # The count is the number of immutable versions in this response.
+            x-simile-constraints:
+                - aggregate:
+                      target: /count
+                      operation: count
+                      source: /versions/*
             properties:
                 number:
                     type: integer
@@ -8766,6 +8796,13 @@ components:
             type: object
             additionalProperties: false
             required: [resource_types, sort, page_size, result_count, has_more, total, resource_totals, results, facets, freshness]
+            # Ariadne rejects a page whose declared result count differs from
+            # the number of public result projections in that payload.
+            x-simile-constraints:
+                - aggregate:
+                      target: /result_count
+                      operation: count
+                      source: /results/*
             properties:
                 resource_types:
                     type: array
@@ -9257,6 +9294,12 @@ components:
                 - total
                 - has_more
                 - keys
+            # `size` is the requested capacity; `count` is the returned key count.
+            x-simile-constraints:
+                - aggregate:
+                      target: /count
+                      operation: count
+                      source: /keys/*
             properties:
                 number:
                     type: integer
@@ -9286,6 +9329,12 @@ components:
                 - total
                 - has_more
                 - rows
+            # `count` is computed after slicing the complete usage-row set.
+            x-simile-constraints:
+                - aggregate:
+                      target: /count
+                      operation: count
+                      source: /rows/*
             properties:
                 number:
                     type: integer
@@ -9450,6 +9499,12 @@ components:
                 - number
                 - size
                 - files
+            # The response reports actual files returned, not the requested limit.
+            x-simile-constraints:
+                - aggregate:
+                      target: /size
+                      operation: count
+                      source: /files/*
             properties:
                 number:
                     type: integer
@@ -9743,6 +9798,12 @@ components:
             type: object
             additionalProperties: false
             required: [file_links, number, size]
+            # A client must not observe a size that disagrees with the link payload.
+            x-simile-constraints:
+                - aggregate:
+                      target: /size
+                      operation: count
+                      source: /file_links/*
             properties:
                 number:
                     type: integer
@@ -10061,6 +10122,12 @@ components:
             type: object
             additionalProperties: false
             required: [number, size, upload_requests]
+            # Octo derives size from the selected upload-request slice.
+            x-simile-constraints:
+                - aggregate:
+                      target: /size
+                      operation: count
+                      source: /upload_requests/*
             properties:
                 number:
                     type: integer
@@ -11099,6 +11166,12 @@ components:
             type: object
             additionalProperties: false
             required: [customers, number, size]
+            # Upper emits the number of customer objects actually returned.
+            x-simile-constraints:
+                - aggregate:
+                      target: /size
+                      operation: count
+                      source: /customers/*
             properties:
                 customers:
                     type: array
@@ -11699,8 +11772,9 @@ components:
                     required:
                         - min
                     x-simile-constraints:
-                        - ordered:
-                              paths: [/min, /max]
+                        - bounded:
+                              path: /max
+                              minimum: { path: /min }
                     properties:
                         min:
                             type: integer
@@ -11772,8 +11846,9 @@ components:
                     required:
                         - min
                     x-simile-constraints:
-                        - ordered:
-                              paths: [/min, /max]
+                        - bounded:
+                              path: /max
+                              minimum: { path: /min }
                     properties:
                         min:
                             type: integer
@@ -11931,6 +12006,12 @@ components:
                         - number
                         - purchase_intents
                         - size
+                    # `size` is emitted from the selected purchase-intent slice.
+                    x-simile-constraints:
+                        - aggregate:
+                              target: /size
+                              operation: count
+                              source: /purchase_intents/*
                     properties:
                         number:
                             type: integer
@@ -12370,8 +12451,9 @@ components:
                     required:
                         - min
                     x-simile-constraints:
-                        - ordered:
-                              paths: [/min, /max]
+                        - bounded:
+                              path: /max
+                              minimum: { path: /min }
                     properties:
                         min:
                             type: integer
@@ -12663,6 +12745,12 @@ components:
                     type: object
                     additionalProperties: false
                     required: [number, size, prices]
+                    # Filtering can shrink a page, so size follows the returned prices.
+                    x-simile-constraints:
+                        - aggregate:
+                              target: /size
+                              operation: count
+                              source: /prices/*
                     properties:
                         number:
                             type: integer
@@ -12941,8 +13029,9 @@ components:
             additionalProperties: false
             required: [currency, minimum]
             x-simile-constraints:
-                - ordered:
-                      paths: [/minimum, /maximum]
+                - bounded:
+                      path: /maximum
+                      minimum: { path: /minimum }
             properties:
                 currency:
                     description: Currency accepted for customer-selected amounts
@@ -12968,8 +13057,9 @@ components:
             additionalProperties: false
             required: [currency, minimum]
             x-simile-constraints:
-                - ordered:
-                      paths: [/minimum, /maximum]
+                - bounded:
+                      path: /maximum
+                      minimum: { path: /minimum }
             properties:
                 currency:
                     description: Currency accepted for customer-selected amounts
@@ -13045,8 +13135,11 @@ components:
                             type: string
                         price:
                             $ref: '#/components/schemas/Price'
+                        # A product line represents a purchase, so zero or negative
+                        # quantity cannot be reconciled into a payable order total.
                         quantity:
                             type: integer
+                            minimum: 1
         OrderFeeLineItem:
             type: object
             additionalProperties: false
@@ -13880,6 +13973,12 @@ components:
                 - number
                 - size
                 - message_templates
+            # Secondary filters run after paging and size is recomputed from the result.
+            x-simile-constraints:
+                - aggregate:
+                      target: /size
+                      operation: count
+                      source: /message_templates/*
             properties:
                 number:
                     type: integer
@@ -13987,6 +14086,13 @@ components:
             additionalProperties: false
             description: Delivery result for one hosted order document link.
             required: [document_kind, document_url, sent_channels]
+            # A channel is attempted once and is recorded in exactly one outcome
+            # collection, so failed channels cannot also be accepted channels.
+            x-simile-constraints:
+                - set:
+                      left: /failed_channels
+                      relation: disjoint
+                      right: /sent_channels
             properties:
                 deliveries:
                     type: array
@@ -14129,6 +14235,12 @@ components:
                         - number
                         - payment_methods
                         - size
+                    # Hydration and customer scoping can reduce the returned method slice.
+                    x-simile-constraints:
+                        - aggregate:
+                              target: /size
+                              operation: count
+                              source: /payment_methods/*
                     properties:
                         number:
                             type: integer
@@ -14492,6 +14604,74 @@ components:
                 - initiated_at
                 - customer
                 - status
+            # Checkout returns the same order snapshot as the authenticated API:
+            # lifecycle evidence must match status and its payment amount must match
+            # the immutable order total whenever both projections are present.
+            x-simile-constraints:
+                - ordered:
+                      paths: [/initiated_at, /sealed_at, /paid_at, /completed_at]
+                - ordered:
+                      paths: [/initiated_at, /canceled_at]
+                - ordered:
+                      paths: [/initiated_at, /expires_at]
+                - implies:
+                      when: { path: /status, equals: preparing }
+                      then:
+                          all:
+                              - { path: /sealed_at, state: absent }
+                              - { path: /paid_at, state: absent }
+                              - { path: /completed_at, state: absent }
+                              - { path: /canceled_at, state: absent }
+                - implies:
+                      when: { path: /status, equals: requires_payment }
+                      then:
+                          all:
+                              - { path: /sealed_at, state: non-null }
+                              - { path: /paid_at, state: absent }
+                              - { path: /completed_at, state: absent }
+                              - { path: /canceled_at, state: absent }
+                - implies:
+                      when: { path: /status, equals: paid }
+                      then:
+                          all:
+                              - { path: /sealed_at, state: non-null }
+                              - { path: /paid_at, state: non-null }
+                              - { path: /completed_at, state: absent }
+                              - { path: /canceled_at, state: absent }
+                - implies:
+                      when: { path: /status, equals: completed }
+                      then:
+                          all:
+                              - { path: /sealed_at, state: non-null }
+                              - { path: /completed_at, state: non-null }
+                              - { path: /canceled_at, state: absent }
+                - implies:
+                      when: { path: /status, equals: canceled }
+                      then:
+                          all:
+                              - { path: /paid_at, state: absent }
+                              - { path: /completed_at, state: absent }
+                              - { path: /canceled_at, state: non-null }
+                - implies:
+                      when: { path: /status, equals: expired }
+                      then:
+                          all:
+                              - { path: /expires_at, state: non-null }
+                              - { path: /paid_at, state: absent }
+                              - { path: /completed_at, state: absent }
+                              - { path: /canceled_at, state: absent }
+                - implies:
+                      when: { path: /status, equals: unknown }
+                      then:
+                          all:
+                              - { path: /sealed_at, state: absent }
+                              - { path: /paid_at, state: absent }
+                              - { path: /completed_at, state: absent }
+                              - { path: /canceled_at, state: absent }
+                - equal:
+                      paths: [/line_item_group/total/currency, /payment/amount/currency]
+                - equal:
+                      paths: [/line_item_group/total/value, /payment/amount/value]
             properties:
                 id:
                     type: string
@@ -14577,6 +14757,105 @@ components:
                 payment:
                     type: object
                     additionalProperties: false
+                    # Payment status is derived from these public timestamps and
+                    # action fields; the amount is tied to the order at the parent.
+                    x-simile-constraints:
+                        - ordered:
+                              paths: [/initiated_at, /executed_at, /paid_at]
+                        - ordered:
+                              paths: [/initiated_at, /executed_at, /failed_at]
+                        - ordered:
+                              paths: [/initiated_at, /canceled_at]
+                        - ordered:
+                              paths: [/initiated_at, /expired_at]
+                        - implies:
+                              when: { path: /status, equals: initiated }
+                              then:
+                                  all:
+                                      - { path: /executed_at, state: absent }
+                                      - { path: /paid_at, state: absent }
+                                      - { path: /failed_at, state: absent }
+                                      - { path: /canceled_at, state: absent }
+                                      - { path: /expired_at, state: absent }
+                        - implies:
+                              when: { path: /status, equals: requires_action }
+                              then:
+                                  all:
+                                      - { path: /next_action, state: non-null }
+                                      - { path: /paid_at, state: absent }
+                                      - { path: /failed_at, state: absent }
+                                      - { path: /canceled_at, state: absent }
+                                      - { path: /expired_at, state: absent }
+                        - implies:
+                              when: { path: /status, equals: processing }
+                              then:
+                                  all:
+                                      - { path: /paid_at, state: absent }
+                                      - { path: /failed_at, state: absent }
+                                      - { path: /canceled_at, state: absent }
+                                      - { path: /expired_at, state: absent }
+                        - implies:
+                              when: { path: /status, equals: overdue }
+                              then:
+                                  all:
+                                      - { path: /due_at, state: non-null }
+                                      - { path: /paid_at, state: absent }
+                                      - { path: /failed_at, state: absent }
+                                      - { path: /canceled_at, state: absent }
+                                      - { path: /expired_at, state: absent }
+                        - implies:
+                              when: { path: /status, equals: executed }
+                              then:
+                                  all:
+                                      - { path: /executed_at, state: non-null }
+                                      - { path: /paid_at, state: absent }
+                                      - { path: /failed_at, state: absent }
+                                      - { path: /canceled_at, state: absent }
+                                      - { path: /expired_at, state: absent }
+                        - implies:
+                              when: { path: /status, equals: paid }
+                              then:
+                                  all:
+                                      - { path: /paid_at, state: non-null }
+                                      - { path: /failed_at, state: absent }
+                                      - { path: /canceled_at, state: absent }
+                                      - { path: /expired_at, state: absent }
+                        - implies:
+                              when: { path: /status, equals: failed }
+                              then:
+                                  all:
+                                      - { path: /paid_at, state: absent }
+                                      - { path: /failed_at, state: non-null }
+                                      - { path: /canceled_at, state: absent }
+                                      - { path: /expired_at, state: absent }
+                        - implies:
+                              when: { path: /status, equals: canceled }
+                              then:
+                                  all:
+                                      - { path: /paid_at, state: absent }
+                                      - { path: /failed_at, state: absent }
+                                      - { path: /canceled_at, state: non-null }
+                                      - { path: /expired_at, state: absent }
+                        - implies:
+                              when: { path: /status, equals: expired }
+                              then:
+                                  all:
+                                      - { path: /paid_at, state: absent }
+                                      - { path: /failed_at, state: absent }
+                                      - { path: /canceled_at, state: absent }
+                                      - { path: /expired_at, state: non-null }
+                        # `unknown` is retained for compatibility, but it cannot claim
+                        # any public signal that would deterministically select a real state.
+                        - implies:
+                              when: { path: /status, equals: unknown }
+                              then:
+                                  all:
+                                      - { path: /executed_at, state: absent }
+                                      - { path: /paid_at, state: absent }
+                                      - { path: /failed_at, state: absent }
+                                      - { path: /canceled_at, state: absent }
+                                      - { path: /expired_at, state: absent }
+                                      - { path: /next_action, state: absent }
                     properties:
                         id:
                             type: string
@@ -14602,6 +14881,7 @@ components:
                             $ref: '#/components/schemas/OrderPaymentError'
                         status:
                             type: string
+                            enum: [initiated, requires_action, processing, overdue, executed, paid, canceled, expired, failed, unknown]
                         initiated_at:
                             type: string
                             format: date-time
@@ -14727,6 +15007,49 @@ components:
             type: object
             additionalProperties: false
             required: [id, created_at, customer_id, type, verified]
+            # Embedded order payment methods keep their rail-specific snapshot and
+            # verification summary coherent without exposing any credentials.
+            x-simile-constraints:
+                - ordered:
+                      paths: [/created_at, /verified_at]
+                - implies:
+                      when: { path: /verified, equals: false }
+                      then:
+                          all:
+                              - { path: /verified_at, state: absent }
+                - implies:
+                      when: { path: /verified_at, state: non-null }
+                      then:
+                          all:
+                              - { path: /verified, equals: true }
+                - implies:
+                      when: { path: /type, equals: mobile_money }
+                      then:
+                          all:
+                              - { path: /mobile_money, state: non-null }
+                              - { path: /bank_account, state: absent }
+                              - { path: /card, state: absent }
+                - implies:
+                      when: { path: /type, equals: bank_account }
+                      then:
+                          all:
+                              - { path: /bank_account, state: non-null }
+                              - { path: /mobile_money, state: absent }
+                              - { path: /card, state: absent }
+                - implies:
+                      when: { path: /type, equals: card }
+                      then:
+                          all:
+                              - { path: /card, state: non-null }
+                              - { path: /mobile_money, state: absent }
+                              - { path: /bank_account, state: absent }
+                - implies:
+                      when: { path: /type, equals: motito }
+                      then:
+                          all:
+                              - { path: /mobile_money, state: absent }
+                              - { path: /bank_account, state: absent }
+                              - { path: /card, state: absent }
             properties:
                 id:
                     type: string
@@ -14770,8 +15093,12 @@ components:
                         account_number:
                             type: string
                             description: Masked number in the form `****1234`.
+                            minLength: 8
+                            maxLength: 8
                         last4:
                             type: string
+                            minLength: 4
+                            maxLength: 4
                 owner:
                     type: object
                     additionalProperties: false
@@ -14806,9 +15133,21 @@ components:
             type: object
             additionalProperties: false
             required: [status, initiated_at]
+            # A successful attempt is exactly the branch that owns a success
+            # timestamp; this prevents status-only or timestamp-only success claims.
             x-simile-constraints:
                 - ordered:
                       paths: [/initiated_at, /succeeded_at]
+                - implies:
+                      when: { path: /status, equals: succeeded }
+                      then:
+                          all:
+                              - { path: /succeeded_at, state: non-null }
+                - implies:
+                      when: { path: /succeeded_at, state: non-null }
+                      then:
+                          all:
+                              - { path: /status, equals: succeeded }
             properties:
                 payment_method_type:
                     type: string
@@ -14875,6 +15214,73 @@ components:
                 - id
                 - initiated_at
                 - status
+            # The public order state is derived from these timestamps, and the
+            # payment amount is an exact binding to the immutable order total.
+            x-simile-constraints:
+                - ordered:
+                      paths: [/initiated_at, /sealed_at, /paid_at, /completed_at]
+                - ordered:
+                      paths: [/initiated_at, /canceled_at]
+                - ordered:
+                      paths: [/initiated_at, /expires_at]
+                - implies:
+                      when: { path: /status, equals: preparing }
+                      then:
+                          all:
+                              - { path: /sealed_at, state: absent }
+                              - { path: /paid_at, state: absent }
+                              - { path: /completed_at, state: absent }
+                              - { path: /canceled_at, state: absent }
+                - implies:
+                      when: { path: /status, equals: requires_payment }
+                      then:
+                          all:
+                              - { path: /sealed_at, state: non-null }
+                              - { path: /paid_at, state: absent }
+                              - { path: /completed_at, state: absent }
+                              - { path: /canceled_at, state: absent }
+                - implies:
+                      when: { path: /status, equals: paid }
+                      then:
+                          all:
+                              - { path: /sealed_at, state: non-null }
+                              - { path: /paid_at, state: non-null }
+                              - { path: /completed_at, state: absent }
+                              - { path: /canceled_at, state: absent }
+                - implies:
+                      when: { path: /status, equals: completed }
+                      then:
+                          all:
+                              - { path: /sealed_at, state: non-null }
+                              - { path: /completed_at, state: non-null }
+                              - { path: /canceled_at, state: absent }
+                - implies:
+                      when: { path: /status, equals: canceled }
+                      then:
+                          all:
+                              - { path: /paid_at, state: absent }
+                              - { path: /completed_at, state: absent }
+                              - { path: /canceled_at, state: non-null }
+                - implies:
+                      when: { path: /status, equals: expired }
+                      then:
+                          all:
+                              - { path: /expires_at, state: non-null }
+                              - { path: /paid_at, state: absent }
+                              - { path: /completed_at, state: absent }
+                              - { path: /canceled_at, state: absent }
+                - implies:
+                      when: { path: /status, equals: unknown }
+                      then:
+                          all:
+                              - { path: /sealed_at, state: absent }
+                              - { path: /paid_at, state: absent }
+                              - { path: /completed_at, state: absent }
+                              - { path: /canceled_at, state: absent }
+                - equal:
+                      paths: [/line_item_group/total/currency, /payment/amount/currency]
+                - equal:
+                      paths: [/line_item_group/total/value, /payment/amount/value]
             properties:
                 canceled_at:
                     type: string
@@ -15014,6 +15420,105 @@ components:
                         - initiated_at
                         - statement_descriptor
                         - status
+                    # Payment state is derived from these public timestamps and
+                    # action fields; the parent constraint binds its amount to order.
+                    x-simile-constraints:
+                        - ordered:
+                              paths: [/initiated_at, /executed_at, /paid_at]
+                        - ordered:
+                              paths: [/initiated_at, /executed_at, /failed_at]
+                        - ordered:
+                              paths: [/initiated_at, /canceled_at]
+                        - ordered:
+                              paths: [/initiated_at, /expired_at]
+                        - implies:
+                              when: { path: /status, equals: initiated }
+                              then:
+                                  all:
+                                      - { path: /executed_at, state: absent }
+                                      - { path: /paid_at, state: absent }
+                                      - { path: /failed_at, state: absent }
+                                      - { path: /canceled_at, state: absent }
+                                      - { path: /expired_at, state: absent }
+                        - implies:
+                              when: { path: /status, equals: requires_action }
+                              then:
+                                  all:
+                                      - { path: /next_action, state: non-null }
+                                      - { path: /paid_at, state: absent }
+                                      - { path: /failed_at, state: absent }
+                                      - { path: /canceled_at, state: absent }
+                                      - { path: /expired_at, state: absent }
+                        - implies:
+                              when: { path: /status, equals: processing }
+                              then:
+                                  all:
+                                      - { path: /paid_at, state: absent }
+                                      - { path: /failed_at, state: absent }
+                                      - { path: /canceled_at, state: absent }
+                                      - { path: /expired_at, state: absent }
+                        - implies:
+                              when: { path: /status, equals: overdue }
+                              then:
+                                  all:
+                                      - { path: /due_at, state: non-null }
+                                      - { path: /paid_at, state: absent }
+                                      - { path: /failed_at, state: absent }
+                                      - { path: /canceled_at, state: absent }
+                                      - { path: /expired_at, state: absent }
+                        - implies:
+                              when: { path: /status, equals: executed }
+                              then:
+                                  all:
+                                      - { path: /executed_at, state: non-null }
+                                      - { path: /paid_at, state: absent }
+                                      - { path: /failed_at, state: absent }
+                                      - { path: /canceled_at, state: absent }
+                                      - { path: /expired_at, state: absent }
+                        - implies:
+                              when: { path: /status, equals: paid }
+                              then:
+                                  all:
+                                      - { path: /paid_at, state: non-null }
+                                      - { path: /failed_at, state: absent }
+                                      - { path: /canceled_at, state: absent }
+                                      - { path: /expired_at, state: absent }
+                        - implies:
+                              when: { path: /status, equals: failed }
+                              then:
+                                  all:
+                                      - { path: /paid_at, state: absent }
+                                      - { path: /failed_at, state: non-null }
+                                      - { path: /canceled_at, state: absent }
+                                      - { path: /expired_at, state: absent }
+                        - implies:
+                              when: { path: /status, equals: canceled }
+                              then:
+                                  all:
+                                      - { path: /paid_at, state: absent }
+                                      - { path: /failed_at, state: absent }
+                                      - { path: /canceled_at, state: non-null }
+                                      - { path: /expired_at, state: absent }
+                        - implies:
+                              when: { path: /status, equals: expired }
+                              then:
+                                  all:
+                                      - { path: /paid_at, state: absent }
+                                      - { path: /failed_at, state: absent }
+                                      - { path: /canceled_at, state: absent }
+                                      - { path: /expired_at, state: non-null }
+                        # `unknown` is retained for compatibility, but it cannot claim
+                        # any public signal that would deterministically select a real state.
+                        - implies:
+                              when: { path: /status, equals: unknown }
+                              then:
+                                  all:
+                                      - { path: /executed_at, state: absent }
+                                      - { path: /paid_at, state: absent }
+                                      - { path: /failed_at, state: absent }
+                                      - { path: /canceled_at, state: absent }
+                                      - { path: /expired_at, state: absent }
+                                      - { path: /next_action, state: absent }
                     properties:
                         id:
                             type: string
@@ -15021,7 +15526,7 @@ components:
                             example: "py_OHFv6I3OZBvB1R46TQQGNxPPtgbPR6CXpQ8En9wl"
                         status:
                             type: string
-                            enum: [initiated, requires_action, overdue, executed, paid, canceled, expired, failed, unknown]
+                            enum: [initiated, requires_action, processing, overdue, executed, paid, canceled, expired, failed, unknown]
                             description: Payment state
                             example: "paid"
                         statement_descriptor:
@@ -15074,6 +15579,21 @@ components:
                             additionalProperties: false
                             description: Most recent payment attempt details
                             required: [status, initiated_at]
+                            # The inline order projection must preserve the same
+                            # success timestamp contract as OrderPaymentAttempt.
+                            x-simile-constraints:
+                                - ordered:
+                                      paths: [/initiated_at, /succeeded_at]
+                                - implies:
+                                      when: { path: /status, equals: succeeded }
+                                      then:
+                                          all:
+                                              - { path: /succeeded_at, state: non-null }
+                                - implies:
+                                      when: { path: /succeeded_at, state: non-null }
+                                      then:
+                                          all:
+                                              - { path: /status, equals: succeeded }
                             properties:
                                 payment_method_type:
                                     type: string
@@ -15544,6 +16064,14 @@ components:
             type: object
             additionalProperties: false
             required: [id, order_line_item_id, original_amount_paid, refund_amount]
+            # A line refund is denominated in the original line currency and may
+            # return no more than the amount originally paid for that line.
+            x-simile-constraints:
+                - equal:
+                      paths: [/original_amount_paid/currency, /refund_amount/currency]
+                - bounded:
+                      path: /refund_amount/value
+                      maximum: { path: /original_amount_paid/value }
             allOf:
                 - oneOf:
                     - not:
@@ -15576,14 +16104,26 @@ components:
                 order_line_item:
                     $ref: '#/components/schemas/RefundOrderLineItem'
                 original_amount_paid:
-                    $ref: '#/components/schemas/Amount'
+                    allOf:
+                        - $ref: '#/components/schemas/Amount'
+                        - type: object
+                          properties:
+                              value:
+                                  type: integer
+                                  minimum: 1
                 reason:
                     $ref: '#/components/schemas/RefundReason'
                 reason_details:
                     type: string
                     maxLength: 2048
                 refund_amount:
-                    $ref: '#/components/schemas/Amount'
+                    allOf:
+                        - $ref: '#/components/schemas/Amount'
+                        - type: object
+                          properties:
+                              value:
+                                  type: integer
+                                  minimum: 1
         RefundOrderLineItem:
             description: Immutable display snapshot of the refunded order line. Omitted when the originating order cannot be resolved.
             oneOf:
@@ -15682,55 +16222,58 @@ components:
                           reason_details: {}
             # Refund timestamps and failure metadata form a mutually exclusive public state machine.
             x-simile-constraints:
-                - ordered:
-                      paths: [/created_at, /processing_at, /succeeded_at]
-                - ordered:
-                      paths: [/created_at, /processing_at, /failed_at]
-                - ordered:
-                      paths: [/created_at, /canceled_at]
+                - lifecycle:
+                      state: /status
+                      created-at: /created_at
+                      transitions:
+                          - { from: pending, to: processing, at: /processing_at }
+                          - { from: processing, to: succeeded, at: /succeeded_at }
+                          - { from: processing, to: failed, at: /failed_at }
+                          - { from: pending, to: canceled, at: /canceled_at }
                 - implies:
                       when: { path: /status, equals: pending }
                       then:
                           all:
-                              - { path: /processing_at, state: absent }
-                              - { path: /succeeded_at, state: absent }
-                              - { path: /failed_at, state: absent }
-                              - { path: /canceled_at, state: absent }
                               - { path: /failure, state: absent }
+                              - { path: /cancel_reason, state: absent }
                 - implies:
                       when: { path: /status, equals: processing }
                       then:
                           all:
-                              - { path: /processing_at, state: non-null }
-                              - { path: /succeeded_at, state: absent }
-                              - { path: /failed_at, state: absent }
-                              - { path: /canceled_at, state: absent }
                               - { path: /failure, state: absent }
+                              - { path: /cancel_reason, state: absent }
                 - implies:
                       when: { path: /status, equals: succeeded }
                       then:
                           all:
-                              - { path: /succeeded_at, state: non-null }
-                              - { path: /failed_at, state: absent }
-                              - { path: /canceled_at, state: absent }
                               - { path: /failure, state: absent }
+                              - { path: /cancel_reason, state: absent }
                 - implies:
                       when: { path: /status, equals: failed }
                       then:
                           all:
-                              - { path: /succeeded_at, state: absent }
-                              - { path: /failed_at, state: non-null }
-                              - { path: /canceled_at, state: absent }
                               - { path: /failure, state: non-null }
+                              - { path: /cancel_reason, state: absent }
                 - implies:
                       when: { path: /status, equals: canceled }
                       then:
                           all:
-                              - { path: /processing_at, state: absent }
-                              - { path: /succeeded_at, state: absent }
-                              - { path: /failed_at, state: absent }
-                              - { path: /canceled_at, state: non-null }
                               - { path: /failure, state: absent }
+                # Refund accounting is a complete, immutable allocation snapshot:
+                # every line uses one currency, lines sum to total, and total cannot
+                # exceed the captured originating-order amount when that snapshot exists.
+                - equal:
+                      paths:
+                          - /total/currency
+                          - /order_amount/currency
+                          - /line_items/*/original_amount_paid/currency
+                          - /line_items/*/refund_amount/currency
+                - aggregate:
+                      target: /total/value
+                      operation: sum
+                      source: /line_items/*/refund_amount/value
+                - ordered:
+                      paths: [/total/value, /order_amount/value]
             properties:
                 cancel_reason:
                     type: string
@@ -15757,6 +16300,7 @@ components:
                     type: string
                 line_items:
                     type: array
+                    minItems: 1
                     description: One or more immutable line-level refund allocations.
                     items:
                         $ref: '#/components/schemas/RefundLineItem'
@@ -15765,6 +16309,11 @@ components:
                 order_amount:
                     allOf:
                         - $ref: '#/components/schemas/Amount'
+                        - type: object
+                          properties:
+                              value:
+                                  type: integer
+                                  minimum: 1
                     description: Total amount of the originating order captured when the refund was created.
                 processing_at:
                     type: string
@@ -15787,7 +16336,13 @@ components:
                     format: date-time
                     description: Omitted unless processing succeeded.
                 total:
-                    $ref: '#/components/schemas/Amount'
+                    allOf:
+                        - $ref: '#/components/schemas/Amount'
+                        - type: object
+                          properties:
+                              value:
+                                  type: integer
+                                  minimum: 1
         RefundResponse:
             type: object
             additionalProperties: false
@@ -15799,6 +16354,12 @@ components:
             type: object
             additionalProperties: false
             required: [number, refunds, size]
+            # The page size is the count of decoded public refunds in this response.
+            x-simile-constraints:
+                - aggregate:
+                      target: /size
+                      operation: count
+                      source: /refunds/*
             properties:
                 number:
                     type: integer
@@ -15912,6 +16473,10 @@ components:
             x-simile-constraints:
                 - ordered:
                       paths: [/created_at, /completed_at, /updated_at]
+                # Completion is the allocation's only public state transition, so
+                # completed_at and updated_at identify the same committed instant.
+                - equal:
+                      paths: [/completed_at, /updated_at]
                 - implies:
                       when: { path: /status, equals: pending }
                       then:
@@ -15950,43 +16515,121 @@ components:
                     format: date-time
                     description: When the public allocation status last changed.
         BalanceTransactionRefundAllocation:
-            allOf:
-                - $ref: '#/components/schemas/BalanceTransactionAllocationBase'
-                - type: object
-                  required: [refund]
-                  properties:
-                      type:
-                          type: string
-                          enum: [refund]
-                      refund:
-                          type: object
-                          additionalProperties: false
-                          required: [amount, id]
-                          properties:
-                              amount:
-                                  $ref: '#/components/schemas/BalanceTransactionAmount'
-                              id:
-                                  type: string
-                                  example: rf_1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcd
+            type: object
+            additionalProperties: false
+            required: [created_at, id, refund, status, type, updated_at]
+            # Keep this subtype closed without composing two independently closed
+            # OpenAPI 3.0 objects, which would make every refund allocation invalid.
+            x-simile-constraints:
+                - ordered:
+                      paths: [/created_at, /completed_at, /updated_at]
+                - equal:
+                      paths: [/completed_at, /updated_at]
+                - implies:
+                      when: { path: /status, equals: pending }
+                      then:
+                          all:
+                              - { path: /completed_at, state: absent }
+                - implies:
+                      when: { path: /status, equals: completed }
+                      then:
+                          all:
+                              - { path: /completed_at, state: non-null }
+                - implies:
+                      when: { path: /completed_at, state: non-null }
+                      then:
+                          all:
+                              - { path: /status, equals: completed }
+            properties:
+                completed_at:
+                    type: string
+                    format: date-time
+                    description: When the allocated amount became permanently consumed. Present only when `status` is `completed`.
+                created_at:
+                    type: string
+                    format: date-time
+                    description: When the amount first became unavailable for another refund or payout.
+                id:
+                    type: string
+                    description: Stable public allocation identifier for reconciliation and support.
+                    example: bta_0123456789abcdefghijklmnopqrstuvwxyzABCD
+                refund:
+                    type: object
+                    additionalProperties: false
+                    required: [amount, id]
+                    properties:
+                        amount:
+                            $ref: '#/components/schemas/BalanceTransactionAmount'
+                        id:
+                            type: string
+                            example: rf_1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcd
+                status:
+                    $ref: '#/components/schemas/BalanceTransactionAllocationStatus'
+                type:
+                    type: string
+                    enum: [refund]
+                updated_at:
+                    type: string
+                    format: date-time
+                    description: When the public allocation status last changed.
         BalanceTransactionPayoutAllocation:
-            allOf:
-                - $ref: '#/components/schemas/BalanceTransactionAllocationBase'
-                - type: object
-                  required: [payout]
-                  properties:
-                      type:
-                          type: string
-                          enum: [payout]
-                      payout:
-                          type: object
-                          additionalProperties: false
-                          required: [amount, id]
-                          properties:
-                              amount:
-                                  $ref: '#/components/schemas/BalanceTransactionAmount'
-                              id:
-                                  type: string
-                                  example: po_zyxwvutsrqponmlkjihgfedcbaABCDEFGHIJKLMN
+            type: object
+            additionalProperties: false
+            required: [created_at, id, payout, status, type, updated_at]
+            # Payout allocations use the same complete public lifecycle snapshot;
+            # duplicating the closed shape avoids contradictory allOf branches.
+            x-simile-constraints:
+                - ordered:
+                      paths: [/created_at, /completed_at, /updated_at]
+                - equal:
+                      paths: [/completed_at, /updated_at]
+                - implies:
+                      when: { path: /status, equals: pending }
+                      then:
+                          all:
+                              - { path: /completed_at, state: absent }
+                - implies:
+                      when: { path: /status, equals: completed }
+                      then:
+                          all:
+                              - { path: /completed_at, state: non-null }
+                - implies:
+                      when: { path: /completed_at, state: non-null }
+                      then:
+                          all:
+                              - { path: /status, equals: completed }
+            properties:
+                completed_at:
+                    type: string
+                    format: date-time
+                    description: When the allocated amount became permanently consumed. Present only when `status` is `completed`.
+                created_at:
+                    type: string
+                    format: date-time
+                    description: When the amount first became unavailable for another refund or payout.
+                id:
+                    type: string
+                    description: Stable public allocation identifier for reconciliation and support.
+                    example: bta_0123456789abcdefghijklmnopqrstuvwxyzABCD
+                payout:
+                    type: object
+                    additionalProperties: false
+                    required: [amount, id]
+                    properties:
+                        amount:
+                            $ref: '#/components/schemas/BalanceTransactionAmount'
+                        id:
+                            type: string
+                            example: po_zyxwvutsrqponmlkjihgfedcbaABCDEFGHIJKLMN
+                status:
+                    $ref: '#/components/schemas/BalanceTransactionAllocationStatus'
+                type:
+                    type: string
+                    enum: [payout]
+                updated_at:
+                    type: string
+                    format: date-time
+                    description: When the public allocation status last changed.
         BalanceTransaction:
             description: |
                 Merchant balance entry caused by a payment, refund, or payout. `type` is the
@@ -16019,99 +16662,139 @@ components:
                     enum: [payment, refund, payout]
                     description: Semantic source or cause of the transaction, not its direction.
         PaymentBalanceTransaction:
-            allOf:
-                - $ref: '#/components/schemas/BalanceTransactionBase'
-                - type: object
-                  required: [order_id, payment_id]
-                  properties:
-                      allocations:
-                          type: array
-                          description: All current pending and completed allocations. Released allocations are omitted.
-                          items:
-                              $ref: '#/components/schemas/BalanceTransactionAllocation'
-                      available_amount:
-                          allOf:
-                              - $ref: '#/components/schemas/BalanceTransactionAmount'
-                          description: Amount still available for a refund or payout.
-                      available_at:
-                          type: string
-                          format: date-time
-                      claimed_at:
-                          type: string
-                          format: date-time
-                          deprecated: true
-                          description: Legacy whole-transaction payout claim timestamp. New integrations should inspect `allocations`.
-                      order_id:
-                          type: string
-                          example: or_0123456789abcdefghijklmnopqrstuvwxyzABCD
-                      paid_at:
-                          type: string
-                          format: date-time
-                          deprecated: true
-                          description: Legacy whole-transaction payout completion timestamp. New integrations should inspect `allocations`.
-                      payment_id:
-                          type: string
-                          example: py_ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmn
-                      payout_id:
-                          type: string
-                          deprecated: true
-                          description: Legacy payout owning the whole transaction remainder. New integrations should inspect `allocations`.
-                          example: po_zyxwvutsrqponmlkjihgfedcbaABCDEFGHIJKLMN
-                      payout_configuration:
-                          type: object
-                          additionalProperties: false
-                          required: [enable_fx, destination]
-                          properties:
-                              enable_fx:
-                                  type: boolean
-                                  enum: [false]
-                              destination:
-                                  type: object
-                                  additionalProperties: false
-                                  required: [financial_account_id]
-                                  properties:
-                                      financial_account_id:
-                                          type: string
-                      pending_amount:
-                          allOf:
-                              - $ref: '#/components/schemas/BalanceTransactionAmount'
-                          description: Amount temporarily unavailable because a refund or payout is unresolved.
-                      spent_amount:
-                          allOf:
-                              - $ref: '#/components/schemas/BalanceTransactionAmount'
-                          description: Amount permanently consumed by completed refund and payout allocations.
-                      type:
-                          type: string
-                          enum: [payment]
+            type: object
+            additionalProperties: false
+            required: [allocations, amount, available_amount, created_at, id, order_id, payment_id, pending_amount, spent_amount, type]
+            # A payment credit is exposed as one complete currency-preserving
+            # partition: available + pending + spent always recreates the source.
+            x-simile-constraints:
+                - equal:
+                      paths:
+                          - /amount/currency
+                          - /available_amount/currency
+                          - /pending_amount/currency
+                          - /spent_amount/currency
+                - equation:
+                      target: /amount/value
+                      value:
+                          add:
+                              - { path: /available_amount/value }
+                              - { path: /pending_amount/value }
+                              - { path: /spent_amount/value }
+            # OpenAPI 3.0 applies additionalProperties inside every allOf branch.
+            # Declaring the complete subtype here keeps the JSON shape closed without
+            # making base fields and payment-only fields reject one another.
+            properties:
+                allocations:
+                    type: array
+                    description: All current pending and completed allocations. Released allocations are omitted.
+                    items:
+                        $ref: '#/components/schemas/BalanceTransactionAllocation'
+                amount:
+                    $ref: '#/components/schemas/BalanceTransactionAmount'
+                available_amount:
+                    allOf:
+                        - $ref: '#/components/schemas/BalanceTransactionAmount'
+                    description: Amount still available for a refund or payout.
+                available_at:
+                    type: string
+                    format: date-time
+                claimed_at:
+                    type: string
+                    format: date-time
+                    deprecated: true
+                    description: Legacy whole-transaction payout claim timestamp. New integrations should inspect `allocations`.
+                created_at:
+                    type: string
+                    format: date-time
+                id:
+                    type: string
+                    example: bt_0123456789abcdefghijklmnopqrstuvwxyzABCD
+                order_id:
+                    type: string
+                    example: or_0123456789abcdefghijklmnopqrstuvwxyzABCD
+                paid_at:
+                    type: string
+                    format: date-time
+                    deprecated: true
+                    description: Legacy whole-transaction payout completion timestamp. New integrations should inspect `allocations`.
+                payment_id:
+                    type: string
+                    example: py_ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmn
+                payout_id:
+                    type: string
+                    deprecated: true
+                    description: Legacy payout owning the whole transaction remainder. New integrations should inspect `allocations`.
+                    example: po_zyxwvutsrqponmlkjihgfedcbaABCDEFGHIJKLMN
+                payout_configuration:
+                    type: object
+                    additionalProperties: false
+                    required: [enable_fx, destination]
+                    properties:
+                        enable_fx:
+                            type: boolean
+                            enum: [false]
+                        destination:
+                            type: object
+                            additionalProperties: false
+                            required: [financial_account_id]
+                            properties:
+                                financial_account_id:
+                                    type: string
+                pending_amount:
+                    allOf:
+                        - $ref: '#/components/schemas/BalanceTransactionAmount'
+                    description: Amount temporarily unavailable because a refund or payout is unresolved.
+                spent_amount:
+                    allOf:
+                        - $ref: '#/components/schemas/BalanceTransactionAmount'
+                    description: Amount permanently consumed by completed refund and payout allocations.
+                type:
+                    type: string
+                    enum: [payment]
         RefundBalanceTransaction:
-            allOf:
-                - $ref: '#/components/schemas/BalanceTransactionBase'
-                - type: object
-                  required: [order_id, refund_id]
-                  properties:
-                      order_id:
-                          type: string
-                          example: or_0123456789abcdefghijklmnopqrstuvwxyzABCD
-                      refund_id:
-                          type: string
-                          example: rf_1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcd
-                      type:
-                          type: string
-                          enum: [refund]
+            type: object
+            additionalProperties: false
+            required: [amount, created_at, id, order_id, refund_id, type]
+            properties:
+                amount:
+                    $ref: '#/components/schemas/BalanceTransactionAmount'
+                created_at:
+                    type: string
+                    format: date-time
+                id:
+                    type: string
+                    example: bt_0123456789abcdefghijklmnopqrstuvwxyzABCD
+                order_id:
+                    type: string
+                    example: or_0123456789abcdefghijklmnopqrstuvwxyzABCD
+                refund_id:
+                    type: string
+                    example: rf_1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcd
+                type:
+                    type: string
+                    enum: [refund]
         PayoutDebitBalanceTransaction:
-            allOf:
-                - $ref: '#/components/schemas/BalanceTransactionBase'
-                - type: object
-                  description: Immutable debit created once a payout succeeds.
-                  required: [payout_id]
-                  properties:
-                      payout_id:
-                          type: string
-                          description: Payout that created this finalized debit.
-                          example: po_zyxwvutsrqponmlkjihgfedcbaABCDEFGHIJKLMN
-                      type:
-                          type: string
-                          enum: [payout]
+            type: object
+            description: Immutable debit created once a payout succeeds.
+            additionalProperties: false
+            required: [amount, created_at, id, payout_id, type]
+            properties:
+                amount:
+                    $ref: '#/components/schemas/BalanceTransactionAmount'
+                created_at:
+                    type: string
+                    format: date-time
+                id:
+                    type: string
+                    example: bt_0123456789abcdefghijklmnopqrstuvwxyzABCD
+                payout_id:
+                    type: string
+                    description: Payout that created this finalized debit.
+                    example: po_zyxwvutsrqponmlkjihgfedcbaABCDEFGHIJKLMN
+                type:
+                    type: string
+                    enum: [payout]
         BalanceTransactionResponse:
             type: object
             additionalProperties: false
@@ -16548,6 +17231,12 @@ components:
             type: object
             additionalProperties: false
             required: [accounts, number, size]
+            # The response builder computes size from successfully decoded accounts.
+            x-simile-constraints:
+                - aggregate:
+                      target: /size
+                      operation: count
+                      source: /accounts/*
             properties:
                 accounts:
                     type: array
@@ -16868,6 +17557,9 @@ components:
                               - { path: /succeeded_at, state: absent }
                               - { path: /failed_at, state: absent }
                               - { path: /canceled_at, state: absent }
+                              - { path: /failure, state: absent }
+                              - { path: /cancellation, state: absent }
+                              - { path: /error, state: absent }
                 - implies:
                       when: { path: /status, equals: scheduled }
                       then:
@@ -16877,6 +17569,9 @@ components:
                               - { path: /succeeded_at, state: absent }
                               - { path: /failed_at, state: absent }
                               - { path: /canceled_at, state: absent }
+                              - { path: /failure, state: absent }
+                              - { path: /cancellation, state: absent }
+                              - { path: /error, state: absent }
                 - implies:
                       when: { path: /status, equals: executing }
                       then:
@@ -16885,6 +17580,9 @@ components:
                               - { path: /succeeded_at, state: absent }
                               - { path: /failed_at, state: absent }
                               - { path: /canceled_at, state: absent }
+                              - { path: /failure, state: absent }
+                              - { path: /cancellation, state: absent }
+                              - { path: /error, state: absent }
                 - implies:
                       when: { path: /status, equals: processing }
                       then:
@@ -16893,6 +17591,9 @@ components:
                               - { path: /succeeded_at, state: absent }
                               - { path: /failed_at, state: absent }
                               - { path: /canceled_at, state: absent }
+                              - { path: /failure, state: absent }
+                              - { path: /cancellation, state: absent }
+                              - { path: /error, state: absent }
                 - implies:
                       when: { path: /status, equals: succeeded }
                       then:
@@ -16902,6 +17603,7 @@ components:
                               - { path: /canceled_at, state: absent }
                               - { path: /failure, state: absent }
                               - { path: /cancellation, state: absent }
+                              - { path: /error, state: absent }
                 - implies:
                       when: { path: /status, equals: failed }
                       then:
@@ -16911,6 +17613,7 @@ components:
                               - { path: /canceled_at, state: absent }
                               - { path: /failure, state: non-null }
                               - { path: /cancellation, state: absent }
+                              - { path: /error, state: non-null }
                 - implies:
                       when: { path: /status, equals: canceled }
                       then:
@@ -16920,11 +17623,35 @@ components:
                               - { path: /canceled_at, state: non-null }
                               - { path: /failure, state: absent }
                               - { path: /cancellation, state: non-null }
+                              - { path: /error, state: absent }
+                # A sealed payout is a bounded, single-currency sum of the exact
+                # source contributions returned with it. Unsealed payouts omit amount.
+                - equal:
+                      paths:
+                          - /max_amount/currency
+                          - /amount/currency
+                          - /balance_transactions/*/amount/currency
+                          - /balance_transactions/*/allocated_amount/currency
+                - bounded:
+                      path: /amount/value
+                      maximum: { path: /max_amount/value }
+                - aggregate:
+                      target: /amount/value
+                      operation: sum
+                      source: /balance_transactions/*/allocated_amount/value
+                      when: { path: /amount, state: non-null }
             properties:
                 amount:
-                    $ref: '#/components/schemas/Amount'
+                    allOf:
+                        - $ref: '#/components/schemas/Amount'
+                        - type: object
+                          properties:
+                              value:
+                                  type: integer
+                                  minimum: 1
                 balance_transactions:
                     type: array
+                    minItems: 1
                     description: |
                         Balance transactions that contributed to this payout. Each item includes
                         the source transaction's original amount and the exact portion allocated
@@ -16987,7 +17714,13 @@ components:
                     type: string
                     description: Actor that initiated the payout
                 max_amount:
-                    $ref: '#/components/schemas/Amount'
+                    allOf:
+                        - $ref: '#/components/schemas/Amount'
+                        - type: object
+                          properties:
+                              value:
+                                  type: integer
+                                  minimum: 1
                 reference:
                     type: string
                     description: Merchant reference carried on the payout
@@ -17022,11 +17755,31 @@ components:
             description: A historical view of one balance transaction's contribution to a payout. Released contributions remain present so clients can inspect the payout's original composition.
             additionalProperties: false
             required: [allocated_amount, amount, id, status]
+            # A payout contribution stays in the source transaction's currency and
+            # can consume at most that source's original amount.
+            x-simile-constraints:
+                - equal:
+                      paths: [/allocated_amount/currency, /amount/currency]
+                - bounded:
+                      path: /allocated_amount/value
+                      maximum: { path: /amount/value }
             properties:
                 allocated_amount:
-                    $ref: '#/components/schemas/Amount'
+                    allOf:
+                        - $ref: '#/components/schemas/Amount'
+                        - type: object
+                          properties:
+                              value:
+                                  type: integer
+                                  minimum: 1
                 amount:
-                    $ref: '#/components/schemas/Amount'
+                    allOf:
+                        - $ref: '#/components/schemas/Amount'
+                        - type: object
+                          properties:
+                              value:
+                                  type: integer
+                                  minimum: 1
                 id:
                     type: string
                     description: Unique balance transaction identifier.
@@ -17178,8 +17931,9 @@ components:
                 - max
             # The advertised inclusive range is usable only when its lower bound does not exceed its upper bound.
             x-simile-constraints:
-                - ordered:
-                      paths: [/min/value, /max/value]
+                - bounded:
+                      path: /min/value
+                      maximum: { path: /max/value }
             properties:
                 min:
                     $ref: '#/components/schemas/PayoutLimitValue'
@@ -17482,6 +18236,83 @@ components:
                 - fingerprint
                 - type
                 - created_at
+            # Archival makes a method unusable, while ownership verification exposes
+            # the same completion instant in both its summary and detailed record.
+            x-simile-constraints:
+                - ordered:
+                      paths: [/created_at, /archived_at]
+                - ordered:
+                      paths: [/created_at, /verification/initiated_at, /verification/completed_at]
+                # Supply provenance is captured before (or at) tokenization and
+                # therefore cannot claim that the method was supplied afterward.
+                - ordered:
+                      paths: [/supplied/supplied_at, /created_at]
+                - equal:
+                      paths: [/verified_at, /verification/completed_at]
+                - implies:
+                      when: { path: /active, equals: true }
+                      then:
+                          all:
+                              - { path: /archived_at, state: absent }
+                - implies:
+                      when: { path: /archived_at, state: non-null }
+                      then:
+                          all:
+                              - { path: /active, equals: false }
+                - implies:
+                      when: { path: /verified_at, state: non-null }
+                      then:
+                          all:
+                              - { path: /verification/completed_at, state: non-null }
+                - implies:
+                      when: { path: /verification/completed_at, state: non-null }
+                      then:
+                          all:
+                              - { path: /verified_at, state: non-null }
+                # Type-specific public details are mutually exclusive; card details
+                # remain optional here because this endpoint intentionally redacts them.
+                - implies:
+                      when: { path: /type, equals: mobile_money }
+                      then:
+                          all:
+                              - { path: /mobile_money, state: non-null }
+                              - { path: /bank_account, state: absent }
+                              - { path: /card, state: absent }
+                - implies:
+                      when: { path: /type, equals: bank_account }
+                      then:
+                          all:
+                              - { path: /bank_account, state: non-null }
+                              - { path: /mobile_money, state: absent }
+                              - { path: /card, state: absent }
+                - implies:
+                      when: { path: /type, equals: card }
+                      then:
+                          all:
+                              - { path: /mobile_money, state: absent }
+                              - { path: /bank_account, state: absent }
+                - implies:
+                      when: { path: /type, equals: motito }
+                      then:
+                          all:
+                              - { path: /mobile_money, state: absent }
+                              - { path: /bank_account, state: absent }
+                              - { path: /card, state: absent }
+                - implies:
+                      when: { path: /mobile_money, state: non-null }
+                      then:
+                          all:
+                              - { path: /type, equals: mobile_money }
+                - implies:
+                      when: { path: /bank_account, state: non-null }
+                      then:
+                          all:
+                              - { path: /type, equals: bank_account }
+                - implies:
+                      when: { path: /card, state: non-null }
+                      then:
+                          all:
+                              - { path: /type, equals: card }
             properties:
                 active:
                     type: boolean
@@ -17566,15 +18397,25 @@ components:
                         - account_number
                         - last4
                         - network
+                    # The public account number is not a second identifier: it is
+                    # exactly the fixed mask plus `last4`, preventing raw credentials.
+                    x-simile-constraints:
+                        - template:
+                              path: /account_number
+                              value: "****{/last4}"
                     properties:
                         account_number:
                             type: string
                             description: Masked wallet number. The full account number is never returned.
                             example: "****7831"
+                            minLength: 8
+                            maxLength: 8
                         last4:
                             type: string
                             description: Last four numeric digits of the normalized wallet number.
                             example: "7831"
+                            minLength: 4
+                            maxLength: 4
                         network:
                             type: string
                             enum: [airtel, mtn, telecel, vodafone]
@@ -18160,6 +19001,12 @@ components:
                         - number
                         - size
                         - chimes
+                    # Recipient/customer filtering happens before this returned count.
+                    x-simile-constraints:
+                        - aggregate:
+                              target: /size
+                              operation: count
+                              source: /chimes/*
                     properties:
                         number:
                             type: integer
@@ -18194,9 +19041,11 @@ components:
             type: object
             additionalProperties: false
             required: [default_sender, min_sender_char_len, max_sender_char_len]
+            # A usable sender-length interval cannot have its lower bound above its upper bound.
             x-simile-constraints:
-                - ordered:
-                      paths: [/min_sender_char_len, /max_sender_char_len]
+                - bounded:
+                      path: /min_sender_char_len
+                      maximum: { path: /max_sender_char_len }
             properties:
                 default_sender:
                     type: string
@@ -19039,6 +19888,59 @@ components:
             x-simile-constraints:
                 - ordered:
                       paths: [/initiated_at, /expires_at]
+                # Cancellation and delivery events cannot precede initiation, and
+                # the derived pending states must agree with transmission evidence.
+                - ordered:
+                      paths: [/initiated_at, /canceled_at]
+                - ordered:
+                      paths: [/initiated_at, /transmission/sent_at]
+                - implies:
+                      when: { path: /status, equals: canceled }
+                      then:
+                          all:
+                              - { path: /canceled_at, state: non-null }
+                - implies:
+                      when: { path: /canceled_at, state: non-null }
+                      then:
+                          all:
+                              - { path: /status, equals: canceled }
+                - implies:
+                      when: { path: /status, equals: pending_delivery }
+                      then:
+                          all:
+                              - { path: /transmission, state: absent }
+                              - { path: /canceled_at, state: absent }
+                              - { path: /cancel_reason, state: absent }
+                - implies:
+                      when: { path: /status, equals: pending }
+                      then:
+                          all:
+                              - { path: /transmission, state: non-null }
+                              - { path: /transmission/sent_at, state: absent }
+                              - { path: /canceled_at, state: absent }
+                              - { path: /cancel_reason, state: absent }
+                - implies:
+                      when: { path: /status, equals: pending_verification }
+                      then:
+                          all:
+                              - { path: /transmission, state: non-null }
+                              - { path: /transmission/sent_at, state: non-null }
+                              - { path: /canceled_at, state: absent }
+                              - { path: /cancel_reason, state: absent }
+                # Verification and expiry are terminal alternatives to cancellation;
+                # cancellation metadata must not leak into either snapshot.
+                - implies:
+                      when: { path: /status, equals: verified }
+                      then:
+                          all:
+                              - { path: /canceled_at, state: absent }
+                              - { path: /cancel_reason, state: absent }
+                - implies:
+                      when: { path: /status, equals: expired }
+                      then:
+                          all:
+                              - { path: /canceled_at, state: absent }
+                              - { path: /cancel_reason, state: absent }
             properties:
                 cancel_reason:
                     type: string
@@ -19445,6 +20347,12 @@ components:
                     type: object
                     additionalProperties: false
                     required: [number, size, orders]
+                    # Product/customer filters can shrink the selected order page.
+                    x-simile-constraints:
+                        - aggregate:
+                              target: /size
+                              operation: count
+                              source: /orders/*
                     properties:
                         number:
                             type: integer
@@ -20076,6 +20984,12 @@ components:
                     type: object
                     additionalProperties: false
                     required: [number, size, products]
+                    # Database page size is the number of product records returned.
+                    x-simile-constraints:
+                        - aggregate:
+                              target: /size
+                              operation: count
+                              source: /products/*
                     properties:
                         number:
                             type: integer
