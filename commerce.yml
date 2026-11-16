@@ -9077,6 +9077,8 @@ components:
             properties:
                 id:
                     type: string
+                    # Public serializers always emit this resource with the sk_ type prefix.
+                    pattern: '^sk_'
                     description: Secret key identifier.
                     example: sk_2xC7k9gK5yQnZ4w8P1sT6vR3
                 label:
@@ -9246,6 +9248,8 @@ components:
             properties:
                 id:
                     type: string
+                    # Public serializers always emit this resource with the sk_ type prefix.
+                    pattern: '^sk_'
                     description: Application-scoped secret key identifier.
                     example: sk_2xC7k9gK5yQnZ4w8P1sT6vR3
                 label:
@@ -9365,6 +9369,8 @@ components:
             properties:
                 secret_key_id:
                     type: string
+                    # Public serializers always emit this resource with the sk_ type prefix.
+                    pattern: '^sk_'
                     example: sk_2xC7k9gK5yQnZ4w8P1sT6vR3
                 occurred_at:
                     type: string
@@ -9536,6 +9542,8 @@ components:
             properties:
                 id:
                     type: string
+                    # Public serializers always emit this resource with the file_ type prefix.
+                    pattern: '^file_'
                     example: file_2xC7k9gK5yQnZ4w8P1sT6vR3
                 purpose:
                     type: string
@@ -9605,6 +9613,8 @@ components:
                     type: string
                 id:
                     type: string
+                    # Public serializers always emit this resource with the file_ type prefix.
+                    pattern: '^file_'
                 name:
                     type: string
                 size:
@@ -9641,6 +9651,8 @@ components:
                     type: string
                 upload_request_id:
                     type: string
+                    # Public serializers always emit this resource with the uplreq_ type prefix.
+                    pattern: '^uplreq_'
         FileMedia:
             type: object
             additionalProperties: false
@@ -9851,11 +9863,15 @@ components:
             properties:
                 id:
                     type: string
+                    # Public serializers always emit this resource with the flink_ type prefix.
+                    pattern: '^flink_'
                 kind:
                     type: string
                     enum: [public]
                 file_id:
                     type: string
+                    # Public serializers always emit this resource with the file_ type prefix.
+                    pattern: '^file_'
                 purpose:
                     type: string
                 status:
@@ -10239,6 +10255,8 @@ components:
             properties:
                 id:
                     type: string
+                    # Public serializers always emit this resource with the uplreq_ type prefix.
+                    pattern: '^uplreq_'
                 purpose:
                     type: string
                 status:
@@ -10248,6 +10266,8 @@ components:
                     type: boolean
                 file_id:
                     type: string
+                    # Public serializers always emit this resource with the file_ type prefix.
+                    pattern: '^file_'
                 upload_url:
                     type: string
                     format: uri
@@ -10429,10 +10449,14 @@ components:
                     format: date-time
                 file_id:
                     type: string
+                    # Public serializers always emit this resource with the file_ type prefix.
+                    pattern: '^file_'
                 filename:
                     type: string
                 id:
                     type: string
+                    # Public serializers always emit this resource with the uplatt_ type prefix.
+                    pattern: '^uplatt_'
                 ordinal:
                     type: integer
                     format: int64
@@ -10446,6 +10470,8 @@ components:
                     format: date-time
                 upload_request_id:
                     type: string
+                    # Public serializers always emit this resource with the uplreq_ type prefix.
+                    pattern: '^uplreq_'
         UploadRequestReview:
             type: object
             additionalProperties: false
@@ -10462,6 +10488,8 @@ components:
                     enum: [approved, rejected]
                 file_id:
                     type: string
+                    # Public serializers always emit this resource with the file_ type prefix.
+                    pattern: '^file_'
                 public_message:
                     type: string
                 reasons:
@@ -11119,6 +11147,8 @@ components:
                     type: boolean
                 id:
                     type: string
+                    # Public serializers always emit this resource with the cu_ type prefix.
+                    pattern: '^cu_'
                 name:
                     type: string
                 phone_number:
@@ -11547,6 +11577,8 @@ components:
             properties:
                 id:
                     type: string
+                    # Public serializers always emit this resource with the pr_ type prefix.
+                    pattern: '^pr_'
                     description: Unique price identifier with pr_ prefix
                     example: "pr_xyz789"
                 active:
@@ -11570,6 +11602,8 @@ components:
             properties:
                 id:
                     type: string
+                    # Public serializers always emit this resource with the pr_ type prefix.
+                    pattern: '^pr_'
                     description: Unique price identifier with pr_ prefix
                     example: "pr_xyz789"
                 active:
@@ -11617,6 +11651,8 @@ components:
             properties:
                 id:
                     type: string
+                    # Public serializers always emit this resource with the prod_ type prefix.
+                    pattern: '^prod_'
                     description: Product identifier returned by the update operation.
                 name:
                     type: string
@@ -12157,6 +12193,8 @@ components:
                     example: true
                 id:
                     type: string
+                    # Public serializers always emit this resource with the pr_ type prefix.
+                    pattern: '^pr_'
                     description: Catalog price ID when the comparison price is not inline
                     example: "pr_original123"
                 label:
@@ -12178,6 +12216,8 @@ components:
                     example: true
                 id:
                     type: string
+                    # Public serializers always emit this resource with the pr_ type prefix.
+                    pattern: '^pr_'
                     description: Catalog price ID when the offer price is not inline
                     example: "pr_xyz789"
                 label:
@@ -12206,8 +12246,12 @@ components:
                     type: string
                 price_id:
                     type: string
+                    # Public serializers always emit this resource with the pr_ type prefix.
+                    pattern: '^pr_'
                 product_id:
                     type: string
+                    # Public serializers always emit this resource with the prod_ type prefix.
+                    pattern: '^prod_'
                 quantity:
                     type: integer
                     minimum: 1
@@ -12229,6 +12273,8 @@ components:
                         $ref: '#/components/schemas/PurchaseIntentBundleComponent'
                 id:
                     type: string
+                    # Public serializers always emit this resource with the pbd_ type prefix.
+                    pattern: '^pbd_'
                     description: Current app-owned bundle referenced by the Buy link
                     example: "pbd_abc123"
                 media:
@@ -12253,6 +12299,8 @@ components:
                               $ref: '#/components/schemas/ProductPriceSummary'
                       variant_set_id:
                           type: string
+                          # Public serializers always emit this resource with the pg_ type prefix.
+                          pattern: '^pg_'
                           description: Variant set configured for this Buy link
                           example: "pg_variantset123"
         PurchaseIntentUsage:
@@ -12291,6 +12339,8 @@ components:
                     description: When order creation consumed the single-use Buy link
                 id:
                     type: string
+                    # Public serializers always emit this resource with the or_ type prefix.
+                    pattern: '^or_'
                     description: Order that consumed the Buy link
                     example: "or_abc123"
         PurchaseIntentVariantAxis:
@@ -12330,6 +12380,8 @@ components:
                     $ref: '#/components/schemas/PurchaseIntentProduct'
                 product_id:
                     type: string
+                    # Public serializers always emit this resource with the prod_ type prefix.
+                    pattern: '^prod_'
                     example: "prod_variant123"
                 variant_values:
                     $ref: '#/components/schemas/VariantValues'
@@ -12348,12 +12400,16 @@ components:
                     example: true
                 default_product_id:
                     type: string
+                    # Public serializers always emit this resource with the prod_ type prefix.
+                    pattern: '^prod_'
                     example: "prod_abc123"
                 description:
                     type: string
                     example: "Choose a tin size"
                 id:
                     type: string
+                    # Public serializers always emit this resource with the pg_ type prefix.
+                    pattern: '^pg_'
                     example: "pg_variantset123"
                 name:
                     type: string
@@ -12414,6 +12470,8 @@ components:
                     example: false
                 application_id:
                     type: string
+                    # Public serializers always emit this resource with the app_ type prefix.
+                    pattern: '^app_'
                     description: Application that owns the purchase intent. This is routing metadata, not merchant presentation.
                     example: "app_abc123"
                 bundle:
@@ -12428,6 +12486,8 @@ components:
                     description: Timestamp at or after which the Buy link is expired
                 id:
                     type: string
+                    # Public serializers always emit this resource with the sale_ type prefix.
+                    pattern: '^sale_'
                     description: Unique purchase intent identifier with sale_ prefix. Append it to https://pages.inttegro.com/buy/ to build the hosted Buy link.
                     example: "sale_ABCXYZ"
                 inactive_at:
@@ -12523,6 +12583,8 @@ components:
             properties:
                 id:
                     type: string
+                    # Public serializers always emit this resource with the prod_ type prefix.
+                    pattern: '^prod_'
                     description: Unique product identifier with prod_ prefix
                     example: "prod_abc123xyz"
                 type:
@@ -12621,6 +12683,8 @@ components:
             properties:
                 id:
                     type: string
+                    # Public serializers always emit this resource with the prod_ type prefix.
+                    pattern: '^prod_'
                     description: Unique product identifier with prod_ prefix
                     example: "prod_abc123xyz"
                 about:
@@ -12867,6 +12931,8 @@ components:
             properties:
                 id:
                     type: string
+                    # Public serializers always emit this resource with the pr_ type prefix.
+                    pattern: '^pr_'
                     description: Unique price identifier with pr_ prefix
                     example: "pr_xyz789"
                 label:
@@ -12890,6 +12956,8 @@ components:
                     $ref: '#/components/schemas/Amount'
                 product_id:
                     type: string
+                    # Public serializers always emit this resource with the prod_ type prefix.
+                    pattern: '^prod_'
                     description: Product ID when the operation returns the relationship by reference
                     example: "prod_abc123"
                 product:
@@ -12943,6 +13011,8 @@ components:
             properties:
                 id:
                     type: string
+                    # Public serializers always emit this resource with the pr_ type prefix.
+                    pattern: '^pr_'
                     description: Unique price identifier with pr_ prefix
                     example: "pr_xyz789"
                 label:
@@ -12966,6 +13036,8 @@ components:
                     $ref: '#/components/schemas/CustomerSelectedAmount'
                 product_id:
                     type: string
+                    # Public serializers always emit this resource with the prod_ type prefix.
+                    pattern: '^prod_'
                     description: Product ID when the operation returns the relationship by reference
                     example: "prod_abc123"
                 product:
@@ -13111,13 +13183,19 @@ components:
                     properties:
                         id:
                             type: string
+                            # Public serializers always emit this resource with the oli_ type prefix.
+                            pattern: '^oli_'
                             description: Immutable order-line identifier with the `oli_` prefix.
                             example: "oli_7QYpB8c3V9kL2nM4"
                         product_id:
                             type: string
+                            # Public serializers always emit this resource with the prod_ type prefix.
+                            pattern: '^prod_'
                             description: Source catalog product ID when this line snapshots a catalog product.
                         price_id:
                             type: string
+                            # Public serializers always emit this resource with the pr_ type prefix.
+                            pattern: '^pr_'
                             description: Source catalog price ID when this line snapshots a saved price.
                         reference:
                             type: string
@@ -13155,6 +13233,8 @@ components:
                     properties:
                         id:
                             type: string
+                            # Public serializers always emit this resource with the oli_ type prefix.
+                            pattern: '^oli_'
                             description: Immutable order-line identifier with the `oli_` prefix.
                         description:
                             type: string
@@ -13179,6 +13259,8 @@ components:
                     properties:
                         id:
                             type: string
+                            # Public serializers always emit this resource with the oli_ type prefix.
+                            pattern: '^oli_'
                             description: Immutable order-line identifier with the `oli_` prefix.
                         tax_code:
                             type: string
@@ -13899,6 +13981,8 @@ components:
             properties:
                 id:
                     type: string
+                    # Public serializers always emit this resource with the mtpl_ type prefix.
+                    pattern: '^mtpl_'
                     description: API-generated unique template id.
                     example: "mtpl_receipt"
                 name:
@@ -14145,8 +14229,10 @@ components:
                     example: "sms"
                 chime_id:
                     type: string
+                    # Public serializers always emit this resource with the ch_ type prefix.
+                    pattern: '^ch_'
                     description: Chime ID created for this delivery.
-                    example: "chm_7QYpB8c3V9kL2nM4"
+                    example: "ch_7QYpB8c3V9kL2nM4"
         OrderDocumentDeliveryFailure:
             type: object
             additionalProperties: false
@@ -14675,6 +14761,8 @@ components:
             properties:
                 id:
                     type: string
+                    # Public serializers always emit this resource with the or_ type prefix.
+                    pattern: '^or_'
                     example: "or_a1b2c3d4e5f6"
                 number:
                     type: string
@@ -14732,6 +14820,8 @@ components:
                     properties:
                         id:
                             type: string
+                            # Public serializers always emit this resource with the cu_ type prefix.
+                            pattern: '^cu_'
                         guest:
                             type: boolean
                         name:
@@ -14859,6 +14949,8 @@ components:
                     properties:
                         id:
                             type: string
+                            # Public serializers always emit this resource with the py_ type prefix.
+                            pattern: '^py_'
                         statement_descriptor:
                             type: string
                         payment_method_types:
@@ -14922,6 +15014,8 @@ components:
                     $ref: '#/components/schemas/OrderDocumentDeliverySummary'
                 id:
                     type: string
+                    # Public serializers always emit this resource with the or_ type prefix.
+                    pattern: '^or_'
                 application_id:
                     type: string
                 number:
@@ -15053,6 +15147,8 @@ components:
             properties:
                 id:
                     type: string
+                    # Public serializers always emit this resource with the pm_ type prefix.
+                    pattern: '^pm_'
                 bank_account:
                     type: object
                     additionalProperties: false
@@ -15082,6 +15178,8 @@ components:
                     format: date-time
                 customer_id:
                     type: string
+                    # Public serializers always emit this resource with the cu_ type prefix.
+                    pattern: '^cu_'
                 mobile_money:
                     type: object
                     additionalProperties: false
@@ -15153,6 +15251,8 @@ components:
                     type: string
                 payment_method_id:
                     type: string
+                    # Public serializers always emit this resource with the pm_ type prefix.
+                    pattern: '^pm_'
                 error:
                     type: object
                     additionalProperties: false
@@ -15327,6 +15427,8 @@ components:
                     properties:
                         id:
                             type: string
+                            # Public serializers always emit this resource with the cu_ type prefix.
+                            pattern: '^cu_'
                         guest:
                             type: boolean
                         name:
@@ -15346,6 +15448,8 @@ components:
                     description: When the order expires. Omitted when no expiry is set.
                 id:
                     type: string
+                    # Public serializers always emit this resource with the or_ type prefix.
+                    pattern: '^or_'
                     description: Unique identifier for this order
                     example: "or_48ZW7BGvYUBWc1i6WBkL2jr0iPQP5jUy76mmmHpt"
                 initiated_at:
@@ -15522,6 +15626,8 @@ components:
                     properties:
                         id:
                             type: string
+                            # Public serializers always emit this resource with the py_ type prefix.
+                            pattern: '^py_'
                             description: Payment intent ID
                             example: "py_OHFv6I3OZBvB1R46TQQGNxPPtgbPR6CXpQ8En9wl"
                         status:
@@ -15561,6 +15667,8 @@ components:
                             properties:
                                 id:
                                     type: string
+                                    # Public serializers always emit this resource with the cu_ type prefix.
+                                    pattern: '^cu_'
                                 guest:
                                     type: boolean
                                 name:
@@ -15600,6 +15708,8 @@ components:
                                     example: "mobile_money"
                                 payment_method_id:
                                     type: string
+                                    # Public serializers always emit this resource with the pm_ type prefix.
+                                    pattern: '^pm_'
                                     example: "pm_hg7D2A5qT6g6mVDSJu6zweKXwsiiNWf3Q85book6"
                                 error:
                                     type: object
@@ -15695,6 +15805,8 @@ components:
                                     properties:
                                         financial_account_id:
                                             type: string
+                                            # Public serializers always emit this resource with the fa_ type prefix.
+                                            pattern: '^fa_'
                                             description: ID of the financial account receiving the payout
                                             example: "fa_1234567890abcdef"
                 paid_at:
@@ -15868,6 +15980,8 @@ components:
             properties:
                 id:
                     type: string
+                    # Public serializers always emit this resource with the pm_ type prefix.
+                    pattern: '^pm_'
                     description: Public identifier of the original payment method.
                     example: pm_xyz789
                 mobile_money:
@@ -15922,6 +16036,8 @@ components:
                             enum: [ghana_bank_account]
                 id:
                     type: string
+                    # Public serializers always emit this resource with the pm_ type prefix.
+                    pattern: '^pm_'
                     description: Public identifier of the original payment method.
                     example: pm_xyz789
                 type:
@@ -16096,9 +16212,13 @@ components:
             properties:
                 id:
                     type: string
+                    # Public serializers always emit this resource with the rli_ type prefix.
+                    pattern: '^rli_'
                     description: Server-generated refund line-item identifier.
                 order_line_item_id:
                     type: string
+                    # Public serializers always emit this resource with the oli_ type prefix.
+                    pattern: '^oli_'
                     deprecated: true
                     description: Deprecated compatibility identifier. Use `order_line_item.id` when `order_line_item` is present.
                 order_line_item:
@@ -16143,6 +16263,8 @@ components:
             properties:
                 id:
                     type: string
+                    # Public serializers always emit this resource with the oli_ type prefix.
+                    pattern: '^oli_'
                     description: Immutable order-line identifier with the `oli_` prefix.
                     example: oli_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMN
                 type:
@@ -16158,6 +16280,8 @@ components:
                     properties:
                         id:
                             type: string
+                            # Public serializers always emit this resource with the prod_ type prefix.
+                            pattern: '^prod_'
                             description: Source catalog product identifier. Omitted for inline products.
                             example: prod_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMN
                         name:
@@ -16170,6 +16294,8 @@ components:
             properties:
                 id:
                     type: string
+                    # Public serializers always emit this resource with the oli_ type prefix.
+                    pattern: '^oli_'
                     description: Immutable order-line identifier with the `oli_` prefix.
                     example: oli_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMN
                 type:
@@ -16190,6 +16316,8 @@ components:
             properties:
                 id:
                     type: string
+                    # Public serializers always emit this resource with the oli_ type prefix.
+                    pattern: '^oli_'
                     description: Immutable order-line identifier with the `oli_` prefix.
                     example: oli_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMN
                 type:
@@ -16298,6 +16426,8 @@ components:
                     description: Sanitized terminal failure information. Present only when `status` is `failed`. An uncertain provider outcome remains `processing` and does not produce this object.
                 id:
                     type: string
+                    # Public serializers always emit this resource with the rf_ type prefix.
+                    pattern: '^rf_'
                 line_items:
                     type: array
                     minItems: 1
@@ -16306,6 +16436,8 @@ components:
                         $ref: '#/components/schemas/RefundLineItem'
                 order_id:
                     type: string
+                    # Public serializers always emit this resource with the or_ type prefix.
+                    pattern: '^or_'
                 order_amount:
                     allOf:
                         - $ref: '#/components/schemas/Amount'
@@ -16503,6 +16635,8 @@ components:
                     description: When the amount first became unavailable for another refund or payout.
                 id:
                     type: string
+                    # Public serializers always emit this resource with the bta_ type prefix.
+                    pattern: '^bta_'
                     description: Stable public allocation identifier for reconciliation and support.
                     example: bta_0123456789abcdefghijklmnopqrstuvwxyzABCD
                 status:
@@ -16551,6 +16685,8 @@ components:
                     description: When the amount first became unavailable for another refund or payout.
                 id:
                     type: string
+                    # Public serializers always emit this resource with the bta_ type prefix.
+                    pattern: '^bta_'
                     description: Stable public allocation identifier for reconciliation and support.
                     example: bta_0123456789abcdefghijklmnopqrstuvwxyzABCD
                 refund:
@@ -16562,6 +16698,8 @@ components:
                             $ref: '#/components/schemas/BalanceTransactionAmount'
                         id:
                             type: string
+                            # Public serializers always emit this resource with the rf_ type prefix.
+                            pattern: '^rf_'
                             example: rf_1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcd
                 status:
                     $ref: '#/components/schemas/BalanceTransactionAllocationStatus'
@@ -16609,6 +16747,8 @@ components:
                     description: When the amount first became unavailable for another refund or payout.
                 id:
                     type: string
+                    # Public serializers always emit this resource with the bta_ type prefix.
+                    pattern: '^bta_'
                     description: Stable public allocation identifier for reconciliation and support.
                     example: bta_0123456789abcdefghijklmnopqrstuvwxyzABCD
                 payout:
@@ -16620,6 +16760,8 @@ components:
                             $ref: '#/components/schemas/BalanceTransactionAmount'
                         id:
                             type: string
+                            # Public serializers always emit this resource with the po_ type prefix.
+                            pattern: '^po_'
                             example: po_zyxwvutsrqponmlkjihgfedcbaABCDEFGHIJKLMN
                 status:
                     $ref: '#/components/schemas/BalanceTransactionAllocationStatus'
@@ -16656,6 +16798,8 @@ components:
                     format: date-time
                 id:
                     type: string
+                    # Public serializers always emit this resource with the bt_ type prefix.
+                    pattern: '^bt_'
                     example: bt_0123456789abcdefghijklmnopqrstuvwxyzABCD
                 type:
                     type: string
@@ -16709,9 +16853,13 @@ components:
                     format: date-time
                 id:
                     type: string
+                    # Public serializers always emit this resource with the bt_ type prefix.
+                    pattern: '^bt_'
                     example: bt_0123456789abcdefghijklmnopqrstuvwxyzABCD
                 order_id:
                     type: string
+                    # Public serializers always emit this resource with the or_ type prefix.
+                    pattern: '^or_'
                     example: or_0123456789abcdefghijklmnopqrstuvwxyzABCD
                 paid_at:
                     type: string
@@ -16720,9 +16868,13 @@ components:
                     description: Legacy whole-transaction payout completion timestamp. New integrations should inspect `allocations`.
                 payment_id:
                     type: string
+                    # Public serializers always emit this resource with the py_ type prefix.
+                    pattern: '^py_'
                     example: py_ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmn
                 payout_id:
                     type: string
+                    # Public serializers always emit this resource with the po_ type prefix.
+                    pattern: '^po_'
                     deprecated: true
                     description: Legacy payout owning the whole transaction remainder. New integrations should inspect `allocations`.
                     example: po_zyxwvutsrqponmlkjihgfedcbaABCDEFGHIJKLMN
@@ -16741,6 +16893,8 @@ components:
                             properties:
                                 financial_account_id:
                                     type: string
+                                    # Public serializers always emit this resource with the fa_ type prefix.
+                                    pattern: '^fa_'
                 pending_amount:
                     allOf:
                         - $ref: '#/components/schemas/BalanceTransactionAmount'
@@ -16764,12 +16918,18 @@ components:
                     format: date-time
                 id:
                     type: string
+                    # Public serializers always emit this resource with the bt_ type prefix.
+                    pattern: '^bt_'
                     example: bt_0123456789abcdefghijklmnopqrstuvwxyzABCD
                 order_id:
                     type: string
+                    # Public serializers always emit this resource with the or_ type prefix.
+                    pattern: '^or_'
                     example: or_0123456789abcdefghijklmnopqrstuvwxyzABCD
                 refund_id:
                     type: string
+                    # Public serializers always emit this resource with the rf_ type prefix.
+                    pattern: '^rf_'
                     example: rf_1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcd
                 type:
                     type: string
@@ -16787,9 +16947,13 @@ components:
                     format: date-time
                 id:
                     type: string
+                    # Public serializers always emit this resource with the bt_ type prefix.
+                    pattern: '^bt_'
                     example: bt_0123456789abcdefghijklmnopqrstuvwxyzABCD
                 payout_id:
                     type: string
+                    # Public serializers always emit this resource with the po_ type prefix.
+                    pattern: '^po_'
                     description: Payout that created this finalized debit.
                     example: po_zyxwvutsrqponmlkjihgfedcbaABCDEFGHIJKLMN
                 type:
@@ -17087,6 +17251,8 @@ components:
                     description: A stable identifier for the underlying financial account within your application. Use it to recognize when the same account has been connected more than once.
                 id:
                     type: string
+                    # Public serializers always emit this resource with the fa_ type prefix.
+                    pattern: '^fa_'
                     example: fa_1234567890abcdef
                 institution:
                     $ref: '#/components/schemas/FinancialInstitution'
@@ -17222,6 +17388,8 @@ components:
                     description: A stable identifier for the underlying financial account within your application. Use it to recognize when the same account has been connected more than once.
                 id:
                     type: string
+                    # Public serializers always emit this resource with the fa_ type prefix.
+                    pattern: '^fa_'
                 label:
                     type: string
                 type:
@@ -17275,6 +17443,8 @@ components:
                     format: date-time
                 id:
                     type: string
+                    # Public serializers always emit this resource with the fm_ type prefix.
+                    pattern: '^fm_'
                     example: fm_abc123xyz789
                 ip_address:
                     type: string
@@ -17661,6 +17831,8 @@ components:
                         $ref: '#/components/schemas/PayoutBalanceTransaction'
                 balance_transaction_id:
                     type: string
+                    # Public serializers always emit this resource with the bt_ type prefix.
+                    pattern: '^bt_'
                     description: Immutable debit balance transaction created when this payout succeeds.
                     example: bt_1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcd
                 canceled_at:
@@ -17675,6 +17847,8 @@ components:
                     $ref: '#/components/schemas/CustomData'
                 destination_id:
                     type: string
+                    # Public serializers always emit this resource with the fa_ type prefix.
+                    pattern: '^fa_'
                     description: Financial account receiving the funds
                     example: "fa_1234567890abcdef"
                 error:
@@ -17704,6 +17878,8 @@ components:
                     description: Caller-safe failure information. Present only when `status` is `failed`.
                 id:
                     type: string
+                    # Public serializers always emit this resource with the po_ type prefix.
+                    pattern: '^po_'
                     description: Unique payout identifier
                     example: "po_yQ2wXm5Dc7Pk9Ls1Vn0RgHaB"
                 initiated_at:
@@ -17727,6 +17903,8 @@ components:
                     example: "PAYOUT-APR-15"
                 schedule_id:
                     type: string
+                    # Public serializers always emit this resource with the posc_ type prefix.
+                    pattern: '^posc_'
                     description: Schedule associated with the payout
                 scheduled_at:
                     type: string
@@ -17782,6 +17960,8 @@ components:
                                   minimum: 1
                 id:
                     type: string
+                    # Public serializers always emit this resource with the bt_ type prefix.
+                    pattern: '^bt_'
                     description: Unique balance transaction identifier.
                     example: bt_1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcd
                 status:
@@ -17859,6 +18039,8 @@ components:
                     description: How strictly the aging period is applied.
                 public_id:
                     type: string
+                    # Public serializers always emit this resource with the bt_aging_spec_ type prefix.
+                    pattern: '^bt_aging_spec_'
                     description: Public identifier for the balance transaction aging specification.
                     example: "bt_aging_spec_168_hourly"
                 label:
@@ -17964,6 +18146,8 @@ components:
                     type: string
                 public_id:
                     type: string
+                    # Public serializers always emit this resource with the bt_aging_spec_ type prefix.
+                    pattern: '^bt_aging_spec_'
                     description: Public identifier for the balance transaction aging specification.
                     example: "bt_aging_spec_168_hourly"
                 label:
@@ -18372,6 +18556,8 @@ components:
                     $ref: '#/components/schemas/CustomData'
                 customer_id:
                     type: string
+                    # Public serializers always emit this resource with the cu_ type prefix.
+                    pattern: '^cu_'
                     description: Customer who owns this payment method
                     example: "cu_a1b2c3d4e5"
                 ephemeral:
@@ -18387,6 +18573,8 @@ components:
                     description: Customer-scoped fingerprint for this payment method within the merchant application. Matching nonempty values for the same customer indicate the same underlying method was added more than once. May be empty for records awaiting fingerprint backfill or methods lacking reliable fingerprint material. It does not identify the method across customers or applications.
                 id:
                     type: string
+                    # Public serializers always emit this resource with the pm_ type prefix.
+                    pattern: '^pm_'
                     description: Unique identifier for this payment method
                     example: "pm_xyz789"
                 mobile_money:
@@ -19084,6 +19272,8 @@ components:
                     $ref: '#/components/schemas/CustomData'
                 customer_id:
                     type: string
+                    # Public serializers always emit this resource with the cu_ type prefix.
+                    pattern: '^cu_'
                 email:
                     $ref: '#/components/schemas/ChimeEmailMessage'
                 full_message:
@@ -19091,6 +19281,8 @@ components:
                     description: Rendered SMS content. Empty for email Chimes.
                 id:
                     type: string
+                    # Public serializers always emit this resource with the ch_ type prefix.
+                    pattern: '^ch_'
                 idempotency_key:
                     type: string
                 purpose:
@@ -19466,6 +19658,8 @@ components:
                     type: string
                 id:
                     type: string
+                    # Public serializers always emit this resource with the sch_ type prefix.
+                    pattern: '^sch_'
                 idempotency_key:
                     type: string
                 purpose:
@@ -19540,6 +19734,8 @@ components:
                     format: date-time
                 id:
                     type: string
+                    # Public serializers always emit this resource with the sch_ type prefix.
+                    pattern: '^sch_'
                 idempotency_key:
                     type: string
                 purpose:
@@ -19650,6 +19846,8 @@ components:
                     $ref: '#/components/schemas/ChimeEmailMessage'
                 id:
                     type: string
+                    # Public serializers always emit this resource with the brc_ type prefix.
+                    pattern: '^brc_'
                 idempotency_key:
                     type: string
                 purpose:
@@ -19724,6 +19922,8 @@ components:
                     format: date-time
                 id:
                     type: string
+                    # Public serializers always emit this resource with the brc_ type prefix.
+                    pattern: '^brc_'
                 idempotency_key:
                     type: string
                 purpose:
@@ -19958,6 +20158,8 @@ components:
                     example: "Your Acme Bank code is {token}."
                 id:
                     type: string
+                    # Public serializers always emit this resource with the ot_ type prefix.
+                    pattern: '^ot_'
                     description: Unique identifier with ot_ prefix
                     example: "ot_3f8a9c7e2d1b4a6f"
                 initiated_at:
@@ -20000,6 +20202,8 @@ components:
                     format: date-time
                 id:
                     type: string
+                    # Public serializers always emit this resource with the ov_ type prefix.
+                    pattern: '^ov_'
                     example: "ov_9e8d7c6b5a4f3e2d"
                 presented_token:
                     type: string
@@ -20428,6 +20632,8 @@ components:
                     properties:
                         id:
                             type: string
+                            # Public serializers always emit this resource with the app_ type prefix.
+                            pattern: '^app_'
                         name:
                             type: string
                         alias:
@@ -20455,6 +20661,8 @@ components:
                             properties:
                                 id:
                                     type: string
+                                    # Public serializers always emit this resource with the sk_ type prefix.
+                                    pattern: '^sk_'
                                 token_type:
                                     type: string
                                 issued_at:
@@ -20470,6 +20678,8 @@ components:
                             properties:
                                 id:
                                     type: string
+                                    # Public serializers always emit this resource with the apprel_ type prefix.
+                                    pattern: '^apprel_'
                                 kind:
                                     type: string
                                     enum:
@@ -20482,6 +20692,8 @@ components:
                                     properties:
                                         id:
                                             type: string
+                                            # Public serializers always emit this resource with the app_ type prefix.
+                                            pattern: '^app_'
                                         name:
                                             type: string
                                         alias:
@@ -20516,6 +20728,8 @@ components:
                     properties:
                         id:
                             type: string
+                            # Public serializers always emit this resource with the app_ type prefix.
+                            pattern: '^app_'
                         name:
                             type: string
                         alias:
@@ -20551,6 +20765,8 @@ components:
                             properties:
                                 id:
                                     type: string
+                                    # Public serializers always emit this resource with the apprel_ type prefix.
+                                    pattern: '^apprel_'
                                 kind:
                                     type: string
                                     enum:
@@ -20563,6 +20779,8 @@ components:
                                     properties:
                                         id:
                                             type: string
+                                            # Public serializers always emit this resource with the app_ type prefix.
+                                            pattern: '^app_'
                                         name:
                                             type: string
                                         alias:
@@ -20615,6 +20833,8 @@ components:
                     properties:
                         id:
                             type: string
+                            # Public serializers always emit this resource with the app_ type prefix.
+                            pattern: '^app_'
                         name:
                             type: string
                         alias:
