@@ -44,6 +44,10 @@ const errors = [
   ...compareOperationCoverage(operations, insomniaRequests, "Insomnia", true),
   ...compareOperationCoverage(operations, postmanRequests, "Postman", false),
   ...validatePublicCheckoutOperations(operations),
+  ...validateOperationSchemaRoots(operations),
+  ...validateRequestBodyRequiredness(operations),
+  ...validateSchemaContracts(spec),
+  ...validateDiscriminatedUnions(spec),
   ...validateSuccessResponseSchemas(spec, operations),
   ...validateRequestExamples(spec, operations, insomniaRequests),
   ...validateRequestExamples(spec, operations, postmanRequests),
@@ -390,6 +394,166 @@ function validatePublicCheckoutOperations(operations) {
   return errors;
 }
 
+function validateOperationSchemaRoots(operations) {
+  const errors = [];
+
+  for (const { key, operation } of operations.values()) {
+    const requestSchema =
+      operation.requestBody?.content?.["application/json"]?.schema;
+    if (requestSchema && !requestSchema.$ref) {
+      errors.push(
+        `${key} JSON request schema must reference a named component`,
+      );
+    }
+
+    for (const [status, inputResponse] of Object.entries(
+      operation.responses ?? {},
+    )) {
+      if (inputResponse.$ref) {
+        continue;
+      }
+      const responseSchema =
+        inputResponse.content?.["application/json"]?.schema;
+      if (responseSchema && !responseSchema.$ref) {
+        errors.push(
+          `${key} ${status} JSON response schema must reference a named component`,
+        );
+      }
+    }
+  }
+
+  return errors;
+}
+
+function validateRequestBodyRequiredness(operations) {
+  const errors = [];
+
+  for (const { key, operation } of operations.values()) {
+    if (operation.requestBody && operation.requestBody.required !== true) {
+      errors.push(
+        `${key} request body must declare required: true; omit requestBody entirely for a bodyless operation`,
+      );
+    }
+  }
+
+  return errors;
+}
+
+function validateSchemaContracts(document) {
+  const errors = [];
+
+  for (const [name, schema] of Object.entries(
+    document.components?.schemas ?? {},
+  )) {
+    validateSchemaContract(schema, `components.schemas.${name}`, errors);
+  }
+
+  return errors;
+}
+
+function validateDiscriminatedUnions(document) {
+  const errors = [];
+
+  for (const [name, schema] of Object.entries(
+    document.components?.schemas ?? {},
+  )) {
+    if (!schema.discriminator) {
+      continue;
+    }
+
+    const location = `components.schemas.${name}`;
+    const branches = schema.oneOf ?? schema.anyOf ?? [];
+    const propertyName = schema.discriminator.propertyName;
+    const mapping = schema.discriminator.mapping;
+    if (branches.length === 0) {
+      errors.push(`${location} discriminator requires oneOf or anyOf branches`);
+      continue;
+    }
+    if (!isPlainObject(mapping) || Object.keys(mapping).length === 0) {
+      errors.push(`${location} discriminator must declare an explicit mapping`);
+    }
+
+    for (const [index, branch] of branches.entries()) {
+      if (!branch.$ref) {
+        errors.push(
+          `${location}.${schema.oneOf ? "oneOf" : "anyOf"}[${index}] must reference a named component`,
+        );
+        continue;
+      }
+      const materialized = materializeSchema(branch, document);
+      if (!(materialized.required ?? []).includes(propertyName)) {
+        errors.push(
+          `${branch.$ref} must require discriminator property ${propertyName}`,
+        );
+      }
+    }
+  }
+
+  return errors;
+}
+
+function validateSchemaContract(schema, location, errors, partial = false) {
+  if (!isPlainObject(schema)) {
+    return;
+  }
+
+  if (schema.$ref && Object.keys(schema).length > 1) {
+    errors.push(
+      `${location} uses sibling keywords beside $ref; wrap the reference in allOf`,
+    );
+  }
+
+  const isObjectSchema = schema.type === "object" || schema.properties;
+  const isComposedSchema = schema.allOf || schema.oneOf || schema.anyOf;
+  if (
+    isObjectSchema &&
+    !isComposedSchema &&
+    !partial &&
+    !Object.hasOwn(schema, "additionalProperties")
+  ) {
+    errors.push(
+      `${location} must declare additionalProperties explicitly`,
+    );
+  }
+
+  if (schema.required && !partial) {
+    for (const propertyName of schema.required) {
+      if (!Object.hasOwn(schema.properties ?? {}, propertyName)) {
+        errors.push(
+          `${location} requires undocumented property ${propertyName}`,
+        );
+      }
+    }
+  }
+
+  for (const [name, property] of Object.entries(schema.properties ?? {})) {
+    validateSchemaContract(property, `${location}.properties.${name}`, errors);
+  }
+  if (isPlainObject(schema.items)) {
+    validateSchemaContract(schema.items, `${location}.items`, errors);
+  }
+  if (isPlainObject(schema.additionalProperties)) {
+    validateSchemaContract(
+      schema.additionalProperties,
+      `${location}.additionalProperties`,
+      errors,
+    );
+  }
+  for (const keyword of ["allOf", "oneOf", "anyOf"]) {
+    for (const [index, branch] of (schema[keyword] ?? []).entries()) {
+      validateSchemaContract(
+        branch,
+        `${location}.${keyword}[${index}]`,
+        errors,
+        true,
+      );
+    }
+  }
+  if (isPlainObject(schema.not)) {
+    validateSchemaContract(schema.not, `${location}.not`, errors, true);
+  }
+}
+
 function validateSuccessResponseSchemas(document, operations) {
   const errors = [];
 
@@ -415,9 +579,18 @@ function validateSuccessResponseSchemas(document, operations) {
           `${key} ${status} success schema exposes a top-level error; use a success-only schema and a status-specific error response`,
         );
       }
+      if (
+        Object.keys(schema.properties ?? {}).length > 0 &&
+        !schema.oneOf &&
+        !schema.anyOf &&
+        (schema.required?.length ?? 0) === 0
+      ) {
+        errors.push(
+          `${key} ${status} success schema must require its response resource`,
+      );
+      }
     }
   }
-
   return errors;
 }
 
@@ -492,13 +665,39 @@ function validateExample(value, inputSchema, document, location) {
   if (value === null && schema.nullable) {
     return [];
   }
+  if (typeof value === "string" && /\{\{[^}]+\}\}/.test(value)) {
+    return [];
+  }
 
-  if (schema.oneOf?.length || schema.anyOf?.length) {
-    const branches = schema.oneOf ?? schema.anyOf;
+  if (schema.oneOf?.length) {
     const base = { ...schema };
     delete base.oneOf;
+    const branchErrors = schema.oneOf.map((branch) =>
+      validateExample(
+        value,
+        mergeSchemas(base, materializeSchema(branch, document)),
+        document,
+        location,
+      ),
+    );
+    const matchingBranches = branchErrors.filter(
+      (candidate) => candidate.length === 0,
+    ).length;
+    if (matchingBranches === 1) {
+      return [];
+    }
+    if (matchingBranches > 1) {
+      return [`${location} matches more than one oneOf schema variant`];
+    }
+    return [
+      `${location} does not match any documented schema variant (${branchErrors[0].join("; ")})`,
+    ];
+  }
+
+  if (schema.anyOf?.length) {
+    const base = { ...schema };
     delete base.anyOf;
-    const branchErrors = branches.map((branch) =>
+    const branchErrors = schema.anyOf.map((branch) =>
       validateExample(
         value,
         mergeSchemas(base, materializeSchema(branch, document)),
@@ -514,6 +713,27 @@ function validateExample(value, inputSchema, document, location) {
     ];
   }
 
+  if (schema.not) {
+    const prohibitedErrors = validateExample(
+      value,
+      schema.not,
+      document,
+      location,
+    );
+    if (prohibitedErrors.length === 0) {
+      return [`${location} matches a prohibited schema`];
+    }
+  }
+
+  if (
+    schema.enum?.length &&
+    !schema.enum.some((candidate) =>
+      valuesEqual(candidate, value),
+    )
+  ) {
+    return [`${location} must be one of ${schema.enum.join(", ")}`];
+  }
+
   const expectedType = schema.type ?? inferType(schema);
   if (expectedType === "object") {
     if (!isPlainObject(value)) {
@@ -521,6 +741,23 @@ function validateExample(value, inputSchema, document, location) {
     }
 
     const errors = [];
+    const propertyCount = Object.keys(value).length;
+    if (
+      typeof schema.minProperties === "number" &&
+      propertyCount < schema.minProperties
+    ) {
+      errors.push(
+        `${location} must contain at least ${schema.minProperties} properties`,
+      );
+    }
+    if (
+      typeof schema.maxProperties === "number" &&
+      propertyCount > schema.maxProperties
+    ) {
+      errors.push(
+        `${location} must contain at most ${schema.maxProperties} properties`,
+      );
+    }
     for (const requiredName of schema.required ?? []) {
       if (!(requiredName in value)) {
         errors.push(`${location}.${requiredName} is required by OpenAPI`);
@@ -547,7 +784,7 @@ function validateExample(value, inputSchema, document, location) {
             `${location}.${name}`,
           ),
         );
-      } else if (schema.properties) {
+      } else if (schema.additionalProperties === false) {
         errors.push(`${location}.${name} is not documented by OpenAPI`);
       }
     }
@@ -558,11 +795,25 @@ function validateExample(value, inputSchema, document, location) {
     if (!Array.isArray(value)) {
       return [`${location} must be an array`];
     }
-    return value.flatMap((item, index) =>
+    const errors = [];
+    if (typeof schema.minItems === "number" && value.length < schema.minItems) {
+      errors.push(`${location} must contain at least ${schema.minItems} items`);
+    }
+    if (typeof schema.maxItems === "number" && value.length > schema.maxItems) {
+      errors.push(`${location} must contain at most ${schema.maxItems} items`);
+    }
+    if (
+      schema.uniqueItems &&
+      new Set(value.map(stableValueKey)).size !== value.length
+    ) {
+      errors.push(`${location} must contain unique items`);
+    }
+    errors.push(...value.flatMap((item, index) =>
       schema.items
         ? validateExample(item, schema.items, document, `${location}[${index}]`)
         : [],
-    );
+    ));
+    return errors;
   }
 
   if (expectedType === "integer" && !Number.isInteger(value)) {
@@ -571,14 +822,79 @@ function validateExample(value, inputSchema, document, location) {
   if (expectedType === "number" && typeof value !== "number") {
     return [`${location} must be a number`];
   }
-  if (expectedType === "string" && typeof value !== "string") {
-    return [`${location} must be a string`];
+  if (expectedType === "integer" || expectedType === "number") {
+    const errors = [];
+    if (
+      typeof schema.minimum === "number" &&
+      (schema.exclusiveMinimum
+        ? value <= schema.minimum
+        : value < schema.minimum)
+    ) {
+      errors.push(
+        `${location} must be ${schema.exclusiveMinimum ? "greater than" : "at least"} ${schema.minimum}`,
+      );
+    }
+    if (
+      typeof schema.maximum === "number" &&
+      (schema.exclusiveMaximum
+        ? value >= schema.maximum
+        : value > schema.maximum)
+    ) {
+      errors.push(
+        `${location} must be ${schema.exclusiveMaximum ? "less than" : "at most"} ${schema.maximum}`,
+      );
+    }
+    if (
+      typeof schema.multipleOf === "number" &&
+      Math.abs(value / schema.multipleOf - Math.round(value / schema.multipleOf)) >
+        Number.EPSILON
+    ) {
+      errors.push(`${location} must be a multiple of ${schema.multipleOf}`);
+    }
+    return errors;
+  }
+  if (expectedType === "string") {
+    if (typeof value !== "string") {
+      return [`${location} must be a string`];
+    }
+    const errors = [];
+    if (typeof schema.minLength === "number" && value.length < schema.minLength) {
+      errors.push(
+        `${location} must contain at least ${schema.minLength} characters`,
+      );
+    }
+    if (typeof schema.maxLength === "number" && value.length > schema.maxLength) {
+      errors.push(
+        `${location} must contain at most ${schema.maxLength} characters`,
+      );
+    }
+    if (schema.pattern && !new RegExp(schema.pattern).test(value)) {
+      errors.push(`${location} must match ${schema.pattern}`);
+    }
+    return errors;
   }
   if (expectedType === "boolean" && typeof value !== "boolean") {
     return [`${location} must be a boolean`];
   }
 
   return [];
+}
+
+function stableValueKey(value) {
+  if (!isPlainObject(value)) {
+    return JSON.stringify(value);
+  }
+  return JSON.stringify(
+    Object.fromEntries(
+      Object.entries(value)
+        .sort(([left], [right]) => left.localeCompare(right))
+        .map(([key, child]) => [key, stableValueKey(child)]),
+    ),
+  );
+}
+
+function valuesEqual(left, right) {
+  return stableValueKey(left) === stableValueKey(right);
 }
 
 function materializeSchema(inputSchema, document, seen = new Set()) {

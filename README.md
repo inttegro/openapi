@@ -25,7 +25,7 @@ Import `commerce.yml` into any OpenAPI 3.0-compatible client, generator, or vali
 Validate the specification with:
 
 ```sh
-npx --yes @redocly/cli@latest lint commerce.yml
+npm run lint:openapi
 ```
 
 ## Use the Insomnia collections
