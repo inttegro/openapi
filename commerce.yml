@@ -9180,6 +9180,7 @@ components:
                 - issued_at
                 - status
                 - active
+            # Keep key usability, status, and lifecycle timestamps from contradicting one another.
             x-simile-constraints:
                 - ordered:
                       paths: [/issued_at, /updated_at]
@@ -9187,6 +9188,24 @@ components:
                       paths: [/issued_at, /revoked_at]
                 - ordered:
                       paths: [/issued_at, /last_used_at]
+                - implies:
+                      when: { path: /status, equals: active }
+                      then:
+                          all:
+                              - { path: /active, equals: true }
+                              - { path: /revoked_at, state: absent }
+                - implies:
+                      when: { path: /status, equals: revoked }
+                      then:
+                          all:
+                              - { path: /active, equals: false }
+                              - { path: /revoked_at, state: non-null }
+                - implies:
+                      when: { path: /status, equals: expired }
+                      then:
+                          all:
+                              - { path: /active, equals: false }
+                              - { path: /revoked_at, state: absent }
             properties:
                 id:
                     type: string
@@ -9738,6 +9757,7 @@ components:
             additionalProperties: false
             description: Public file link metadata. Token hashes and provider URLs are not exposed.
             required: [access, active, created_at, created_by, delivery, expires_at, file_id, id, kind, purpose, status, updated_at]
+            # A capability link must not look usable after its public lifecycle says otherwise.
             x-simile-constraints:
                 - ordered:
                       paths: [/created_at, /updated_at]
@@ -9745,6 +9765,28 @@ components:
                       paths: [/created_at, /expires_at]
                 - ordered:
                       paths: [/created_at, /revoked_at]
+                - implies:
+                      when: { path: /status, equals: active }
+                      then:
+                          all:
+                              - { path: /active, equals: true }
+                              - { path: /revoked_at, state: absent }
+                - implies:
+                      when: { path: /status, equals: revoked }
+                      then:
+                          all:
+                              - { path: /active, equals: false }
+                              - { path: /revoked_at, state: non-null }
+                - implies:
+                      when: { path: /status, equals: expired }
+                      then:
+                          all:
+                              - { path: /active, equals: false }
+                - implies:
+                      when: { path: /status, equals: disabled }
+                      then:
+                          all:
+                              - { path: /active, equals: false }
             properties:
                 id:
                     type: string
@@ -10065,6 +10107,7 @@ components:
             additionalProperties: false
             description: Public upload request metadata. Token hashes are not exposed.
             required: [active, attempts, constraints, created_at, display, expires_at, id, purpose, recipient, requester, resource, status, subject, updated_at]
+            # Status, activity, terminal timestamps, and the resulting file must describe one lifecycle.
             x-simile-constraints:
                 - ordered:
                       paths: [/created_at, /updated_at]
@@ -10076,6 +10119,56 @@ components:
                       paths: [/created_at, /expired_at, /updated_at]
                 - ordered:
                       paths: [/created_at, /canceled_at, /updated_at]
+                - implies:
+                      when: { path: /status, equals: pending }
+                      then:
+                          all:
+                              - { path: /active, equals: true }
+                              - { path: /fulfilled_at, state: absent }
+                              - { path: /expired_at, state: absent }
+                              - { path: /canceled_at, state: absent }
+                - implies:
+                      when: { path: /status, equals: uploading }
+                      then:
+                          all:
+                              - { path: /active, equals: true }
+                              - { path: /uploading_at, state: non-null }
+                              - { path: /fulfilled_at, state: absent }
+                              - { path: /expired_at, state: absent }
+                              - { path: /canceled_at, state: absent }
+                - implies:
+                      when: { path: /status, equals: fulfilled }
+                      then:
+                          all:
+                              - { path: /active, equals: false }
+                              - { path: /file_id, state: non-null }
+                              - { path: /fulfilled_at, state: non-null }
+                              - { path: /expired_at, state: absent }
+                              - { path: /canceled_at, state: absent }
+                - implies:
+                      when: { path: /status, equals: expired }
+                      then:
+                          all:
+                              - { path: /active, equals: false }
+                              - { path: /fulfilled_at, state: absent }
+                              - { path: /expired_at, state: non-null }
+                              - { path: /canceled_at, state: absent }
+                - implies:
+                      when: { path: /status, equals: canceled }
+                      then:
+                          all:
+                              - { path: /active, equals: false }
+                              - { path: /fulfilled_at, state: absent }
+                              - { path: /expired_at, state: absent }
+                              - { path: /canceled_at, state: non-null }
+                - implies:
+                      when: { path: /status, equals: failed }
+                      then:
+                          all:
+                              - { path: /active, equals: false }
+                              - { path: /fulfilled_at, state: absent }
+                              - { path: /expired_at, state: absent }
+                              - { path: /canceled_at, state: absent }
             properties:
                 id:
                     type: string
@@ -12206,11 +12299,33 @@ components:
                 - quantity
                 - status
                 - usage
+            # Effective Buy-link status is derived from these persisted lifecycle facts.
             x-simile-constraints:
                 - ordered:
                       paths: [/created_at, /updated_at]
                 - ordered:
                       paths: [/created_at, /inactive_at]
+                - implies:
+                      when: { path: /status, equals: active }
+                      then:
+                          all:
+                              - { path: /inactive_at, state: absent }
+                - implies:
+                      when: { path: /status, equals: inactive }
+                      then:
+                          all:
+                              - { path: /inactive_at, state: non-null }
+                - implies:
+                      when: { path: /status, equals: used }
+                      then:
+                          all:
+                              - { path: /inactive_at, state: absent }
+                - implies:
+                      when: { path: /status, equals: expired }
+                      then:
+                          all:
+                              - { path: /expires_at, state: non-null }
+                              - { path: /inactive_at, state: absent }
             properties:
                 allow_variants:
                     type: boolean
@@ -12308,9 +12423,21 @@ components:
                 - name
                 - active
                 - created_at
+            # Published products require publication evidence and archived products cannot remain active.
             x-simile-constraints:
                 - ordered:
                       paths: [/created_at, /published_at, /updated_at, /archived_at]
+                - implies:
+                      when: { path: /active, equals: true }
+                      then:
+                          all:
+                              - { path: /published_at, state: non-null }
+                              - { path: /archived_at, state: null-or-absent }
+                - implies:
+                      when: { path: /archived_at, state: non-null }
+                      then:
+                          all:
+                              - { path: /active, equals: false }
             properties:
                 id:
                     type: string
@@ -12399,9 +12526,16 @@ components:
                 - name
                 - active
                 - created_at
+            # Embedded product projections must preserve the product publication lifecycle.
             x-simile-constraints:
                 - ordered:
                       paths: [/created_at, /published_at, /updated_at, /archived_at]
+                - implies:
+                      when: { path: /active, equals: true }
+                      then:
+                          all:
+                              - { path: /published_at, state: non-null }
+                              - { path: /archived_at, state: null-or-absent }
             properties:
                 id:
                     type: string
@@ -12631,11 +12765,17 @@ components:
             type: object
             additionalProperties: false
             required: [id, active, type, created_at, fixed_amount]
+            # An active catalog price cannot simultaneously carry archive state.
             x-simile-constraints:
                 - ordered:
                       paths: [/created_at, /updated_at]
                 - ordered:
                       paths: [/created_at, /archived_at]
+                - implies:
+                      when: { path: /active, equals: true }
+                      then:
+                          all:
+                              - { path: /archived_at, state: null-or-absent }
             properties:
                 id:
                     type: string
@@ -12701,11 +12841,17 @@ components:
             type: object
             additionalProperties: false
             required: [id, active, type, created_at, customer_selected_amount]
+            # Customer-selected prices follow the same active-versus-archived contract as fixed prices.
             x-simile-constraints:
                 - ordered:
                       paths: [/created_at, /updated_at]
                 - ordered:
                       paths: [/created_at, /archived_at]
+                - implies:
+                      when: { path: /active, equals: true }
+                      then:
+                          all:
+                              - { path: /archived_at, state: null-or-absent }
             properties:
                 id:
                     type: string
@@ -13636,9 +13782,27 @@ components:
                 - has_unpublished_changes
                 - created_at
                 - updated_at
+            # Template status must agree with the publication and archive evidence returned to callers.
             x-simile-constraints:
                 - ordered:
                       paths: [/created_at, /published_at, /updated_at, /archived_at]
+                - implies:
+                      when: { path: /status, equals: draft }
+                      then:
+                          all:
+                              - { path: /published_at, state: absent }
+                              - { path: /archived_at, state: absent }
+                - implies:
+                      when: { path: /status, equals: published }
+                      then:
+                          all:
+                              - { path: /published_at, state: non-null }
+                              - { path: /archived_at, state: absent }
+                - implies:
+                      when: { path: /status, equals: archived }
+                      then:
+                          all:
+                              - { path: /archived_at, state: non-null }
             properties:
                 id:
                     type: string
@@ -15516,6 +15680,7 @@ components:
                               type: string
                               enum: [custom]
                           reason_details: {}
+            # Refund timestamps and failure metadata form a mutually exclusive public state machine.
             x-simile-constraints:
                 - ordered:
                       paths: [/created_at, /processing_at, /succeeded_at]
@@ -15523,6 +15688,49 @@ components:
                       paths: [/created_at, /processing_at, /failed_at]
                 - ordered:
                       paths: [/created_at, /canceled_at]
+                - implies:
+                      when: { path: /status, equals: pending }
+                      then:
+                          all:
+                              - { path: /processing_at, state: absent }
+                              - { path: /succeeded_at, state: absent }
+                              - { path: /failed_at, state: absent }
+                              - { path: /canceled_at, state: absent }
+                              - { path: /failure, state: absent }
+                - implies:
+                      when: { path: /status, equals: processing }
+                      then:
+                          all:
+                              - { path: /processing_at, state: non-null }
+                              - { path: /succeeded_at, state: absent }
+                              - { path: /failed_at, state: absent }
+                              - { path: /canceled_at, state: absent }
+                              - { path: /failure, state: absent }
+                - implies:
+                      when: { path: /status, equals: succeeded }
+                      then:
+                          all:
+                              - { path: /succeeded_at, state: non-null }
+                              - { path: /failed_at, state: absent }
+                              - { path: /canceled_at, state: absent }
+                              - { path: /failure, state: absent }
+                - implies:
+                      when: { path: /status, equals: failed }
+                      then:
+                          all:
+                              - { path: /succeeded_at, state: absent }
+                              - { path: /failed_at, state: non-null }
+                              - { path: /canceled_at, state: absent }
+                              - { path: /failure, state: non-null }
+                - implies:
+                      when: { path: /status, equals: canceled }
+                      then:
+                          all:
+                              - { path: /processing_at, state: absent }
+                              - { path: /succeeded_at, state: absent }
+                              - { path: /failed_at, state: absent }
+                              - { path: /canceled_at, state: non-null }
+                              - { path: /failure, state: absent }
             properties:
                 cancel_reason:
                     type: string
@@ -15700,9 +15908,25 @@ components:
             type: object
             additionalProperties: false
             required: [created_at, id, status, type, updated_at]
+            # Completion is the only allocation state that may expose a completion timestamp.
             x-simile-constraints:
                 - ordered:
                       paths: [/created_at, /completed_at, /updated_at]
+                - implies:
+                      when: { path: /status, equals: pending }
+                      then:
+                          all:
+                              - { path: /completed_at, state: absent }
+                - implies:
+                      when: { path: /status, equals: completed }
+                      then:
+                          all:
+                              - { path: /completed_at, state: non-null }
+                - implies:
+                      when: { path: /completed_at, state: non-null }
+                      then:
+                          all:
+                              - { path: /status, equals: completed }
             properties:
                 completed_at:
                     type: string
@@ -16627,6 +16851,7 @@ components:
                 - initiated_at
                 - max_amount
                 - status
+            # Payout status, terminal evidence, and caller-safe explanations must stay synchronized.
             x-simile-constraints:
                 - ordered:
                       paths: [/initiated_at, /scheduled_at, /sent_at, /succeeded_at]
@@ -16634,6 +16859,67 @@ components:
                       paths: [/initiated_at, /scheduled_at, /sent_at, /failed_at]
                 - ordered:
                       paths: [/initiated_at, /scheduled_at, /canceled_at]
+                - implies:
+                      when: { path: /status, equals: initialized }
+                      then:
+                          all:
+                              - { path: /scheduled_at, state: absent }
+                              - { path: /sent_at, state: absent }
+                              - { path: /succeeded_at, state: absent }
+                              - { path: /failed_at, state: absent }
+                              - { path: /canceled_at, state: absent }
+                - implies:
+                      when: { path: /status, equals: scheduled }
+                      then:
+                          all:
+                              - { path: /scheduled_at, state: non-null }
+                              - { path: /sent_at, state: absent }
+                              - { path: /succeeded_at, state: absent }
+                              - { path: /failed_at, state: absent }
+                              - { path: /canceled_at, state: absent }
+                - implies:
+                      when: { path: /status, equals: executing }
+                      then:
+                          all:
+                              - { path: /sent_at, state: absent }
+                              - { path: /succeeded_at, state: absent }
+                              - { path: /failed_at, state: absent }
+                              - { path: /canceled_at, state: absent }
+                - implies:
+                      when: { path: /status, equals: processing }
+                      then:
+                          all:
+                              - { path: /sent_at, state: non-null }
+                              - { path: /succeeded_at, state: absent }
+                              - { path: /failed_at, state: absent }
+                              - { path: /canceled_at, state: absent }
+                - implies:
+                      when: { path: /status, equals: succeeded }
+                      then:
+                          all:
+                              - { path: /succeeded_at, state: non-null }
+                              - { path: /failed_at, state: absent }
+                              - { path: /canceled_at, state: absent }
+                              - { path: /failure, state: absent }
+                              - { path: /cancellation, state: absent }
+                - implies:
+                      when: { path: /status, equals: failed }
+                      then:
+                          all:
+                              - { path: /succeeded_at, state: absent }
+                              - { path: /failed_at, state: non-null }
+                              - { path: /canceled_at, state: absent }
+                              - { path: /failure, state: non-null }
+                              - { path: /cancellation, state: absent }
+                - implies:
+                      when: { path: /status, equals: canceled }
+                      then:
+                          all:
+                              - { path: /succeeded_at, state: absent }
+                              - { path: /failed_at, state: absent }
+                              - { path: /canceled_at, state: non-null }
+                              - { path: /failure, state: absent }
+                              - { path: /cancellation, state: non-null }
             properties:
                 amount:
                     $ref: '#/components/schemas/Amount'
@@ -16890,6 +17176,7 @@ components:
             required:
                 - min
                 - max
+            # The advertised inclusive range is usable only when its lower bound does not exceed its upper bound.
             x-simile-constraints:
                 - ordered:
                       paths: [/min/value, /max/value]
@@ -17969,11 +18256,38 @@ components:
             type: object
             additionalProperties: false
             required: [address, created_at, gateway, id, initialized_at, mechanism, status]
+            # Delivery status must be backed by the corresponding mutually exclusive transmission evidence.
             x-simile-constraints:
                 - ordered:
                       paths: [/created_at, /initialized_at, /sent_at, /delivered_at]
                 - ordered:
                       paths: [/created_at, /initialized_at, /sent_at, /failed_at]
+                - implies:
+                      when: { path: /status, equals: initialized }
+                      then:
+                          all:
+                              - { path: /sent_at, state: absent }
+                              - { path: /delivered_at, state: absent }
+                              - { path: /failed_at, state: absent }
+                - implies:
+                      when: { path: /status, equals: sent }
+                      then:
+                          all:
+                              - { path: /sent_at, state: non-null }
+                              - { path: /delivered_at, state: absent }
+                              - { path: /failed_at, state: absent }
+                - implies:
+                      when: { path: /status, equals: delivered }
+                      then:
+                          all:
+                              - { path: /delivered_at, state: non-null }
+                              - { path: /failed_at, state: absent }
+                - implies:
+                      when: { path: /status, equals: failed }
+                      then:
+                          all:
+                              - { path: /delivered_at, state: absent }
+                              - { path: /failed_at, state: non-null }
             properties:
                 address:
                     type: string
@@ -18282,6 +18596,7 @@ components:
             type: object
             additionalProperties: false
             required: [created_at, full_message, id, send_after, sender_id]
+            # Scheduling and execution timestamps must follow the public delivery sequence.
             x-simile-constraints:
                 - ordered:
                       paths: [/created_at, /send_after, /executed_at]
@@ -18347,6 +18662,7 @@ components:
             type: object
             additionalProperties: false
             required: [content, created_at, id, recipients, send_after, sender_id]
+            # Scheduling and execution timestamps must follow the public delivery sequence.
             x-simile-constraints:
                 - ordered:
                       paths: [/created_at, /send_after, /executed_at]
@@ -18530,6 +18846,7 @@ components:
             type: object
             additionalProperties: false
             required: [content, created_at, id, recipients, send_after, sender_id]
+            # Execution cannot precede creation; immediate broadcasts set send_after just before creation.
             x-simile-constraints:
                 - ordered:
                       paths: [/created_at, /executed_at]
@@ -18718,6 +19035,7 @@ components:
             additionalProperties: false
             description: OTP transaction object returned by initiate, verify, and lookup endpoints
             required: [expires_at, full_message, id, initiated_at, status]
+            # An OTP validity window must end at or after the transaction begins.
             x-simile-constraints:
                 - ordered:
                       paths: [/initiated_at, /expires_at]
