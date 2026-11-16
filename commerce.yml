@@ -3,8 +3,8 @@ openapi: 3.0.3
 info:
     title: Inttegro API
     description: Machine-readable reference for the public Inttegro API
-    version: 0.1.0-beta69
-    x-inttegro-collection-version: 0.1.0-beta69
+    version: 0.1.0-beta70
+    x-inttegro-collection-version: 0.1.0-beta70
     contact:
         name: Inttegro Engineering
         url: "https://inttegro.com"
@@ -7958,9 +7958,14 @@ components:
             in: header
             required: false
             schema:
-                type: string
+                $ref: '#/components/schemas/IdempotencyKeyValue'
             description: Stable key used to replay safe retries without applying the mutation twice.
     schemas:
+        IdempotencyKeyValue:
+            type: string
+            minLength: 1
+            maxLength: 255
+            description: Stable caller-chosen retry key.
         RequestPropertySelection:
             type: object
             additionalProperties: false
@@ -8433,21 +8438,38 @@ components:
                 - $ref: '#/components/schemas/OperatingPolicySelectionByID'
                 - $ref: '#/components/schemas/InlineOperatingPolicySelection'
         OperatingPolicySource:
+            oneOf:
+                - $ref: '#/components/schemas/InlineOperatingPolicySource'
+                - $ref: '#/components/schemas/TemplateOperatingPolicySource'
+            discriminator:
+                propertyName: type
+                mapping:
+                    inline: '#/components/schemas/InlineOperatingPolicySource'
+                    template: '#/components/schemas/TemplateOperatingPolicySource'
+        InlineOperatingPolicySource:
             type: object
             additionalProperties: false
             required: [type]
             properties:
                 type:
                     type: string
-                    enum: [inline, template]
+                    enum: [inline]
+        TemplateOperatingPolicySource:
+            type: object
+            additionalProperties: false
+            required: [type, id, version]
+            properties:
+                type:
+                    type: string
+                    enum: [template]
                 id:
                     type: string
                     pattern: '^op_'
-                    description: Template identifier when `type` is `template`.
+                    description: Template identifier.
                 version:
                     type: integer
                     minimum: 1
-                    description: Template version when `type` is `template`.
+                    description: Template version.
         ApplicationOperatingPolicy:
             type: object
             additionalProperties: false
@@ -8646,6 +8668,10 @@ components:
                     maxLength: 8192
                     description: Opaque continuation value returned as `next_cursor` by the preceding page.
         ResourceSearchFilter:
+            oneOf:
+                - $ref: '#/components/schemas/ResourceSearchEqualsFilter'
+                - $ref: '#/components/schemas/ResourceSearchInFilter'
+        ResourceSearchEqualsFilter:
             type: object
             additionalProperties: false
             required: [field, operator, values]
@@ -8655,8 +8681,29 @@ components:
                     description: Unqualified route-local field name documented by the selected endpoint.
                 operator:
                     type: string
-                    enum: [eq, in]
-                    description: "`eq` requires exactly one value; `in` matches any supplied value."
+                    enum: [eq]
+                    description: Exact equality comparison.
+                values:
+                    type: array
+                    minItems: 1
+                    maxItems: 1
+                    uniqueItems: true
+                    items:
+                        type: string
+                        minLength: 1
+                        maxLength: 256
+        ResourceSearchInFilter:
+            type: object
+            additionalProperties: false
+            required: [field, operator, values]
+            properties:
+                field:
+                    type: string
+                    description: Unqualified route-local field name documented by the selected endpoint.
+                operator:
+                    type: string
+                    enum: [in]
+                    description: Matches any supplied value.
                 values:
                     type: array
                     minItems: 1
@@ -8680,18 +8727,34 @@ components:
                     maximum: 50
                     default: 10
         ResourceSearchSort:
+            oneOf:
+                - $ref: '#/components/schemas/ResourceSearchRelevanceSort'
+                - $ref: '#/components/schemas/ResourceSearchChronologicalSort'
+        ResourceSearchRelevanceSort:
             type: object
             additionalProperties: false
             required: [field, direction]
             properties:
                 field:
                     type: string
-                    enum: [relevance, updated_at, published_at]
+                    enum: [relevance]
+                    description: Sort by search relevance.
+                direction:
+                    type: string
+                    enum: [desc]
+                    description: Relevance is always sorted in descending order.
+        ResourceSearchChronologicalSort:
+            type: object
+            additionalProperties: false
+            required: [field, direction]
+            properties:
+                field:
+                    type: string
+                    enum: [updated_at, published_at]
                     description: "`published_at` is supported only by product search."
                 direction:
                     type: string
                     enum: [asc, desc]
-                    description: Relevance supports descending order only.
         ResourceSearchResponse:
             type: object
             additionalProperties: false
@@ -9117,6 +9180,13 @@ components:
                 - issued_at
                 - status
                 - active
+            x-simile-constraints:
+                - ordered:
+                      paths: [/issued_at, /updated_at]
+                - ordered:
+                      paths: [/issued_at, /revoked_at]
+                - ordered:
+                      paths: [/issued_at, /last_used_at]
             properties:
                 id:
                     type: string
@@ -9668,6 +9738,13 @@ components:
             additionalProperties: false
             description: Public file link metadata. Token hashes and provider URLs are not exposed.
             required: [access, active, created_at, created_by, delivery, expires_at, file_id, id, kind, purpose, status, updated_at]
+            x-simile-constraints:
+                - ordered:
+                      paths: [/created_at, /updated_at]
+                - ordered:
+                      paths: [/created_at, /expires_at]
+                - ordered:
+                      paths: [/created_at, /revoked_at]
             properties:
                 id:
                     type: string
@@ -9988,6 +10065,17 @@ components:
             additionalProperties: false
             description: Public upload request metadata. Token hashes are not exposed.
             required: [active, attempts, constraints, created_at, display, expires_at, id, purpose, recipient, requester, resource, status, subject, updated_at]
+            x-simile-constraints:
+                - ordered:
+                      paths: [/created_at, /updated_at]
+                - ordered:
+                      paths: [/created_at, /expires_at]
+                - ordered:
+                      paths: [/created_at, /uploading_at, /fulfilled_at, /updated_at]
+                - ordered:
+                      paths: [/created_at, /expired_at, /updated_at]
+                - ordered:
+                      paths: [/created_at, /canceled_at, /updated_at]
             properties:
                 id:
                     type: string
@@ -10475,13 +10563,28 @@ components:
             required:
                 - customer_data
                 - line_items
+            allOf:
+                - not:
+                      required: [statement_descriptor, statement_descriptor_prefix]
+                      properties:
+                          statement_descriptor: {}
+                          statement_descriptor_prefix: {}
             properties:
                 customer_data:
                     $ref: '#/components/schemas/CustomerData'
+                payment_method_types:
+                    type: array
+                    description: Payment method types the order may accept. Omit or send an empty array to use all supported types.
+                    items:
+                        $ref: '#/components/schemas/PaymentMethodType'
                 payment_method_data:
                     allOf:
                         - $ref: '#/components/schemas/PaymentMethodData'
                     description: New payment instrument details to use when executing payment for the order.
+                payment_due_after:
+                    type: string
+                    format: date-time
+                    description: Optional payment due time.
                 number:
                     type: string
                     description: Optional order number for reference. When omitted, Inttegro uses the generated order ID.
@@ -10494,6 +10597,7 @@ components:
                     type: string
                     description: Optional statement descriptor shown on the customer's bank statement
                     example: "STMTDESC"
+                    minLength: 3
                     maxLength: 22
                 statement_descriptor_prefix:
                     type: string
@@ -10501,6 +10605,7 @@ components:
                     example: "LINE"
                     minLength: 2
                     maxLength: 10
+                    pattern: '^[^*]+$'
                 execute_payment:
                     type: boolean
                     description: Whether to execute payment immediately after order creation
@@ -10515,7 +10620,8 @@ components:
                     description: Optional metadata controlling request processing
                     properties:
                         idempotency_key:
-                            type: string
+                            allOf:
+                                - $ref: '#/components/schemas/IdempotencyKeyValue'
                             description: Unique key to prevent duplicate order creation
                         response:
                             $ref: '#/components/schemas/RequestResponse'
@@ -10556,11 +10662,27 @@ components:
             required:
                 - customer_id
                 - line_items
+            allOf:
+                - not:
+                      required: [payment_method_id, payment_method_data]
+                      properties:
+                          payment_method_id: {}
+                          payment_method_data: {}
+                - not:
+                      required: [statement_descriptor, statement_descriptor_prefix]
+                      properties:
+                          statement_descriptor: {}
+                          statement_descriptor_prefix: {}
             properties:
                 customer_id:
                     type: string
                     description: ID of existing customer
                     example: "cu_dZjC0hAsYi2dObveagp6pJLoXvgmicoBQj8KuNOZ"
+                payment_method_types:
+                    type: array
+                    description: Payment method types the order may accept. Omit or send an empty array to use all supported types.
+                    items:
+                        $ref: '#/components/schemas/PaymentMethodType'
                 payment_method_id:
                     type: string
                     description: ID of saved payment method to use
@@ -10569,6 +10691,14 @@ components:
                     allOf:
                         - $ref: '#/components/schemas/PaymentMethodData'
                     description: New payment instrument details to use instead of a saved payment method.
+                payment_due_after:
+                    type: string
+                    format: date-time
+                    description: Optional payment due time.
+                number:
+                    type: string
+                    description: Optional order number for reference. When omitted, Inttegro uses the generated order ID.
+                    example: "ORDER-NUMBER-2"
                 receipt_number:
                     type: string
                     description: Optional receipt number for downstream reconciliation. Uses the same length rules as `number`.
@@ -10576,6 +10706,7 @@ components:
                 statement_descriptor:
                     type: string
                     description: Optional statement descriptor shown on the customer's bank statement
+                    minLength: 3
                     maxLength: 22
                 statement_descriptor_prefix:
                     type: string
@@ -10583,6 +10714,7 @@ components:
                     example: "LINE"
                     minLength: 2
                     maxLength: 10
+                    pattern: '^[^*]+$'
                 execute_payment:
                     type: boolean
                     description: Whether to execute payment immediately
@@ -10597,7 +10729,8 @@ components:
                     description: Optional metadata controlling request processing
                     properties:
                         idempotency_key:
-                            type: string
+                            allOf:
+                                - $ref: '#/components/schemas/IdempotencyKeyValue'
                             description: Unique key to prevent duplicate order creation
                         response:
                             $ref: '#/components/schemas/RequestResponse'
@@ -10670,10 +10803,9 @@ components:
         CustomerData:
             type: object
             additionalProperties: false
-            required:
-                - name
-                - email_address
-                - phone_number
+            anyOf:
+                - required: [email_address]
+                - required: [phone_number]
             properties:
                 name:
                     type: string
@@ -10688,9 +10820,6 @@ components:
                     type: string
                     description: Customer's phone number
                     example: "0559714200"
-                reference:
-                    type: string
-                    description: External reference ID for the customer
                 custom_data:
                     $ref: '#/components/schemas/CustomDataInput'
         CustomerAddressInput:
@@ -11953,18 +12082,28 @@ components:
                           description: Variant set configured for this Buy link
                           example: "pg_variantset123"
         PurchaseIntentUsage:
+            description: Exactly one of multi_use or single_use is returned as true. Order is present after a single-use intent is consumed.
+            oneOf:
+                - $ref: '#/components/schemas/PurchaseIntentMultiUseUsage'
+                - $ref: '#/components/schemas/PurchaseIntentSingleUseUsage'
+        PurchaseIntentMultiUseUsage:
             type: object
             additionalProperties: false
-            description: Exactly one of multi_use or single_use is returned as true. Order is present after a single-use intent is consumed.
+            required: [multi_use]
             properties:
                 multi_use:
                     type: boolean
-                    example: true
+                    enum: [true]
+        PurchaseIntentSingleUseUsage:
+            type: object
+            additionalProperties: false
+            required: [single_use]
+            properties:
                 order:
                     $ref: '#/components/schemas/PurchaseIntentUsageOrder'
                 single_use:
                     type: boolean
-                    example: true
+                    enum: [true]
         PurchaseIntentUsageOrder:
             type: object
             additionalProperties: false
@@ -12067,6 +12206,11 @@ components:
                 - quantity
                 - status
                 - usage
+            x-simile-constraints:
+                - ordered:
+                      paths: [/created_at, /updated_at]
+                - ordered:
+                      paths: [/created_at, /inactive_at]
             properties:
                 allow_variants:
                     type: boolean
@@ -12164,6 +12308,9 @@ components:
                 - name
                 - active
                 - created_at
+            x-simile-constraints:
+                - ordered:
+                      paths: [/created_at, /published_at, /updated_at, /archived_at]
             properties:
                 id:
                     type: string
@@ -12252,6 +12399,9 @@ components:
                 - name
                 - active
                 - created_at
+            x-simile-constraints:
+                - ordered:
+                      paths: [/created_at, /published_at, /updated_at, /archived_at]
             properties:
                 id:
                     type: string
@@ -12269,7 +12419,7 @@ components:
                     type: string
                     format: date-time
                     nullable: true
-                    description: Archive timestamp (if archived)
+                    description: Archive timestamp (if archived). A non-null value means `active` is false.
                     example: null
                 attributes:
                     type: array
@@ -12481,6 +12631,11 @@ components:
             type: object
             additionalProperties: false
             required: [id, active, type, created_at, fixed_amount]
+            x-simile-constraints:
+                - ordered:
+                      paths: [/created_at, /updated_at]
+                - ordered:
+                      paths: [/created_at, /archived_at]
             properties:
                 id:
                     type: string
@@ -12530,7 +12685,7 @@ components:
                     type: string
                     format: date-time
                     nullable: true
-                    description: Archive timestamp (if archived)
+                    description: Archive timestamp (if archived). A non-null value means `active` is false.
                     example: null
         CustomerSelectedCatalogPrice:
             allOf:
@@ -12546,6 +12701,11 @@ components:
             type: object
             additionalProperties: false
             required: [id, active, type, created_at, customer_selected_amount]
+            x-simile-constraints:
+                - ordered:
+                      paths: [/created_at, /updated_at]
+                - ordered:
+                      paths: [/created_at, /archived_at]
             properties:
                 id:
                     type: string
@@ -12595,7 +12755,7 @@ components:
                     type: string
                     format: date-time
                     nullable: true
-                    description: Archive timestamp (if archived)
+                    description: Archive timestamp (if archived). A non-null value means `active` is false.
                     example: null
         SuggestedAmountParams:
             type: object
@@ -13057,10 +13217,7 @@ components:
         BillingDetails:
             type: object
             additionalProperties: false
-            required:
-                - name
-                - email_address
-                - phone_number
+            required: [name]
             properties:
                 name:
                     type: string
@@ -13085,12 +13242,7 @@ components:
         Address:
             type: object
             additionalProperties: false
-            required:
-                - name
-                - phone_number
-                - line1
-                - town
-                - country
+            required: [country]
             properties:
                 name:
                     type: string
@@ -13108,7 +13260,7 @@ components:
                     type: string
                     description: Street address line 2 (optional)
                     example: "Behind Pantang"
-                town:
+                city:
                     type: string
                     description: City or town
                     example: "Accra"
@@ -13116,14 +13268,10 @@ components:
                     type: string
                     description: State, province, or region
                     example: "Greater Accra"
-                district:
-                    type: string
-                    description: District or area
-                    example: "Adenta"
                 country:
                     type: string
-                    description: Country name
-                    example: "Ghana"
+                    description: Country value recorded for the address.
+                    example: "GH"
                 post_code:
                     type: string
                     description: Postal/ZIP code
@@ -13335,7 +13483,8 @@ components:
             properties:
                 about:
                     type: string
-                default: {}
+                default:
+                    description: Default value used when this variable is omitted.
                 name:
                     type: string
                     pattern: "^[a-z][a-z0-9_]{0,63}$"
@@ -13351,7 +13500,8 @@ components:
             properties:
                 about:
                     type: string
-                default: {}
+                default:
+                    description: Default value used when this variable is omitted.
                 items:
                     type: array
                     items:
@@ -13370,7 +13520,8 @@ components:
             properties:
                 about:
                     type: string
-                default: {}
+                default:
+                    description: Default value used when this variable is omitted.
                 name:
                     type: string
                 required:
@@ -13485,6 +13636,9 @@ components:
                 - has_unpublished_changes
                 - created_at
                 - updated_at
+            x-simile-constraints:
+                - ordered:
+                      paths: [/created_at, /published_at, /updated_at, /archived_at]
             properties:
                 id:
                     type: string
@@ -13836,62 +13990,63 @@ components:
         CheckoutLookupRequest:
             oneOf:
                 - $ref: '#/components/schemas/CheckoutOrderReferenceRequest'
-                - type: object
-                  deprecated: true
-                  description: Legacy Purchase Intent amount selection. New integrations should use `/checkout/pay`.
-                  additionalProperties: false
-                  required:
-                      - purchase_intent_id
-                  properties:
-                      purchase_intent_id:
-                          type: string
-                          minLength: 1
-                          description: Purchase Intent whose customer-selected amount policy should be loaded.
-                          example: "sale_a1b2c3d4e5f6"
+                - $ref: '#/components/schemas/LegacyCheckoutPurchaseIntentLookupRequest'
+        LegacyCheckoutPurchaseIntentLookupRequest:
+            type: object
+            deprecated: true
+            description: Legacy Purchase Intent amount selection. New integrations should use `/checkout/pay`.
+            additionalProperties: false
+            required: [purchase_intent_id]
+            properties:
+                purchase_intent_id:
+                    type: string
+                    minLength: 1
+                    description: Purchase Intent whose customer-selected amount policy should be loaded.
+                    example: "sale_a1b2c3d4e5f6"
         CheckoutSelectAmountRequest:
             oneOf:
-                - type: object
-                  additionalProperties: false
-                  required:
-                      - purchase_intent_id
-                      - selected_amount
-                  properties:
-                      purchase_intent_id:
-                          type: string
-                          minLength: 1
-                          description: Purchase Intent used to create a new Checkout Order.
-                          example: "sale_a1b2c3d4e5f6"
-                      selected_amount:
-                          $ref: '#/components/schemas/CheckoutSelectedAmount'
-                - type: object
-                  additionalProperties: false
-                  required:
-                      - order_id
-                      - line_items
-                  properties:
-                      order_id:
-                          type: string
-                          minLength: 1
-                          description: Existing finalized Order whose amount should be changed before payment begins.
-                          example: "or_a1b2c3d4e5f6"
-                      line_items:
-                          type: array
-                          minItems: 1
-                          description: Customer-selected amounts keyed by the Order line-item IDs returned by checkout lookup.
-                          items:
-                              type: object
-                              additionalProperties: false
-                              required:
-                                  - id
-                                  - selected_amount
-                              properties:
-                                  id:
-                                      type: string
-                                      minLength: 1
-                                      description: Product line-item ID whose amount should be changed.
-                                      example: "oli_a1b2c3d4e5f6"
-                                  selected_amount:
-                                      $ref: '#/components/schemas/CheckoutSelectedAmount'
+                - $ref: '#/components/schemas/CheckoutPurchaseIntentSelectAmountRequest'
+                - $ref: '#/components/schemas/CheckoutOrderSelectAmountRequest'
+        CheckoutPurchaseIntentSelectAmountRequest:
+            type: object
+            additionalProperties: false
+            required: [purchase_intent_id, selected_amount]
+            properties:
+                purchase_intent_id:
+                    type: string
+                    minLength: 1
+                    description: Purchase Intent used to create a new Checkout Order.
+                    example: "sale_a1b2c3d4e5f6"
+                selected_amount:
+                    $ref: '#/components/schemas/CheckoutSelectedAmount'
+        CheckoutOrderSelectAmountRequest:
+            type: object
+            additionalProperties: false
+            required: [order_id, line_items]
+            properties:
+                order_id:
+                    type: string
+                    minLength: 1
+                    description: Existing finalized Order whose amount should be changed before payment begins.
+                    example: "or_a1b2c3d4e5f6"
+                line_items:
+                    type: array
+                    minItems: 1
+                    description: Customer-selected amounts keyed by the Order line-item IDs returned by checkout lookup.
+                    items:
+                        $ref: '#/components/schemas/CheckoutOrderLineItemAmountSelection'
+        CheckoutOrderLineItemAmountSelection:
+            type: object
+            additionalProperties: false
+            required: [id, selected_amount]
+            properties:
+                id:
+                    type: string
+                    minLength: 1
+                    description: Product line-item ID whose amount should be changed.
+                    example: "oli_a1b2c3d4e5f6"
+                selected_amount:
+                    $ref: '#/components/schemas/CheckoutSelectedAmount'
         CheckoutSelectedAmount:
             type: object
             additionalProperties: false
@@ -14006,11 +14161,26 @@ components:
             description: Pays an existing finalized Order with either a saved or newly supplied payment method.
             additionalProperties: false
             required: [order_id]
-            not:
-                required: [payment_method_id, payment_method_data]
-                properties:
-                    payment_method_id: {}
-                    payment_method_data: {}
+            allOf:
+                - not:
+                      required: [payment_method_id, payment_method_data]
+                      properties:
+                          payment_method_id: {}
+                          payment_method_data: {}
+                - anyOf:
+                    - not:
+                          required: [save_payment_method, payment_method_data]
+                          properties:
+                              save_payment_method:
+                                  enum: [true]
+                              payment_method_data: {}
+                    - properties:
+                          payment_method_data:
+                              type: object
+                              additionalProperties: true
+                              required: [billing_details]
+                              properties:
+                                  billing_details: {}
             properties:
                 order_id:
                     type: string
@@ -14042,6 +14212,20 @@ components:
             description: Creates an Order from a Purchase Intent and pays it with a newly supplied payment method.
             additionalProperties: false
             required: [purchase_intent_id, customer_data, payment_method_data]
+            allOf:
+                - anyOf:
+                    - not:
+                          required: [save_payment_method]
+                          properties:
+                              save_payment_method:
+                                  enum: [true]
+                    - properties:
+                          payment_method_data:
+                              type: object
+                              additionalProperties: true
+                              required: [billing_details]
+                              properties:
+                                  billing_details: {}
             properties:
                 purchase_intent_id:
                     type: string
@@ -14113,17 +14297,24 @@ components:
                 order:
                     $ref: '#/components/schemas/CheckoutOrder'
         CheckoutLookupResponse:
-            type: object
-            additionalProperties: false
             description: |
                 Returns exactly one resource matching the supplied checkout reference. Purchase
                 Intent responses use the same public resource shape as Purchase Intent lookup.
             oneOf:
-                - required: [order]
-                - required: [purchase_intent]
+                - $ref: '#/components/schemas/CheckoutOrderLookupResponse'
+                - $ref: '#/components/schemas/CheckoutPurchaseIntentLookupResponse'
+        CheckoutOrderLookupResponse:
+            type: object
+            additionalProperties: false
+            required: [order]
             properties:
                 order:
                     $ref: '#/components/schemas/CheckoutOrder'
+        CheckoutPurchaseIntentLookupResponse:
+            type: object
+            additionalProperties: false
+            required: [purchase_intent]
+            properties:
                 purchase_intent:
                     $ref: '#/components/schemas/PurchaseIntent'
         CheckoutOrder:
@@ -15056,6 +15247,27 @@ components:
             type: object
             additionalProperties: false
             required: [order_line_item_id, refund_amount]
+            allOf:
+                - oneOf:
+                    - not:
+                          anyOf:
+                              - required: [reason]
+                                properties:
+                                    reason: {}
+                              - required: [reason_details]
+                                properties:
+                                    reason_details: {}
+                    - required: [reason]
+                      properties:
+                          reason:
+                              type: string
+                              enum: [requested_by_customer, duplicate, fraudulent, order_canceled, item_returned, item_damaged, item_not_received, item_not_as_described]
+                    - required: [reason, reason_details]
+                      properties:
+                          reason:
+                              type: string
+                              enum: [custom]
+                          reason_details: {}
             properties:
                 order_line_item_id:
                     type: string
@@ -15085,6 +15297,19 @@ components:
             type: object
             additionalProperties: false
             required: [line_items, order_id, reason]
+            allOf:
+                - oneOf:
+                    - required: [reason]
+                      properties:
+                          reason:
+                              type: string
+                              enum: [requested_by_customer, duplicate, fraudulent, order_canceled, item_returned, item_damaged, item_not_received, item_not_as_described]
+                    - required: [reason, reason_details]
+                      properties:
+                          reason:
+                              type: string
+                              enum: [custom]
+                          reason_details: {}
             properties:
                 custom_data:
                     $ref: '#/components/schemas/CustomData'
@@ -15155,6 +15380,27 @@ components:
             type: object
             additionalProperties: false
             required: [id, order_line_item_id, original_amount_paid, refund_amount]
+            allOf:
+                - oneOf:
+                    - not:
+                          anyOf:
+                              - required: [reason]
+                                properties:
+                                    reason: {}
+                              - required: [reason_details]
+                                properties:
+                                    reason_details: {}
+                    - required: [reason]
+                      properties:
+                          reason:
+                              type: string
+                              enum: [requested_by_customer, duplicate, fraudulent, order_canceled, item_returned, item_damaged, item_not_received, item_not_as_described]
+                    - required: [reason, reason_details]
+                      properties:
+                          reason:
+                              type: string
+                              enum: [custom]
+                          reason_details: {}
             properties:
                 id:
                     type: string
@@ -15257,6 +15503,26 @@ components:
             type: object
             additionalProperties: false
             required: [created_at, id, line_items, order_id, reason, settlement, status, total]
+            allOf:
+                - oneOf:
+                    - required: [reason]
+                      properties:
+                          reason:
+                              type: string
+                              enum: [requested_by_customer, duplicate, fraudulent, order_canceled, item_returned, item_damaged, item_not_received, item_not_as_described]
+                    - required: [reason, reason_details]
+                      properties:
+                          reason:
+                              type: string
+                              enum: [custom]
+                          reason_details: {}
+            x-simile-constraints:
+                - ordered:
+                      paths: [/created_at, /processing_at, /succeeded_at]
+                - ordered:
+                      paths: [/created_at, /processing_at, /failed_at]
+                - ordered:
+                      paths: [/created_at, /canceled_at]
             properties:
                 cancel_reason:
                     type: string
@@ -15434,6 +15700,9 @@ components:
             type: object
             additionalProperties: false
             required: [created_at, id, status, type, updated_at]
+            x-simile-constraints:
+                - ordered:
+                      paths: [/created_at, /completed_at, /updated_at]
             properties:
                 completed_at:
                     type: string
@@ -16358,6 +16627,13 @@ components:
                 - initiated_at
                 - max_amount
                 - status
+            x-simile-constraints:
+                - ordered:
+                      paths: [/initiated_at, /scheduled_at, /sent_at, /succeeded_at]
+                - ordered:
+                      paths: [/initiated_at, /scheduled_at, /sent_at, /failed_at]
+                - ordered:
+                      paths: [/initiated_at, /scheduled_at, /canceled_at]
             properties:
                 amount:
                     $ref: '#/components/schemas/Amount'
@@ -16614,6 +16890,9 @@ components:
             required:
                 - min
                 - max
+            x-simile-constraints:
+                - ordered:
+                      paths: [/min/value, /max/value]
             properties:
                 min:
                     $ref: '#/components/schemas/PayoutLimitValue'
@@ -17135,9 +17414,8 @@ components:
         PaymentMethodData:
             type: object
             additionalProperties: false
-            description: Payment instrument details for tokenization
-            required:
-                - type
+            description: Payment instrument details supplied while creating an order.
+            required: [type, mobile_money]
             properties:
                 type:
                     type: string
@@ -17145,23 +17423,125 @@ components:
                     description: Payment rail type (currently only mobile_money supported)
                     example: "mobile_money"
                 mobile_money:
+                    $ref: '#/components/schemas/PaymentMethodMobileMoneyInput'
+        UpdateOrderPaymentMethodData:
+            type: object
+            additionalProperties: false
+            description: New mobile-money payment method and required owner details for an order update.
+            required: [type, mobile_money, billing_details]
+            properties:
+                type:
+                    type: string
+                    enum: [mobile_money]
+                mobile_money:
+                    $ref: '#/components/schemas/UpdateOrderMobileMoneyInput'
+                billing_details:
+                    $ref: '#/components/schemas/UpdateOrderPaymentMethodOwnerInput'
+        PayOrderPaymentMethodData:
+            type: object
+            additionalProperties: false
+            description: New mobile-money payment method details supplied while paying an order.
+            required: [type, mobile_money]
+            properties:
+                type:
+                    type: string
+                    enum: [mobile_money]
+                mobile_money:
+                    $ref: '#/components/schemas/PaymentMethodMobileMoneyInput'
+                billing_details:
+                    $ref: '#/components/schemas/PaymentMethodBillingDetailsInput'
+                shipping:
+                    $ref: '#/components/schemas/PaymentMethodShippingInput'
+        PaymentMethodType:
+            type: string
+            enum: [bank_account, card, mobile_money, motito]
+        PaymentMethodMobileMoneyInput:
+            type: object
+            additionalProperties: false
+            description: Mobile-money wallet details.
+            required: [network, account_number]
+            properties:
+                reference:
+                    type: string
+                network:
+                    type: string
+                    enum: [airtel, mtn, telecel, vodafone]
+                    description: Mobile-money network provider.
+                    example: "mtn"
+                account_number:
+                    type: string
+                    description: Mobile-money account number in local or international form.
+                    example: "+233242057831"
+                    pattern: '^(\+?\d{10,15})$'
+        UpdateOrderMobileMoneyInput:
+            type: object
+            additionalProperties: false
+            required: [network, account_number]
+            properties:
+                network:
+                    type: string
+                    enum: [airtel, mtn, telecel, vodafone]
+                account_number:
+                    type: string
+                    pattern: '^(\+?\d{10,15})$'
+        UpdateOrderPaymentMethodOwnerInput:
+            type: object
+            additionalProperties: false
+            required: [name, address]
+            properties:
+                name:
+                    type: string
+                address:
                     type: object
                     additionalProperties: false
-                    description: Mobile money wallet details (required when type is mobile_money)
-                    required:
-                        - network
-                        - account_number
+                    required: [country]
                     properties:
-                        network:
+                        country:
                             type: string
-                            enum: [airtel, mtn, telecel, vodafone]
-                            description: Mobile money network provider
-                            example: "mtn"
-                        account_number:
+        PaymentMethodBillingDetailsInput:
+            type: object
+            additionalProperties: false
+            required: [name, address]
+            properties:
+                name:
+                    type: string
+                phone_number:
+                    type: string
+                address:
+                    $ref: '#/components/schemas/PaymentMethodAddressInput'
+        PaymentMethodAddressInput:
+            type: object
+            additionalProperties: false
+            required: [country]
+            properties:
+                name:
+                    type: string
+                phone_number:
+                    type: string
+                line1:
+                    type: string
+                line2:
+                    type: string
+                city:
+                    type: string
+                region:
+                    type: string
+                post_code:
+                    type: string
+                country:
+                    type: string
+        PaymentMethodShippingInput:
+            type: object
+            additionalProperties: false
+            required: [address]
+            properties:
+                address:
+                    type: object
+                    additionalProperties: false
+                    required: [country]
+                    properties:
+                        country:
                             type: string
-                            description: Mobile money account number (international or local format)
-                            example: "+233242057831"
-                            pattern: '^(\+?\d{10,15})$'
         PaymentMethodSettings:
             type: object
             additionalProperties: false
@@ -17413,7 +17793,8 @@ components:
                     description: Optional metadata controlling request processing
                     properties:
                         idempotency_key:
-                            type: string
+                            allOf:
+                                - $ref: '#/components/schemas/IdempotencyKeyValue'
                             description: Unique key to prevent duplicate sends
                             example: "chime_send_20231214_abc123"
                         response:
@@ -17588,6 +17969,11 @@ components:
             type: object
             additionalProperties: false
             required: [address, created_at, gateway, id, initialized_at, mechanism, status]
+            x-simile-constraints:
+                - ordered:
+                      paths: [/created_at, /initialized_at, /sent_at, /delivered_at]
+                - ordered:
+                      paths: [/created_at, /initialized_at, /sent_at, /failed_at]
             properties:
                 address:
                     type: string
@@ -17847,7 +18233,8 @@ components:
                     additionalProperties: false
                     properties:
                         idempotency_key:
-                            type: string
+                            allOf:
+                                - $ref: '#/components/schemas/IdempotencyKeyValue'
                             description: Stable retry key. It must match the Idempotency-Key header when both are provided.
                         response:
                             $ref: '#/components/schemas/RequestResponse'
@@ -17895,6 +18282,9 @@ components:
             type: object
             additionalProperties: false
             required: [created_at, full_message, id, send_after, sender_id]
+            x-simile-constraints:
+                - ordered:
+                      paths: [/created_at, /send_after, /executed_at]
             properties:
                 created_at:
                     type: string
@@ -17957,6 +18347,9 @@ components:
             type: object
             additionalProperties: false
             required: [content, created_at, id, recipients, send_after, sender_id]
+            x-simile-constraints:
+                - ordered:
+                      paths: [/created_at, /send_after, /executed_at]
             properties:
                 chime_ids:
                     type: array
@@ -18031,15 +18424,14 @@ components:
                     additionalProperties: false
                     properties:
                         idempotency_key:
-                            type: string
+                            allOf:
+                                - $ref: '#/components/schemas/IdempotencyKeyValue'
                             description: Stable retry key. It must match the Idempotency-Key header when both are provided.
                         response:
                             $ref: '#/components/schemas/RequestResponse'
                 message_template:
                     oneOf:
-                        - type: string
-                          description: Raw SMS message content for SMS broadcasts.
-                          example: "Your order #12345 has shipped."
+                        - $ref: '#/components/schemas/BroadcastRawSMSContent'
                         - $ref: '#/components/schemas/MessageTemplateReference'
                     description: Raw SMS content for SMS broadcasts, or a stored message template reference for SMS or email broadcasts.
                 email:
@@ -18064,6 +18456,10 @@ components:
                     type: string
                     description: Sender identifier displayed to recipients.
                     example: "YourBrand"
+        BroadcastRawSMSContent:
+            type: string
+            description: Raw SMS message content for a broadcast.
+            example: "Your order #12345 has shipped."
         BroadcastResponse:
             type: object
             additionalProperties: false
@@ -18134,6 +18530,9 @@ components:
             type: object
             additionalProperties: false
             required: [content, created_at, id, recipients, send_after, sender_id]
+            x-simile-constraints:
+                - ordered:
+                      paths: [/created_at, /executed_at]
             properties:
                 chime_ids:
                     type: array
@@ -18201,6 +18600,12 @@ components:
             type: object
             required: [purpose, recipient, service_name, token_size]
             additionalProperties: false
+            allOf:
+                - not:
+                      required: [token_alphabet, token_alphabet_type]
+                      properties:
+                          token_alphabet: {}
+                          token_alphabet_type: {}
             properties:
                 async_delivery:
                     type: boolean
@@ -18313,6 +18718,9 @@ components:
             additionalProperties: false
             description: OTP transaction object returned by initiate, verify, and lookup endpoints
             required: [expires_at, full_message, id, initiated_at, status]
+            x-simile-constraints:
+                - ordered:
+                      paths: [/initiated_at, /expires_at]
             properties:
                 cancel_reason:
                     type: string
@@ -18415,6 +18823,29 @@ components:
             additionalProperties: false
             required:
                 - order_id
+            allOf:
+                - not:
+                      required: [payment_method_id, payment_method_data]
+                      properties:
+                          payment_method_id: {}
+                          payment_method_data: {}
+                - not:
+                      required: [clear_payment_method, payment_method_id]
+                      properties:
+                          clear_payment_method:
+                              enum: [true]
+                          payment_method_id: {}
+                - not:
+                      required: [clear_payment_method, payment_method_data]
+                      properties:
+                          clear_payment_method:
+                              enum: [true]
+                          payment_method_data: {}
+                - not:
+                      required: [statement_descriptor, statement_descriptor_prefix]
+                      properties:
+                          statement_descriptor: {}
+                          statement_descriptor_prefix: {}
             properties:
                 clear_payment_method:
                     type: boolean
@@ -18437,6 +18868,7 @@ components:
                     description: |
                         Full replacement for the order's line items. Omit this field to keep the
                         current line items unchanged.
+                    minItems: 1
                     items:
                         $ref: '#/components/schemas/LineItem'
                 number:
@@ -18455,7 +18887,7 @@ components:
                     example: "or_48ZW7BGvYUBWc1i6WBkL2jr0iPQP5jUy76mmmHpt"
                 payment_method_data:
                     allOf:
-                        - $ref: '#/components/schemas/PaymentMethodData'
+                        - $ref: '#/components/schemas/UpdateOrderPaymentMethodData'
                     description: |
                         New payment method details to tokenize and attach to the order. Currently
                         only `mobile_money` is supported for order updates. When using inline mobile
@@ -18471,6 +18903,7 @@ components:
                     type: string
                     description: Replacement payment statement descriptor for the order's payment.
                     example: "ORDER 12345"
+                    minLength: 3
                     maxLength: 22
                 statement_descriptor_prefix:
                     type: string
@@ -18478,22 +18911,64 @@ components:
                     example: "LINE"
                     minLength: 2
                     maxLength: 10
+                    pattern: '^[^*]+$'
         PayOrderRequest:
             type: object
             additionalProperties: false
             required:
                 - order_id
+            allOf:
+                - not:
+                      required: [payment_method_id, payment_method_data]
+                      properties:
+                          payment_method_id: {}
+                          payment_method_data: {}
+                - not:
+                      required: [paid_out_of_band, payment_method_id]
+                      properties:
+                          paid_out_of_band:
+                              enum: [true]
+                          payment_method_id: {}
+                - not:
+                      required: [paid_out_of_band, payment_method_data]
+                      properties:
+                          paid_out_of_band:
+                              enum: [true]
+                          payment_method_data: {}
+                - anyOf:
+                    - not:
+                          required: [save_payment_method, payment_method_data]
+                          properties:
+                              save_payment_method:
+                                  enum: [true]
+                              payment_method_data: {}
+                    - properties:
+                          payment_method_data:
+                              type: object
+                              additionalProperties: true
+                              required: [billing_details]
+                              properties:
+                                  billing_details: {}
             properties:
                 order_id:
                     type: string
                     description: Unique identifier of the order to pay
                     example: "GKj7A8lM5wEGRUvbqpI4bkDFsQvpqVyh5fqePNnb"
+                payment_method_types:
+                    type: array
+                    description: Payment method types to expose for this payment attempt.
+                    items:
+                        $ref: '#/components/schemas/PaymentMethodType'
                 payment_method_data:
-                    $ref: '#/components/schemas/PaymentMethodData'
+                    $ref: '#/components/schemas/PayOrderPaymentMethodData'
                 payment_method_id:
                     type: string
                     description: ID of a saved payment method to use for this payment
                     example: "pm_xyz123abc456"
+                save_payment_method:
+                    type: boolean
+                    default: false
+                    description: Save a newly supplied payment method. When true and payment_method_data is present, billing_details is required.
                 paid_out_of_band:
                     type: boolean
                     description: |
