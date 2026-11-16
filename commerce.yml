@@ -3,8 +3,8 @@ openapi: 3.0.3
 info:
     title: Inttegro API
     description: Machine-readable reference for the public Inttegro API
-    version: 0.1.0-beta67
-    x-inttegro-collection-version: 0.1.0-beta67
+    version: 0.1.0-beta68
+    x-inttegro-collection-version: 0.1.0-beta68
     contact:
         name: Inttegro Engineering
         url: "https://inttegro.com"
@@ -1583,7 +1583,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/CheckoutOrderResponse'
+                                $ref: '#/components/schemas/CheckoutOrderErrorResponse'
                 '409':
                     description: Another request is currently using the same idempotency key
                     headers:
@@ -1612,7 +1612,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/CheckoutOrderResponse'
+                                $ref: '#/components/schemas/CheckoutOrderErrorResponse'
                 '504':
                     description: Checkout payment timed out
                     headers:
@@ -1675,7 +1675,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/CheckoutOrderResponse'
+                                $ref: '#/components/schemas/CheckoutOrderErrorResponse'
                 '503':
                     description: Checkout payment confirmation failed transiently
                     headers:
@@ -1731,7 +1731,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/CheckoutOrderResponse'
+                                $ref: '#/components/schemas/CheckoutOrderErrorResponse'
                 '409':
                     description: Another request is currently using the same idempotency key
                     headers:
@@ -1760,7 +1760,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/CheckoutOrderResponse'
+                                $ref: '#/components/schemas/CheckoutOrderErrorResponse'
                 '504':
                     description: Checkout confirmation request timed out
                     headers:
@@ -2247,7 +2247,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/OrderResponse'
+                                $ref: '#/components/schemas/OrderErrorResponse'
                 '500':
                     description: Order payment confirmation failed unexpectedly
                     headers:
@@ -2256,7 +2256,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/OrderResponse'
+                                $ref: '#/components/schemas/OrderErrorResponse'
                 '503':
                     description: Order payment confirmation hit a transient dependency failure
                     headers:
@@ -2267,7 +2267,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/OrderResponse'
+                                $ref: '#/components/schemas/OrderErrorResponse'
     /orders/request_confirmation:
         post:
             summary: Request payment confirmation
@@ -2313,7 +2313,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/OrderResponse'
+                                $ref: '#/components/schemas/OrderErrorResponse'
                 '401':
                     description: Unauthorized - invalid or missing API key
                     headers:
@@ -2338,7 +2338,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/OrderResponse'
+                                $ref: '#/components/schemas/OrderErrorResponse'
     /orders/cancel:
         post:
             summary: Cancel an order
@@ -2688,7 +2688,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/OrderDocumentDeliveryResponse'
+                                $ref: '#/components/schemas/OrderDocumentDeliveryErrorResponse'
                 '401':
                     description: Unauthorized - invalid or missing API key
                     headers:
@@ -2717,7 +2717,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/OrderDocumentDeliveryResponse'
+                                $ref: '#/components/schemas/OrderDocumentDeliveryErrorResponse'
     /orders/send_receipt:
         post:
             summary: Send an order receipt
@@ -2775,7 +2775,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/OrderDocumentDeliveryResponse'
+                                $ref: '#/components/schemas/OrderDocumentDeliveryErrorResponse'
                 '401':
                     description: Unauthorized - invalid or missing API key
                     headers:
@@ -2804,7 +2804,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/OrderDocumentDeliveryResponse'
+                                $ref: '#/components/schemas/OrderDocumentDeliveryErrorResponse'
     /orders/page:
         post:
             summary: Page through orders
@@ -11671,11 +11671,11 @@ components:
                     type: string
         CustomerResponse:
             type: object
+            additionalProperties: false
+            required: [customer]
             properties:
                 customer:
                     $ref: '#/components/schemas/Customer'
-                error:
-                    $ref: '#/components/schemas/Error'
         CustomerPage:
             type: object
             required: [customers, number, size]
@@ -12009,11 +12009,11 @@ components:
                     $ref: '#/components/schemas/CustomerSelectedAmountParams'
         AddProductPriceResponse:
             type: object
+            additionalProperties: false
+            required: [price]
             properties:
                 price:
                     $ref: '#/components/schemas/CatalogPrice'
-                error:
-                    $ref: '#/components/schemas/Error'
         ProductPriceSummary:
             type: object
             required:
@@ -12073,11 +12073,11 @@ components:
                     example: "prod_abc123"
         ProductResponse:
             type: object
+            additionalProperties: false
+            required: [product]
             properties:
                 product:
                     $ref: '#/components/schemas/Product'
-                error:
-                    $ref: '#/components/schemas/Error'
         UpdateProductResponse:
             type: object
             properties:
@@ -13085,6 +13085,8 @@ components:
                     example: "prod_abc123"
         PricePageResponse:
             type: object
+            additionalProperties: false
+            required: [page]
             properties:
                 page:
                     type: object
@@ -13099,8 +13101,6 @@ components:
                             type: array
                             items:
                                 $ref: '#/components/schemas/PricePageItem'
-                error:
-                    $ref: '#/components/schemas/Error'
         PricePageItem:
             $ref: '#/components/schemas/CatalogPrice'
         PriceActionRequest:
@@ -13114,11 +13114,11 @@ components:
                     example: "pr_xyz789"
         PriceResponse:
             type: object
+            additionalProperties: false
+            required: [price]
             properties:
                 price:
                     $ref: '#/components/schemas/CatalogPrice'
-                error:
-                    $ref: '#/components/schemas/Error'
         CatalogPriceParams:
             type: object
             oneOf:
@@ -13333,6 +13333,8 @@ components:
                     example: 50
         PageFinancialAccountsResponse:
             type: object
+            additionalProperties: false
+            required: [page]
             properties:
                 page:
                     type: object
@@ -13384,8 +13386,6 @@ components:
                                         description: Archive timestamp (if archived)
                                     custom_data:
                                         $ref: '#/components/schemas/CustomData'
-                error:
-                    $ref: '#/components/schemas/Error'
         OrderLineItem:
             oneOf:
                 - $ref: '#/components/schemas/OrderProductLineItem'
@@ -14328,7 +14328,19 @@ components:
                     example: "or_48ZW7BGvYUBWc1i6WBkL2jr0iPQP5jUy76mmmHpt"
         OrderDocumentDeliveryResponse:
             type: object
-            description: Response returned by deliberate order document delivery endpoints.
+            additionalProperties: false
+            description: Successful or partially successful deliberate order document delivery.
+            required: [delivery]
+            properties:
+                delivery:
+                    $ref: '#/components/schemas/OrderDocumentDelivery'
+                order:
+                    $ref: '#/components/schemas/Order'
+        OrderDocumentDeliveryErrorResponse:
+            type: object
+            additionalProperties: false
+            description: Failed order document delivery. Partial delivery and order details are included when available.
+            required: [error]
             properties:
                 delivery:
                     $ref: '#/components/schemas/OrderDocumentDelivery'
@@ -15105,12 +15117,22 @@ components:
                     example: "123456"
         CheckoutOrderResponse:
             type: object
-            description: Checkout response. Error responses can include the latest Order snapshot when available.
+            additionalProperties: false
+            description: Successful checkout response.
+            required: [order]
             properties:
                 order:
                     $ref: '#/components/schemas/CheckoutOrder'
+        CheckoutOrderErrorResponse:
+            type: object
+            additionalProperties: false
+            description: Checkout error response. The latest Order snapshot is included when available.
+            required: [error]
+            properties:
                 error:
                     $ref: '#/components/schemas/Error'
+                order:
+                    $ref: '#/components/schemas/CheckoutOrder'
         CheckoutLookupResponse:
             type: object
             additionalProperties: false
@@ -15415,9 +15437,20 @@ components:
                     format: date-time
         OrderResponse:
             type: object
+            additionalProperties: false
             required:
                 - order
             properties:
+                order:
+                    $ref: '#/components/schemas/Order'
+        OrderErrorResponse:
+            type: object
+            additionalProperties: false
+            description: Order operation error. The latest Order snapshot is included when available.
+            required: [error]
+            properties:
+                error:
+                    $ref: '#/components/schemas/Error'
                 order:
                     $ref: '#/components/schemas/Order'
         Order:
