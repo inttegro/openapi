@@ -63,9 +63,13 @@ construct during synthesis.
 | `/components/schemas/OTPTransaction` | 3 `ordered`, 7 `implies` | Expiry, cancellation, and delivery timestamps cannot predate initiation; cancellation metadata agrees with status; and pending delivery/verification states agree with transmission evidence. |
 
 The audit also uses ordinary OpenAPI keywords for local rules: positive order quantities and money
-values, nonempty refund and payout contribution arrays, fixed masked-account lengths, and the
-`processing` payment status already emitted by the implementation. The balance-transaction schemas
-were flattened from closed `allOf` compositions because OpenAPI 3.0 applies
+values, nonempty refund and payout contribution arrays, fixed masked-account lengths, the
+`processing` payment status already emitted by the implementation, and anchored type-prefix
+patterns on 118 public resource-identifier fields. Those ID patterns follow the public
+serializers and their domain constants (`app`, `sk`, `file`, `prod`, `sale`, `or`, `py`, `rf`,
+`bt`, `po`, `ch`, and the other allow-listed types); polymorphic and provider-owned identifiers are
+deliberately excluded. The balance-transaction schemas were flattened from closed `allOf`
+compositions because OpenAPI 3.0 applies
 `additionalProperties: false` inside each branch; the former composition admitted no instance.
 The component names, JSON fields, required fields, descriptions, and operation references remain
 the same.
@@ -113,6 +117,14 @@ misstate the public contract:
   does carry the template.
 - `last4` is documented as decimal digits. Simile currently compiles string lengths but not the
   OpenAPI `pattern` keyword, so a digit-class rule would not survive compilation or synthesis.
+- Several incoming identifier fields intentionally accept either a typed public ID or its raw value.
+  A strict type-prefix pattern would reject behavior supported by the request parsers, while an
+  optional-prefix pattern would still let synthesis choose an untyped value. Response identifiers
+  with serializer-enforced types are constrained; permissive inputs remain reported here instead of
+  being made deceptively strict.
+- `FinancialAccountWalletResponse` normally emits an `fw_` ID, but the legacy update projection
+  reuses that schema while returning the raw wallet ID. A single strict pattern would contradict one
+  of those public shapes, so this needs separate typed and legacy schemas before it can be enforced.
 - `overdue` payment state depends on the current clock, and `processing` depends on execution-claim
   fields that are intentionally private. The public constraints can exclude contradictory terminal
   evidence but cannot reconstruct those states completely.
@@ -155,6 +167,11 @@ misstate the public contract:
 
 The test is intentionally allow-listed. Removing a changed schema's constraints or omitting its
 relationship tests fails the run instead of silently reducing coverage.
+
+`scripts/check-typed-id-patterns.mjs` separately checks the ordinary OpenAPI rules for all 118
+allow-listed typed identifier fields. Every JSON Pointer must resolve to a string schema with the
+expected anchored prefix; the test also exercises one matching value and one cross-resource value
+per field so removing the anchor or weakening the prefix is visible.
 
 The current run compiles the full OpenAPI document (228 total relationships), synthesizes requests
 and responses for 47 audited schema locations, and accepts/rejects 330 relationship fixtures across
