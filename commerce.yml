@@ -3,8 +3,8 @@ openapi: 3.0.3
 info:
     title: Inttegro API
     description: Machine-readable reference for the public Inttegro API
-    version: 0.1.0-beta75
-    x-inttegro-collection-version: 0.1.0-beta75
+    version: 0.1.0-beta78
+    x-inttegro-collection-version: 0.1.0-beta78
     contact:
         name: Inttegro Engineering
         url: "https://inttegro.com"
@@ -412,6 +412,16 @@ paths:
                                       properties:
                                           error:
                                               { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [precondition_unmet] }, code: { enum: [chime_cooldown_active] }, fix_code: { enum: [satisfy_precondition] }, type: { enum: [bad_request] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                            examples:
+                                cooldown_active:
+                                    summary: The same cooldown key was used too soon
+                                    value:
+                                        error:
+                                            cause: precondition_unmet
+                                            code: chime_cooldown_active
+                                            fix_code: satisfy_precondition
+                                            type: bad_request
+                                            url: https://studio.inttegro.com/errors
                 '500':
                     description: Chime send failed unexpectedly
                     headers:
@@ -2952,6 +2962,15 @@ paths:
                                           - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [missing_request_parameter] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/e/c-missing_request_parameter"] } } }
                                           - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [request_parameter_choice_required] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/e/t-invalid_request_parameter"] } } }
                                           - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [request_parameter_choice_required] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                            examples:
+                                payment_method_invalid:
+                                    summary: The payment method cannot be used for this order
+                                    value:
+                                        cause: invalid_request_parameter
+                                        code: payment_method_invalid
+                                        fix_code: change_request_parameters
+                                        type: invalid_request_parameter
+                                        url: https://studio.inttegro.com/errors
                 '401':
                     description: Unauthorized - invalid or missing API key
                     headers:
@@ -4189,6 +4208,16 @@ paths:
                                                   - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [missing_request_parameter] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/e/c-missing_request_parameter"] } } }
                                                   - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [request_parameter_choice_required] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/e/t-invalid_request_parameter"] } } }
                                                   - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [request_parameter_choice_required] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                            examples:
+                                currency_mismatch:
+                                    summary: The refund currency differs from the paid order currency
+                                    value:
+                                        error:
+                                            cause: invalid_request_parameter
+                                            code: refund_currency_mismatch
+                                            fix_code: change_request_parameters
+                                            type: invalid_request_parameter
+                                            url: https://studio.inttegro.com/errors
                 '401':
                     description: Authorization is required
                     headers:
@@ -6150,6 +6179,21 @@ paths:
                     application/json:
                         schema:
                             $ref: '#/components/schemas/FinancialAccountCreateRequest'
+                        example:
+                            label: Marketplace Seller Sub-Account
+                            reference: SELLER-001-COLLECTION
+                            description: Dedicated collection account for seller 001.
+                            type: wallet
+                            currency: ghs
+                            owner:
+                                name: Ama Mensah
+                                address:
+                                    country: GH
+                            wallet:
+                                type: mobile_money
+                                mobile_money:
+                                    network: mtn
+                                    account_number: "+233242057831"
             responses:
                 '200':
                     description: Financial account created
@@ -6378,6 +6422,25 @@ paths:
                     application/json:
                         schema:
                             $ref: '#/components/schemas/FinancialAccountCreateRequest'
+                        example:
+                            label: Konadu Tailoring Collections
+                            reference: KONADU-MOMO-SETTLEMENT
+                            description: Primary settlement wallet for Konadu B2C operations.
+                            type: wallet
+                            currency: ghs
+                            owner:
+                                name: Ama Mensah
+                                address:
+                                    country: GH
+                            wallet:
+                                type: mobile_money
+                                mobile_money:
+                                    network: mtn
+                                    account_number: "+233242057831"
+                            push_configuration:
+                                enabled: true
+                            pull_configuration:
+                                enabled: false
             responses:
                 '200':
                     description: Financial account connected
@@ -7250,6 +7313,15 @@ paths:
                                           - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [missing_request_parameter] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/e/c-missing_request_parameter"] } } }
                                           - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [request_parameter_choice_required] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/e/t-invalid_request_parameter"] } } }
                                           - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [request_parameter_choice_required] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                            examples:
+                                payout_restricted:
+                                    summary: The application cannot schedule this payout
+                                    value:
+                                        cause: precondition_unmet
+                                        code: payout_restricted
+                                        fix_code: satisfy_precondition
+                                        type: bad_request
+                                        url: https://studio.inttegro.com/errors
                 '401':
                     description: Unauthorized - Missing or invalid authentication
                     headers:
@@ -9504,6 +9576,16 @@ paths:
                     application/json:
                         schema:
                             $ref: '#/components/schemas/TokenizeMobileMoneyPaymentMethodRequest'
+                        example:
+                            customer_id: cu_a1b2c3d4e5
+                            type: mobile_money
+                            mobile_money:
+                                account_number: "+233242057831"
+                                network: mtn
+                            owner:
+                                name: Jane Mensah
+                                address:
+                                    country: GH
             responses:
                 '200':
                     description: Payment method tokenized successfully
@@ -9514,6 +9596,23 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/TokenizePaymentMethodResponse'
+                            # Why: this exact outcome proves that a successful tokenization never
+                            # exposes the raw wallet number and keeps its masked fields coherent.
+                            examples:
+                                tokenized:
+                                    summary: A reusable mobile-money payment method
+                                    value:
+                                        payment_method:
+                                            id: pm_example
+                                            active: true
+                                            customer_id: cu_example
+                                            fingerprint: fp_example
+                                            type: mobile_money
+                                            created_at: "2026-11-17T10:00:00Z"
+                                            mobile_money:
+                                                account_number: "****7831"
+                                                last4: "7831"
+                                                network: mtn
                 '400':
                     description: Invalid payment method tokenization request
                     headers:
@@ -9534,6 +9633,15 @@ paths:
                                           - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [missing_request_parameter] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/e/c-missing_request_parameter"] } } }
                                           - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [request_parameter_choice_required] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/e/t-invalid_request_parameter"] } } }
                                           - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [request_parameter_choice_required] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                            examples:
+                                malformed_body:
+                                    summary: The payment-method payload is malformed
+                                    value:
+                                        cause: invalid_request_body
+                                        code: invalid_request_body
+                                        fix_code: change_request_parameters
+                                        type: invalid_request
+                                        url: https://studio.inttegro.com/errors
                 '401':
                     description: Unauthorized - Missing or invalid authentication
                     headers:
@@ -10256,6 +10364,19 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/ProductResponse'
+                            # Why: a fixed success outcome exercises the public publication
+                            # invariant instead of returning an arbitrary schema-shaped product.
+                            examples:
+                                created:
+                                    summary: A published digital product
+                                    value:
+                                        product:
+                                            id: prod_example
+                                            type: digital
+                                            name: Commerce Guide
+                                            active: true
+                                            created_at: "2026-11-17T10:00:00Z"
+                                            published_at: "2026-11-17T10:00:00Z"
                 '400':
                     description: Bad request - invalid parameters
                     headers:
@@ -10307,6 +10428,15 @@ paths:
                                           - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [idempotency_conflict] }, code: { enum: [idempotency_key_conflict] }, fix_code: { enum: [use_new_idempotency_key] }, type: { enum: [idempotency_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
                                           - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_parameter] }, code: { enum: [product_media_downloads_too_large, product_media_gallery_too_large, product_modifier_groups_invalid] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
                                           - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [unknown] }, code: { enum: [request_failed] }, fix_code: { enum: [contact_customer_support] }, type: { enum: [unknown_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                            examples:
+                                gallery_too_large:
+                                    summary: The product gallery exceeds the public media limit
+                                    value:
+                                        cause: invalid_request_parameter
+                                        code: product_media_gallery_too_large
+                                        fix_code: change_request_parameters
+                                        type: invalid_request_parameter
+                                        url: https://studio.inttegro.com/errors
     /products/add_price:
         post:
             summary: Add a price to a product
@@ -10885,6 +11015,20 @@ paths:
                     application/json:
                         schema:
                             $ref: '#/components/schemas/CreatePurchaseIntentRequest'
+                        example:
+                            product_id: prod_abc123
+                            price_id: pr_xyz789
+                            quantity:
+                                min: 1
+                                max: 5
+                            usage:
+                                multi_use: true
+                            expires_at: "2030-12-01T09:00:00Z"
+                            presentation:
+                                buy_page:
+                                    text:
+                                        checkout_section_title: Complete your order
+                                        primary_action_label: Continue
             responses:
                 '200':
                     description: Purchase intent created successfully
@@ -10895,6 +11039,35 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/PurchaseIntentResponse'
+                            # Why: this exact outcome keeps the Buy link, selected product, and
+                            # effective special-offer price coherent for local integration tests.
+                            examples:
+                                created:
+                                    summary: An active reusable Buy link with a special offer
+                                    value:
+                                        purchase_intent:
+                                            allow_variants: false
+                                            application_id: app_example
+                                            created_at: "2026-11-17T10:00:00Z"
+                                            id: sale_example
+                                            product:
+                                                id: prod_example
+                                                type: digital
+                                                name: Commerce Guide
+                                                active: true
+                                                created_at: "2026-11-17T10:00:00Z"
+                                                published_at: "2026-11-17T10:00:00Z"
+                                            price:
+                                                active: true
+                                                nominal:
+                                                    currency: ghs
+                                                    value: 15000
+                                            quantity:
+                                                min: 1
+                                                max: 5
+                                            status: active
+                                            usage:
+                                                multi_use: true
                 '400':
                     description: Invalid request, quantity range, price availability, or product-price relationship
                     headers:
@@ -10916,6 +11089,15 @@ paths:
                                           - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [missing_request_parameter] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/e/c-missing_request_parameter"] } } }
                                           - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [request_parameter_choice_required] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/e/t-invalid_request_parameter"] } } }
                                           - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [request_parameter_choice_required] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                            examples:
+                                invalid_quantity_range:
+                                    summary: The maximum quantity is below the minimum
+                                    value:
+                                        cause: invalid_request_parameter
+                                        code: invalid_purchase_intent_quantity_range
+                                        fix_code: change_request_parameters
+                                        type: invalid_request_parameter
+                                        url: https://studio.inttegro.com/errors
                 '401':
                     description: Unauthorized - invalid or missing API key
                     headers:
@@ -16128,118 +16310,283 @@ components:
                 updated_at:
                     type: string
                     format: date-time
+        PurchaseIntentProductSelection:
+            type: object
+            additionalProperties: false
+            description: Product selection with optional variant-set configuration. Use this instead of product_id.
+            required:
+                - id
+            properties:
+                id:
+                    type: string
+                    description: Product ID to sell through the Buy link
+                    example: "prod_abc123"
+                variant_set_id:
+                    type: string
+                    description: Optional variant set ID the hosted checkout may use for sibling product selection
+                    example: "pg_variantset123"
+        PurchaseIntentBundleSelection:
+            type: object
+            additionalProperties: false
+            description: Bundle selection. Components are resolved from the live catalog. Omit price and price_id to use the current catalog bundle price.
+            required:
+                - id
+            properties:
+                id:
+                    type: string
+                    description: App-owned bundle ID to sell through the Buy link
+                    example: "pbd_abc123"
+        PurchaseIntentPriceSelection:
+            type: object
+            additionalProperties: false
+            description: Price selection for the Buy-link offer. Products require it; bundles may omit it to use the current catalog default. Send exactly one of id or nominal and at most one of original or original_id.
+            allOf:
+                - oneOf:
+                    - required:
+                        - id
+                      properties:
+                          id: {}
+                    - required:
+                        - nominal
+                      properties:
+                          nominal: {}
+                - not:
+                      properties:
+                          original: {}
+                          original_id: {}
+                      required:
+                          - original
+                          - original_id
+            properties:
+                id:
+                    type: string
+                    description: Active, unarchived app-owned price ID. It must belong to a selected product; for a bundle it must be fixed and use the bundle catalog currency.
+                    example: "pr_xyz789"
+                nominal:
+                    description: Inline offer amount when no price ID is provided
+                    allOf:
+                        - $ref: '#/components/schemas/PriceParams'
+                original:
+                    type: object
+                    additionalProperties: false
+                    description: Optional original price used for comparison display
+                    allOf:
+                        - oneOf:
+                            - required:
+                                - id
+                              properties:
+                                  id: {}
+                            - required:
+                                - nominal
+                              properties:
+                                  nominal: {}
+                    properties:
+                        id:
+                            type: string
+                            description: App-owned fixed comparison price ID. It must belong to a selected product; for a bundle it must use the bundle catalog currency.
+                            example: "pr_original123"
+                        nominal:
+                            description: Inline original price amount
+                            allOf:
+                                - $ref: '#/components/schemas/PriceParams'
+                original_id:
+                    type: string
+                    description: App-owned comparison price ID when not using original.id
+                    example: "pr_original123"
         CreatePurchaseIntentRequest:
             type: object
             additionalProperties: false
             required:
                 - quantity
-            allOf:
-                - oneOf:
-                    - required: [product]
-                    - required: [product_id]
-                    - required: [bundle]
-                    - required: [bundle_id]
-                - oneOf:
-                    - allOf:
-                        - anyOf:
-                            - required: [product]
-                            - required: [product_id]
-                        - oneOf:
-                            - required: [price]
-                            - required: [price_id]
-                    - allOf:
-                        - anyOf:
-                            - required: [bundle]
-                            - required: [bundle_id]
-                        - not:
-                              required: [price, price_id]
-                              properties:
-                                  price: {}
-                                  price_id: {}
+            # Why: spelling the ten public target/price alternatives directly makes the
+            # exclusivity rule constructible; the former nested allOf/oneOf graph was valid for
+            # callers but exceeded Simile's deterministic request-synthesis search.
+            oneOf:
+                - type: object
+                  required: [product, price]
+                  properties:
+                      product:
+                          $ref: '#/components/schemas/PurchaseIntentProductSelection'
+                      price:
+                          $ref: '#/components/schemas/PurchaseIntentPriceSelection'
+                  not:
+                      anyOf:
+                          - required: [product_id]
+                            properties: { product_id: {} }
+                          - required: [bundle]
+                            properties: { bundle: {} }
+                          - required: [bundle_id]
+                            properties: { bundle_id: {} }
+                          - required: [price_id]
+                            properties: { price_id: {} }
+                - type: object
+                  required: [product, price_id]
+                  properties:
+                      product:
+                          $ref: '#/components/schemas/PurchaseIntentProductSelection'
+                      price_id:
+                          type: string
+                  not:
+                      anyOf:
+                          - required: [product_id]
+                            properties: { product_id: {} }
+                          - required: [bundle]
+                            properties: { bundle: {} }
+                          - required: [bundle_id]
+                            properties: { bundle_id: {} }
+                          - required: [price]
+                            properties: { price: {} }
+                - type: object
+                  required: [product_id, price]
+                  properties:
+                      product_id:
+                          type: string
+                      price:
+                          $ref: '#/components/schemas/PurchaseIntentPriceSelection'
+                  not:
+                      anyOf:
+                          - required: [product]
+                            properties: { product: {} }
+                          - required: [bundle]
+                            properties: { bundle: {} }
+                          - required: [bundle_id]
+                            properties: { bundle_id: {} }
+                          - required: [price_id]
+                            properties: { price_id: {} }
+                - type: object
+                  required: [product_id, price_id]
+                  properties:
+                      product_id:
+                          type: string
+                      price_id:
+                          type: string
+                  not:
+                      anyOf:
+                          - required: [product]
+                            properties: { product: {} }
+                          - required: [bundle]
+                            properties: { bundle: {} }
+                          - required: [bundle_id]
+                            properties: { bundle_id: {} }
+                          - required: [price]
+                            properties: { price: {} }
+                - type: object
+                  required: [bundle]
+                  properties:
+                      bundle:
+                          $ref: '#/components/schemas/PurchaseIntentBundleSelection'
+                  not:
+                      anyOf:
+                          - required: [product]
+                            properties: { product: {} }
+                          - required: [product_id]
+                            properties: { product_id: {} }
+                          - required: [bundle_id]
+                            properties: { bundle_id: {} }
+                          - required: [price]
+                            properties: { price: {} }
+                          - required: [price_id]
+                            properties: { price_id: {} }
+                - type: object
+                  required: [bundle, price]
+                  properties:
+                      bundle:
+                          $ref: '#/components/schemas/PurchaseIntentBundleSelection'
+                      price:
+                          $ref: '#/components/schemas/PurchaseIntentPriceSelection'
+                  not:
+                      anyOf:
+                          - required: [product]
+                            properties: { product: {} }
+                          - required: [product_id]
+                            properties: { product_id: {} }
+                          - required: [bundle_id]
+                            properties: { bundle_id: {} }
+                          - required: [price_id]
+                            properties: { price_id: {} }
+                - type: object
+                  required: [bundle, price_id]
+                  properties:
+                      bundle:
+                          $ref: '#/components/schemas/PurchaseIntentBundleSelection'
+                      price_id:
+                          type: string
+                  not:
+                      anyOf:
+                          - required: [product]
+                            properties: { product: {} }
+                          - required: [product_id]
+                            properties: { product_id: {} }
+                          - required: [bundle_id]
+                            properties: { bundle_id: {} }
+                          - required: [price]
+                            properties: { price: {} }
+                - type: object
+                  required: [bundle_id]
+                  properties:
+                      bundle_id:
+                          type: string
+                  not:
+                      anyOf:
+                          - required: [product]
+                            properties: { product: {} }
+                          - required: [product_id]
+                            properties: { product_id: {} }
+                          - required: [bundle]
+                            properties: { bundle: {} }
+                          - required: [price]
+                            properties: { price: {} }
+                          - required: [price_id]
+                            properties: { price_id: {} }
+                - type: object
+                  required: [bundle_id, price]
+                  properties:
+                      bundle_id:
+                          type: string
+                      price:
+                          $ref: '#/components/schemas/PurchaseIntentPriceSelection'
+                  not:
+                      anyOf:
+                          - required: [product]
+                            properties: { product: {} }
+                          - required: [product_id]
+                            properties: { product_id: {} }
+                          - required: [bundle]
+                            properties: { bundle: {} }
+                          - required: [price_id]
+                            properties: { price_id: {} }
+                - type: object
+                  required: [bundle_id, price_id]
+                  properties:
+                      bundle_id:
+                          type: string
+                      price_id:
+                          type: string
+                  not:
+                      anyOf:
+                          - required: [product]
+                            properties: { product: {} }
+                          - required: [product_id]
+                            properties: { product_id: {} }
+                          - required: [bundle]
+                            properties: { bundle: {} }
+                          - required: [price]
+                            properties: { price: {} }
             properties:
                 product:
-                    type: object
-                    additionalProperties: false
-                    description: Product selection with optional variant-set configuration. Use this instead of product_id.
-                    required:
-                        - id
-                    properties:
-                        id:
-                            type: string
-                            description: Product ID to sell through the Buy link
-                            example: "prod_abc123"
-                        variant_set_id:
-                            type: string
-                            description: Optional variant set ID the hosted checkout may use for sibling product selection
-                            example: "pg_variantset123"
+                    $ref: '#/components/schemas/PurchaseIntentProductSelection'
                 product_id:
                     type: string
                     description: App-owned product ID to sell through the Buy link when not using product
                     example: "prod_abc123"
                 bundle:
-                    type: object
-                    additionalProperties: false
-                    description: Bundle selection. Components are resolved from the live catalog. Omit price and price_id to use the current catalog bundle price.
-                    required:
-                        - id
-                    properties:
-                        id:
-                            type: string
-                            description: App-owned bundle ID to sell through the Buy link
-                            example: "pbd_abc123"
+                    $ref: '#/components/schemas/PurchaseIntentBundleSelection'
                 bundle_id:
                     type: string
                     description: App-owned bundle ID to sell through the Buy link when not using bundle
                     example: "pbd_abc123"
                 price:
-                    type: object
-                    additionalProperties: false
-                    description: Price selection for the Buy-link offer. Products require it; bundles may omit it to use the current catalog default. Send exactly one of id or nominal and at most one of original or original_id.
-                    allOf:
-                        - oneOf:
-                            - required:
-                                - id
-                            - required:
-                                - nominal
-                        - not:
-                            properties:
-                                original: {}
-                                original_id: {}
-                            required:
-                                - original
-                                - original_id
-                    properties:
-                        id:
-                            type: string
-                            description: Active, unarchived app-owned price ID. It must belong to a selected product; for a bundle it must be fixed and use the bundle catalog currency.
-                            example: "pr_xyz789"
-                        nominal:
-                            description: Inline offer amount when no price ID is provided
-                            allOf:
-                                - $ref: '#/components/schemas/PriceParams'
-                        original:
-                            type: object
-                            additionalProperties: false
-                            description: Optional original price used for comparison display
-                            allOf:
-                                - oneOf:
-                                    - required:
-                                        - id
-                                    - required:
-                                        - nominal
-                            properties:
-                                id:
-                                    type: string
-                                    description: App-owned fixed comparison price ID. It must belong to a selected product; for a bundle it must use the bundle catalog currency.
-                                    example: "pr_original123"
-                                nominal:
-                                    description: Inline original price amount
-                                    allOf:
-                                        - $ref: '#/components/schemas/PriceParams'
-                        original_id:
-                            type: string
-                            description: App-owned comparison price ID when not using original.id
-                            example: "pr_original123"
+                    $ref: '#/components/schemas/PurchaseIntentPriceSelection'
                 price_id:
                     type: string
                     description: Active, unarchived app-owned price ID. It must belong to a selected product; for a bundle it must be fixed and use the bundle catalog currency.
@@ -22556,15 +22903,22 @@ components:
                     wallet: '#/components/schemas/FinancialAccountWalletRequest'
                     bank_account: '#/components/schemas/FinancialAccountBankRequest'
                     dosh_account: '#/components/schemas/FinancialAccountDoshRequest'
-        FinancialAccountRequestBase:
+        FinancialAccountCurrency:
+            # Why: financial-account handlers currently accept only GHS; reusing the broader
+            # quoted-amount Currency enum would synthesize currencies these operations reject.
+            type: string
+            description: Currency currently supported for financial accounts.
+            enum: [ghs]
+            example: ghs
+        FinancialAccountWalletRequest:
+            # Why: OpenAPI 3.0 evaluates a closed allOf base independently, so the former
+            # base-plus-subtype composition rejected the subtype's own wallet and owner fields.
             type: object
             additionalProperties: false
-            required: [currency, label, reference, type]
+            required: [currency, label, owner, reference, type, wallet]
             properties:
                 currency:
-                    type: string
-                    description: Supported lowercase currency code
-                    example: ghs
+                    $ref: '#/components/schemas/FinancialAccountCurrency'
                 custom_data:
                     $ref: '#/components/schemas/CustomDataInput'
                 description:
@@ -22594,82 +22948,157 @@ components:
                     maxLength: 40
                 type:
                     type: string
-                    enum: [wallet, bank_account, dosh_account]
-        FinancialAccountWalletRequest:
-            allOf:
-                - $ref: '#/components/schemas/FinancialAccountRequestBase'
-                - type: object
-                  required: [owner, wallet]
-                  properties:
-                      type:
-                          type: string
-                          enum: [wallet]
-                      wallet:
-                          type: object
-                          additionalProperties: false
-                          required: [mobile_money, type]
-                          properties:
-                              type:
-                                  type: string
-                                  enum: [mobile_money]
-                              mobile_money:
-                                  type: object
-                                  additionalProperties: false
-                                  required: [account_number, network]
-                                  properties:
-                                      account_number:
-                                          type: string
-                                      network:
-                                          type: string
-                                          enum: [airtel, mtn, telecel, vodafone]
+                    enum: [wallet]
+                wallet:
+                    type: object
+                    additionalProperties: false
+                    required: [mobile_money, type]
+                    properties:
+                        type:
+                            type: string
+                            enum: [mobile_money]
+                        mobile_money:
+                            type: object
+                            additionalProperties: false
+                            required: [account_number, network]
+                            properties:
+                                account_number:
+                                    type: string
+                                    minLength: 1
+                                network:
+                                    type: string
+                                    enum: [airtel, mtn, telecel, vodafone]
         FinancialAccountBankRequest:
-            allOf:
-                - $ref: '#/components/schemas/FinancialAccountRequestBase'
-                - type: object
-                  description: Owner name and country must be supplied through top-level owner, the bank-account holder, or both. Missing values are filled between the two representations.
-                  required: [bank_account]
+            # Why: flattening keeps unknown-field rejection real instead of publishing an
+            # impossible closed allOf that rejects every valid bank-account request.
+            type: object
+            additionalProperties: false
+            description: Owner name and country must be supplied through top-level owner, the bank-account holder, or both. Missing values are filled between the two representations.
+            required: [bank_account, currency, label, reference, type]
+            # Why: bank-account handlers merge these two public owner representations but reject a
+            # request when neither contains the required name and country.
+            anyOf:
+                - required: [owner]
                   properties:
-                      type:
-                          type: string
-                          enum: [bank_account]
+                      owner:
+                          $ref: '#/components/schemas/FinancialAccountOwnerInput'
+                - required: [bank_account]
+                  properties:
                       bank_account:
                           type: object
-                          additionalProperties: false
-                          required: [ghana_bank_account, type]
+                          # Why: this partial branch checks only the nested holder; the owning
+                          # bank_account schema below remains the closed authority for its fields.
+                          additionalProperties: true
+                          required: [ghana_bank_account]
                           properties:
-                              type:
-                                  type: string
-                                  enum: [ghana_bank_account]
                               ghana_bank_account:
                                   type: object
-                                  additionalProperties: false
-                                  required: [number]
-                                  anyOf:
-                                      - required: [sort_code]
-                                      - required: [swift_code]
+                                  additionalProperties: true
+                                  required: [holder]
                                   properties:
                                       holder:
                                           $ref: '#/components/schemas/FinancialAccountOwnerInput'
-                                      number:
-                                          type: string
-                                          minLength: 1
-                                      sort_code:
-                                          type: string
-                                          minLength: 1
-                                      swift_code:
-                                          type: string
-                                          minLength: 1
+            properties:
+                bank_account:
+                    type: object
+                    additionalProperties: false
+                    required: [ghana_bank_account, type]
+                    properties:
+                        type:
+                            type: string
+                            enum: [ghana_bank_account]
+                        ghana_bank_account:
+                            type: object
+                            additionalProperties: false
+                            required: [number]
+                            anyOf:
+                                - required: [sort_code]
+                                - required: [swift_code]
+                            properties:
+                                holder:
+                                    $ref: '#/components/schemas/FinancialAccountOwnerInput'
+                                number:
+                                    type: string
+                                    minLength: 1
+                                sort_code:
+                                    type: string
+                                    minLength: 1
+                                swift_code:
+                                    type: string
+                                    minLength: 1
+                currency:
+                    $ref: '#/components/schemas/FinancialAccountCurrency'
+                custom_data:
+                    $ref: '#/components/schemas/CustomDataInput'
+                description:
+                    type: string
+                    maxLength: 200
+                label:
+                    type: string
+                    minLength: 5
+                    maxLength: 40
+                owner:
+                    $ref: '#/components/schemas/FinancialAccountOwnerInput'
+                pull_configuration:
+                    type: object
+                    additionalProperties: false
+                    properties:
+                        enabled:
+                            type: boolean
+                push_configuration:
+                    type: object
+                    additionalProperties: false
+                    properties:
+                        enabled:
+                            type: boolean
+                reference:
+                    type: string
+                    minLength: 5
+                    maxLength: 40
+                type:
+                    type: string
+                    enum: [bank_account]
         FinancialAccountDoshRequest:
-            allOf:
-                - $ref: '#/components/schemas/FinancialAccountRequestBase'
-                - type: object
-                  required: [dosh_account, owner]
-                  properties:
-                      type:
-                          type: string
-                          enum: [dosh_account]
-                      dosh_account:
-                          $ref: '#/components/schemas/DoshAccount'
+            # Why: the flattened variant preserves the closed public request shape while allowing
+            # the Dosh marker and owner fields that the former allOf base rejected.
+            type: object
+            additionalProperties: false
+            required: [currency, dosh_account, label, owner, reference, type]
+            properties:
+                currency:
+                    $ref: '#/components/schemas/FinancialAccountCurrency'
+                custom_data:
+                    $ref: '#/components/schemas/CustomDataInput'
+                description:
+                    type: string
+                    maxLength: 200
+                dosh_account:
+                    $ref: '#/components/schemas/DoshAccount'
+                label:
+                    type: string
+                    minLength: 5
+                    maxLength: 40
+                owner:
+                    $ref: '#/components/schemas/FinancialAccountOwnerInput'
+                pull_configuration:
+                    type: object
+                    additionalProperties: false
+                    properties:
+                        enabled:
+                            type: boolean
+                push_configuration:
+                    type: object
+                    additionalProperties: false
+                    properties:
+                        enabled:
+                            type: boolean
+                reference:
+                    type: string
+                    minLength: 5
+                    maxLength: 40
+                type:
+                    type: string
+                    enum: [dosh_account]
         DoshAccount:
             type: object
             description: Dosh account marker. Dosh credentials and internal identifiers are not supplied by callers or returned publicly.
@@ -23922,12 +24351,12 @@ components:
                     minLength: 1
                     description: Payment method owner's name.
                     example: "Jane Mensah"
-        PaymentMethodTokenizeBase:
+        TokenizeMobileMoneyPaymentMethodRequest:
+            # Why: OpenAPI 3.0 closed allOf branches do not share evaluated properties; flattening
+            # prevents the base branch from rejecting the required mobile_money and owner fields.
             type: object
             additionalProperties: false
-            required:
-                - customer_id
-                - type
+            required: [customer_id, mobile_money, owner, type]
             properties:
                 customer_id:
                     type: string
@@ -23939,35 +24368,22 @@ components:
                 type:
                     type: string
                     enum: [mobile_money]
-        TokenizeMobileMoneyPaymentMethodRequest:
-            allOf:
-                - $ref: '#/components/schemas/PaymentMethodTokenizeBase'
-                - type: object
-                  required:
-                      - mobile_money
-                      - owner
-                  properties:
-                      type:
-                          type: string
-                          enum: [mobile_money]
-                      mobile_money:
-                          type: object
-                          additionalProperties: false
-                          required:
-                              - account_number
-                              - network
-                          properties:
-                              account_number:
-                                  type: string
-                                  minLength: 1
-                                  description: Mobile-money number in a valid local or international phone-number format.
-                                  example: "+233242057831"
-                              network:
-                                  type: string
-                                  enum: [airtel, mtn, telecel, vodafone]
-                                  example: "mtn"
-                      owner:
-                          $ref: '#/components/schemas/PaymentMethodOwnerInput'
+                mobile_money:
+                    type: object
+                    additionalProperties: false
+                    required: [account_number, network]
+                    properties:
+                        account_number:
+                            type: string
+                            minLength: 1
+                            description: Mobile-money number in a valid local or international phone-number format.
+                            example: "+233242057831"
+                        network:
+                            type: string
+                            enum: [airtel, mtn, telecel, vodafone]
+                            example: "mtn"
+                owner:
+                    $ref: '#/components/schemas/PaymentMethodOwnerInput'
         PaymentMethodObject:
             type: object
             additionalProperties: false
