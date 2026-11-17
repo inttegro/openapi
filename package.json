@@ -4,15 +4,18 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "npm run lint:openapi && npm run test:typed-id-patterns && npm run test:error-contract && npm run test:operation-errors && npm run test:simile-soundness && node scripts/check-contract.mjs",
+    "test": "npm run lint:openapi && npm run test:typed-id-patterns && npm run test:error-contract && npm run test:operation-errors && npm run test:simile-soundness && npm run test:simile-service && npm run test:simile-coverage && node scripts/check-contract.mjs",
     "test:error-contract": "node scripts/check-error-contract.mjs",
     "test:operation-errors": "node scripts/check-operation-error-contract.mjs",
     "test:typed-id-patterns": "node scripts/check-typed-id-patterns.mjs",
     "test:simile-soundness": "node scripts/check-simile-soundness.mjs",
+    "test:simile-service": "node scripts/check-simile-service.mjs",
+    "test:simile-coverage": "node scripts/generate-simile-operation-coverage.mjs --check",
     "contract:update": "npm run postman:generate && node scripts/check-contract.mjs --update",
     "lint:openapi": "redocly lint commerce.yml",
     "postman:check": "node scripts/generate-postman.mjs --check",
-    "postman:generate": "node scripts/generate-postman.mjs"
+    "postman:generate": "node scripts/generate-postman.mjs",
+    "simile:coverage": "node scripts/generate-simile-operation-coverage.mjs"
   },
   "devDependencies": {
     "@redocly/cli": "2.79.0",
