@@ -400,7 +400,7 @@ function validateOperationSchemaRoots(operations) {
   for (const { key, operation } of operations.values()) {
     const requestSchema =
       operation.requestBody?.content?.["application/json"]?.schema;
-    if (requestSchema && !requestSchema.$ref) {
+    if (requestSchema && !hasNamedSchemaRoot(requestSchema)) {
       errors.push(
         `${key} JSON request schema must reference a named component`,
       );
@@ -414,7 +414,7 @@ function validateOperationSchemaRoots(operations) {
       }
       const responseSchema =
         inputResponse.content?.["application/json"]?.schema;
-      if (responseSchema && !responseSchema.$ref) {
+      if (responseSchema && !hasNamedSchemaRoot(responseSchema)) {
         errors.push(
           `${key} ${status} JSON response schema must reference a named component`,
         );
@@ -423,6 +423,13 @@ function validateOperationSchemaRoots(operations) {
   }
 
   return errors;
+}
+
+function hasNamedSchemaRoot(schema) {
+  // Why: operation-specific soundness overlays must retain the named public shape while
+  // narrowing it. Treating the leading allOf reference as the root preserves that contract
+  // discipline without forcing semantically distinct error sets into one shared component.
+  return Boolean(schema?.$ref || schema?.allOf?.[0]?.$ref);
 }
 
 function validateRequestBodyRequiredness(operations) {

@@ -147,15 +147,17 @@ function exerciseEveryRelationship() {
       const soundPath = resolve(work, `relationship-${count}-sound.json`);
       const unsoundPath = resolve(work, `relationship-${count}-unsound.json`);
       writeFileSync(contractPath, YAML.stringify(projectedContract(fixture.schema, constraint, count)));
-      writeFileSync(soundPath, `${JSON.stringify(fixture.sound, null, 2)}\n`);
-      writeFileSync(unsoundPath, `${JSON.stringify(fixture.unsound, null, 2)}\n`);
+      // Simile validates the complete request envelope now; wrapping fixtures
+      // keeps the relationship proof on the JSON body selected by Content-Type.
+      writeFileSync(soundPath, `${JSON.stringify(requestFixture(fixture.sound), null, 2)}\n`);
+      writeFileSync(unsoundPath, `${JSON.stringify(requestFixture(fixture.unsound), null, 2)}\n`);
 
       runSimile([
         "run",
         contractPath,
         "--operation-id",
         `simileSoundnessRelationship${count}`,
-        "--body",
+        "--request",
         soundPath,
         "--output",
         "json",
@@ -165,7 +167,7 @@ function exerciseEveryRelationship() {
         contractPath,
         "--operation-id",
         `simileSoundnessRelationship${count}`,
-        "--body",
+        "--request",
         unsoundPath,
         "--output",
         "json",
@@ -174,6 +176,13 @@ function exerciseEveryRelationship() {
     });
   }
   return count;
+}
+
+function requestFixture(body) {
+  return {
+    headers: { "Content-Type": "application/json" },
+    body,
+  };
 }
 
 function projectedContract(schema, constraint, index) {

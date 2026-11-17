@@ -4,7 +4,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "npm run lint:openapi && npm run test:typed-id-patterns && npm run test:simile-soundness && node scripts/check-contract.mjs",
+    "test": "npm run lint:openapi && npm run test:typed-id-patterns && npm run test:error-contract && npm run test:operation-errors && npm run test:simile-soundness && node scripts/check-contract.mjs",
+    "test:error-contract": "node scripts/check-error-contract.mjs",
+    "test:operation-errors": "node scripts/check-operation-error-contract.mjs",
     "test:typed-id-patterns": "node scripts/check-typed-id-patterns.mjs",
     "test:simile-soundness": "node scripts/check-simile-soundness.mjs",
     "contract:update": "npm run postman:generate && node scripts/check-contract.mjs --update",

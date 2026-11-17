@@ -65,7 +65,13 @@ construct during synthesis.
 The audit also uses ordinary OpenAPI keywords for local rules: positive order quantities and money
 values, nonempty refund and payout contribution arrays, fixed masked-account lengths, the
 `processing` payment status already emitted by the implementation, and anchored type-prefix
-patterns on 118 public resource-identifier fields. Those ID patterns follow the public
+patterns on 118 public resource-identifier fields. The public `Error` machine fields (`cause`,
+`code`, `fix_code`, and `type`) are finite enums taken from public error constructors and the
+documented error catalog; `url` is likewise limited to the canonical Studio error pages. The
+`Error.oneOf` variants then bind those fields into the 327 complete tuples emitted by public
+constructors, so synthesis cannot combine individually valid values into a nonexistent error.
+Twelve unused constant- or catalog-only names are deliberately excluded because no public response
+constructs them. Those ID patterns follow the public
 serializers and their domain constants (`app`, `sk`, `file`, `prod`, `sale`, `or`, `py`, `rf`,
 `bt`, `po`, `ch`, and the other allow-listed types); polymorphic and provider-owned identifiers are
 deliberately excluded. The balance-transaction schemas were flattened from closed `allOf`
@@ -96,6 +102,24 @@ the same.
 No new `multiply`, `aggregate(min)`, or `aggregate(max)` clause was added. The audited public
 schemas do not expose a proven derived target that those operators can construct without crossing
 a polymorphic branch or inventing a field.
+
+## Operation-specific error soundness
+
+Every one of the 135 public operations now narrows each declared error response to the public
+error tuples that its handler and shared HTTP middleware can emit at that status. The 498 audited
+operation/status pairs retain their existing direct-error or error-envelope shape; the response
+schema intersects that shape with a pre-filtered `oneOf` tuple subset. The full tuple, rather than
+only `code`, is repeated in the subset because this gives Simile a constructive branch and prevents
+it from searching the unrelated 45-branch global union.
+
+The inventory in `scripts/operation-error-codes.mjs` comes from endpoint registrations, handler
+interpreters, shared authentication, authorization, availability, idempotency and request-parameter
+middleware, plus endpoint tests. It is checked against every error status in the specification, so
+adding an operation or status without auditing its public codes fails the contract test. The audit
+also added 23 already-emitted public codes that were absent from `ErrorCode`, filled the JSON schema
+on 66 already-declared error responses, and added the documented
+503 response for Chime paging when customer resolution is temporarily unavailable. These are
+existing public behaviors made explicit; no success or request shape changed.
 
 ## Unsupported soundness requirements
 
@@ -152,8 +176,9 @@ misstate the public contract:
 - Conditional message-content alternatives require disjunction (`then.any`), and idempotency
   equality spans an HTTP header and a body rather than one schema object. Neither relationship can
   be encoded with the supported clauses.
-- Error documentation URLs are selected by error-code lookup and fallback priority, not by literal
-  string insertion, so `template` would be an incorrect approximation.
+- Error documentation URL selection is still a lookup with fallback priority. The global and
+  operation-specific schemas enumerate every currently proven tuple, but the relationship cannot be
+  reduced to a reusable Simile `template` or equation without a lookup operator.
 
 ## Verification
 
@@ -172,6 +197,12 @@ relationship tests fails the run instead of silently reducing coverage.
 allow-listed typed identifier fields. Every JSON Pointer must resolve to a string schema with the
 expected anchored prefix; the test also exercises one matching value and one cross-resource value
 per field so removing the anchor or weakening the prefix is visible.
+
+`scripts/check-error-contract.mjs` proves the 312-code global inventory and all 327 coherent public
+tuples. `scripts/check-operation-error-contract.mjs` then proves all 135 operation inventories and
+498 status mappings, compiles representative projections with Simile, synthesizes every response
+wrapper family, accepts a sound payload, and rejects an otherwise globally valid tuple that the
+selected operation cannot emit.
 
 The current run compiles the full OpenAPI document (228 total relationships), synthesizes requests
 and responses for 47 audited schema locations, and accepts/rejects 330 relationship fixtures across
