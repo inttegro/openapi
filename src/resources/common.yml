@@ -169,9 +169,26 @@ components:
                     maximum: 50
                     default: 10
         ResourceSearchSort:
-            oneOf:
-                - $ref: '#/components/schemas/ResourceSearchRelevanceSort'
-                - $ref: '#/components/schemas/ResourceSearchChronologicalSort'
+            type: object
+            additionalProperties: false
+            required: [field, direction]
+            # Why: expressing the relevance rule on one concrete object keeps request-to-response
+            # sort preservation constructible; independent oneOf branch selection could otherwise
+            # discard the caller's valid choice while synthesizing the response.
+            x-simile-constraints:
+                - implies:
+                      when: { path: /field, equals: relevance }
+                      then:
+                          all:
+                              - { path: /direction, equals: desc }
+            properties:
+                field:
+                    type: string
+                    enum: [relevance, updated_at, published_at]
+                    description: "`published_at` is supported only by product search."
+                direction:
+                    type: string
+                    enum: [asc, desc]
         ResourceSearchRelevanceSort:
             type: object
             additionalProperties: false
@@ -256,6 +273,195 @@ components:
                     maxLength: 8192
                 freshness:
                     $ref: '#/components/schemas/ResourceSearchFreshness'
+        FinancialAccountSearchResponse:
+            type: object
+            additionalProperties: false
+            required: [search]
+            properties:
+                search:
+                    allOf:
+                        - $ref: '#/components/schemas/ResourceSearchPage'
+                        - type: object
+                          properties:
+                              resource_types:
+                                  type: array
+                                  minItems: 1
+                                  maxItems: 1
+                                  items: { type: string, enum: [financial_account] }
+                              resource_totals:
+                                  type: array
+                                  items:
+                                      allOf:
+                                          - $ref: '#/components/schemas/ResourceSearchResourceTotal'
+                                          - type: object
+                                            properties:
+                                                resource_type: { type: string, enum: [financial_account] }
+                              results:
+                                  type: array
+                                  maxItems: 100
+                                  items:
+                                      allOf:
+                                          - $ref: '#/components/schemas/ResourceSearchResult'
+                                          - type: object
+                                            properties:
+                                                resource:
+                                                    allOf:
+                                                        - $ref: '#/components/schemas/ResourceSearchResourceReference'
+                                                        - type: object
+                                                          properties:
+                                                              type: { type: string, enum: [financial_account] }
+        CustomerSearchResponse:
+            type: object
+            additionalProperties: false
+            required: [search]
+            properties:
+                search:
+                    # Why: a customer search must advertise, total, and return only customer projections.
+                    allOf:
+                        - $ref: '#/components/schemas/ResourceSearchPage'
+                        - type: object
+                          properties:
+                              resource_types:
+                                  type: array
+                                  minItems: 1
+                                  maxItems: 1
+                                  items: { type: string, enum: [customer] }
+                              resource_totals:
+                                  type: array
+                                  items:
+                                      allOf:
+                                          - $ref: '#/components/schemas/ResourceSearchResourceTotal'
+                                          - type: object
+                                            properties:
+                                                resource_type: { type: string, enum: [customer] }
+                              results:
+                                  type: array
+                                  maxItems: 100
+                                  items:
+                                      allOf:
+                                          - $ref: '#/components/schemas/ResourceSearchResult'
+                                          - type: object
+                                            properties:
+                                                resource:
+                                                    allOf:
+                                                        - $ref: '#/components/schemas/ResourceSearchResourceReference'
+                                                        - type: object
+                                                          properties:
+                                                              type: { type: string, enum: [customer] }
+        OrderSearchResponse:
+            type: object
+            additionalProperties: false
+            required: [search]
+            properties:
+                search:
+                    # Why: an order search must advertise, total, and return only order projections.
+                    allOf:
+                        - $ref: '#/components/schemas/ResourceSearchPage'
+                        - type: object
+                          properties:
+                              resource_types:
+                                  type: array
+                                  minItems: 1
+                                  maxItems: 1
+                                  items: { type: string, enum: [order] }
+                              resource_totals:
+                                  type: array
+                                  items:
+                                      allOf:
+                                          - $ref: '#/components/schemas/ResourceSearchResourceTotal'
+                                          - type: object
+                                            properties:
+                                                resource_type: { type: string, enum: [order] }
+                              results:
+                                  type: array
+                                  maxItems: 100
+                                  items:
+                                      allOf:
+                                          - $ref: '#/components/schemas/ResourceSearchResult'
+                                          - type: object
+                                            properties:
+                                                resource:
+                                                    allOf:
+                                                        - $ref: '#/components/schemas/ResourceSearchResourceReference'
+                                                        - type: object
+                                                          properties:
+                                                              type: { type: string, enum: [order] }
+        PayoutSearchResponse:
+            type: object
+            additionalProperties: false
+            required: [search]
+            properties:
+                search:
+                    # Why: a payout search must advertise, total, and return only payout projections.
+                    allOf:
+                        - $ref: '#/components/schemas/ResourceSearchPage'
+                        - type: object
+                          properties:
+                              resource_types:
+                                  type: array
+                                  minItems: 1
+                                  maxItems: 1
+                                  items: { type: string, enum: [payout] }
+                              resource_totals:
+                                  type: array
+                                  items:
+                                      allOf:
+                                          - $ref: '#/components/schemas/ResourceSearchResourceTotal'
+                                          - type: object
+                                            properties:
+                                                resource_type: { type: string, enum: [payout] }
+                              results:
+                                  type: array
+                                  maxItems: 100
+                                  items:
+                                      allOf:
+                                          - $ref: '#/components/schemas/ResourceSearchResult'
+                                          - type: object
+                                            properties:
+                                                resource:
+                                                    allOf:
+                                                        - $ref: '#/components/schemas/ResourceSearchResourceReference'
+                                                        - type: object
+                                                          properties:
+                                                              type: { type: string, enum: [payout] }
+        ProductSearchResponse:
+            type: object
+            additionalProperties: false
+            required: [search]
+            properties:
+                search:
+                    # Why: a product search must advertise, total, and return only product projections.
+                    allOf:
+                        - $ref: '#/components/schemas/ResourceSearchPage'
+                        - type: object
+                          properties:
+                              resource_types:
+                                  type: array
+                                  minItems: 1
+                                  maxItems: 1
+                                  items: { type: string, enum: [product] }
+                              resource_totals:
+                                  type: array
+                                  items:
+                                      allOf:
+                                          - $ref: '#/components/schemas/ResourceSearchResourceTotal'
+                                          - type: object
+                                            properties:
+                                                resource_type: { type: string, enum: [product] }
+                              results:
+                                  type: array
+                                  maxItems: 100
+                                  items:
+                                      allOf:
+                                          - $ref: '#/components/schemas/ResourceSearchResult'
+                                          - type: object
+                                            properties:
+                                                resource:
+                                                    allOf:
+                                                        - $ref: '#/components/schemas/ResourceSearchResourceReference'
+                                                        - type: object
+                                                          properties:
+                                                              type: { type: string, enum: [product] }
         SearchResourceType:
             type: string
             enum: [customer, financial_account, order, payout, product]

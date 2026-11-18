@@ -27,6 +27,19 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/CustomerResponse'
+                            # Why: public request-controlled values must survive into the synthesized operation result.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /billing_address, to: /customer/billing_address }
+                                    - { from: /custom_data, to: /customer/custom_data }
+                                    - { from: /email_address, to: /customer/email_address }
+                                    - { from: /name, to: /customer/name }
+                                    - { from: /phone_number, to: /customer/phone_number }
+                                    - { from: /reference, to: /customer/reference }
+                                    - { from: /shipping_address, to: /customer/shipping_address }
+                                    - { from: /title, to: /customer/title }
+                                    - to: /customer/guest
+                                      value: { literal: false }
                 '400':
                     description: Invalid request
                     headers:
@@ -111,6 +124,10 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/CustomerResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /customer_id, to: /customer/id }
                 '400':
                     description: Invalid request
                     headers:
@@ -195,6 +212,19 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/CustomerResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /customer_id, to: /customer/id }
+                                    - { from: /billing_address, to: /customer/billing_address }
+                                    - { from: /custom_data, to: /customer/custom_data }
+                                    - { from: /email_address, to: /customer/email_address }
+                                    - { from: /name, to: /customer/name }
+                                    - { from: /phone_number, to: /customer/phone_number }
+                                    - { from: /reference, to: /customer/reference }
+                                    - { from: /shipping_address, to: /customer/shipping_address }
+                                    - { from: /suffix, to: /customer/suffix }
+                                    - { from: /title, to: /customer/title }
                 '400':
                     description: Invalid request
                     headers:
@@ -280,6 +310,10 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/PageCustomersResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /page_number, to: /page/number }
                 '400':
                     description: Invalid page request
                     headers:
@@ -375,7 +409,16 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: './common.yml#/components/schemas/ResourceSearchResponse'
+                                # Why: this route must not synthesize projections or totals for another resource family.
+                                $ref: './common.yml#/components/schemas/CustomerSearchResponse'
+                            # Why: public request-controlled values must survive into the synthesized operation result.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /page_size, to: /search/page_size, default: 20 }
+                                    # Why: bind union leaves independently so synthesis preserves the caller's
+                                    # concrete sort choice instead of trying to copy an unresolved oneOf wrapper.
+                                    - { from: /sort/field, to: /search/sort/field }
+                                    - { from: /sort/direction, to: /search/sort/direction }
                 '400':
                     description: Search parameters or cursor are invalid
                     content:
@@ -511,6 +554,8 @@ components:
                     $ref: './common.yml#/components/schemas/CustomDataInput'
                 customer_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed cu_ resource ID.
+                    pattern: '^cu_'
                 email_address:
                     type: string
                     minLength: 3
@@ -559,6 +604,8 @@ components:
             properties:
                 customer_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed cu_ resource ID.
+                    pattern: '^cu_'
                     minLength: 1
                     maxLength: 100
                     description: The customer identifier (with or without cu_ prefix)
@@ -683,6 +730,8 @@ components:
             properties:
                 product_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed prod_ resource ID.
+                    pattern: '^prod_'
                     description: Product ID to associate this price with. It is immutable once set.
                     example: "prod_abc123"
                 label:

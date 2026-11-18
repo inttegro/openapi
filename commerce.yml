@@ -6,8 +6,8 @@ info:
     description: Machine-readable reference for the public Inttegro API
     # Why: contract and client artifacts are reviewed as one immutable bundle;
     # changing soundness rules or executable examples requires a new bundle identity.
-    version: 0.1.0-beta80
-    x-inttegro-collection-version: 0.1.0-beta80
+    version: 0.1.0-beta81
+    x-inttegro-collection-version: 0.1.0-beta81
     contact:
         name: Inttegro Engineering
         url: "https://inttegro.com"
@@ -48,6 +48,20 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/InitiateOTPResponse'
+                            # Why: asynchronous initiation returns before delivery and therefore cannot expose a
+                            # transmission; recipient, sender, and message text are transformed or absent in that flow.
+                            x-simile-from-request:
+                                rules:
+                                    - when:
+                                          all:
+                                              - { request: /async_delivery, equals: true, default: false }
+                                      then:
+                                          set:
+                                              /transaction/status: pending_delivery
+                                          omit:
+                                              - /transaction/transmission
+                                              - /transaction/canceled_at
+                                              - /transaction/cancel_reason
                 '400':
                     description: Bad request - invalid parameters
                     headers:
@@ -137,6 +151,13 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/VerifyOTPResponse'
+                            # Why: the completed attempt must identify the selected transaction and preserve the
+                            # recipient and token that were actually checked; delivery evidence is historical state.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /transaction_id, to: /transaction/id }
+                                    - { from: /recipient, to: /verification_attempt/recipient }
+                                    - { from: /token, to: /verification_attempt/presented_token }
                 '400':
                     description: Bad request - invalid parameters
                     headers:
@@ -223,6 +244,10 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/LookupOTPResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /transaction_id, to: /transaction/id }
                 '400':
                     description: Bad request - invalid parameters
                     headers:
@@ -305,6 +330,16 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/ChimeResponse'
+                            # Why: a successful send must preserve the caller's recipient and authored message fields;
+                            # otherwise Simile could acknowledge a different notification.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /custom_data, to: /chime/custom_data }
+                                    - { from: /email, to: /chime/email }
+                                    - { from: /full_message, to: /chime/full_message }
+                                    - { from: /purpose, to: /chime/purpose }
+                                    - { from: /recipient, to: /chime/recipient }
+                                    - { from: /sender_id, to: /chime/sender_id }
                 '400':
                     description: Invalid request
                     headers:
@@ -485,6 +520,10 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/ChimeResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /chime_id, to: /chime/id }
                 '400':
                     description: Invalid request
                     headers:
@@ -565,6 +604,11 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/PageChimesResponse'
+                            # Why: the returned page number must be the requested/default page; its `size` is the
+                            # number of chimes actually returned and can be smaller than the requested capacity.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /page_number, to: /page/number, default: 1 }
                 '400':
                     description: Invalid page request
                     headers:
@@ -713,6 +757,15 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/ScheduleResponse'
+                            # Why: scheduling must preserve the caller's content, timing, and sender choices; recipient
+                            # objects are resolved to canonical string addresses and therefore are not direct echoes.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /email, to: /scheduled_chime/email }
+                                    - { from: /full_message, to: /scheduled_chime/full_message }
+                                    - { from: /purpose, to: /scheduled_chime/purpose }
+                                    - { from: /send_after, to: /scheduled_chime/send_after }
+                                    - { from: /sender_id, to: /scheduled_chime/sender_id }
                 '400':
                     description: Invalid request
                     headers:
@@ -867,6 +920,13 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/BroadcastResponse'
+                            # Why: a broadcast preserves its caller-authored content and sender; recipient objects are
+                            # resolved to canonical delivery addresses and cannot be asserted as direct echoes.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /email, to: /broadcast/email }
+                                    - { from: /purpose, to: /broadcast/purpose }
+                                    - { from: /sender, to: /broadcast/sender_id }
                 '400':
                     description: Invalid request
                     headers:
@@ -1018,6 +1078,10 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/ScheduleLookupResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /schedule_id, to: /scheduled_chime/id }
                 '400':
                     description: Invalid request
                     headers:
@@ -1100,6 +1164,10 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/ScheduleCancelResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /schedule_id, to: /scheduled_chime/id }
                 '400':
                     description: Invalid request
                     headers:
@@ -1183,6 +1251,10 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/LookupBroadcastResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /broadcast_id, to: /broadcast/id }
                 '400':
                     description: Invalid request
                     headers:
@@ -1265,6 +1337,10 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/BroadcastCancelResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /broadcast_id, to: /broadcast/id }
                 '400':
                     description: Invalid request
                     headers:
@@ -1354,6 +1430,20 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/MessageTemplateEnvelope'
+                            # Why: public request-controlled values must survive into the synthesized operation result.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /about, to: /message_template/about }
+                                    - { from: /attachments, to: /message_template/attachments }
+                                    - { from: /channel, to: /message_template/channel }
+                                    - { from: /email, to: /message_template/email }
+                                    - { from: /locale, to: /message_template/locale }
+                                    - { from: /name, to: /message_template/name }
+                                    - { from: /purpose, to: /message_template/purpose }
+                                    - { from: /sms, to: /message_template/sms }
+                                    - { from: /variables, to: /message_template/variables }
+                                    - to: /message_template/status
+                                      value: { literal: draft }
                 '401':
                     description: Unauthorized - invalid or missing API key
                     headers:
@@ -1444,6 +1534,19 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/MessageTemplateEnvelope'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /id, to: /message_template/id }
+                                    - { from: /about, to: /message_template/about }
+                                    - { from: /attachments, to: /message_template/attachments }
+                                    - { from: /channel, to: /message_template/channel }
+                                    - { from: /email, to: /message_template/email }
+                                    - { from: /locale, to: /message_template/locale }
+                                    - { from: /name, to: /message_template/name }
+                                    - { from: /purpose, to: /message_template/purpose }
+                                    - { from: /sms, to: /message_template/sms }
+                                    - { from: /variables, to: /message_template/variables }
                 '401':
                     description: Unauthorized - invalid or missing API key
                     headers:
@@ -1566,6 +1669,12 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/MessageTemplateEnvelope'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /id, to: /message_template/id }
+                                    - to: /message_template/status
+                                      value: { literal: published }
                 '401':
                     description: Unauthorized - invalid or missing API key
                     headers:
@@ -1688,6 +1797,12 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/MessageTemplateEnvelope'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /id, to: /message_template/id }
+                                    - to: /message_template/status
+                                      value: { literal: archived }
                 '401':
                     description: Unauthorized - invalid or missing API key
                     headers:
@@ -1790,6 +1905,10 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/MessageTemplateEnvelope'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /id, to: /message_template/id }
                 '401':
                     description: Unauthorized - invalid or missing API key
                     headers:
@@ -1871,6 +1990,11 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/MessageTemplatesPageEnvelope'
+                            # Why: the response must identify the requested page, while `size` remains the number of
+                            # templates actually returned after filtering rather than the requested capacity.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /page, to: /page/number, default: 1 }
                 '401':
                     description: Unauthorized - invalid or missing API key
                     headers:
@@ -1950,6 +2074,11 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/RenderMessageTemplatePreviewResponse'
+                            # Why: the preview returns the stored template selected by the reference; binding only its
+                            # identifier leaves the separately rendered variable output free to differ from the input.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /message_template/template_id, to: /message_template/id }
                 '401':
                     description: Unauthorized - invalid or missing API key
                     headers:
@@ -2047,6 +2176,19 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/CustomerResponse'
+                            # Why: public request-controlled values must survive into the synthesized operation result.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /billing_address, to: /customer/billing_address }
+                                    - { from: /custom_data, to: /customer/custom_data }
+                                    - { from: /email_address, to: /customer/email_address }
+                                    - { from: /name, to: /customer/name }
+                                    - { from: /phone_number, to: /customer/phone_number }
+                                    - { from: /reference, to: /customer/reference }
+                                    - { from: /shipping_address, to: /customer/shipping_address }
+                                    - { from: /title, to: /customer/title }
+                                    - to: /customer/guest
+                                      value: { literal: false }
                 '400':
                     description: Invalid request
                     headers:
@@ -2131,6 +2273,10 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/CustomerResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /customer_id, to: /customer/id }
                 '400':
                     description: Invalid request
                     headers:
@@ -2215,6 +2361,19 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/CustomerResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /customer_id, to: /customer/id }
+                                    - { from: /billing_address, to: /customer/billing_address }
+                                    - { from: /custom_data, to: /customer/custom_data }
+                                    - { from: /email_address, to: /customer/email_address }
+                                    - { from: /name, to: /customer/name }
+                                    - { from: /phone_number, to: /customer/phone_number }
+                                    - { from: /reference, to: /customer/reference }
+                                    - { from: /shipping_address, to: /customer/shipping_address }
+                                    - { from: /suffix, to: /customer/suffix }
+                                    - { from: /title, to: /customer/title }
                 '400':
                     description: Invalid request
                     headers:
@@ -2300,6 +2459,10 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/PageCustomersResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /page_number, to: /page/number }
                 '400':
                     description: Invalid page request
                     headers:
@@ -2388,6 +2551,11 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/CheckoutLookupResponse'
+                            # Why: public request-controlled values must survive into the synthesized operation result.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /order_id, to: /order/id }
+                                    - { from: /purchase_intent_id, to: /purchase_intent/id }
                 '400':
                     description: Invalid checkout lookup request
                     headers:
@@ -2460,6 +2628,11 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/CheckoutOrderResponse'
+                            # Why: public request-controlled values must survive into the synthesized operation result.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /order_id, to: /order/id }
+                                    - { from: /purchase_intent_id, to: /order/created_from/resource_id }
                 '400':
                     description: Invalid amount-selection request
                     headers:
@@ -2573,6 +2746,15 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/CheckoutOrderResponse'
+                            # Why: public request-controlled values must survive into the synthesized operation result.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /order_id, to: /order/id }
+                                    - { from: /purchase_intent_id, to: /order/created_from/resource_id }
+                                    - { from: /customer_data/name, to: /order/customer/name }
+                                    - { from: /customer_data/email_address, to: /order/customer/email_address }
+                                    - { from: /customer_data/phone_number, to: /order/customer/phone_number }
+                                    - { from: /payment_method_id, to: /order/payment/payment_method/id }
                 '400':
                     description: Checkout payment request cannot be satisfied
                     headers:
@@ -2697,6 +2879,11 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/CheckoutOrderResponse'
+                            # Why: public request-controlled values must survive into the synthesized operation result.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /order_id, to: /order/id }
+                                    - { from: /payment_id, to: /order/payment/id }
                 '400':
                     description: Invalid checkout payment confirmation request
                     headers:
@@ -2820,6 +3007,10 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/CheckoutOrderResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /order_id, to: /order/id }
                 '400':
                     description: Checkout confirmation request cannot be satisfied
                     headers:
@@ -2982,7 +3173,6 @@ paths:
                                     - { from: /customer_data/phone_number, to: /order/customer/phone_number }
                                     - { from: /number, to: /order/number }
                                     - { from: /receipt_number, to: /order/receipt_number }
-                                    - { from: /checkout_settings, to: /order/checkout_settings }
                                     - { from: /custom_data, to: /order/custom_data }
                                     - { from: /line_items, to: /order/line_item_group/line_items }
                                     - { from: /line_items/*/product/price/currency, to: /order/line_item_group/total/currency }
@@ -3263,6 +3453,10 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/OrderResponse'
+                            # Why: a lookup must return the exact public resource selected by the caller.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /order_id, to: /order/id }
                 '400':
                     description: Order lookup failed
                     headers:
@@ -3347,6 +3541,24 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/OrderResponse'
+                            # Why: an update response must preserve the selected order identity and every
+                            # request field that the public operation replaces verbatim.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /order_id, to: /order/id }
+                                    - { from: /custom_data, to: /order/custom_data }
+                                    - { from: /invoice_settings, to: /order/invoice_settings }
+                                    - { from: /line_items, to: /order/line_item_group/line_items }
+                                    - { from: /number, to: /order/number }
+                                    - { from: /payment_method_id, to: /order/payment/payment_method/id }
+                                    - { from: /receipt_number, to: /order/receipt_number }
+                                    - { from: /statement_descriptor, to: /order/payment/statement_descriptor }
+                                rules:
+                                    - when:
+                                          all:
+                                              - { request: /clear_payment_method, equals: true, default: false }
+                                      then:
+                                          omit: [/order/payment/payment_method]
                 '400':
                     description: Bad request - invalid parameters or mutation precondition not met
                     headers:
@@ -3417,6 +3629,12 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/OrderResponse'
+                            # Why: payment initiation acts on the requested order and, when supplied, must
+                            # expose the same saved payment-method identity in the resulting order snapshot.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /order_id, to: /order/id }
+                                    - { from: /payment_method_id, to: /order/payment/payment_method/id }
                 '400':
                     description: Bad request - invalid parameters
                     headers:
@@ -3530,6 +3748,11 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/OrderResponse'
+                            # Why: confirmation must return the selected Order. The optional payment selector is not
+                            # bound because current Simile cannot construct that optional nested lifecycle coherently.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /order_id, to: /order/id }
                 '400':
                     description: Invalid token or order
                     headers:
@@ -3658,6 +3881,10 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/OrderResponse'
+                            # Why: confirmation delivery must return the order whose confirmation was requested.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /order_id, to: /order/id }
                 '400':
                     description: Order confirmation request is invalid or cannot be satisfied
                     headers:
@@ -3767,6 +3994,12 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/OrderResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /order_id, to: /order/id }
+                                    - to: /order/status
+                                      value: { literal: canceled }
                 '400':
                     description: Order cancellation request is invalid or cannot be satisfied
                     headers:
@@ -3854,6 +4087,10 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/FinalizeOrderResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /order_id, to: /order/id }
                 '401':
                     description: Unauthorized - invalid or missing API key
                     headers:
@@ -3958,6 +4195,12 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/CompleteOrderResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /order_id, to: /order/id }
+                                    - to: /order/status
+                                      value: { literal: completed }
                 '401':
                     description: Unauthorized - invalid or missing API key
                     headers:
@@ -4295,6 +4538,10 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/PageOrdersResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /page_number, to: /page/number }
                 '401':
                     description: Unauthorized - invalid or missing API key
                     headers:
@@ -4390,6 +4637,16 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/RefundResponse'
+                            # Why: public request-controlled values must survive into the synthesized operation result.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /custom_data, to: /refund/custom_data }
+                                    - { from: /order_id, to: /refund/order_id }
+                                    - { from: /reason, to: /refund/reason }
+                                    - { from: /reason_details, to: /refund/reason_details }
+                                    - { from: /reference, to: /refund/reference }
+                                    - to: /refund/status
+                                      value: { literal: pending }
                 '400':
                     description: Invalid refund request
                     headers:
@@ -4545,6 +4802,12 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/RefundResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /refund_id, to: /refund/id }
+                                    - to: /refund/status
+                                      value: { literal: canceled }
                 '400':
                     description: Invalid refund cancellation request
                     headers:
@@ -4697,6 +4960,10 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/RefundResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /refund_id, to: /refund/id }
                 '400':
                     description: Invalid refund lookup request
                     headers:
@@ -4793,6 +5060,10 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/RefundPageResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /page_number, to: /page/number }
                 '400':
                     description: Invalid refund page request
                     headers:
@@ -4895,6 +5166,12 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/CreateApplicationResponse'
+                            # Why: public request-controlled values must survive into the synthesized operation result.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /alias, to: /app/alias }
+                                    - { from: /description, to: /app/description }
+                                    - { from: /name, to: /app/name }
                 '401':
                     description: Unauthorized - invalid or missing API key
                     headers:
@@ -5132,6 +5409,12 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/UpdateApplicationResponse'
+                            # Why: public request-controlled values must survive into the synthesized operation result.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /alias, to: /app/alias }
+                                    - { from: /description, to: /app/description }
+                                    - { from: /name, to: /app/name }
                 '401':
                     description: Unauthorized - invalid or missing API key
                     headers:
@@ -5196,6 +5479,10 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/ChildrenPolicyResponse'
+                            # Why: public request-controlled values must survive into the synthesized operation result.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /version, to: /children_policy/version }
                 '400':
                     description: Invalid children policy lookup request.
                     content:
@@ -5316,6 +5603,11 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/ChildrenPolicyVersionsPageResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /number, to: /page/number, default: 1 }
+                                    - { from: /size, to: /page/size, default: 20 }
                 '400':
                     description: Invalid children policy page request.
                     content:
@@ -5422,6 +5714,40 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/OperatingPolicyResponse'
+                            # Why: public request-controlled values must survive into the synthesized operation result.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /capabilities/payments/currencies, to: /operating_policy/capabilities/payments/currencies }
+                                    - { from: /capabilities/payments/limits, to: /operating_policy/capabilities/payments/limits }
+                                    - { from: /capabilities/payment_methods, to: /operating_policy/capabilities/payment_methods }
+                                    - { from: /capabilities/payouts/enabled, to: /operating_policy/capabilities/payouts/enabled }
+                                    - { from: /capabilities/payouts/limits, to: /operating_policy/capabilities/payouts/limits }
+                                    - { from: /capabilities/payouts/bt_aging_spec/id, to: /operating_policy/capabilities/payouts/bt_aging_spec/id }
+                                    - { from: /description, to: /operating_policy/description }
+                                    - { from: /name, to: /operating_policy/name }
+                                # Why: the public aging catalog resolves each caller-visible ID to one canonical
+                                # duration; without this mapping a synthesized response can pair incompatible values.
+                                rules:
+                                    - when:
+                                          all:
+                                              - { request: /capabilities/payouts/bt_aging_spec/id, equals: bt_aging_spec_immediate }
+                                      then:
+                                          set: { /operating_policy/capabilities/payouts/bt_aging_spec/t_plus: 0h }
+                                    - when:
+                                          all:
+                                              - { request: /capabilities/payouts/bt_aging_spec/id, equals: bt_aging_spec_24_hourly }
+                                      then:
+                                          set: { /operating_policy/capabilities/payouts/bt_aging_spec/t_plus: 24h }
+                                    - when:
+                                          all:
+                                              - { request: /capabilities/payouts/bt_aging_spec/id, equals: bt_aging_spec_48_hourly }
+                                      then:
+                                          set: { /operating_policy/capabilities/payouts/bt_aging_spec/t_plus: 48h }
+                                    - when:
+                                          all:
+                                              - { request: /capabilities/payouts/bt_aging_spec/id, equals: bt_aging_spec_168_hourly }
+                                      then:
+                                          set: { /operating_policy/capabilities/payouts/bt_aging_spec/t_plus: 168h }
                 '400':
                     description: Invalid operating policy request.
                     content:
@@ -5550,6 +5876,13 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/OperatingPolicyResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /operating_policy_id, to: /operating_policy/id }
+                                    # Why: when a historical version is requested, returning a different snapshot
+                                    # would be schema-valid but operationally unrelated to the lookup.
+                                    - { from: /version, to: /operating_policy/version }
                 '400':
                     description: Invalid operating policy lookup request.
                     content:
@@ -5672,6 +6005,11 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/OperatingPolicyVersionsPageResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /number, to: /page/number, default: 1 }
+                                    - { from: /size, to: /page/size, default: 20 }
                 '400':
                     description: Invalid operating policy page request.
                     content:
@@ -5778,6 +6116,47 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/OperatingPolicyResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /operating_policy_id, to: /operating_policy/id }
+                                    # Why: bind the request-owned capability leaves independently because the
+                                    # aging reference expands into a platform-owned response snapshot.
+                                    - { from: /capabilities/payments/currencies, to: /operating_policy/capabilities/payments/currencies }
+                                    - { from: /capabilities/payments/limits, to: /operating_policy/capabilities/payments/limits }
+                                    - { from: /capabilities/payment_methods, to: /operating_policy/capabilities/payment_methods }
+                                    - { from: /capabilities/payouts/enabled, to: /operating_policy/capabilities/payouts/enabled }
+                                    - { from: /capabilities/payouts/limits, to: /operating_policy/capabilities/payouts/limits }
+                                    - { from: /capabilities/payouts/bt_aging_spec/id, to: /operating_policy/capabilities/payouts/bt_aging_spec/id }
+                                    - { from: /description, to: /operating_policy/description }
+                                    - { from: /name, to: /operating_policy/name }
+                                    - to: /operating_policy/version
+                                      value:
+                                          add:
+                                              - { request: /expected_version }
+                                              - { literal: 1 }
+                                # Why: each public catalog ID has one canonical duration in the returned snapshot.
+                                rules:
+                                    - when:
+                                          all:
+                                              - { request: /capabilities/payouts/bt_aging_spec/id, equals: bt_aging_spec_immediate }
+                                      then:
+                                          set: { /operating_policy/capabilities/payouts/bt_aging_spec/t_plus: 0h }
+                                    - when:
+                                          all:
+                                              - { request: /capabilities/payouts/bt_aging_spec/id, equals: bt_aging_spec_24_hourly }
+                                      then:
+                                          set: { /operating_policy/capabilities/payouts/bt_aging_spec/t_plus: 24h }
+                                    - when:
+                                          all:
+                                              - { request: /capabilities/payouts/bt_aging_spec/id, equals: bt_aging_spec_48_hourly }
+                                      then:
+                                          set: { /operating_policy/capabilities/payouts/bt_aging_spec/t_plus: 48h }
+                                    - when:
+                                          all:
+                                              - { request: /capabilities/payouts/bt_aging_spec/id, equals: bt_aging_spec_168_hourly }
+                                      then:
+                                          set: { /operating_policy/capabilities/payouts/bt_aging_spec/t_plus: 168h }
                 '400':
                     description: Invalid operating policy update request.
                     content:
@@ -5920,6 +6299,10 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/GenerateSecretKeyResponse'
+                            # Why: public request-controlled values must survive into the synthesized operation result.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /label, to: /key/label }
                 '401':
                     description: Unauthorized - invalid or missing API key
                     headers:
@@ -6038,6 +6421,10 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/LookupSecretKeyResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /secret_key_id, to: /key/id }
                 '401':
                     description: Unauthorized - invalid or missing API key
                     headers:
@@ -6112,6 +6499,11 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/UpdateSecretKeyResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /secret_key_id, to: /key/id }
+                                    - { from: /label, to: /key/label }
                 '401':
                     description: Unauthorized - invalid or missing API key
                     headers:
@@ -6218,6 +6610,10 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/DestroySecretKeyResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /secret_key_id, to: /key/id }
                 '401':
                     description: Unauthorized - invalid or missing API key
                     headers:
@@ -6322,6 +6718,10 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/SecretKeyUsageResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /secret_key_id, to: /key/id }
                 '401':
                     description: Unauthorized - invalid or missing API key
                     headers:
@@ -6410,6 +6810,15 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/CreateFinancialAccountResponse'
+                            # Why: public request-controlled values must survive into the synthesized operation result.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /currency, to: /account/currency }
+                                    - { from: /custom_data, to: /account/custom_data }
+                                    - { from: /description, to: /account/description }
+                                    - { from: /label, to: /account/label }
+                                    - { from: /reference, to: /account/reference }
+                                    - { from: /type, to: /account/type }
                 '401':
                     description: Unauthorized - missing or invalid API key
                     headers:
@@ -6496,6 +6905,10 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/LookupFinancialAccountResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /account_id, to: /account/id }
                 '401':
                     description: Unauthorized - missing or invalid API key
                     headers:
@@ -6566,6 +6979,10 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/PageFinancialAccountsResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /page_number, to: /page/number }
                 '401':
                     description: Unauthorized - missing or invalid API key
                     headers:
@@ -6657,6 +7074,15 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/ConnectFinancialAccountResponse'
+                            # Why: public request-controlled values must survive into the synthesized operation result.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /currency, to: /account/currency }
+                                    - { from: /custom_data, to: /account/custom_data }
+                                    - { from: /description, to: /account/description }
+                                    - { from: /label, to: /account/label }
+                                    - { from: /reference, to: /account/reference }
+                                    - { from: /type, to: /account/type }
                 '401':
                     description: Unauthorized - missing or invalid API key
                     headers:
@@ -6745,6 +7171,15 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/UpdateFinancialAccountResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /account_id, to: /account/id }
+                                    - { from: /custom_data, to: /account/custom_data }
+                                    - { from: /description, to: /account/description }
+                                    - { from: /label, to: /account/label }
+                                    - { from: /owner, to: /account/owner }
+                                    - { from: /reference, to: /account/reference }
                 '401':
                     description: Unauthorized - missing or invalid API key
                     headers:
@@ -6817,6 +7252,10 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/EnableFinancialAccountPushResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /account_id, to: /account/id }
                 '401':
                     description: Unauthorized - missing or invalid API key
                     headers:
@@ -6889,6 +7328,10 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/DisableFinancialAccountPushResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /account_id, to: /account/id }
                 '401':
                     description: Unauthorized - missing or invalid API key
                     headers:
@@ -6961,6 +7404,10 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/DisconnectFinancialAccountResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /account_id, to: /account/id }
                 '401':
                     description: Unauthorized - missing or invalid API key
                     headers:
@@ -7034,6 +7481,10 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/ReconnectFinancialAccountResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /account_id, to: /account/id }
                 '401':
                     description: Unauthorized - missing or invalid API key
                     headers:
@@ -7106,6 +7557,10 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/EnableFinancialAccountPullResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /account_id, to: /account/id }
                 '401':
                     description: Unauthorized - missing or invalid API key
                     headers:
@@ -7178,6 +7633,10 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/DisableFinancialAccountPullResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /account_id, to: /account/id }
                 '401':
                     description: Unauthorized - missing or invalid API key
                     headers:
@@ -7331,6 +7790,10 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/BalanceTransactionResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /transaction_id, to: /transaction/id }
                 '400':
                     description: Bad request - invalid JSON, unknown field, or missing transaction_id
                     headers:
@@ -7413,6 +7876,10 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/BalanceTransactionPageResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /page_number, to: /page/number }
                 '400':
                     description: Bad request - invalid JSON, unknown field, or invalid pagination values
                     headers:
@@ -7659,6 +8126,10 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/PayoutSettingsMutationResponse'
+                            # Why: public request-controlled values must survive into the synthesized operation result.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /destinations, to: /settings/destinations }
                 '401':
                     description: Unauthorized - Missing or invalid authentication
                     headers:
@@ -7811,6 +8282,17 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/DisableAutomaticPayoutsResponse'
+                            # Why: public request-controlled values must survive into the synthesized operation result.
+                            x-simile-from-request:
+                                bindings:
+                                    - to: /settings/schedule/name
+                                      value: { literal: manual }
+                                    - to: /settings/schedule/type
+                                      value: { literal: manual }
+                                    - to: /settings/schedule/interval
+                                      value: { literal: manual }
+                                    - to: /settings/schedule/schedule_on
+                                      value: { literal: never }
                 '401':
                     description: Unauthorized - Missing or invalid authentication
                     headers:
@@ -7958,6 +8440,10 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/PayoutPageResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /page_number, to: /page/number }
                 '401':
                     description: Unauthorized - missing or invalid API key
                     headers:
@@ -8198,6 +8684,10 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/FileResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /file_id, to: /file/id }
                 '400':
                     description: Invalid request
                     headers:
@@ -8286,6 +8776,10 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/FilePageResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /page_number, to: /page/number }
                 '400':
                     description: Invalid request
                     headers:
@@ -8491,6 +8985,10 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/FileResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /file_id, to: /file/id }
                 '400':
                     description: Invalid request
                     headers:
@@ -8599,6 +9097,27 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/CreateFileLinkResponse'
+                            # Why: public request-controlled values must survive into the synthesized operation result.
+                            x-simile-from-request:
+                                bindings:
+                                    # Why: IP-range restrictions are enforced but intentionally omitted from the
+                                    # public link representation; only response-visible access settings can project.
+                                    - { from: /access/max_accesses, to: /file_link/access/max_accesses }
+                                    - { from: /access/allow_download, to: /file_link/access/allow_download }
+                                    - { from: /access/allowed_origins, to: /file_link/access/allowed_origins }
+                                    - { from: /created_by, to: /file_link/created_by }
+                                    - { from: /custom_data, to: /file_link/custom_data }
+                                    - { from: /delivery, to: /file_link/delivery }
+                                    - { from: /expires_at, to: /file_link/expires_at }
+                                    - { from: /file_id, to: /file_link/file_id }
+                                    # Why: creation always returns a live public capability; allowing any other
+                                    # schema-valid lifecycle would make the synthesized result unreachable.
+                                    - to: /file_link/kind
+                                      value: { literal: public }
+                                    - to: /file_link/status
+                                      value: { literal: active }
+                                    - to: /file_link/active
+                                      value: { literal: true }
                 '400':
                     description: Invalid request
                     headers:
@@ -8690,6 +9209,10 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/FileLinkResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /id, to: /file_link/id }
                 '400':
                     description: Invalid request
                     headers:
@@ -8778,6 +9301,10 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/FileLinkPageResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /page_number, to: /page/number }
                 '400':
                     description: Invalid request
                     headers:
@@ -8855,6 +9382,10 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/FileLinkResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /id, to: /file_link/id }
                 '400':
                     description: Invalid request
                     headers:
@@ -9073,6 +9604,30 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/UploadRequestResponse'
+                            # Why: public request-controlled values must survive into the synthesized operation result.
+                            x-simile-from-request:
+                                bindings:
+                                    # Why: creation initializes server-owned counters at zero; only the caller's
+                                    # maximum-attempt policy is preserved from the request.
+                                    - { from: /attempts/max_attempts, to: /upload_request/attempts/max_attempts }
+                                    - to: /upload_request/attempts/attempt_count
+                                      value: { literal: 0 }
+                                    - to: /upload_request/attempts/failed_attempt_count
+                                      value: { literal: 0 }
+                                    - { from: /constraints, to: /upload_request/constraints }
+                                    - { from: /custom_data, to: /upload_request/custom_data }
+                                    - { from: /display, to: /upload_request/display }
+                                    - { from: /expires_at, to: /upload_request/expires_at }
+                                    - { from: /purpose, to: /upload_request/purpose }
+                                    - { from: /recipient, to: /upload_request/recipient }
+                                    - { from: /requester, to: /upload_request/requester }
+                                    - { from: /resource, to: /upload_request/resource }
+                                    - { from: /subject, to: /upload_request/subject }
+                                    # Why: a newly created upload request is always active and awaiting its first upload.
+                                    - to: /upload_request/status
+                                      value: { literal: pending }
+                                    - to: /upload_request/active
+                                      value: { literal: true }
                 '400':
                     description: Invalid request
                     headers:
@@ -9167,6 +9722,10 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/UploadRequestWithAttemptResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /id, to: /upload_request/id }
                 '400':
                     description: Invalid request
                     headers:
@@ -9255,6 +9814,10 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/UploadRequestPageResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /page_number, to: /page/number }
                 '400':
                     description: Invalid request
                     headers:
@@ -9332,6 +9895,10 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/UploadRequestResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /id, to: /upload_request/id }
                 '400':
                     description: Invalid request
                     headers:
@@ -9440,6 +10007,10 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/UploadRequestWithAttemptResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /id, to: /upload_request/id }
                 '400':
                     description: Invalid request
                     headers:
@@ -9661,6 +10232,11 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/FileReferenceReconcileResponse'
+                            # Why: public request-controlled values must survive into the synthesized operation result.
+                            x-simile-from-request:
+                                bindings:
+                                    - to: /reconciled
+                                      value: { literal: true }
                 '400':
                     description: Invalid request or idempotency key
                     headers:
@@ -9904,6 +10480,10 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/LookupPaymentMethodResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /payment_method_id, to: /payment_method/id }
                 '400':
                     description: Invalid payment method lookup request
                     headers:
@@ -9981,6 +10561,17 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/PaymentMethodPageResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /page_number, to: /page/number, default: 1 }
+                                rules:
+                                    - when:
+                                          all:
+                                              - { request: /page_number, equals: 0, default: 1 }
+                                      then:
+                                          set:
+                                              /page/number: 1
                 '400':
                     description: Invalid payment methods page request
                     headers:
@@ -10080,6 +10671,19 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/UpdatePaymentMethodResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /payment_method_id, to: /payment_method/id }
+                                    - { from: /active, to: /payment_method/active }
+                                    - { from: /custom_data, to: /payment_method/custom_data }
+                                    - { from: /owner, to: /payment_method/owner }
+                                rules:
+                                    - when:
+                                          all:
+                                              - { request: /archived, equals: false }
+                                      then:
+                                          omit: [/payment_method/archived_at]
                 '404':
                     description: Payment method not found
                     headers:
@@ -10161,6 +10765,12 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/ActivatePaymentMethodResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /payment_method_id, to: /payment_method/id }
+                                    - to: /payment_method/active
+                                      value: { literal: true }
                 '404':
                     description: Payment method not found
                     headers:
@@ -10242,6 +10852,12 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/DisactivatePaymentMethodResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /payment_method_id, to: /payment_method/id }
+                                    - to: /payment_method/active
+                                      value: { literal: false }
                 '404':
                     description: Payment method not found
                     headers:
@@ -10324,6 +10940,12 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/ArchivePaymentMethodResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /payment_method_id, to: /payment_method/id }
+                                    - to: /payment_method/active
+                                      value: { literal: false }
                 '404':
                     description: Payment method not found
                     headers:
@@ -10406,6 +11028,10 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/UnarchivePaymentMethodResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /payment_method_id, to: /payment_method/id }
                 '404':
                     description: Payment method not found
                     headers:
@@ -10570,6 +11196,34 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/ProductResponse'
+                            # Why: public request-controlled values must survive into the synthesized operation result.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /about, to: /product/about }
+                                    - { from: /attributes, to: /product/attributes }
+                                    - { from: /category, to: /product/category }
+                                    - { from: /custom_data, to: /product/custom_data }
+                                    - { from: /description, to: /product/description }
+                                    - { from: /dimensions, to: /product/dimensions }
+                                    - { from: /media, to: /product/media }
+                                    - { from: /name, to: /product/name }
+                                    - { from: /reference, to: /product/reference }
+                                    - { from: /shipment, to: /product/shipment }
+                                    - { from: /tax_code, to: /product/tax_code }
+                                    - { from: /type, to: /product/type }
+                                    - { from: /unit_dimension, to: /product/unit_dim }
+                                rules:
+                                    - when:
+                                          all:
+                                              - { request: /publish, equals: true, default: false }
+                                      then:
+                                          set: { /product/active: true }
+                                    - when:
+                                          all:
+                                              - { request: /publish, equals: false, default: false }
+                                      then:
+                                          set: { /product/active: false }
+                                          omit: [/product/published_at]
                             # Why: a fixed success outcome exercises the public publication
                             # invariant instead of returning an arbitrary schema-shaped product.
                             examples:
@@ -10675,6 +11329,17 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/AddProductPriceResponse'
+                            # Why: public request-controlled values must survive into the synthesized operation result.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /about, to: /price/about }
+                                    - { from: /customer_selected_amount, to: /price/customer_selected_amount }
+                                    - { from: /fixed_amount, to: /price/fixed_amount }
+                                    - { from: /label, to: /price/label }
+                                    - { from: /product_id, to: /price/product_id }
+                                    - { from: /type, to: /price/type }
+                                    - to: /price/active
+                                      value: { literal: true }
                 '400':
                     description: Bad request - invalid parameters
                     headers:
@@ -10753,6 +11418,10 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/ProductResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /product_id, to: /product/id }
                 '400':
                     description: Bad request - invalid parameters
                     headers:
@@ -10832,6 +11501,19 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/UpdateProductResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /product_id, to: /product/id }
+                                    - { from: /about, to: /product/about }
+                                    - { from: /category, to: /product/category }
+                                    - { from: /custom_data, to: /product/custom_data }
+                                    - { from: /description, to: /product/description }
+                                    - { from: /dimensions, to: /product/dimensions }
+                                    - { from: /name, to: /product/name }
+                                    - { from: /tax_code, to: /product/tax_code }
+                                    - { from: /type, to: /product/type }
+                                    - { from: /unit_dimension, to: /product/unit_dim }
                 '400':
                     description: Bad request - invalid parameters
                     headers:
@@ -10911,6 +11593,12 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/ProductResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /product_id, to: /product/id }
+                                    - to: /product/active
+                                      value: { literal: true }
                 '400':
                     description: Bad request - invalid parameters
                     headers:
@@ -10990,6 +11678,12 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/ProductResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /product_id, to: /product/id }
+                                    - to: /product/active
+                                      value: { literal: false }
                 '400':
                     description: Bad request - invalid parameters
                     headers:
@@ -11070,6 +11764,12 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/ProductResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /product_id, to: /product/id }
+                                    - to: /product/active
+                                      value: { literal: false }
                 '400':
                     description: Bad request - invalid parameters
                     headers:
@@ -11147,6 +11847,10 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/PageProductsResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /page_number, to: /page/number }
                 '401':
                     description: Unauthorized - invalid or missing API key
                     headers:
@@ -11743,6 +12447,17 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/PriceResponse'
+                            # Why: public request-controlled values must survive into the synthesized operation result.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /about, to: /price/about }
+                                    - { from: /customer_selected_amount, to: /price/customer_selected_amount }
+                                    - { from: /fixed_amount, to: /price/fixed_amount }
+                                    - { from: /label, to: /price/label }
+                                    - { from: /product_id, to: /price/product_id }
+                                    - { from: /type, to: /price/type }
+                                    - to: /price/active
+                                      value: { literal: true }
                 '400':
                     description: Bad request - invalid parameters
                     headers:
@@ -11820,6 +12535,10 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/PriceResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /price_id, to: /price/id }
                 '400':
                     description: Bad request - invalid parameters
                     headers:
@@ -11898,6 +12617,17 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/PricePageResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /page_number, to: /page/number }
+                                rules:
+                                    - when:
+                                          all:
+                                              - { request: /page_number, equals: 0, default: 1 }
+                                      then:
+                                          set:
+                                              /page/number: 1
                 '400':
                     description: Invalid price page request
                     headers:
@@ -11973,6 +12703,12 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/PriceResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /price_id, to: /price/id }
+                                    - { from: /about, to: /price/about }
+                                    - { from: /label, to: /price/label }
                 '400':
                     description: Bad request - invalid parameters
                     headers:
@@ -12055,6 +12791,12 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/PriceResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /price_id, to: /price/id }
+                                    - to: /price/active
+                                      value: { literal: true }
                 '400':
                     description: Bad request - invalid parameters
                     headers:
@@ -12138,6 +12880,12 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/PriceResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /price_id, to: /price/id }
+                                    - to: /price/active
+                                      value: { literal: false }
                 '400':
                     description: Bad request - invalid parameters
                     headers:
@@ -12222,6 +12970,12 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/PriceResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /price_id, to: /price/id }
+                                    - to: /price/active
+                                      value: { literal: false }
                 '400':
                     description: Invalid price archive request
                     headers:
@@ -12367,7 +13121,16 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/ResourceSearchResponse'
+                                # Why: this route must not synthesize projections or totals for another resource family.
+                                $ref: '#/components/schemas/CustomerSearchResponse'
+                            # Why: public request-controlled values must survive into the synthesized operation result.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /page_size, to: /search/page_size, default: 20 }
+                                    # Why: bind union leaves independently so synthesis preserves the caller's
+                                    # concrete sort choice instead of trying to copy an unresolved oneOf wrapper.
+                                    - { from: /sort/field, to: /search/sort/field }
+                                    - { from: /sort/direction, to: /search/sort/direction }
                 '400':
                     description: Search parameters or cursor are invalid
                     content:
@@ -12457,7 +13220,16 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/ResourceSearchResponse'
+                                # Why: this route must not synthesize projections or totals for another resource family.
+                                $ref: '#/components/schemas/FinancialAccountSearchResponse'
+                            # Why: public request-controlled values must survive into the synthesized operation result.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /page_size, to: /search/page_size, default: 20 }
+                                    # Why: bind union leaves independently so synthesis preserves the caller's
+                                    # concrete sort choice instead of trying to copy an unresolved oneOf wrapper.
+                                    - { from: /sort/field, to: /search/sort/field }
+                                    - { from: /sort/direction, to: /search/sort/direction }
                 '400':
                     description: Search parameters or cursor are invalid
                     content:
@@ -12548,7 +13320,16 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/ResourceSearchResponse'
+                                # Why: this route must not synthesize projections or totals for another resource family.
+                                $ref: '#/components/schemas/OrderSearchResponse'
+                            # Why: public request-controlled values must survive into the synthesized operation result.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /page_size, to: /search/page_size, default: 20 }
+                                    # Why: bind union leaves independently so synthesis preserves the caller's
+                                    # concrete sort choice instead of trying to copy an unresolved oneOf wrapper.
+                                    - { from: /sort/field, to: /search/sort/field }
+                                    - { from: /sort/direction, to: /search/sort/direction }
                 '400':
                     description: Search parameters or cursor are invalid
                     content:
@@ -12638,7 +13419,16 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/ResourceSearchResponse'
+                                # Why: this route must not synthesize projections or totals for another resource family.
+                                $ref: '#/components/schemas/PayoutSearchResponse'
+                            # Why: public request-controlled values must survive into the synthesized operation result.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /page_size, to: /search/page_size, default: 20 }
+                                    # Why: bind union leaves independently so synthesis preserves the caller's
+                                    # concrete sort choice instead of trying to copy an unresolved oneOf wrapper.
+                                    - { from: /sort/field, to: /search/sort/field }
+                                    - { from: /sort/direction, to: /search/sort/direction }
                 '400':
                     description: Search parameters or cursor are invalid
                     content:
@@ -12730,7 +13520,16 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/ResourceSearchResponse'
+                                # Why: this route must not synthesize projections or totals for another resource family.
+                                $ref: '#/components/schemas/ProductSearchResponse'
+                            # Why: public request-controlled values must survive into the synthesized operation result.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /page_size, to: /search/page_size, default: 20 }
+                                    # Why: bind union leaves independently so synthesis preserves the caller's
+                                    # concrete sort choice instead of trying to copy an unresolved oneOf wrapper.
+                                    - { from: /sort/field, to: /search/sort/field }
+                                    - { from: /sort/direction, to: /search/sort/direction }
                 '400':
                     description: Search parameters or cursor are invalid
                     content:
@@ -13602,9 +14401,26 @@ components:
                     maximum: 50
                     default: 10
         ResourceSearchSort:
-            oneOf:
-                - $ref: '#/components/schemas/ResourceSearchRelevanceSort'
-                - $ref: '#/components/schemas/ResourceSearchChronologicalSort'
+            type: object
+            additionalProperties: false
+            required: [field, direction]
+            # Why: expressing the relevance rule on one concrete object keeps request-to-response
+            # sort preservation constructible; independent oneOf branch selection could otherwise
+            # discard the caller's valid choice while synthesizing the response.
+            x-simile-constraints:
+                - implies:
+                      when: { path: /field, equals: relevance }
+                      then:
+                          all:
+                              - { path: /direction, equals: desc }
+            properties:
+                field:
+                    type: string
+                    enum: [relevance, updated_at, published_at]
+                    description: "`published_at` is supported only by product search."
+                direction:
+                    type: string
+                    enum: [asc, desc]
         ResourceSearchRelevanceSort:
             type: object
             additionalProperties: false
@@ -13689,6 +14505,195 @@ components:
                     maxLength: 8192
                 freshness:
                     $ref: '#/components/schemas/ResourceSearchFreshness'
+        FinancialAccountSearchResponse:
+            type: object
+            additionalProperties: false
+            required: [search]
+            properties:
+                search:
+                    allOf:
+                        - $ref: '#/components/schemas/ResourceSearchPage'
+                        - type: object
+                          properties:
+                              resource_types:
+                                  type: array
+                                  minItems: 1
+                                  maxItems: 1
+                                  items: { type: string, enum: [financial_account] }
+                              resource_totals:
+                                  type: array
+                                  items:
+                                      allOf:
+                                          - $ref: '#/components/schemas/ResourceSearchResourceTotal'
+                                          - type: object
+                                            properties:
+                                                resource_type: { type: string, enum: [financial_account] }
+                              results:
+                                  type: array
+                                  maxItems: 100
+                                  items:
+                                      allOf:
+                                          - $ref: '#/components/schemas/ResourceSearchResult'
+                                          - type: object
+                                            properties:
+                                                resource:
+                                                    allOf:
+                                                        - $ref: '#/components/schemas/ResourceSearchResourceReference'
+                                                        - type: object
+                                                          properties:
+                                                              type: { type: string, enum: [financial_account] }
+        CustomerSearchResponse:
+            type: object
+            additionalProperties: false
+            required: [search]
+            properties:
+                search:
+                    # Why: a customer search must advertise, total, and return only customer projections.
+                    allOf:
+                        - $ref: '#/components/schemas/ResourceSearchPage'
+                        - type: object
+                          properties:
+                              resource_types:
+                                  type: array
+                                  minItems: 1
+                                  maxItems: 1
+                                  items: { type: string, enum: [customer] }
+                              resource_totals:
+                                  type: array
+                                  items:
+                                      allOf:
+                                          - $ref: '#/components/schemas/ResourceSearchResourceTotal'
+                                          - type: object
+                                            properties:
+                                                resource_type: { type: string, enum: [customer] }
+                              results:
+                                  type: array
+                                  maxItems: 100
+                                  items:
+                                      allOf:
+                                          - $ref: '#/components/schemas/ResourceSearchResult'
+                                          - type: object
+                                            properties:
+                                                resource:
+                                                    allOf:
+                                                        - $ref: '#/components/schemas/ResourceSearchResourceReference'
+                                                        - type: object
+                                                          properties:
+                                                              type: { type: string, enum: [customer] }
+        OrderSearchResponse:
+            type: object
+            additionalProperties: false
+            required: [search]
+            properties:
+                search:
+                    # Why: an order search must advertise, total, and return only order projections.
+                    allOf:
+                        - $ref: '#/components/schemas/ResourceSearchPage'
+                        - type: object
+                          properties:
+                              resource_types:
+                                  type: array
+                                  minItems: 1
+                                  maxItems: 1
+                                  items: { type: string, enum: [order] }
+                              resource_totals:
+                                  type: array
+                                  items:
+                                      allOf:
+                                          - $ref: '#/components/schemas/ResourceSearchResourceTotal'
+                                          - type: object
+                                            properties:
+                                                resource_type: { type: string, enum: [order] }
+                              results:
+                                  type: array
+                                  maxItems: 100
+                                  items:
+                                      allOf:
+                                          - $ref: '#/components/schemas/ResourceSearchResult'
+                                          - type: object
+                                            properties:
+                                                resource:
+                                                    allOf:
+                                                        - $ref: '#/components/schemas/ResourceSearchResourceReference'
+                                                        - type: object
+                                                          properties:
+                                                              type: { type: string, enum: [order] }
+        PayoutSearchResponse:
+            type: object
+            additionalProperties: false
+            required: [search]
+            properties:
+                search:
+                    # Why: a payout search must advertise, total, and return only payout projections.
+                    allOf:
+                        - $ref: '#/components/schemas/ResourceSearchPage'
+                        - type: object
+                          properties:
+                              resource_types:
+                                  type: array
+                                  minItems: 1
+                                  maxItems: 1
+                                  items: { type: string, enum: [payout] }
+                              resource_totals:
+                                  type: array
+                                  items:
+                                      allOf:
+                                          - $ref: '#/components/schemas/ResourceSearchResourceTotal'
+                                          - type: object
+                                            properties:
+                                                resource_type: { type: string, enum: [payout] }
+                              results:
+                                  type: array
+                                  maxItems: 100
+                                  items:
+                                      allOf:
+                                          - $ref: '#/components/schemas/ResourceSearchResult'
+                                          - type: object
+                                            properties:
+                                                resource:
+                                                    allOf:
+                                                        - $ref: '#/components/schemas/ResourceSearchResourceReference'
+                                                        - type: object
+                                                          properties:
+                                                              type: { type: string, enum: [payout] }
+        ProductSearchResponse:
+            type: object
+            additionalProperties: false
+            required: [search]
+            properties:
+                search:
+                    # Why: a product search must advertise, total, and return only product projections.
+                    allOf:
+                        - $ref: '#/components/schemas/ResourceSearchPage'
+                        - type: object
+                          properties:
+                              resource_types:
+                                  type: array
+                                  minItems: 1
+                                  maxItems: 1
+                                  items: { type: string, enum: [product] }
+                              resource_totals:
+                                  type: array
+                                  items:
+                                      allOf:
+                                          - $ref: '#/components/schemas/ResourceSearchResourceTotal'
+                                          - type: object
+                                            properties:
+                                                resource_type: { type: string, enum: [product] }
+                              results:
+                                  type: array
+                                  maxItems: 100
+                                  items:
+                                      allOf:
+                                          - $ref: '#/components/schemas/ResourceSearchResult'
+                                          - type: object
+                                            properties:
+                                                resource:
+                                                    allOf:
+                                                        - $ref: '#/components/schemas/ResourceSearchResourceReference'
+                                                        - type: object
+                                                          properties:
+                                                              type: { type: string, enum: [product] }
         SearchResourceType:
             type: string
             enum: [customer, financial_account, order, payout, product]
@@ -13974,6 +14979,8 @@ components:
             properties:
                 secret_key_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed sk_ resource ID.
+                    pattern: '^sk_'
                     description: Secret key identifier. Typed `sk_...` IDs are accepted.
                     example: sk_2xC7k9gK5yQnZ4w8P1sT6vR3
         LookupSecretKeyResponse:
@@ -13995,6 +15002,8 @@ components:
                     example: Production checkout
                 secret_key_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed sk_ resource ID.
+                    pattern: '^sk_'
                     description: Secret key identifier to update.
                     example: sk_2xC7k9gK5yQnZ4w8P1sT6vR3
         UpdateSecretKeyResponse:
@@ -14012,6 +15021,8 @@ components:
             properties:
                 secret_key_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed sk_ resource ID.
+                    pattern: '^sk_'
                     description: Secret key identifier to revoke.
                     example: sk_2xC7k9gK5yQnZ4w8P1sT6vR3
         DestroySecretKeyResponse:
@@ -14037,6 +15048,8 @@ components:
                     description: Page number alias. Omitted or 0 is normalized to 1.
                 secret_key_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed sk_ resource ID.
+                    pattern: '^sk_'
                     description: Secret key identifier whose recent activity should be returned.
                     example: sk_2xC7k9gK5yQnZ4w8P1sT6vR3
                 size:
@@ -14260,6 +15273,8 @@ components:
             properties:
                 file_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed file_ resource ID.
+                    pattern: '^file_'
                     example: file_2xC7k9gK5yQnZ4w8P1sT6vR3
         PageFilesRequest:
             type: object
@@ -14314,6 +15329,8 @@ components:
             properties:
                 file_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed file_ resource ID.
+                    pattern: '^file_'
                     example: file_2xC7k9gK5yQnZ4w8P1sT6vR3
         FileResponse:
             type: object
@@ -14469,7 +15486,8 @@ components:
                     type: string
                 email:
                     type: string
-                    format: email
+                    # Why: Octo currently trims and echoes actor email labels without validating
+                    # RFC email syntax, so declaring `format: email` would reject real service output.
         FileSource:
             type: object
             additionalProperties: false
@@ -14566,6 +15584,8 @@ components:
             properties:
                 file_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed file_ resource ID.
+                    pattern: '^file_'
                     example: file_2xC7k9gK5yQnZ4w8P1sT6vR3
                 delivery:
                     $ref: '#/components/schemas/FileLinkDelivery'
@@ -14586,6 +15606,8 @@ components:
             properties:
                 id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed flink_ resource ID.
+                    pattern: '^flink_'
                     example: flink_8pQz3LkY6mN2vT9sB4cD1eF0
         PageFileLinksRequest:
             type: object
@@ -14610,6 +15632,8 @@ components:
             properties:
                 id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed flink_ resource ID.
+                    pattern: '^flink_'
                 revoked_by:
                     $ref: '#/components/schemas/FileActorInput'
         CreateFileLinkResponse:
@@ -14849,6 +15873,8 @@ components:
             properties:
                 id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed uplreq_ resource ID.
+                    pattern: '^uplreq_'
                     example: uplreq_1gK9pQ4vL8mN2sT5wX7yZ0
         PageUploadRequestsRequest:
             type: object
@@ -14875,6 +15901,8 @@ components:
             properties:
                 id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed uplreq_ resource ID.
+                    pattern: '^uplreq_'
                 canceled_by:
                     $ref: '#/components/schemas/FileActorInput'
         FulfillUploadRequestRequest:
@@ -14903,6 +15931,8 @@ components:
                     enum: [approved, rejected]
                 id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed uplreq_ resource ID.
+                    pattern: '^uplreq_'
                     minLength: 1
                 public_message:
                     type: string
@@ -14924,6 +15954,8 @@ components:
                     enum: [approved, rejected]
                 id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed uplreq_ resource ID.
+                    pattern: '^uplreq_'
                     minLength: 1
                 public_message:
                     type: string
@@ -15695,6 +16727,8 @@ components:
             properties:
                 customer_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed cu_ resource ID.
+                    pattern: '^cu_'
                     description: ID of existing customer
                     example: "cu_dZjC0hAsYi2dObveagp6pJLoXvgmicoBQj8KuNOZ"
                 payment_method_types:
@@ -15903,6 +16937,8 @@ components:
                     $ref: '#/components/schemas/CustomDataInput'
                 customer_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed cu_ resource ID.
+                    pattern: '^cu_'
                 email_address:
                     type: string
                     minLength: 3
@@ -15951,6 +16987,8 @@ components:
             properties:
                 customer_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed cu_ resource ID.
+                    pattern: '^cu_'
                     minLength: 1
                     maxLength: 100
                     description: The customer identifier (with or without cu_ prefix)
@@ -16264,6 +17302,8 @@ components:
             properties:
                 product_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed prod_ resource ID.
+                    pattern: '^prod_'
                     description: Product ID to lookup
                     example: "prod_abc123"
         UpdateProductRequest:
@@ -16280,6 +17320,8 @@ components:
             properties:
                 product_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed prod_ resource ID.
+                    pattern: '^prod_'
                     description: Product ID to update
                     example: "prod_abc123"
                 type:
@@ -16342,6 +17384,8 @@ components:
             properties:
                 product_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed prod_ resource ID.
+                    pattern: '^prod_'
                     description: Product ID to attach the new price to
                     example: "prod_abc123"
                 label:
@@ -16366,6 +17410,8 @@ components:
             properties:
                 product_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed prod_ resource ID.
+                    pattern: '^prod_'
                     description: Product ID to attach the new price to
                     example: "prod_abc123"
                 label:
@@ -16459,6 +17505,8 @@ components:
             properties:
                 product_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed prod_ resource ID.
+                    pattern: '^prod_'
                     description: Product ID to perform action on
                     example: "prod_abc123"
         ProductResponse:
@@ -16525,10 +17573,14 @@ components:
             properties:
                 id:
                     type: string
+                    # Why: the successful response preserves this selector as a typed product resource ID.
+                    pattern: '^prod_'
                     description: Product ID to sell through the Buy link
                     example: "prod_abc123"
                 variant_set_id:
                     type: string
+                    # Why: the resolved product snapshot preserves this typed variant-set selector.
+                    pattern: '^pg_'
                     description: Optional variant set ID the hosted checkout may use for sibling product selection
                     example: "pg_variantset123"
         PurchaseIntentBundleSelection:
@@ -16540,6 +17592,8 @@ components:
             properties:
                 id:
                     type: string
+                    # Why: the successful response preserves this selector as a typed bundle resource ID.
+                    pattern: '^pbd_'
                     description: App-owned bundle ID to sell through the Buy link
                     example: "pbd_abc123"
         PurchaseIntentPriceSelection:
@@ -16566,6 +17620,8 @@ components:
             properties:
                 id:
                     type: string
+                    # Why: a catalog-price response cannot preserve an untyped price selector.
+                    pattern: '^pr_'
                     description: Active, unarchived app-owned price ID. It must belong to a selected product; for a bundle it must be fixed and use the bundle catalog currency.
                     example: "pr_xyz789"
                 nominal:
@@ -16589,6 +17645,8 @@ components:
                     properties:
                         id:
                             type: string
+                            # Why: the comparison-price response preserves this typed catalog selector.
+                            pattern: '^pr_'
                             description: App-owned fixed comparison price ID. It must belong to a selected product; for a bundle it must use the bundle catalog currency.
                             example: "pr_original123"
                         nominal:
@@ -16597,6 +17655,8 @@ components:
                                 - $ref: '#/components/schemas/PriceParams'
                 original_id:
                     type: string
+                    # Why: the comparison-price response preserves this typed catalog selector.
+                    pattern: '^pr_'
                     description: App-owned comparison price ID when not using original.id
                     example: "pr_original123"
         CreatePurchaseIntentRequest:
@@ -16783,18 +17843,24 @@ components:
                     $ref: '#/components/schemas/PurchaseIntentProductSelection'
                 product_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed prod_ resource ID.
+                    pattern: '^prod_'
                     description: App-owned product ID to sell through the Buy link when not using product
                     example: "prod_abc123"
                 bundle:
                     $ref: '#/components/schemas/PurchaseIntentBundleSelection'
                 bundle_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed pbd_ resource ID.
+                    pattern: '^pbd_'
                     description: App-owned bundle ID to sell through the Buy link when not using bundle
                     example: "pbd_abc123"
                 price:
                     $ref: '#/components/schemas/PurchaseIntentPriceSelection'
                 price_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed pr_ resource ID.
+                    pattern: '^pr_'
                     description: Active, unarchived app-owned price ID. It must belong to a selected product; for a bundle it must be fixed and use the bundle catalog currency.
                     example: "pr_xyz789"
                 quantity:
@@ -16868,6 +17934,8 @@ components:
                     description: RFC3339 expiry timestamp, including a past time for immediate expiry, or null to clear expiry
                 id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed sale_ resource ID.
+                    pattern: '^sale_'
                     minLength: 1
                     description: Purchase intent ID to update. Send this or purchase_intent_id.
                     example: "sale_ABCXYZ"
@@ -16894,6 +17962,8 @@ components:
                             example: 3
                 purchase_intent_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed sale_ resource ID.
+                    pattern: '^sale_'
                     minLength: 1
                     description: Alias for id. If both are present, this value takes precedence.
                     example: "sale_ABCXYZ"
@@ -16987,11 +18057,15 @@ components:
             properties:
                 id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed sale_ resource ID.
+                    pattern: '^sale_'
                     minLength: 1
                     description: Purchase intent ID to cancel. Send this or purchase_intent_id.
                     example: "sale_ABCXYZ"
                 purchase_intent_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed sale_ resource ID.
+                    pattern: '^sale_'
                     minLength: 1
                     description: Alias for id. If both are present, this value takes precedence.
                     example: "sale_ABCXYZ"
@@ -17003,6 +18077,8 @@ components:
             properties:
                 id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed sale_ resource ID.
+                    pattern: '^sale_'
                     minLength: 1
                     description: Purchase intent ID to look up
                     example: "sale_ABCXYZ"
@@ -17432,12 +18508,19 @@ components:
                 - quantity
                 - status
                 - usage
+            # Why: every Buy link targets exactly one catalog resource. Allowing both or neither
+            # would produce a schema-valid response that checkout cannot resolve.
+            anyOf:
+                - required: [product]
+                - required: [bundle]
             # Effective Buy-link status is derived from these persisted lifecycle facts.
             x-simile-constraints:
                 - ordered:
                       paths: [/created_at, /updated_at]
                 - ordered:
                       paths: [/created_at, /inactive_at]
+                - ordered:
+                      paths: [/created_at, /expires_at]
                 - implies:
                       when: { path: /status, equals: active }
                       then:
@@ -17459,6 +18542,30 @@ components:
                           all:
                               - { path: /expires_at, state: non-null }
                               - { path: /inactive_at, state: absent }
+                # A variant snapshot exists exactly when the product target enables variant choice.
+                - implies:
+                      when: { path: /variant_set, state: non-null }
+                      then:
+                          all:
+                              - { path: /allow_variants, equals: true }
+                              - { path: /product, state: non-null }
+                              - { path: /bundle, state: absent }
+                - implies:
+                      when: { path: /variant_set, state: absent }
+                      then:
+                          all:
+                              - { path: /allow_variants, equals: false }
+                - implies:
+                      when: { path: /bundle, state: non-null }
+                      then:
+                          all:
+                              - { path: /product, state: absent }
+                              - { path: /variant_set, state: absent }
+                - implies:
+                      when: { path: /product, state: non-null }
+                      then:
+                          all:
+                              - { path: /bundle, state: absent }
             properties:
                 allow_variants:
                     type: boolean
@@ -17832,6 +18939,8 @@ components:
             properties:
                 price_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed pr_ resource ID.
+                    pattern: '^pr_'
                     description: Price ID to perform the action on
                     example: "pr_xyz789"
         PriceResponse:
@@ -17857,6 +18966,8 @@ components:
             properties:
                 product_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed prod_ resource ID.
+                    pattern: '^prod_'
                     description: Product ID to associate this price with.
                     example: "prod_abc123"
                 label:
@@ -17881,6 +18992,8 @@ components:
             properties:
                 product_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed prod_ resource ID.
+                    pattern: '^prod_'
                     description: Product ID to associate this price with. It is immutable once set.
                     example: "prod_abc123"
                 label:
@@ -18666,6 +19779,8 @@ components:
             properties:
                 id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed mtpl_ resource ID.
+                    pattern: '^mtpl_'
                     description: API-generated message template id.
                     example: "mtpl_receipt"
                 name:
@@ -18705,6 +19820,8 @@ components:
             properties:
                 id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed mtpl_ resource ID.
+                    pattern: '^mtpl_'
                     description: API-generated message template id.
                     example: "mtpl_receipt"
         PageMessageTemplatesRequest:
@@ -18747,6 +19864,8 @@ components:
             properties:
                 template_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed mtpl_ resource ID.
+                    pattern: '^mtpl_'
                     description: API-generated message template id.
                     example: "mtpl_receipt"
                 variables:
@@ -19137,6 +20256,8 @@ components:
             properties:
                 order_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed or_ resource ID.
+                    pattern: '^or_'
                     description: Order whose hosted invoice or receipt link should be delivered.
                     example: "or_48ZW7BGvYUBWc1i6WBkL2jr0iPQP5jUy76mmmHpt"
         OrderDocumentDeliveryResponse:
@@ -19342,6 +20463,8 @@ components:
             properties:
                 order_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed or_ resource ID.
+                    pattern: '^or_'
                     minLength: 1
                     description: The finalized Order to inspect or pay.
                     example: "or_a1b2c3d4e5f6"
@@ -19358,6 +20481,8 @@ components:
             properties:
                 purchase_intent_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed sale_ resource ID.
+                    pattern: '^sale_'
                     minLength: 1
                     description: Purchase Intent whose customer-selected amount policy should be loaded.
                     example: "sale_a1b2c3d4e5f6"
@@ -19384,6 +20509,8 @@ components:
             properties:
                 order_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed or_ resource ID.
+                    pattern: '^or_'
                     minLength: 1
                     description: Existing finalized Order whose amount should be changed before payment begins.
                     example: "or_a1b2c3d4e5f6"
@@ -19542,11 +20669,15 @@ components:
             properties:
                 order_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed or_ resource ID.
+                    pattern: '^or_'
                     minLength: 1
                     description: The finalized Order to pay.
                     example: "or_a1b2c3d4e5f6"
                 payment_method_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed pm_ resource ID.
+                    pattern: '^pm_'
                     minLength: 1
                     description: |
                         A saved payment method owned by the Order's immutable customer. Mutually
@@ -19623,10 +20754,14 @@ components:
             properties:
                 order_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed or_ resource ID.
+                    pattern: '^or_'
                     minLength: 1
                     example: "or_a1b2c3d4e5f6"
                 payment_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed py_ resource ID.
+                    pattern: '^py_'
                     description: Optional payment identifier when already known by the client.
                 confirmation_id:
                     type: string
@@ -22198,6 +23333,9 @@ components:
             properties:
                 order_line_item_id:
                     type: string
+                    # Why: response projection preserves this public selector in a typed order-line field;
+                    # accepting an untyped value would make an otherwise valid refund response impossible.
+                    pattern: '^oli_'
                     description: Strong identifier for the paid order line item being refunded.
                     example: oli_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMN
                 reason:
@@ -22248,6 +23386,8 @@ components:
                         $ref: '#/components/schemas/CreateRefundLineItem'
                 order_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed or_ resource ID.
+                    pattern: '^or_'
                     description: Paid order to refund.
                     example: or_0123456789abcdefghijklmnopqrstuvwxyzABCD
                 reason:
@@ -22269,6 +23409,8 @@ components:
             properties:
                 refund_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed rf_ resource ID.
+                    pattern: '^rf_'
                     description: Refund to cancel before processing begins.
                     example: rf_1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcd
                 reason:
@@ -22285,6 +23427,8 @@ components:
             properties:
                 refund_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed rf_ resource ID.
+                    pattern: '^rf_'
                     description: Refund identifier to retrieve.
                     example: rf_1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcd
         PageRefundsRequest:
@@ -23361,6 +24505,8 @@ components:
             properties:
                 account_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed fa_ resource ID.
+                    pattern: '^fa_'
                     example: fa_1234567890abcdef
         FinancialAccountDisableRequest:
             allOf:
@@ -24420,6 +25566,8 @@ components:
             properties:
                 destination_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed fa_ resource ID.
+                    pattern: '^fa_'
                     description: Financial account that should receive the payout.
                     example: "fa_1234567890abcdef"
                 execute_after:
@@ -24445,6 +25593,8 @@ components:
             properties:
                 payout_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed po_ resource ID.
+                    pattern: '^po_'
                     description: Payout identifier returned when the payout was created.
                     example: "po_yQ2wXm5Dc7Pk9Ls1Vn0RgHaB"
         CancelPayoutRequest:
@@ -24456,6 +25606,8 @@ components:
             properties:
                 payout_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed po_ resource ID.
+                    pattern: '^po_'
                     description: Scheduled payout identifier.
                     example: "po_yQ2wXm5Dc7Pk9Ls1Vn0RgHaB"
         SetPayoutDestinationsRequest:
@@ -24581,6 +25733,8 @@ components:
             properties:
                 customer_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed cu_ resource ID.
+                    pattern: '^cu_'
                     minLength: 1
                     description: Existing customer in the authenticated application who will own the payment method.
                     example: "cu_a1b2c3d4e5"
@@ -24796,6 +25950,9 @@ components:
                             maxLength: 8
                         last4:
                             type: string
+                            # Why: the masked account template is only safe when its source is four digits,
+                            # otherwise a schema-valid response could expose a malformed credential marker.
+                            pattern: '^[0-9]{4}$'
                             description: Last four numeric digits of the normalized wallet number.
                             example: "7831"
                             minLength: 4
@@ -25224,6 +26381,8 @@ components:
             properties:
                 chime_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed ch_ resource ID.
+                    pattern: '^ch_'
                     description: Unique identifier of the chime to look up
                     example: "ch_1234567890abcdef1234567890abcdef12345678"
         PageChimesRequest:
@@ -25876,6 +27035,8 @@ components:
             properties:
                 schedule_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed sch_ resource ID.
+                    pattern: '^sch_'
         CancelScheduleRequest:
             type: object
             additionalProperties: false
@@ -25883,6 +27044,8 @@ components:
             properties:
                 schedule_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed sch_ resource ID.
+                    pattern: '^sch_'
         ScheduleLookupResponse:
             type: object
             additionalProperties: false
@@ -26064,6 +27227,8 @@ components:
             properties:
                 broadcast_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed brc_ resource ID.
+                    pattern: '^brc_'
         LookupBroadcastResponse:
             type: object
             additionalProperties: false
@@ -26078,6 +27243,8 @@ components:
             properties:
                 broadcast_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed brc_ resource ID.
+                    pattern: '^brc_'
         BroadcastCancelResponse:
             type: object
             additionalProperties: false
@@ -26236,6 +27403,9 @@ components:
             properties:
                 transaction_id:
                     type: string
+                    # Why: the response always returns a typed OTP transaction ID, so accepting arbitrary
+                    # strings here would make the request-to-response identity relation impossible to prove.
+                    pattern: '^ot_'
                     description: ID of the OTP transaction to verify (with ot_ prefix)
                     example: "ot_3f8a9c7e2d1b4a6f"
                 recipient:
@@ -26262,6 +27432,8 @@ components:
             properties:
                 transaction_id:
                     type: string
+                    # Why: lookup success echoes a typed OTP transaction ID; constrain the selector to that public type.
+                    pattern: '^ot_'
                     description: ID of the OTP transaction to lookup (with ot_ prefix)
                     example: "ot_3f8a9c7e2d1b4a6f"
         LookupOTPResponse:
@@ -26436,8 +27608,10 @@ components:
             properties:
                 order_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed or_ resource ID.
+                    pattern: '^or_'
                     description: Unique identifier of the order to lookup
-                    example: "JoPtqOmsjgZKwkPvqTrqGsopu07wfC7ttoWqmfwt"
+                    example: "or_JoPtqOmsjgZKwkPvqTrqGsopu07wfC7ttoWqmfwt"
         UpdateOrderRequest:
             type: object
             additionalProperties: false
@@ -26503,6 +27677,8 @@ components:
                     example: "RCPT-12345-REV2"
                 order_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed or_ resource ID.
+                    pattern: '^or_'
                     description: Unique identifier of the order to update.
                     example: "or_48ZW7BGvYUBWc1i6WBkL2jr0iPQP5jUy76mmmHpt"
                 payment_method_data:
@@ -26515,6 +27691,8 @@ components:
                         `billing_details.address.country`.
                 payment_method_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed pm_ resource ID.
+                    pattern: '^pm_'
                     description: |
                         ID of a saved payment method to attach to the order. Mutually exclusive
                         with `payment_method_data` and `clear_payment_method`.
@@ -26572,8 +27750,10 @@ components:
             properties:
                 order_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed or_ resource ID.
+                    pattern: '^or_'
                     description: Unique identifier of the order to pay
-                    example: "GKj7A8lM5wEGRUvbqpI4bkDFsQvpqVyh5fqePNnb"
+                    example: "or_GKj7A8lM5wEGRUvbqpI4bkDFsQvpqVyh5fqePNnb"
                 payment_method_types:
                     type: array
                     description: Payment method types to expose for this payment attempt.
@@ -26583,6 +27763,8 @@ components:
                     $ref: '#/components/schemas/PayOrderPaymentMethodData'
                 payment_method_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed pm_ resource ID.
+                    pattern: '^pm_'
                     description: ID of a saved payment method to use for this payment
                     example: "pm_xyz123abc456"
                 save_payment_method:
@@ -26608,12 +27790,16 @@ components:
             properties:
                 order_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed or_ resource ID.
+                    pattern: '^or_'
                     description: Unique identifier of the order
-                    example: "JoPtqOmsjgZKwkPvqTrqGsopu07wfC7ttoWqmfwt"
+                    example: "or_JoPtqOmsjgZKwkPvqTrqGsopu07wfC7ttoWqmfwt"
                 payment_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed py_ resource ID.
+                    pattern: '^py_'
                     description: Unique identifier of the payment being confirmed
-                    example: "pay_123"
+                    example: "py_123"
                 confirmation_id:
                     type: string
                     description: Unique identifier of the confirmation challenge
@@ -26630,8 +27816,10 @@ components:
             properties:
                 order_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed or_ resource ID.
+                    pattern: '^or_'
                     description: Unique identifier of the order
-                    example: "kAVwBsk6EhQVv2YBUhYAqMf0lktEoQ0S7ZR8y2xi"
+                    example: "or_kAVwBsk6EhQVv2YBUhYAqMf0lktEoQ0S7ZR8y2xi"
         CancelOrderRequest:
             type: object
             additionalProperties: false
@@ -26640,6 +27828,8 @@ components:
             properties:
                 order_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed or_ resource ID.
+                    pattern: '^or_'
                     description: Unique identifier of the order to cancel
                 reason:
                     type: string
@@ -26656,6 +27846,8 @@ components:
             properties:
                 order_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed or_ resource ID.
+                    pattern: '^or_'
                     description: Unique identifier of the order to finalize
                     example: "or_48ZW7BGvYUBWc1i6WBkL2jr0iPQP5jUy76mmmHpt"
         FinalizeOrderResponse:
@@ -26685,6 +27877,8 @@ components:
             properties:
                 order_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed or_ resource ID.
+                    pattern: '^or_'
                     description: Unique identifier of the order to complete
                     example: "or_48ZW7BGvYUBWc1i6WBkL2jr0iPQP5jUy76mmmHpt"
                 paid_out_of_band:
@@ -27136,6 +28330,8 @@ components:
             properties:
                 transaction_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed bt_ resource ID.
+                    pattern: '^bt_'
                     minLength: 1
                     description: Unique identifier of the balance transaction
         PageBalanceTransactionsRequest:
@@ -27202,7 +28398,17 @@ components:
             required: [payment_method]
             properties:
                 payment_method:
-                    $ref: '#/components/schemas/PaymentMethodObject'
+                    # Why: this endpoint accepts only mobile-money tokenization; a generic method
+                    # schema could otherwise synthesize a different, impossible payment rail.
+                    $ref: '#/components/schemas/TokenizedMobileMoneyPaymentMethodObject'
+        TokenizedMobileMoneyPaymentMethodObject:
+            allOf:
+                - $ref: '#/components/schemas/PaymentMethodObject'
+                - type: object
+                  properties:
+                      type:
+                          type: string
+                          enum: [mobile_money]
         LookupPaymentMethodRequest:
             type: object
             additionalProperties: false
@@ -27211,6 +28417,8 @@ components:
             properties:
                 payment_method_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed pm_ resource ID.
+                    pattern: '^pm_'
                     description: ID of the payment method to fetch
                     example: "pm_xyz789"
         LookupPaymentMethodResponse:
@@ -27228,6 +28436,8 @@ components:
             properties:
                 payment_method_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed pm_ resource ID.
+                    pattern: '^pm_'
                     description: ID of the payment method to update
                     example: "pm_xyz789"
                 custom_data:
@@ -27301,6 +28511,8 @@ components:
             properties:
                 payment_method_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed pm_ resource ID.
+                    pattern: '^pm_'
                     description: ID of the payment method to activate
                     example: "pm_xyz789"
         ActivatePaymentMethodResponse:
@@ -27318,6 +28530,8 @@ components:
             properties:
                 payment_method_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed pm_ resource ID.
+                    pattern: '^pm_'
                     description: ID of the payment method to mark inactive
                     example: "pm_xyz789"
         DisactivatePaymentMethodResponse:
@@ -27335,6 +28549,8 @@ components:
             properties:
                 payment_method_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed pm_ resource ID.
+                    pattern: '^pm_'
                     description: ID of the payment method to archive
                     example: "pm_xyz789"
         ArchivePaymentMethodResponse:
@@ -27352,6 +28568,8 @@ components:
             properties:
                 payment_method_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed pm_ resource ID.
+                    pattern: '^pm_'
                     description: ID of the payment method to unarchive
                     example: "pm_xyz789"
         UnarchivePaymentMethodResponse:
@@ -27425,6 +28643,8 @@ components:
             properties:
                 price_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed pr_ resource ID.
+                    pattern: '^pr_'
                     description: The unique identifier of the price to lookup
                     example: "pr_xyz789"
         UpdatePriceRequest:
@@ -27435,6 +28655,8 @@ components:
             properties:
                 price_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed pr_ resource ID.
+                    pattern: '^pr_'
                     description: The unique identifier of the price to update
                     example: "pr_xyz789"
                 label:

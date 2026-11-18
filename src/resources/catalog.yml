@@ -39,6 +39,34 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/ProductResponse'
+                            # Why: public request-controlled values must survive into the synthesized operation result.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /about, to: /product/about }
+                                    - { from: /attributes, to: /product/attributes }
+                                    - { from: /category, to: /product/category }
+                                    - { from: /custom_data, to: /product/custom_data }
+                                    - { from: /description, to: /product/description }
+                                    - { from: /dimensions, to: /product/dimensions }
+                                    - { from: /media, to: /product/media }
+                                    - { from: /name, to: /product/name }
+                                    - { from: /reference, to: /product/reference }
+                                    - { from: /shipment, to: /product/shipment }
+                                    - { from: /tax_code, to: /product/tax_code }
+                                    - { from: /type, to: /product/type }
+                                    - { from: /unit_dimension, to: /product/unit_dim }
+                                rules:
+                                    - when:
+                                          all:
+                                              - { request: /publish, equals: true, default: false }
+                                      then:
+                                          set: { /product/active: true }
+                                    - when:
+                                          all:
+                                              - { request: /publish, equals: false, default: false }
+                                      then:
+                                          set: { /product/active: false }
+                                          omit: [/product/published_at]
                             # Why: a fixed success outcome exercises the public publication
                             # invariant instead of returning an arbitrary schema-shaped product.
                             examples:
@@ -144,6 +172,17 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/AddProductPriceResponse'
+                            # Why: public request-controlled values must survive into the synthesized operation result.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /about, to: /price/about }
+                                    - { from: /customer_selected_amount, to: /price/customer_selected_amount }
+                                    - { from: /fixed_amount, to: /price/fixed_amount }
+                                    - { from: /label, to: /price/label }
+                                    - { from: /product_id, to: /price/product_id }
+                                    - { from: /type, to: /price/type }
+                                    - to: /price/active
+                                      value: { literal: true }
                 '400':
                     description: Bad request - invalid parameters
                     headers:
@@ -222,6 +261,10 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/ProductResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /product_id, to: /product/id }
                 '400':
                     description: Bad request - invalid parameters
                     headers:
@@ -301,6 +344,19 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/UpdateProductResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /product_id, to: /product/id }
+                                    - { from: /about, to: /product/about }
+                                    - { from: /category, to: /product/category }
+                                    - { from: /custom_data, to: /product/custom_data }
+                                    - { from: /description, to: /product/description }
+                                    - { from: /dimensions, to: /product/dimensions }
+                                    - { from: /name, to: /product/name }
+                                    - { from: /tax_code, to: /product/tax_code }
+                                    - { from: /type, to: /product/type }
+                                    - { from: /unit_dimension, to: /product/unit_dim }
                 '400':
                     description: Bad request - invalid parameters
                     headers:
@@ -380,6 +436,12 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/ProductResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /product_id, to: /product/id }
+                                    - to: /product/active
+                                      value: { literal: true }
                 '400':
                     description: Bad request - invalid parameters
                     headers:
@@ -459,6 +521,12 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/ProductResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /product_id, to: /product/id }
+                                    - to: /product/active
+                                      value: { literal: false }
                 '400':
                     description: Bad request - invalid parameters
                     headers:
@@ -539,6 +607,12 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/ProductResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /product_id, to: /product/id }
+                                    - to: /product/active
+                                      value: { literal: false }
                 '400':
                     description: Bad request - invalid parameters
                     headers:
@@ -616,6 +690,10 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/PageProductsResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /page_number, to: /page/number }
                 '401':
                     description: Unauthorized - invalid or missing API key
                     headers:
@@ -698,6 +776,17 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/PriceResponse'
+                            # Why: public request-controlled values must survive into the synthesized operation result.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /about, to: /price/about }
+                                    - { from: /customer_selected_amount, to: /price/customer_selected_amount }
+                                    - { from: /fixed_amount, to: /price/fixed_amount }
+                                    - { from: /label, to: /price/label }
+                                    - { from: /product_id, to: /price/product_id }
+                                    - { from: /type, to: /price/type }
+                                    - to: /price/active
+                                      value: { literal: true }
                 '400':
                     description: Bad request - invalid parameters
                     headers:
@@ -775,6 +864,10 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/PriceResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /price_id, to: /price/id }
                 '400':
                     description: Bad request - invalid parameters
                     headers:
@@ -853,6 +946,17 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/PricePageResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /page_number, to: /page/number }
+                                rules:
+                                    - when:
+                                          all:
+                                              - { request: /page_number, equals: 0, default: 1 }
+                                      then:
+                                          set:
+                                              /page/number: 1
                 '400':
                     description: Invalid price page request
                     headers:
@@ -928,6 +1032,12 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/PriceResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /price_id, to: /price/id }
+                                    - { from: /about, to: /price/about }
+                                    - { from: /label, to: /price/label }
                 '400':
                     description: Bad request - invalid parameters
                     headers:
@@ -1010,6 +1120,12 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/PriceResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /price_id, to: /price/id }
+                                    - to: /price/active
+                                      value: { literal: true }
                 '400':
                     description: Bad request - invalid parameters
                     headers:
@@ -1093,6 +1209,12 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/PriceResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /price_id, to: /price/id }
+                                    - to: /price/active
+                                      value: { literal: false }
                 '400':
                     description: Bad request - invalid parameters
                     headers:
@@ -1177,6 +1299,12 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/PriceResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /price_id, to: /price/id }
+                                    - to: /price/active
+                                      value: { literal: false }
                 '400':
                     description: Invalid price archive request
                     headers:
@@ -1268,7 +1396,16 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: './common.yml#/components/schemas/ResourceSearchResponse'
+                                # Why: this route must not synthesize projections or totals for another resource family.
+                                $ref: './common.yml#/components/schemas/ProductSearchResponse'
+                            # Why: public request-controlled values must survive into the synthesized operation result.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /page_size, to: /search/page_size, default: 20 }
+                                    # Why: bind union leaves independently so synthesis preserves the caller's
+                                    # concrete sort choice instead of trying to copy an unresolved oneOf wrapper.
+                                    - { from: /sort/field, to: /search/sort/field }
+                                    - { from: /sort/direction, to: /search/sort/direction }
                 '400':
                     description: Search parameters or cursor are invalid
                     content:
@@ -1556,6 +1693,8 @@ components:
             properties:
                 product_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed prod_ resource ID.
+                    pattern: '^prod_'
                     description: Product ID to lookup
                     example: "prod_abc123"
         UpdateProductRequest:
@@ -1572,6 +1711,8 @@ components:
             properties:
                 product_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed prod_ resource ID.
+                    pattern: '^prod_'
                     description: Product ID to update
                     example: "prod_abc123"
                 type:
@@ -1634,6 +1775,8 @@ components:
             properties:
                 product_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed prod_ resource ID.
+                    pattern: '^prod_'
                     description: Product ID to attach the new price to
                     example: "prod_abc123"
                 label:
@@ -1658,6 +1801,8 @@ components:
             properties:
                 product_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed prod_ resource ID.
+                    pattern: '^prod_'
                     description: Product ID to attach the new price to
                     example: "prod_abc123"
                 label:
@@ -1726,6 +1871,8 @@ components:
             properties:
                 product_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed prod_ resource ID.
+                    pattern: '^prod_'
                     description: Product ID to perform action on
                     example: "prod_abc123"
         ProductResponse:
@@ -2063,6 +2210,8 @@ components:
             properties:
                 price_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed pr_ resource ID.
+                    pattern: '^pr_'
                     description: Price ID to perform the action on
                     example: "pr_xyz789"
         PriceResponse:
@@ -2088,6 +2237,8 @@ components:
             properties:
                 product_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed prod_ resource ID.
+                    pattern: '^prod_'
                     description: Product ID to associate this price with.
                     example: "prod_abc123"
                 label:
@@ -2402,6 +2553,8 @@ components:
             properties:
                 price_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed pr_ resource ID.
+                    pattern: '^pr_'
                     description: The unique identifier of the price to lookup
                     example: "pr_xyz789"
         UpdatePriceRequest:
@@ -2412,6 +2565,8 @@ components:
             properties:
                 price_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed pr_ resource ID.
+                    pattern: '^pr_'
                     description: The unique identifier of the price to update
                     example: "pr_xyz789"
                 label:

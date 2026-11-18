@@ -151,6 +151,10 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/LookupPaymentMethodResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /payment_method_id, to: /payment_method/id }
                 '400':
                     description: Invalid payment method lookup request
                     headers:
@@ -228,6 +232,17 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/PaymentMethodPageResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /page_number, to: /page/number, default: 1 }
+                                rules:
+                                    - when:
+                                          all:
+                                              - { request: /page_number, equals: 0, default: 1 }
+                                      then:
+                                          set:
+                                              /page/number: 1
                 '400':
                     description: Invalid payment methods page request
                     headers:
@@ -327,6 +342,19 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/UpdatePaymentMethodResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /payment_method_id, to: /payment_method/id }
+                                    - { from: /active, to: /payment_method/active }
+                                    - { from: /custom_data, to: /payment_method/custom_data }
+                                    - { from: /owner, to: /payment_method/owner }
+                                rules:
+                                    - when:
+                                          all:
+                                              - { request: /archived, equals: false }
+                                      then:
+                                          omit: [/payment_method/archived_at]
                 '404':
                     description: Payment method not found
                     headers:
@@ -408,6 +436,12 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/ActivatePaymentMethodResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /payment_method_id, to: /payment_method/id }
+                                    - to: /payment_method/active
+                                      value: { literal: true }
                 '404':
                     description: Payment method not found
                     headers:
@@ -489,6 +523,12 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/DisactivatePaymentMethodResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /payment_method_id, to: /payment_method/id }
+                                    - to: /payment_method/active
+                                      value: { literal: false }
                 '404':
                     description: Payment method not found
                     headers:
@@ -571,6 +611,12 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/ArchivePaymentMethodResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /payment_method_id, to: /payment_method/id }
+                                    - to: /payment_method/active
+                                      value: { literal: false }
                 '404':
                     description: Payment method not found
                     headers:
@@ -653,6 +699,10 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/UnarchivePaymentMethodResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /payment_method_id, to: /payment_method/id }
                 '404':
                     description: Payment method not found
                     headers:
@@ -879,6 +929,8 @@ components:
             properties:
                 customer_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed cu_ resource ID.
+                    pattern: '^cu_'
                     minLength: 1
                     description: Existing customer in the authenticated application who will own the payment method.
                     example: "cu_a1b2c3d4e5"
@@ -1094,6 +1146,9 @@ components:
                             maxLength: 8
                         last4:
                             type: string
+                            # Why: the masked account template is only safe when its source is four digits,
+                            # otherwise a schema-valid response could expose a malformed credential marker.
+                            pattern: '^[0-9]{4}$'
                             description: Last four numeric digits of the normalized wallet number.
                             example: "7831"
                             minLength: 4
@@ -1347,7 +1402,17 @@ components:
             required: [payment_method]
             properties:
                 payment_method:
-                    $ref: '#/components/schemas/PaymentMethodObject'
+                    # Why: this endpoint accepts only mobile-money tokenization; a generic method
+                    # schema could otherwise synthesize a different, impossible payment rail.
+                    $ref: '#/components/schemas/TokenizedMobileMoneyPaymentMethodObject'
+        TokenizedMobileMoneyPaymentMethodObject:
+            allOf:
+                - $ref: '#/components/schemas/PaymentMethodObject'
+                - type: object
+                  properties:
+                      type:
+                          type: string
+                          enum: [mobile_money]
         LookupPaymentMethodRequest:
             type: object
             additionalProperties: false
@@ -1356,6 +1421,8 @@ components:
             properties:
                 payment_method_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed pm_ resource ID.
+                    pattern: '^pm_'
                     description: ID of the payment method to fetch
                     example: "pm_xyz789"
         LookupPaymentMethodResponse:
@@ -1373,6 +1440,8 @@ components:
             properties:
                 payment_method_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed pm_ resource ID.
+                    pattern: '^pm_'
                     description: ID of the payment method to update
                     example: "pm_xyz789"
                 custom_data:
@@ -1446,6 +1515,8 @@ components:
             properties:
                 payment_method_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed pm_ resource ID.
+                    pattern: '^pm_'
                     description: ID of the payment method to activate
                     example: "pm_xyz789"
         ActivatePaymentMethodResponse:
@@ -1463,6 +1534,8 @@ components:
             properties:
                 payment_method_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed pm_ resource ID.
+                    pattern: '^pm_'
                     description: ID of the payment method to mark inactive
                     example: "pm_xyz789"
         DisactivatePaymentMethodResponse:
@@ -1480,6 +1553,8 @@ components:
             properties:
                 payment_method_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed pm_ resource ID.
+                    pattern: '^pm_'
                     description: ID of the payment method to archive
                     example: "pm_xyz789"
         ArchivePaymentMethodResponse:
@@ -1497,6 +1572,8 @@ components:
             properties:
                 payment_method_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed pm_ resource ID.
+                    pattern: '^pm_'
                     description: ID of the payment method to unarchive
                     example: "pm_xyz789"
         UnarchivePaymentMethodResponse:

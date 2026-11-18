@@ -7,12 +7,6 @@ scenario "payment_method_tokenized" {
   }
 }
 
-scenario "product_created" {
-  select "createProduct" {
-    outcome = "created"
-  }
-}
-
 scenario "purchase_intent_created" {
   select "createPurchaseIntent" {
     outcome = "created"
