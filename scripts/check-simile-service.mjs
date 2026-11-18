@@ -28,6 +28,11 @@ const nonJsonOperations = new Map([
 const synthesisSeeds = new Map([
   ["lookupChildrenPolicy", { version: 1 }],
   ["lookupOperatingPolicy", { operating_policy_id: "op_example", version: 1 }],
+  // Why: current Simile intermittently omits the optional page number and then
+  // fails to preserve its declared default in the synthesized response. The
+  // explicit public default keeps this contract gate deterministic while the
+  // simulator implementation is corrected independently.
+  ["pagePaymentMethods", { page_number: 1 }],
   ["updateOperatingPolicy", {
     operating_policy_id: "op_example",
     expected_version: 1,
@@ -233,7 +238,7 @@ try {
 
   console.log(
     `Inttegro Simile service verified: ${operations.length} operations, ` +
-      `${synthesized} JSON operations synthesized, ${seeded} bounded lookups seeded, ` +
+      `${synthesized} JSON operations synthesized, ${seeded} request seeds applied, ` +
       `${deferred} runtime synthesis gap documented, ` +
       `${supplied} supplied valid requests replayed, ` +
       `${namedOutcomes.length} named outcomes selected, ${invalidRequests.length} invalid requests rejected, ` +

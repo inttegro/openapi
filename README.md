@@ -9,6 +9,8 @@ This repository contains the public, machine-readable contract and ready-to-run 
 - [`commerce.yml`](commerce.yml) — the generated, portable public OpenAPI specification.
 - [`smithy/commerce.smithy`](smithy/commerce.smithy) — the generated, readable Smithy 2.0 projection.
 - [`commerce.smithy.json`](commerce.smithy.json) — the generated, fully assembled Smithy JSON AST for consumers that need one portable file.
+- [`typescript/commerce.d.ts`](typescript/commerce.d.ts) — the generated, types-only contract containing public payloads, operations, constraints, relations, and literal examples.
+- [`typescript/proof-kernel.d.ts`](typescript/proof-kernel.d.ts) — the runtime-free type algebra that proves schema paths and request-to-response scenarios.
 - [`insomnia/`](insomnia/) — Insomnia v5.1 collections covering the public API.
 - [`postman/`](postman/) — equivalent Postman Collection v2.1 artifacts generated from Insomnia.
 
@@ -18,7 +20,7 @@ This contract contains only operations intended for API consumers using document
 
 ## Versions
 
-OpenAPI, Smithy, Insomnia, and Postman are released as one collection bundle. The bundle version is declared by `info.version` and `info.x-inttegro-collection-version` in `src/openapi.yml`, copied into `commerce.yml` and the Smithy service, exposed as `collection_version` in the shared client environment, and written to every generated Postman collection.
+OpenAPI, Smithy, the types-only contract, Insomnia, and Postman are released as one collection bundle. The bundle version is declared by `info.version` and `info.x-inttegro-collection-version` in `src/openapi.yml`, copied into `commerce.yml`, Smithy, and the TypeScript declaration contract, exposed as `collection_version` in the shared client environment, and written to every generated Postman collection.
 
 The contract test requires all representations to carry the same version. It also refuses to refresh the reviewed contract lock after an artifact changes unless the collection version is bumped. Insomnia schema 5.1 and Postman Collection 2.1 are file-format versions; they are independent of the Inttegro collection bundle version.
 
@@ -61,6 +63,34 @@ npm run smithy:check
 npm run smithy:compile
 ```
 
+## Use the types-only contract
+
+Consumers that use TypeScript's type system can load `typescript/commerce.d.ts`
+without installing or executing a runtime library. `RequestBody`,
+`ResponseBody`, and `ResponseRelation` expose each operation's payloads and
+soundness proposition. `SchemaDefinitions`, `SchemaConstraintSites`, and
+`OperationExamples` expose the closed source algebra when a consumer needs to
+inspect or prove the contract itself.
+
+The declarations retain all 601 public schemas, all 135 operations, all 238
+cross-field constraints, all 111 request-to-response relations, and every
+named example. The included `createOrder` proof establishes the documented
+request and response as a valid witness and proves that incorrect totals,
+currencies, lifecycle branches, and operation error codes are rejected.
+
+This projection deliberately contains declarations only: `tsc` emits no
+JavaScript. OpenAPI remains the authored HTTP authority while the type-system
+form is evaluated. See [`typescript/README.md`](typescript/README.md) for the
+consumer API and proof layout.
+
+Regenerate and type-check it with:
+
+```sh
+npm run typescript:bundle
+npm run typescript:check
+npm run typescript:compile
+```
+
 ## Use the Insomnia collections
 
 Follow [`insomnia/README.md`](insomnia/README.md) to import the collections, configure a private environment, or run the checkout quickstart with Inso CLI. Keep API keys in a private Insomnia environment, shell environment, or supported external vault; never commit them to this repository.
@@ -84,7 +114,7 @@ npm run postman:generate
 
 ## Keep contract formats and collections in sync
 
-The repository treats the modular OpenAPI source, generated OpenAPI and Smithy artifacts, Insomnia, and Postman as one public contract. CI first proves that `commerce.yml`, `smithy/commerce.smithy`, and `commerce.smithy.json` are reproducible, then requires exact operation coverage, validates request examples against the OpenAPI schemas, checks that Postman is an exact generated counterpart of Insomnia, and verifies a reviewed digest that cannot be refreshed after a one-sided OpenAPI or Insomnia change.
+The repository treats the modular OpenAPI source, generated OpenAPI, Smithy, and types-only artifacts, Insomnia, and Postman as one public contract. CI first proves that `commerce.yml`, `smithy/commerce.smithy`, `commerce.smithy.json`, and `typescript/commerce.d.ts` are reproducible, compiles every type-level proof, then requires exact operation coverage, validates request examples against the OpenAPI schemas, checks that Postman is an exact generated counterpart of Insomnia, and verifies a reviewed digest that cannot be refreshed after a one-sided OpenAPI or Insomnia change.
 
 Run the same contract gate locally:
 
@@ -93,7 +123,7 @@ npm ci
 npm test
 ```
 
-When intentionally changing the API contract, update the appropriate OpenAPI resource and Insomnia, regenerate the portable OpenAPI, Smithy, and Postman artifacts, review them together, and refresh their shared digest. `contract:update` performs all generation steps:
+When intentionally changing the API contract, update the appropriate OpenAPI resource and Insomnia, regenerate the portable OpenAPI, Smithy, types-only, and Postman artifacts, review them together, and refresh their shared digest. `contract:update` performs all generation steps:
 
 ```sh
 npm run contract:update

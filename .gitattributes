@@ -3,11 +3,14 @@ commerce.yml whitespace=-indent-with-non-tab
 # contract is more useful than treating their multi-megabyte bodies as hand code.
 commerce.smithy.json linguist-generated=true whitespace=-indent-with-non-tab
 smithy/commerce.smithy linguist-generated=true
+typescript/commerce.d.ts linguist-generated=true
 # Why: repository source and workflow files intentionally use spaces for
 # indentation, so the global non-tab indentation warning is inapplicable.
 .github/workflows/*.yml whitespace=-indent-with-non-tab
 scripts/*.mjs whitespace=-indent-with-non-tab
+package-lock.json whitespace=-indent-with-non-tab
 smithy/*.smithy whitespace=-indent-with-non-tab
+typescript/*.d.ts whitespace=-indent-with-non-tab
 # Why: modular resource contracts use the same deliberate space-indented YAML style as the bundle.
 src/**/*.yml whitespace=-indent-with-non-tab
 insomnia/*.yaml whitespace=-indent-with-non-tab
