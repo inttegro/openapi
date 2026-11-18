@@ -1,7 +1,8 @@
 {
-  "version": 3,
+  "version": 4,
   "collection_version": "0.1.0-beta80",
   "openapi_sha256": "d22f2ae4c7a8d6bd6fda5d2a8c18d9581d1447585a0dca1fcb6bffdbac5dd90d",
+  "smithy_sha256": "1527ad8812ab0178f148f127bea2ed11d9e537b7d3bc0d69efc80982008e5734",
   "insomnia_sha256": "e61faeddc3d73d6015dc3286996f4566f963b97831b6cda5afcf8a6236a975bd",
   "postman_sha256": "c8085e99bcdec22972d41d853acb2296babf9fe137a0b3c1b1942bcc41281dab",
   "operation_count": 135,

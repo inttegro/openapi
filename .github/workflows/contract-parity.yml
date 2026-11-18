@@ -1,9 +1,12 @@
-name: OpenAPI and client collection parity
+name: Contract representation parity
 
 on:
   pull_request:
     paths:
+      - src/**
       - commerce.yml
+      - commerce.smithy.json
+      - smithy/**
       - insomnia/**
       - postman/**
       - contract.lock.json
@@ -15,7 +18,10 @@ on:
     branches:
       - master
     paths:
+      - src/**
       - commerce.yml
+      - commerce.smithy.json
+      - smithy/**
       - insomnia/**
       - postman/**
       - contract.lock.json
@@ -33,6 +39,17 @@ jobs:
         with:
           node-version: 22
           cache: npm
+      - uses: coursier/cache-action@v8
+      - uses: coursier/setup-action@v3
+      - name: Install pinned OpenAPI to Smithy translator
+        run: |
+          mkdir -p "$RUNNER_TEMP/smithytranslate-bin"
+          cs install --install-dir "$RUNNER_TEMP/smithytranslate-bin" --channel https://disneystreaming.github.io/coursier.json smithytranslate:0.7.10
+          echo "$RUNNER_TEMP/smithytranslate-bin" >> "$GITHUB_PATH"
+      - uses: smithy-lang/setup-smithy-cli@v1
+        with:
+          version: "1.75.0"
+          config: smithy/smithy-build.json
       - run: npm ci
       - run: npm test
       - run: ./insomnia/scripts/validate.sh
