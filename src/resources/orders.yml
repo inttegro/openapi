@@ -128,6 +128,9 @@ paths:
                                                     - type: product
                                                       product:
                                                           id: oli_simile_tshirt
+                                                          # Why: this named response is the witness paired with the
+                                                          # create request, so it must preserve the submitted product type.
+                                                          type: physical
                                                           name: Premium Cotton T-Shirt
                                                           price: { currency: ghs, value: 20000 }
                                                           quantity: 1

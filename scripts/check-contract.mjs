@@ -30,6 +30,7 @@ const PUBLIC_CHECKOUT_OPERATIONS = new Set([
 const rootDir = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const specPath = join(rootDir, "commerce.yml");
 const smithyAstPath = join(rootDir, "commerce.smithy.json");
+const typescriptDir = join(rootDir, "typescript");
 const insomniaDir = join(rootDir, "insomnia");
 const postmanDir = join(rootDir, "postman");
 const lockPath = join(rootDir, "contract.lock.json");
@@ -977,10 +978,13 @@ function inferType(schema) {
 
 function buildLock(operations, insomniaRequests, postmanRequests) {
   return {
-    version: 4,
+    version: 5,
     collection_version: spec.info?.["x-inttegro-collection-version"] ?? "",
     openapi_sha256: hashFile(specPath),
     smithy_sha256: hashFile(smithyAstPath),
+    typescript_sha256: hashArtifacts(typescriptDir, (filePath) =>
+      filePath.endsWith(".d.ts"),
+    ),
     insomnia_sha256: hashArtifacts(insomniaDir, (filePath) =>
       filePath.endsWith(".insomnia.yaml"),
     ),
@@ -1025,7 +1029,7 @@ function checkLock(actual) {
   }
 
   console.log(
-    `OpenAPI, Smithy, Insomnia, and Postman agree on ${actual.operation_count} operations and the reviewed contract lock is current.`,
+    `OpenAPI, Smithy, TypeScript declarations, Insomnia, and Postman agree on ${actual.operation_count} operations and the reviewed contract lock is current.`,
   );
 }
 
@@ -1033,10 +1037,13 @@ function updateContractLock(actual) {
   if (existsSync(lockPath)) {
     const expected = JSON.parse(readFileSync(lockPath, "utf8"));
     const openApiChanged = expected.openapi_sha256 !== actual.openapi_sha256;
+    const smithyChanged = expected.smithy_sha256 !== actual.smithy_sha256;
     const previousInsomniaHash =
       expected.insomnia_sha256 ?? expected.call_sha256;
     const insomniaChanged = previousInsomniaHash !== actual.insomnia_sha256;
     const postmanChanged = expected.postman_sha256 !== actual.postman_sha256;
+    const typescriptChanged =
+      expected.typescript_sha256 !== actual.typescript_sha256;
 
     if (openApiChanged !== insomniaChanged) {
       console.error(
@@ -1049,7 +1056,11 @@ function updateContractLock(actual) {
     if (
       expected.collection_version &&
       expected.collection_version === actual.collection_version &&
-      (openApiChanged || insomniaChanged || postmanChanged)
+      (openApiChanged ||
+        smithyChanged ||
+        insomniaChanged ||
+        postmanChanged ||
+        typescriptChanged)
     ) {
       console.error(
         `Refusing to refresh changed collection artifacts without bumping collection version ${actual.collection_version}.`,
@@ -1063,7 +1074,7 @@ function updateContractLock(actual) {
     );
     if (!lockChanged) {
       console.log(
-        "OpenAPI, Smithy, and client collections are unchanged; the reviewed contract lock is already current.",
+        "OpenAPI, Smithy, TypeScript declarations, and client collections are unchanged; the reviewed contract lock is already current.",
       );
       return;
     }
@@ -1071,7 +1082,7 @@ function updateContractLock(actual) {
 
   writeFileSync(lockPath, `${JSON.stringify(actual, null, 2)}\n`);
   console.log(
-    `Updated ${relative(rootDir, lockPath)} for ${actual.operation_count} OpenAPI and Smithy operations.`,
+    `Updated ${relative(rootDir, lockPath)} for ${actual.operation_count} OpenAPI, Smithy, and TypeScript operations.`,
   );
 }
 
