@@ -31,6 +31,16 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/RefundResponse'
+                            # Why: public request-controlled values must survive into the synthesized operation result.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /custom_data, to: /refund/custom_data }
+                                    - { from: /order_id, to: /refund/order_id }
+                                    - { from: /reason, to: /refund/reason }
+                                    - { from: /reason_details, to: /refund/reason_details }
+                                    - { from: /reference, to: /refund/reference }
+                                    - to: /refund/status
+                                      value: { literal: pending }
                 '400':
                     description: Invalid refund request
                     headers:
@@ -186,6 +196,12 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/RefundResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /refund_id, to: /refund/id }
+                                    - to: /refund/status
+                                      value: { literal: canceled }
                 '400':
                     description: Invalid refund cancellation request
                     headers:
@@ -338,6 +354,10 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/RefundResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /refund_id, to: /refund/id }
                 '400':
                     description: Invalid refund lookup request
                     headers:
@@ -434,6 +454,10 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/RefundPageResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /page_number, to: /page/number }
                 '400':
                     description: Invalid refund page request
                     headers:
@@ -691,6 +715,9 @@ components:
             properties:
                 order_line_item_id:
                     type: string
+                    # Why: response projection preserves this public selector in a typed order-line field;
+                    # accepting an untyped value would make an otherwise valid refund response impossible.
+                    pattern: '^oli_'
                     description: Strong identifier for the paid order line item being refunded.
                     example: oli_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMN
                 reason:
@@ -741,6 +768,8 @@ components:
                         $ref: '#/components/schemas/CreateRefundLineItem'
                 order_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed or_ resource ID.
+                    pattern: '^or_'
                     description: Paid order to refund.
                     example: or_0123456789abcdefghijklmnopqrstuvwxyzABCD
                 reason:
@@ -762,6 +791,8 @@ components:
             properties:
                 refund_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed rf_ resource ID.
+                    pattern: '^rf_'
                     description: Refund to cancel before processing begins.
                     example: rf_1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcd
                 reason:
@@ -778,6 +809,8 @@ components:
             properties:
                 refund_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed rf_ resource ID.
+                    pattern: '^rf_'
                     description: Refund identifier to retrieve.
                     example: rf_1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcd
         PageRefundsRequest:

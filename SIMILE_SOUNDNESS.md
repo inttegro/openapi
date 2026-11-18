@@ -19,6 +19,7 @@ construct during synthesis.
 | `/components/schemas/ChildrenPolicyVersionsPage` | 1 `aggregate(count)` | `count` equals the number of version snapshots returned; `size` remains the requested capacity. |
 | `/components/schemas/OperatingPolicy` | 1 `bounded`, 1 `ordered` | A historical operating-policy version cannot exceed the active version; its public timestamps are chronological. |
 | `/components/schemas/OperatingPolicyVersionsPage` | 1 `aggregate(count)` | `count` equals the number of operating-policy versions returned. |
+| `/components/schemas/ResourceSearchSort` | 1 `implies` | Relevance sorting is always descending; chronological sorting retains either public direction. |
 | `/components/schemas/ResourceSearchPage` | 1 `aggregate(count)` | Ariadne's `result_count` equals the number of public search results in the payload. |
 | `/components/schemas/SecretKeyPage` | 1 `aggregate(count)` | `count` equals the returned key count; `size` remains the requested capacity. |
 | `/components/schemas/SecretKeyUsagePage` | 1 `aggregate(count)` | `count` equals the returned secret-key usage-row count. |
@@ -29,6 +30,7 @@ construct during synthesis.
 | `/components/schemas/CreatePurchaseIntentRequest/properties/quantity` | 1 `bounded` | An optional maximum Buy-link quantity cannot be below the required minimum. |
 | `/components/schemas/UpdatePurchaseIntentRequestFields/properties/quantity` | 1 `bounded` | Replacement Buy-link quantity bounds preserve `max >= min`. |
 | `/components/schemas/PagePurchaseIntentsResponse/properties/page` | 1 `aggregate(count)` | `size` equals the number of purchase intents actually returned. |
+| `/components/schemas/PurchaseIntent` | 3 `ordered`, 8 `implies` | Buy-link lifecycle times are chronological; status evidence, product-versus-bundle targeting, variant availability, and `allow_variants` cannot contradict each other. |
 | `/components/schemas/PurchaseIntent/properties/quantity` | 1 `bounded` | The returned optional maximum quantity cannot be below the minimum. |
 | `/components/schemas/PricePageResponse/properties/page` | 1 `aggregate(count)` | `size` equals the number of prices returned. |
 | `/components/schemas/CustomerSelectedAmountParams` | 1 `bounded` | An optional maximum customer-selected amount cannot be below the required minimum. |
@@ -79,6 +81,28 @@ compositions because OpenAPI 3.0 applies
 `additionalProperties: false` inside each branch; the former composition admitted no instance.
 The component names, JSON fields, required fields, descriptions, and operation references remain
 the same.
+
+Ordinary OpenAPI also narrows the five resource-search responses independently: product, customer,
+order, payout, and financial-account searches can advertise, total, and return only their own
+resource discriminator. The tokenization response likewise fixes the already-public payment-method
+rail to `mobile_money`. These are operation-specific enum constraints, not new response fields.
+
+## Request-to-response reachability
+
+The successful JSON payloads of 111 of 135 operations now declare `x-simile-from-request` bindings
+and conditional rules. They preserve caller-selected IDs, mutable fields, requested/default page
+numbers, search sort/page settings, public state transitions, and policy version arithmetic. The
+test fails if a new success payload lacks either a relation or one of the 24 exact exceptions in
+`scripts/request-response-relation-exceptions.mjs`. It also proves that typed request selectors
+cannot be copied into incompatible response-ID types.
+
+The exceptions are deliberate rather than claims of reachability. They comprise authentication-
+scoped or static empty-request reads; multipart and transport bodies; lifecycle-heavy payout and
+delivery envelopes that current relation-mode synthesis cannot construct; Purchase Intent's
+product-or-bundle target union; mobile-money substring masking; and page normalization that needs a
+conditional numeric transform. `SIMILE_OPERATION_COVERAGE.md` names the status for every operation.
+Smithy retains the same status/content-type maps on each operation under
+`x-inttegro-simile-response-relations`.
 
 ## New-language delta and evidence
 
@@ -139,8 +163,6 @@ misstate the public contract:
   masked-number template in the current compiler. Its fields have enforced lengths, but the
   account-number/`last4` derivation remains uncompiled there. The standalone `PaymentMethodObject`
   does carry the template.
-- `last4` is documented as decimal digits. Simile currently compiles string lengths but not the
-  OpenAPI `pattern` keyword, so a digit-class rule would not survive compilation or synthesis.
 - Several incoming identifier fields intentionally accept either a typed public ID or its raw value.
   A strict type-prefix pattern would reject behavior supported by the request parsers, while an
   optional-prefix pattern would still let synthesis choose an untyped value. Response identifiers
@@ -179,6 +201,16 @@ misstate the public contract:
 - Error documentation URL selection is still a lookup with fallback priority. The global and
   operation-specific schemas enumerate every currently proven tuple, but the relationship cannot be
   reduced to a reusable Simile `template` or equation without a lookup operator.
+- Mobile-money tokenization cannot prove that response `last4` is the final four digits of the raw
+  request account number because the relation language has no substring or masking transform. The
+  response itself is constrained to four decimal digits and `account_number = "****" + last4`.
+- Create-refund allocation cannot yet transform request line allocations into the richer response
+  line snapshots or derive the constrained response total without server-resolved paid amounts.
+- A create-order checkout URL includes the newly generated order ID, so it cannot be copied directly
+  from the request redirect URL. Catalog-resolved product, bundle, price, tax, fee, and shipping
+  snapshots likewise remain response-owned rather than falsely echoed from selectors.
+- Expiry checks against the current clock and server normalization or capping of page sizes are not
+  expressible as deterministic request-to-response clauses with the current operators.
 
 ## Verification
 
@@ -204,6 +236,14 @@ tuples. `scripts/check-operation-error-contract.mjs` then proves all 135 operati
 wrapper family, accepts a sound payload, and rejects an otherwise globally valid tuple that the
 selected operation cannot emit.
 
-The current run compiles the full OpenAPI document (228 total relationships), synthesizes requests
-and responses for 47 audited schema locations, and accepts/rejects 330 relationship fixtures across
-165 allow-listed relationships.
+`scripts/check-request-response-relations.mjs` separately audits all 135 public operations: 111
+operations contain 111 constructive success-payload relations, and the other 24 match the shared
+exception inventory exactly. `scripts/check-simile-service.mjs` compiles the full service, exercises
+all JSON-capable operations, replays every supplied example and additional union witnesses, and
+validates nine exact named scenarios plus negative requests.
+
+The current run compiles the full OpenAPI document, exercises 49 audited schema locations, and
+accepts/rejects 362 fixture payloads across 181 allow-listed relationships. Two Purchase Intent
+schemas use explicit valid witnesses because finite unconstrained generation can choose an
+expensive non-empty target-union branch; every individual relationship still has both a sound and
+an unsound fixture.

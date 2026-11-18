@@ -229,6 +229,19 @@ function projectSmithy(input, openApi, sourceDigest) {
     if (operation.method === "get") {
       idl = addOperationTrait(idl, operation.id, "@readonly");
     }
+    const relations = responseRelations(operation.value);
+    if (Object.keys(relations).length > 0) {
+      // Why: Smithy has no native request-to-response binding trait. Retaining the exact
+      // status/content-type map prevents Smithy consumers from losing the reachability rules
+      // that make synthesized responses coherent with submitted requests in OpenAPI.
+      idl = addOperationTrait(
+        idl,
+        operation.id,
+        openApiExtensionsTrait({
+          "x-inttegro-simile-response-relations": relations,
+        }),
+      );
+    }
   }
 
   // Why: smithytranslate emits Alloy discriminated unions whose target
@@ -825,6 +838,7 @@ function validateCompiledModel(ast, openApi, sourceDigest) {
   }
 
   validateSimileConstraints(shapes, openApi);
+  validateResponseRelations(shapes, openApi);
   validateDirectPatterns(shapes, openApi);
   validateAlternateStatuses(shapes);
 }
@@ -848,6 +862,43 @@ function validateSimileConstraints(shapes, openApi) {
       throw new Error("A Simile constraint was lost in the Smithy projection");
     }
   }
+}
+
+function validateResponseRelations(shapes, openApi) {
+  let retained = 0;
+  for (const operation of operations(openApi)) {
+    const expected = responseRelations(operation.value);
+    const actual =
+      shapes[`${NAMESPACE}#${operation.id}`]?.traits?.[
+        "alloy.openapi#openapiExtensions"
+      ]?.["x-inttegro-simile-response-relations"];
+    if (Object.keys(expected).length === 0) {
+      if (actual !== undefined) {
+        throw new Error(`${operation.id} retained a response relation that OpenAPI does not declare`);
+      }
+      continue;
+    }
+    if (stableJson(actual) !== stableJson(expected)) {
+      throw new Error(`${operation.id} lost an OpenAPI request-response relation in Smithy`);
+    }
+    retained += 1;
+  }
+  if (retained === 0) {
+    throw new Error("Smithy projection retained no request-response relations");
+  }
+}
+
+function responseRelations(operation) {
+  const result = {};
+  for (const [status, response] of Object.entries(operation.responses ?? {})) {
+    for (const [contentType, media] of Object.entries(response?.content ?? {})) {
+      const relation = media?.["x-simile-from-request"];
+      if (relation === undefined) continue;
+      result[status] ??= {};
+      result[status][contentType] = relation;
+    }
+  }
+  return result;
 }
 
 function validateDirectPatterns(shapes, openApi) {

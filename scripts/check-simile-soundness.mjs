@@ -19,6 +19,7 @@ const constrainedObjects = [
   ["components", "schemas", "ChildrenPolicyVersionsPage"],
   ["components", "schemas", "OperatingPolicy"],
   ["components", "schemas", "OperatingPolicyVersionsPage"],
+  ["components", "schemas", "ResourceSearchSort"],
   ["components", "schemas", "ResourceSearchPage"],
   ["components", "schemas", "SecretKeyPage"],
   ["components", "schemas", "SecretKeyUsagePage"],
@@ -29,6 +30,7 @@ const constrainedObjects = [
   ["components", "schemas", "CreatePurchaseIntentRequest", "properties", "quantity"],
   ["components", "schemas", "UpdatePurchaseIntentRequestFields", "properties", "quantity"],
   ["components", "schemas", "PagePurchaseIntentsResponse", "properties", "page"],
+  ["components", "schemas", "PurchaseIntent"],
   ["components", "schemas", "PurchaseIntent", "properties", "quantity"],
   ["components", "schemas", "PricePageResponse", "properties", "page"],
   ["components", "schemas", "CustomerSelectedAmountParams"],
@@ -101,6 +103,7 @@ function synthesizeChangedSchemas() {
     const schema = location.length === 3
       ? { $ref: `#/components/schemas/${location[2]}` }
       : structuredClone(readAt(augmented, location));
+    const seed = schemaSynthesisSeed(location);
     const operationId = `simileSoundnessSchema${index}`;
     augmented.paths[`/__simile_soundness/schema_${index}`] = {
       post: {
@@ -112,7 +115,12 @@ function synthesizeChangedSchemas() {
         responses: {
           "200": {
             description: "Synthetic soundness response",
-            content: { "application/json": { schema } },
+            content: {
+              "application/json": {
+                schema,
+                ...(seed === undefined ? {} : { examples: { witness: { value: seed } } }),
+              },
+            },
           },
         },
       },
@@ -121,16 +129,35 @@ function synthesizeChangedSchemas() {
 
   const augmentedPath = resolve(work, "changed-schemas.yml");
   writeFileSync(augmentedPath, YAML.stringify(augmented));
-  constrainedObjects.forEach((_, index) => {
-    runSimile([
+  constrainedObjects.forEach((location, index) => {
+    const seed = schemaSynthesisSeed(location);
+    const args = [
       "run",
       augmentedPath,
       "--operation-id",
       `simileSoundnessSchema${index}`,
-      "--output",
-      "json",
-    ]);
+    ];
+    if (seed !== undefined) {
+      // Why: finite generation sometimes chooses a non-empty Purchase Intent page or the more
+      // expensive target union. Explicit valid witnesses prove the schema without weakening it.
+      args.push("--request", JSON.stringify({ body: seed }));
+      args.push("--outcome", "witness");
+    }
+    args.push("--output", "json");
+    runSimile(args);
   });
+}
+
+function schemaSynthesisSeed(location) {
+  const locationLabel = label(location);
+  if (locationLabel === "PagePurchaseIntentsResponse.properties.page") {
+    return { number: 1, purchase_intents: [], size: 0 };
+  }
+  if (locationLabel === "PurchaseIntent") {
+    return document.paths["/purchase_intents/create"].post.responses["200"]
+      .content["application/json"].examples.created.value.purchase_intent;
+  }
+  return undefined;
 }
 
 function exerciseEveryRelationship() {

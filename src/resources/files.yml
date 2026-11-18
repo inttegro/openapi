@@ -119,6 +119,10 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/FileResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /file_id, to: /file/id }
                 '400':
                     description: Invalid request
                     headers:
@@ -207,6 +211,10 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/FilePageResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /page_number, to: /page/number }
                 '400':
                     description: Invalid request
                     headers:
@@ -412,6 +420,10 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/FileResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /file_id, to: /file/id }
                 '400':
                     description: Invalid request
                     headers:
@@ -520,6 +532,27 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/CreateFileLinkResponse'
+                            # Why: public request-controlled values must survive into the synthesized operation result.
+                            x-simile-from-request:
+                                bindings:
+                                    # Why: IP-range restrictions are enforced but intentionally omitted from the
+                                    # public link representation; only response-visible access settings can project.
+                                    - { from: /access/max_accesses, to: /file_link/access/max_accesses }
+                                    - { from: /access/allow_download, to: /file_link/access/allow_download }
+                                    - { from: /access/allowed_origins, to: /file_link/access/allowed_origins }
+                                    - { from: /created_by, to: /file_link/created_by }
+                                    - { from: /custom_data, to: /file_link/custom_data }
+                                    - { from: /delivery, to: /file_link/delivery }
+                                    - { from: /expires_at, to: /file_link/expires_at }
+                                    - { from: /file_id, to: /file_link/file_id }
+                                    # Why: creation always returns a live public capability; allowing any other
+                                    # schema-valid lifecycle would make the synthesized result unreachable.
+                                    - to: /file_link/kind
+                                      value: { literal: public }
+                                    - to: /file_link/status
+                                      value: { literal: active }
+                                    - to: /file_link/active
+                                      value: { literal: true }
                 '400':
                     description: Invalid request
                     headers:
@@ -611,6 +644,10 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/FileLinkResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /id, to: /file_link/id }
                 '400':
                     description: Invalid request
                     headers:
@@ -699,6 +736,10 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/FileLinkPageResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /page_number, to: /page/number }
                 '400':
                     description: Invalid request
                     headers:
@@ -776,6 +817,10 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/FileLinkResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /id, to: /file_link/id }
                 '400':
                     description: Invalid request
                     headers:
@@ -994,6 +1039,30 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/UploadRequestResponse'
+                            # Why: public request-controlled values must survive into the synthesized operation result.
+                            x-simile-from-request:
+                                bindings:
+                                    # Why: creation initializes server-owned counters at zero; only the caller's
+                                    # maximum-attempt policy is preserved from the request.
+                                    - { from: /attempts/max_attempts, to: /upload_request/attempts/max_attempts }
+                                    - to: /upload_request/attempts/attempt_count
+                                      value: { literal: 0 }
+                                    - to: /upload_request/attempts/failed_attempt_count
+                                      value: { literal: 0 }
+                                    - { from: /constraints, to: /upload_request/constraints }
+                                    - { from: /custom_data, to: /upload_request/custom_data }
+                                    - { from: /display, to: /upload_request/display }
+                                    - { from: /expires_at, to: /upload_request/expires_at }
+                                    - { from: /purpose, to: /upload_request/purpose }
+                                    - { from: /recipient, to: /upload_request/recipient }
+                                    - { from: /requester, to: /upload_request/requester }
+                                    - { from: /resource, to: /upload_request/resource }
+                                    - { from: /subject, to: /upload_request/subject }
+                                    # Why: a newly created upload request is always active and awaiting its first upload.
+                                    - to: /upload_request/status
+                                      value: { literal: pending }
+                                    - to: /upload_request/active
+                                      value: { literal: true }
                 '400':
                     description: Invalid request
                     headers:
@@ -1088,6 +1157,10 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/UploadRequestWithAttemptResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /id, to: /upload_request/id }
                 '400':
                     description: Invalid request
                     headers:
@@ -1176,6 +1249,10 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/UploadRequestPageResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /page_number, to: /page/number }
                 '400':
                     description: Invalid request
                     headers:
@@ -1253,6 +1330,10 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/UploadRequestResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /id, to: /upload_request/id }
                 '400':
                     description: Invalid request
                     headers:
@@ -1361,6 +1442,10 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/UploadRequestWithAttemptResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /id, to: /upload_request/id }
                 '400':
                     description: Invalid request
                     headers:
@@ -1582,6 +1667,11 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/FileReferenceReconcileResponse'
+                            # Why: public request-controlled values must survive into the synthesized operation result.
+                            x-simile-from-request:
+                                bindings:
+                                    - to: /reconciled
+                                      value: { literal: true }
                 '400':
                     description: Invalid request or idempotency key
                     headers:
@@ -1721,6 +1811,8 @@ components:
             properties:
                 file_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed file_ resource ID.
+                    pattern: '^file_'
                     example: file_2xC7k9gK5yQnZ4w8P1sT6vR3
         PageFilesRequest:
             type: object
@@ -1775,6 +1867,8 @@ components:
             properties:
                 file_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed file_ resource ID.
+                    pattern: '^file_'
                     example: file_2xC7k9gK5yQnZ4w8P1sT6vR3
         FileResponse:
             type: object
@@ -1930,7 +2024,8 @@ components:
                     type: string
                 email:
                     type: string
-                    format: email
+                    # Why: Octo currently trims and echoes actor email labels without validating
+                    # RFC email syntax, so declaring `format: email` would reject real service output.
         FileSource:
             type: object
             additionalProperties: false
@@ -2027,6 +2122,8 @@ components:
             properties:
                 file_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed file_ resource ID.
+                    pattern: '^file_'
                     example: file_2xC7k9gK5yQnZ4w8P1sT6vR3
                 delivery:
                     $ref: '#/components/schemas/FileLinkDelivery'
@@ -2047,6 +2144,8 @@ components:
             properties:
                 id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed flink_ resource ID.
+                    pattern: '^flink_'
                     example: flink_8pQz3LkY6mN2vT9sB4cD1eF0
         PageFileLinksRequest:
             type: object
@@ -2071,6 +2170,8 @@ components:
             properties:
                 id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed flink_ resource ID.
+                    pattern: '^flink_'
                 revoked_by:
                     $ref: '#/components/schemas/FileActorInput'
         CreateFileLinkResponse:
@@ -2310,6 +2411,8 @@ components:
             properties:
                 id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed uplreq_ resource ID.
+                    pattern: '^uplreq_'
                     example: uplreq_1gK9pQ4vL8mN2sT5wX7yZ0
         PageUploadRequestsRequest:
             type: object
@@ -2336,6 +2439,8 @@ components:
             properties:
                 id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed uplreq_ resource ID.
+                    pattern: '^uplreq_'
                 canceled_by:
                     $ref: '#/components/schemas/FileActorInput'
         FulfillUploadRequestRequest:
@@ -2364,6 +2469,8 @@ components:
                     enum: [approved, rejected]
                 id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed uplreq_ resource ID.
+                    pattern: '^uplreq_'
                     minLength: 1
                 public_message:
                     type: string
@@ -2385,6 +2492,8 @@ components:
                     enum: [approved, rejected]
                 id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed uplreq_ resource ID.
+                    pattern: '^uplreq_'
                     minLength: 1
                 public_message:
                     type: string

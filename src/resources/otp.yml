@@ -31,6 +31,20 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/InitiateOTPResponse'
+                            # Why: asynchronous initiation returns before delivery and therefore cannot expose a
+                            # transmission; recipient, sender, and message text are transformed or absent in that flow.
+                            x-simile-from-request:
+                                rules:
+                                    - when:
+                                          all:
+                                              - { request: /async_delivery, equals: true, default: false }
+                                      then:
+                                          set:
+                                              /transaction/status: pending_delivery
+                                          omit:
+                                              - /transaction/transmission
+                                              - /transaction/canceled_at
+                                              - /transaction/cancel_reason
                 '400':
                     description: Bad request - invalid parameters
                     headers:
@@ -120,6 +134,13 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/VerifyOTPResponse'
+                            # Why: the completed attempt must identify the selected transaction and preserve the
+                            # recipient and token that were actually checked; delivery evidence is historical state.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /transaction_id, to: /transaction/id }
+                                    - { from: /recipient, to: /verification_attempt/recipient }
+                                    - { from: /token, to: /verification_attempt/presented_token }
                 '400':
                     description: Bad request - invalid parameters
                     headers:
@@ -206,6 +227,10 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/LookupOTPResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /transaction_id, to: /transaction/id }
                 '400':
                     description: Bad request - invalid parameters
                     headers:
@@ -344,6 +369,9 @@ components:
             properties:
                 transaction_id:
                     type: string
+                    # Why: the response always returns a typed OTP transaction ID, so accepting arbitrary
+                    # strings here would make the request-to-response identity relation impossible to prove.
+                    pattern: '^ot_'
                     description: ID of the OTP transaction to verify (with ot_ prefix)
                     example: "ot_3f8a9c7e2d1b4a6f"
                 recipient:
@@ -370,6 +398,8 @@ components:
             properties:
                 transaction_id:
                     type: string
+                    # Why: lookup success echoes a typed OTP transaction ID; constrain the selector to that public type.
+                    pattern: '^ot_'
                     description: ID of the OTP transaction to lookup (with ot_ prefix)
                     example: "ot_3f8a9c7e2d1b4a6f"
         LookupOTPResponse:

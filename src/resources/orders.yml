@@ -69,7 +69,6 @@ paths:
                                     - { from: /customer_data/phone_number, to: /order/customer/phone_number }
                                     - { from: /number, to: /order/number }
                                     - { from: /receipt_number, to: /order/receipt_number }
-                                    - { from: /checkout_settings, to: /order/checkout_settings }
                                     - { from: /custom_data, to: /order/custom_data }
                                     - { from: /line_items, to: /order/line_item_group/line_items }
                                     - { from: /line_items/*/product/price/currency, to: /order/line_item_group/total/currency }
@@ -350,6 +349,10 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/OrderResponse'
+                            # Why: a lookup must return the exact public resource selected by the caller.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /order_id, to: /order/id }
                 '400':
                     description: Order lookup failed
                     headers:
@@ -434,6 +437,24 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/OrderResponse'
+                            # Why: an update response must preserve the selected order identity and every
+                            # request field that the public operation replaces verbatim.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /order_id, to: /order/id }
+                                    - { from: /custom_data, to: /order/custom_data }
+                                    - { from: /invoice_settings, to: /order/invoice_settings }
+                                    - { from: /line_items, to: /order/line_item_group/line_items }
+                                    - { from: /number, to: /order/number }
+                                    - { from: /payment_method_id, to: /order/payment/payment_method/id }
+                                    - { from: /receipt_number, to: /order/receipt_number }
+                                    - { from: /statement_descriptor, to: /order/payment/statement_descriptor }
+                                rules:
+                                    - when:
+                                          all:
+                                              - { request: /clear_payment_method, equals: true, default: false }
+                                      then:
+                                          omit: [/order/payment/payment_method]
                 '400':
                     description: Bad request - invalid parameters or mutation precondition not met
                     headers:
@@ -504,6 +525,12 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/OrderResponse'
+                            # Why: payment initiation acts on the requested order and, when supplied, must
+                            # expose the same saved payment-method identity in the resulting order snapshot.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /order_id, to: /order/id }
+                                    - { from: /payment_method_id, to: /order/payment/payment_method/id }
                 '400':
                     description: Bad request - invalid parameters
                     headers:
@@ -617,6 +644,11 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/OrderResponse'
+                            # Why: confirmation must return the selected Order. The optional payment selector is not
+                            # bound because current Simile cannot construct that optional nested lifecycle coherently.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /order_id, to: /order/id }
                 '400':
                     description: Invalid token or order
                     headers:
@@ -745,6 +777,10 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/OrderResponse'
+                            # Why: confirmation delivery must return the order whose confirmation was requested.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /order_id, to: /order/id }
                 '400':
                     description: Order confirmation request is invalid or cannot be satisfied
                     headers:
@@ -854,6 +890,12 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/OrderResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /order_id, to: /order/id }
+                                    - to: /order/status
+                                      value: { literal: canceled }
                 '400':
                     description: Order cancellation request is invalid or cannot be satisfied
                     headers:
@@ -941,6 +983,10 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/FinalizeOrderResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /order_id, to: /order/id }
                 '401':
                     description: Unauthorized - invalid or missing API key
                     headers:
@@ -1045,6 +1091,12 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/CompleteOrderResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /order_id, to: /order/id }
+                                    - to: /order/status
+                                      value: { literal: completed }
                 '401':
                     description: Unauthorized - invalid or missing API key
                     headers:
@@ -1382,6 +1434,10 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/PageOrdersResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /page_number, to: /page/number }
                 '401':
                     description: Unauthorized - invalid or missing API key
                     headers:
@@ -1487,7 +1543,16 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: './common.yml#/components/schemas/ResourceSearchResponse'
+                                # Why: this route must not synthesize projections or totals for another resource family.
+                                $ref: './common.yml#/components/schemas/OrderSearchResponse'
+                            # Why: public request-controlled values must survive into the synthesized operation result.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /page_size, to: /search/page_size, default: 20 }
+                                    # Why: bind union leaves independently so synthesis preserves the caller's
+                                    # concrete sort choice instead of trying to copy an unresolved oneOf wrapper.
+                                    - { from: /sort/field, to: /search/sort/field }
+                                    - { from: /sort/direction, to: /search/sort/direction }
                 '400':
                     description: Search parameters or cursor are invalid
                     content:
@@ -1823,6 +1888,8 @@ components:
             properties:
                 customer_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed cu_ resource ID.
+                    pattern: '^cu_'
                     description: ID of existing customer
                     example: "cu_dZjC0hAsYi2dObveagp6pJLoXvgmicoBQj8KuNOZ"
                 payment_method_types:
@@ -2336,6 +2403,8 @@ components:
             properties:
                 order_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed or_ resource ID.
+                    pattern: '^or_'
                     description: Order whose hosted invoice or receipt link should be delivered.
                     example: "or_48ZW7BGvYUBWc1i6WBkL2jr0iPQP5jUy76mmmHpt"
         OrderDocumentDeliveryResponse:
@@ -3324,8 +3393,10 @@ components:
             properties:
                 order_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed or_ resource ID.
+                    pattern: '^or_'
                     description: Unique identifier of the order to lookup
-                    example: "JoPtqOmsjgZKwkPvqTrqGsopu07wfC7ttoWqmfwt"
+                    example: "or_JoPtqOmsjgZKwkPvqTrqGsopu07wfC7ttoWqmfwt"
         UpdateOrderRequest:
             type: object
             additionalProperties: false
@@ -3391,6 +3462,8 @@ components:
                     example: "RCPT-12345-REV2"
                 order_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed or_ resource ID.
+                    pattern: '^or_'
                     description: Unique identifier of the order to update.
                     example: "or_48ZW7BGvYUBWc1i6WBkL2jr0iPQP5jUy76mmmHpt"
                 payment_method_data:
@@ -3403,6 +3476,8 @@ components:
                         `billing_details.address.country`.
                 payment_method_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed pm_ resource ID.
+                    pattern: '^pm_'
                     description: |
                         ID of a saved payment method to attach to the order. Mutually exclusive
                         with `payment_method_data` and `clear_payment_method`.
@@ -3460,8 +3535,10 @@ components:
             properties:
                 order_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed or_ resource ID.
+                    pattern: '^or_'
                     description: Unique identifier of the order to pay
-                    example: "GKj7A8lM5wEGRUvbqpI4bkDFsQvpqVyh5fqePNnb"
+                    example: "or_GKj7A8lM5wEGRUvbqpI4bkDFsQvpqVyh5fqePNnb"
                 payment_method_types:
                     type: array
                     description: Payment method types to expose for this payment attempt.
@@ -3471,6 +3548,8 @@ components:
                     $ref: '#/components/schemas/PayOrderPaymentMethodData'
                 payment_method_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed pm_ resource ID.
+                    pattern: '^pm_'
                     description: ID of a saved payment method to use for this payment
                     example: "pm_xyz123abc456"
                 save_payment_method:
@@ -3496,12 +3575,16 @@ components:
             properties:
                 order_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed or_ resource ID.
+                    pattern: '^or_'
                     description: Unique identifier of the order
-                    example: "JoPtqOmsjgZKwkPvqTrqGsopu07wfC7ttoWqmfwt"
+                    example: "or_JoPtqOmsjgZKwkPvqTrqGsopu07wfC7ttoWqmfwt"
                 payment_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed py_ resource ID.
+                    pattern: '^py_'
                     description: Unique identifier of the payment being confirmed
-                    example: "pay_123"
+                    example: "py_123"
                 confirmation_id:
                     type: string
                     description: Unique identifier of the confirmation challenge
@@ -3518,8 +3601,10 @@ components:
             properties:
                 order_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed or_ resource ID.
+                    pattern: '^or_'
                     description: Unique identifier of the order
-                    example: "kAVwBsk6EhQVv2YBUhYAqMf0lktEoQ0S7ZR8y2xi"
+                    example: "or_kAVwBsk6EhQVv2YBUhYAqMf0lktEoQ0S7ZR8y2xi"
         CancelOrderRequest:
             type: object
             additionalProperties: false
@@ -3528,6 +3613,8 @@ components:
             properties:
                 order_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed or_ resource ID.
+                    pattern: '^or_'
                     description: Unique identifier of the order to cancel
                 reason:
                     type: string
@@ -3544,6 +3631,8 @@ components:
             properties:
                 order_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed or_ resource ID.
+                    pattern: '^or_'
                     description: Unique identifier of the order to finalize
                     example: "or_48ZW7BGvYUBWc1i6WBkL2jr0iPQP5jUy76mmmHpt"
         FinalizeOrderResponse:
@@ -3573,6 +3662,8 @@ components:
             properties:
                 order_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed or_ resource ID.
+                    pattern: '^or_'
                     description: Unique identifier of the order to complete
                     example: "or_48ZW7BGvYUBWc1i6WBkL2jr0iPQP5jUy76mmmHpt"
                 paid_out_of_band:

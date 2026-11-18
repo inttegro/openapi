@@ -27,6 +27,16 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/ChimeResponse'
+                            # Why: a successful send must preserve the caller's recipient and authored message fields;
+                            # otherwise Simile could acknowledge a different notification.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /custom_data, to: /chime/custom_data }
+                                    - { from: /email, to: /chime/email }
+                                    - { from: /full_message, to: /chime/full_message }
+                                    - { from: /purpose, to: /chime/purpose }
+                                    - { from: /recipient, to: /chime/recipient }
+                                    - { from: /sender_id, to: /chime/sender_id }
                 '400':
                     description: Invalid request
                     headers:
@@ -207,6 +217,10 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/ChimeResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /chime_id, to: /chime/id }
                 '400':
                     description: Invalid request
                     headers:
@@ -287,6 +301,11 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/PageChimesResponse'
+                            # Why: the returned page number must be the requested/default page; its `size` is the
+                            # number of chimes actually returned and can be smaller than the requested capacity.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /page_number, to: /page/number, default: 1 }
                 '400':
                     description: Invalid page request
                     headers:
@@ -435,6 +454,15 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/ScheduleResponse'
+                            # Why: scheduling must preserve the caller's content, timing, and sender choices; recipient
+                            # objects are resolved to canonical string addresses and therefore are not direct echoes.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /email, to: /scheduled_chime/email }
+                                    - { from: /full_message, to: /scheduled_chime/full_message }
+                                    - { from: /purpose, to: /scheduled_chime/purpose }
+                                    - { from: /send_after, to: /scheduled_chime/send_after }
+                                    - { from: /sender_id, to: /scheduled_chime/sender_id }
                 '400':
                     description: Invalid request
                     headers:
@@ -589,6 +617,13 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/BroadcastResponse'
+                            # Why: a broadcast preserves its caller-authored content and sender; recipient objects are
+                            # resolved to canonical delivery addresses and cannot be asserted as direct echoes.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /email, to: /broadcast/email }
+                                    - { from: /purpose, to: /broadcast/purpose }
+                                    - { from: /sender, to: /broadcast/sender_id }
                 '400':
                     description: Invalid request
                     headers:
@@ -740,6 +775,10 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/ScheduleLookupResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /schedule_id, to: /scheduled_chime/id }
                 '400':
                     description: Invalid request
                     headers:
@@ -822,6 +861,10 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/ScheduleCancelResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /schedule_id, to: /scheduled_chime/id }
                 '400':
                     description: Invalid request
                     headers:
@@ -905,6 +948,10 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/LookupBroadcastResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /broadcast_id, to: /broadcast/id }
                 '400':
                     description: Invalid request
                     headers:
@@ -987,6 +1034,10 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/BroadcastCancelResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /broadcast_id, to: /broadcast/id }
                 '400':
                     description: Invalid request
                     headers:
@@ -1076,6 +1127,20 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/MessageTemplateEnvelope'
+                            # Why: public request-controlled values must survive into the synthesized operation result.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /about, to: /message_template/about }
+                                    - { from: /attachments, to: /message_template/attachments }
+                                    - { from: /channel, to: /message_template/channel }
+                                    - { from: /email, to: /message_template/email }
+                                    - { from: /locale, to: /message_template/locale }
+                                    - { from: /name, to: /message_template/name }
+                                    - { from: /purpose, to: /message_template/purpose }
+                                    - { from: /sms, to: /message_template/sms }
+                                    - { from: /variables, to: /message_template/variables }
+                                    - to: /message_template/status
+                                      value: { literal: draft }
                 '401':
                     description: Unauthorized - invalid or missing API key
                     headers:
@@ -1166,6 +1231,19 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/MessageTemplateEnvelope'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /id, to: /message_template/id }
+                                    - { from: /about, to: /message_template/about }
+                                    - { from: /attachments, to: /message_template/attachments }
+                                    - { from: /channel, to: /message_template/channel }
+                                    - { from: /email, to: /message_template/email }
+                                    - { from: /locale, to: /message_template/locale }
+                                    - { from: /name, to: /message_template/name }
+                                    - { from: /purpose, to: /message_template/purpose }
+                                    - { from: /sms, to: /message_template/sms }
+                                    - { from: /variables, to: /message_template/variables }
                 '401':
                     description: Unauthorized - invalid or missing API key
                     headers:
@@ -1288,6 +1366,12 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/MessageTemplateEnvelope'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /id, to: /message_template/id }
+                                    - to: /message_template/status
+                                      value: { literal: published }
                 '401':
                     description: Unauthorized - invalid or missing API key
                     headers:
@@ -1410,6 +1494,12 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/MessageTemplateEnvelope'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /id, to: /message_template/id }
+                                    - to: /message_template/status
+                                      value: { literal: archived }
                 '401':
                     description: Unauthorized - invalid or missing API key
                     headers:
@@ -1512,6 +1602,10 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/MessageTemplateEnvelope'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /id, to: /message_template/id }
                 '401':
                     description: Unauthorized - invalid or missing API key
                     headers:
@@ -1593,6 +1687,11 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/MessageTemplatesPageEnvelope'
+                            # Why: the response must identify the requested page, while `size` remains the number of
+                            # templates actually returned after filtering rather than the requested capacity.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /page, to: /page/number, default: 1 }
                 '401':
                     description: Unauthorized - invalid or missing API key
                     headers:
@@ -1672,6 +1771,11 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/RenderMessageTemplatePreviewResponse'
+                            # Why: the preview returns the stored template selected by the reference; binding only its
+                            # identifier leaves the separately rendered variable output free to differ from the input.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /message_template/template_id, to: /message_template/id }
                 '401':
                     description: Unauthorized - invalid or missing API key
                     headers:
@@ -1825,6 +1929,8 @@ components:
             properties:
                 id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed mtpl_ resource ID.
+                    pattern: '^mtpl_'
                     description: API-generated message template id.
                     example: "mtpl_receipt"
                 name:
@@ -1864,6 +1970,8 @@ components:
             properties:
                 id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed mtpl_ resource ID.
+                    pattern: '^mtpl_'
                     description: API-generated message template id.
                     example: "mtpl_receipt"
         PageMessageTemplatesRequest:
@@ -1906,6 +2014,8 @@ components:
             properties:
                 template_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed mtpl_ resource ID.
+                    pattern: '^mtpl_'
                     description: API-generated message template id.
                     example: "mtpl_receipt"
                 variables:
@@ -2298,6 +2408,8 @@ components:
             properties:
                 destination_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed fa_ resource ID.
+                    pattern: '^fa_'
                     description: Financial account that should receive the payout.
                     example: "fa_1234567890abcdef"
                 execute_after:
@@ -2323,6 +2435,8 @@ components:
             properties:
                 chime_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed ch_ resource ID.
+                    pattern: '^ch_'
                     description: Unique identifier of the chime to look up
                     example: "ch_1234567890abcdef1234567890abcdef12345678"
         PageChimesRequest:
@@ -2975,6 +3089,8 @@ components:
             properties:
                 schedule_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed sch_ resource ID.
+                    pattern: '^sch_'
         CancelScheduleRequest:
             type: object
             additionalProperties: false
@@ -2982,6 +3098,8 @@ components:
             properties:
                 schedule_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed sch_ resource ID.
+                    pattern: '^sch_'
         ScheduleLookupResponse:
             type: object
             additionalProperties: false
@@ -3163,6 +3281,8 @@ components:
             properties:
                 broadcast_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed brc_ resource ID.
+                    pattern: '^brc_'
         LookupBroadcastResponse:
             type: object
             additionalProperties: false
@@ -3177,6 +3297,8 @@ components:
             properties:
                 broadcast_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed brc_ resource ID.
+                    pattern: '^brc_'
         BroadcastCancelResponse:
             type: object
             additionalProperties: false

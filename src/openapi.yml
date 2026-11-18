@@ -5,8 +5,8 @@ info:
     description: Machine-readable reference for the public Inttegro API
     # Why: contract and client artifacts are reviewed as one immutable bundle;
     # changing soundness rules or executable examples requires a new bundle identity.
-    version: 0.1.0-beta80
-    x-inttegro-collection-version: 0.1.0-beta80
+    version: 0.1.0-beta81
+    x-inttegro-collection-version: 0.1.0-beta81
     contact:
         name: Inttegro Engineering
         url: "https://inttegro.com"
@@ -420,6 +420,16 @@ components:
             $ref: './resources/common.yml#/components/schemas/ResourceSearchResponse'
         ResourceSearchPage:
             $ref: './resources/common.yml#/components/schemas/ResourceSearchPage'
+        FinancialAccountSearchResponse:
+            $ref: './resources/common.yml#/components/schemas/FinancialAccountSearchResponse'
+        CustomerSearchResponse:
+            $ref: './resources/common.yml#/components/schemas/CustomerSearchResponse'
+        OrderSearchResponse:
+            $ref: './resources/common.yml#/components/schemas/OrderSearchResponse'
+        PayoutSearchResponse:
+            $ref: './resources/common.yml#/components/schemas/PayoutSearchResponse'
+        ProductSearchResponse:
+            $ref: './resources/common.yml#/components/schemas/ProductSearchResponse'
         SearchResourceType:
             $ref: './resources/common.yml#/components/schemas/SearchResourceType'
         ResourceSearchTotal:
@@ -1454,6 +1464,8 @@ components:
             $ref: './resources/finance.yml#/components/schemas/EnableAutomaticPayoutsRequest'
         TokenizePaymentMethodResponse:
             $ref: './resources/payment-methods.yml#/components/schemas/TokenizePaymentMethodResponse'
+        TokenizedMobileMoneyPaymentMethodObject:
+            $ref: './resources/payment-methods.yml#/components/schemas/TokenizedMobileMoneyPaymentMethodObject'
         LookupPaymentMethodRequest:
             $ref: './resources/payment-methods.yml#/components/schemas/LookupPaymentMethodRequest'
         LookupPaymentMethodResponse:

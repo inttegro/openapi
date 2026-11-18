@@ -26,6 +26,12 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/CreateApplicationResponse'
+                            # Why: public request-controlled values must survive into the synthesized operation result.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /alias, to: /app/alias }
+                                    - { from: /description, to: /app/description }
+                                    - { from: /name, to: /app/name }
                 '401':
                     description: Unauthorized - invalid or missing API key
                     headers:
@@ -263,6 +269,12 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/UpdateApplicationResponse'
+                            # Why: public request-controlled values must survive into the synthesized operation result.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /alias, to: /app/alias }
+                                    - { from: /description, to: /app/description }
+                                    - { from: /name, to: /app/name }
                 '401':
                     description: Unauthorized - invalid or missing API key
                     headers:
@@ -327,6 +339,10 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/ChildrenPolicyResponse'
+                            # Why: public request-controlled values must survive into the synthesized operation result.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /version, to: /children_policy/version }
                 '400':
                     description: Invalid children policy lookup request.
                     content:
@@ -447,6 +463,11 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/ChildrenPolicyVersionsPageResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /number, to: /page/number, default: 1 }
+                                    - { from: /size, to: /page/size, default: 20 }
                 '400':
                     description: Invalid children policy page request.
                     content:
@@ -553,6 +574,40 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/OperatingPolicyResponse'
+                            # Why: public request-controlled values must survive into the synthesized operation result.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /capabilities/payments/currencies, to: /operating_policy/capabilities/payments/currencies }
+                                    - { from: /capabilities/payments/limits, to: /operating_policy/capabilities/payments/limits }
+                                    - { from: /capabilities/payment_methods, to: /operating_policy/capabilities/payment_methods }
+                                    - { from: /capabilities/payouts/enabled, to: /operating_policy/capabilities/payouts/enabled }
+                                    - { from: /capabilities/payouts/limits, to: /operating_policy/capabilities/payouts/limits }
+                                    - { from: /capabilities/payouts/bt_aging_spec/id, to: /operating_policy/capabilities/payouts/bt_aging_spec/id }
+                                    - { from: /description, to: /operating_policy/description }
+                                    - { from: /name, to: /operating_policy/name }
+                                # Why: the public aging catalog resolves each caller-visible ID to one canonical
+                                # duration; without this mapping a synthesized response can pair incompatible values.
+                                rules:
+                                    - when:
+                                          all:
+                                              - { request: /capabilities/payouts/bt_aging_spec/id, equals: bt_aging_spec_immediate }
+                                      then:
+                                          set: { /operating_policy/capabilities/payouts/bt_aging_spec/t_plus: 0h }
+                                    - when:
+                                          all:
+                                              - { request: /capabilities/payouts/bt_aging_spec/id, equals: bt_aging_spec_24_hourly }
+                                      then:
+                                          set: { /operating_policy/capabilities/payouts/bt_aging_spec/t_plus: 24h }
+                                    - when:
+                                          all:
+                                              - { request: /capabilities/payouts/bt_aging_spec/id, equals: bt_aging_spec_48_hourly }
+                                      then:
+                                          set: { /operating_policy/capabilities/payouts/bt_aging_spec/t_plus: 48h }
+                                    - when:
+                                          all:
+                                              - { request: /capabilities/payouts/bt_aging_spec/id, equals: bt_aging_spec_168_hourly }
+                                      then:
+                                          set: { /operating_policy/capabilities/payouts/bt_aging_spec/t_plus: 168h }
                 '400':
                     description: Invalid operating policy request.
                     content:
@@ -681,6 +736,13 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/OperatingPolicyResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /operating_policy_id, to: /operating_policy/id }
+                                    # Why: when a historical version is requested, returning a different snapshot
+                                    # would be schema-valid but operationally unrelated to the lookup.
+                                    - { from: /version, to: /operating_policy/version }
                 '400':
                     description: Invalid operating policy lookup request.
                     content:
@@ -803,6 +865,11 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/OperatingPolicyVersionsPageResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /number, to: /page/number, default: 1 }
+                                    - { from: /size, to: /page/size, default: 20 }
                 '400':
                     description: Invalid operating policy page request.
                     content:
@@ -909,6 +976,47 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/OperatingPolicyResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /operating_policy_id, to: /operating_policy/id }
+                                    # Why: bind the request-owned capability leaves independently because the
+                                    # aging reference expands into a platform-owned response snapshot.
+                                    - { from: /capabilities/payments/currencies, to: /operating_policy/capabilities/payments/currencies }
+                                    - { from: /capabilities/payments/limits, to: /operating_policy/capabilities/payments/limits }
+                                    - { from: /capabilities/payment_methods, to: /operating_policy/capabilities/payment_methods }
+                                    - { from: /capabilities/payouts/enabled, to: /operating_policy/capabilities/payouts/enabled }
+                                    - { from: /capabilities/payouts/limits, to: /operating_policy/capabilities/payouts/limits }
+                                    - { from: /capabilities/payouts/bt_aging_spec/id, to: /operating_policy/capabilities/payouts/bt_aging_spec/id }
+                                    - { from: /description, to: /operating_policy/description }
+                                    - { from: /name, to: /operating_policy/name }
+                                    - to: /operating_policy/version
+                                      value:
+                                          add:
+                                              - { request: /expected_version }
+                                              - { literal: 1 }
+                                # Why: each public catalog ID has one canonical duration in the returned snapshot.
+                                rules:
+                                    - when:
+                                          all:
+                                              - { request: /capabilities/payouts/bt_aging_spec/id, equals: bt_aging_spec_immediate }
+                                      then:
+                                          set: { /operating_policy/capabilities/payouts/bt_aging_spec/t_plus: 0h }
+                                    - when:
+                                          all:
+                                              - { request: /capabilities/payouts/bt_aging_spec/id, equals: bt_aging_spec_24_hourly }
+                                      then:
+                                          set: { /operating_policy/capabilities/payouts/bt_aging_spec/t_plus: 24h }
+                                    - when:
+                                          all:
+                                              - { request: /capabilities/payouts/bt_aging_spec/id, equals: bt_aging_spec_48_hourly }
+                                      then:
+                                          set: { /operating_policy/capabilities/payouts/bt_aging_spec/t_plus: 48h }
+                                    - when:
+                                          all:
+                                              - { request: /capabilities/payouts/bt_aging_spec/id, equals: bt_aging_spec_168_hourly }
+                                      then:
+                                          set: { /operating_policy/capabilities/payouts/bt_aging_spec/t_plus: 168h }
                 '400':
                     description: Invalid operating policy update request.
                     content:
@@ -1051,6 +1159,10 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/GenerateSecretKeyResponse'
+                            # Why: public request-controlled values must survive into the synthesized operation result.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /label, to: /key/label }
                 '401':
                     description: Unauthorized - invalid or missing API key
                     headers:
@@ -1169,6 +1281,10 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/LookupSecretKeyResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /secret_key_id, to: /key/id }
                 '401':
                     description: Unauthorized - invalid or missing API key
                     headers:
@@ -1243,6 +1359,11 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/UpdateSecretKeyResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /secret_key_id, to: /key/id }
+                                    - { from: /label, to: /key/label }
                 '401':
                     description: Unauthorized - invalid or missing API key
                     headers:
@@ -1349,6 +1470,10 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/DestroySecretKeyResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /secret_key_id, to: /key/id }
                 '401':
                     description: Unauthorized - invalid or missing API key
                     headers:
@@ -1453,6 +1578,10 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/SecretKeyUsageResponse'
+                            # Why: this operation must return a result reachable from the caller-selected resource or page.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /secret_key_id, to: /key/id }
                 '401':
                     description: Unauthorized - invalid or missing API key
                     headers:
@@ -2240,6 +2369,8 @@ components:
             properties:
                 secret_key_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed sk_ resource ID.
+                    pattern: '^sk_'
                     description: Secret key identifier. Typed `sk_...` IDs are accepted.
                     example: sk_2xC7k9gK5yQnZ4w8P1sT6vR3
         LookupSecretKeyResponse:
@@ -2261,6 +2392,8 @@ components:
                     example: Production checkout
                 secret_key_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed sk_ resource ID.
+                    pattern: '^sk_'
                     description: Secret key identifier to update.
                     example: sk_2xC7k9gK5yQnZ4w8P1sT6vR3
         UpdateSecretKeyResponse:
@@ -2278,6 +2411,8 @@ components:
             properties:
                 secret_key_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed sk_ resource ID.
+                    pattern: '^sk_'
                     description: Secret key identifier to revoke.
                     example: sk_2xC7k9gK5yQnZ4w8P1sT6vR3
         DestroySecretKeyResponse:
@@ -2303,6 +2438,8 @@ components:
                     description: Page number alias. Omitted or 0 is normalized to 1.
                 secret_key_id:
                     type: string
+                    # Why: a successful response preserves this selector as a typed sk_ resource ID.
+                    pattern: '^sk_'
                     description: Secret key identifier whose recent activity should be returned.
                     example: sk_2xC7k9gK5yQnZ4w8P1sT6vR3
                 size:
