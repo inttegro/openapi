@@ -1,0 +1,63 @@
+# Authoritative specifications resource contract.
+# Why: keeping each resource's operations and schemas together makes public invariants
+# reviewable without weakening the single bundled contract distributed to consumers.
+
+paths:
+    /spec/countries:
+        post:
+            summary: Get country specifications
+            description: |
+                Retrieve country specifications including supported currencies, payment methods,
+                payout schedules, legal entity types, financial account types, ID document
+                types, and country-specific bank reference data for all configured countries.
+
+                Use this to:
+                - Build country-specific onboarding flows
+                - Validate payment methods by country
+                - Display appropriate ID document types
+                - Show available payout schedules per country
+                - Populate country-specific bank and branch selectors
+
+                This is a public endpoint that does not require authentication.
+            operationId: listCountrySpecs
+            tags:
+                - Specifications
+            security: []
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: './catalog.yml#/components/schemas/ListCountrySpecsRequest'
+            responses:
+                '200':
+                    description: Country specifications retrieved successfully
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                $ref: './catalog.yml#/components/schemas/ListCountrySpecsResponse'
+                '400':
+                    description: Invalid request body
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/ErrorEnvelope'
+                                    - type: object
+                                      properties:
+                                          error:
+                                              oneOf:
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_body] }, code: { enum: [invalid_request_body] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_parameter] }, code: { enum: [invalid_request_parameter, request_parameter_null_rejected, request_parameter_parse_failed, request_parameter_too_large, request_parameter_too_small, request_parameter_type_mismatch, request_parameter_value_not_allowed, request_parameters_mutually_exclusive, unexpected_request_parameter] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/e/t-invalid_request_parameter"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_parameter] }, code: { enum: [request_parameter_choice_required, request_parameter_null_rejected, request_parameter_parse_failed, request_parameter_too_large, request_parameter_too_small, request_parameter_type_mismatch, request_parameter_value_not_allowed, request_parameters_mutually_exclusive, unexpected_request_parameter] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [missing_request_parameter] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/e/c-missing_request_parameter"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [request_parameter_choice_required] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/e/t-invalid_request_parameter"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [request_parameter_choice_required] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }

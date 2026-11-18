@@ -1,0 +1,1557 @@
+# Authoritative purchase-intents resource contract.
+# Why: keeping each resource's operations and schemas together makes public invariants
+# reviewable without weakening the single bundled contract distributed to consumers.
+
+paths:
+    /purchase_intents/create:
+        post:
+            summary: Create a purchase intent
+            description: |
+                Creates a controlled, shareable Buy link for a catalog product or bundle without
+                requiring you to build a product page, cart, or checkout UI. The returned
+                `sale_...` ID becomes `https://pages.inttegro.com/buy/{purchase_intent_id}`.
+                An order is created only when a customer checks out from that link.
+
+                This operation supports idempotency. Reuse the same `Idempotency-Key` and
+                request body when retrying an uncertain request.
+            operationId: createPurchaseIntent
+            tags:
+                - Purchase Intents
+            parameters:
+                - name: Idempotency-Key
+                  in: header
+                  required: false
+                  schema:
+                      type: string
+                  description: Stable key used to replay safe retries without creating a duplicate Buy link.
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/CreatePurchaseIntentRequest'
+                        example:
+                            product_id: prod_abc123
+                            price_id: pr_xyz789
+                            quantity:
+                                min: 1
+                                max: 5
+                            usage:
+                                multi_use: true
+                            expires_at: "2030-12-01T09:00:00Z"
+                            presentation:
+                                buy_page:
+                                    text:
+                                        checkout_section_title: Complete your order
+                                        primary_action_label: Continue
+            responses:
+                '200':
+                    description: Purchase intent created successfully
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/PurchaseIntentResponse'
+                            # Why: this exact outcome keeps the Buy link, selected product, and
+                            # effective special-offer price coherent for local integration tests.
+                            examples:
+                                created:
+                                    summary: An active reusable Buy link with a special offer
+                                    value:
+                                        purchase_intent:
+                                            allow_variants: false
+                                            application_id: app_example
+                                            created_at: "2026-11-17T10:00:00Z"
+                                            id: sale_example
+                                            product:
+                                                id: prod_example
+                                                type: digital
+                                                name: Commerce Guide
+                                                active: true
+                                                created_at: "2026-11-17T10:00:00Z"
+                                                published_at: "2026-11-17T10:00:00Z"
+                                            price:
+                                                active: true
+                                                nominal:
+                                                    currency: ghs
+                                                    value: 15000
+                                            quantity:
+                                                min: 1
+                                                max: 5
+                                            status: active
+                                            usage:
+                                                multi_use: true
+                '400':
+                    description: Invalid request, quantity range, price availability, or product-price relationship
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/Error'
+                                    - oneOf:
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [precondition_unmet] }, code: { enum: [purchase_intent_bundle_price_unavailable, purchase_intent_bundle_unavailable, purchase_intent_price_unavailable, purchase_intent_product_unavailable] }, fix_code: { enum: [satisfy_precondition] }, type: { enum: [bad_request] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_parameter] }, code: { enum: [idempotency_key_invalid, idempotency_key_mismatch, idempotency_key_unsupported] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [idempotency_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_body] }, code: { enum: [invalid_request_body] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_parameter] }, code: { enum: [invalid_request_parameter, request_parameter_null_rejected, request_parameter_parse_failed, request_parameter_too_large, request_parameter_too_small, request_parameter_type_mismatch, request_parameter_value_not_allowed, request_parameters_mutually_exclusive, unexpected_request_parameter] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/e/t-invalid_request_parameter"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_parameter] }, code: { enum: [invalid_purchase_intent_quantity_range, invalid_purchase_intent_target, purchase_intent_price_product_mismatch, request_parameter_choice_required, request_parameter_null_rejected, request_parameter_parse_failed, request_parameter_too_large, request_parameter_too_small, request_parameter_type_mismatch, request_parameter_value_not_allowed, request_parameters_mutually_exclusive, unexpected_request_parameter] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [missing_request_parameter] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/e/c-missing_request_parameter"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [request_parameter_choice_required] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/e/t-invalid_request_parameter"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [request_parameter_choice_required] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                            examples:
+                                invalid_quantity_range:
+                                    summary: The maximum quantity is below the minimum
+                                    value:
+                                        cause: invalid_request_parameter
+                                        code: invalid_purchase_intent_quantity_range
+                                        fix_code: change_request_parameters
+                                        type: invalid_request_parameter
+                                        url: https://studio.inttegro.com/errors
+                '401':
+                    description: Unauthorized - invalid or missing API key
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/Error'
+                                    - oneOf:
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [authentication_failed] }, code: { enum: [authentication_failed] }, fix_code: { enum: [authenticate_request] }, type: { enum: [authentication_error] }, url: { enum: ["https://studio.inttegro.com/e/c-authentication_failed"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [authentication_failed] }, code: { enum: [endpoint_authentication_required] }, fix_code: { enum: [authenticate_request] }, type: { enum: [authentication_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                '404':
+                    description: Product or price not found
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/Error'
+                                    - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_parameter] }, code: { enum: [purchase_intent_bundle_not_found, purchase_intent_price_not_found, purchase_intent_product_not_found] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                '500':
+                    description: Purchase intent creation failed unexpectedly
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/Error'
+                                    - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [unknown] }, code: { enum: [request_failed] }, fix_code: { enum: [contact_customer_support] }, type: { enum: [unknown_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+    /purchase_intents/update:
+        post:
+            summary: Update a purchase intent
+            description: |
+                Changes quantity bounds or expiry without changing what an already-shared
+                Buy link sells. `reactivate: true` clears cancellation state and any existing
+                elapsed expiry. Product, price, usage mode, and variant selection remain
+                immutable after creation.
+
+                This operation supports idempotency. Reuse the same `Idempotency-Key` and
+                request body when retrying an uncertain request.
+            operationId: updatePurchaseIntent
+            tags:
+                - Purchase Intents
+            parameters:
+                - name: Idempotency-Key
+                  in: header
+                  required: false
+                  schema:
+                      type: string
+                  description: Stable key used to replay safe retries without applying the update twice.
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/UpdatePurchaseIntentRequest'
+            responses:
+                '200':
+                    description: Purchase intent updated successfully
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/PurchaseIntentResponse'
+                '400':
+                    description: Bad request - invalid parameters
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/Error'
+                                    - oneOf:
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [precondition_unmet] }, code: { enum: [purchase_intent_bundle_price_unavailable, purchase_intent_bundle_unavailable, purchase_intent_invalid, purchase_intent_price_unavailable, purchase_intent_product_unavailable] }, fix_code: { enum: [satisfy_precondition] }, type: { enum: [bad_request] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_parameter] }, code: { enum: [idempotency_key_invalid, idempotency_key_mismatch, idempotency_key_unsupported] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [idempotency_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_body] }, code: { enum: [invalid_request_body] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_parameter] }, code: { enum: [invalid_request_parameter, request_parameter_null_rejected, request_parameter_parse_failed, request_parameter_too_large, request_parameter_too_small, request_parameter_type_mismatch, request_parameter_value_not_allowed, request_parameters_mutually_exclusive, unexpected_request_parameter] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/e/t-invalid_request_parameter"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_parameter] }, code: { enum: [invalid_purchase_intent_quantity_range, request_parameter_choice_required, request_parameter_null_rejected, request_parameter_parse_failed, request_parameter_too_large, request_parameter_too_small, request_parameter_type_mismatch, request_parameter_value_not_allowed, request_parameters_mutually_exclusive, unexpected_request_parameter] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [missing_request_parameter] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/e/c-missing_request_parameter"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [request_parameter_choice_required] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/e/t-invalid_request_parameter"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [request_parameter_choice_required] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                '401':
+                    description: Unauthorized - invalid or missing API key
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/Error'
+                                    - oneOf:
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [authentication_failed] }, code: { enum: [authentication_failed] }, fix_code: { enum: [authenticate_request] }, type: { enum: [authentication_error] }, url: { enum: ["https://studio.inttegro.com/e/c-authentication_failed"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [authentication_failed] }, code: { enum: [endpoint_authentication_required] }, fix_code: { enum: [authenticate_request] }, type: { enum: [authentication_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                '404':
+                    description: Purchase intent not found
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/Error'
+                                    - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_parameter] }, code: { enum: [purchase_intent_not_found] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                '500':
+                    description: Purchase intent update failed unexpectedly
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/Error'
+                                    - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [unknown] }, code: { enum: [request_failed] }, fix_code: { enum: [contact_customer_support] }, type: { enum: [unknown_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+    /purchase_intents/cancel:
+        post:
+            summary: Cancel a purchase intent
+            description: |
+                Stops a Buy link from creating new orders immediately. Cancellation is an
+                explicit merchant action and is distinct from time-driven expiry. Repeating
+                cancellation for an already inactive intent returns its current state, but a
+                single-use intent that already created an order cannot be canceled.
+
+                This operation supports idempotency. Reuse the same `Idempotency-Key` and
+                request body when retrying an uncertain request.
+            operationId: cancelPurchaseIntent
+            tags:
+                - Purchase Intents
+            parameters:
+                - name: Idempotency-Key
+                  in: header
+                  required: false
+                  schema:
+                      type: string
+                  description: Stable key used to replay safe retries without applying cancellation twice.
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/CancelPurchaseIntentRequest'
+            responses:
+                '200':
+                    description: Purchase intent canceled successfully
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/PurchaseIntentResponse'
+                '400':
+                    description: Bad request - invalid parameters
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/Error'
+                                    - oneOf:
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [precondition_unmet] }, code: { enum: [purchase_intent_already_used, purchase_intent_bundle_price_unavailable, purchase_intent_bundle_unavailable] }, fix_code: { enum: [satisfy_precondition] }, type: { enum: [bad_request] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_parameter] }, code: { enum: [idempotency_key_invalid, idempotency_key_mismatch, idempotency_key_unsupported] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [idempotency_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_body] }, code: { enum: [invalid_request_body] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_parameter] }, code: { enum: [invalid_request_parameter, request_parameter_null_rejected, request_parameter_parse_failed, request_parameter_too_large, request_parameter_too_small, request_parameter_type_mismatch, request_parameter_value_not_allowed, request_parameters_mutually_exclusive, unexpected_request_parameter] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/e/t-invalid_request_parameter"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_parameter] }, code: { enum: [request_parameter_choice_required, request_parameter_null_rejected, request_parameter_parse_failed, request_parameter_too_large, request_parameter_too_small, request_parameter_type_mismatch, request_parameter_value_not_allowed, request_parameters_mutually_exclusive, unexpected_request_parameter] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [missing_request_parameter] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/e/c-missing_request_parameter"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [request_parameter_choice_required] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/e/t-invalid_request_parameter"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [request_parameter_choice_required] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                '401':
+                    description: Unauthorized - invalid or missing API key
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/Error'
+                                    - oneOf:
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [authentication_failed] }, code: { enum: [authentication_failed] }, fix_code: { enum: [authenticate_request] }, type: { enum: [authentication_error] }, url: { enum: ["https://studio.inttegro.com/e/c-authentication_failed"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [authentication_failed] }, code: { enum: [endpoint_authentication_required] }, fix_code: { enum: [authenticate_request] }, type: { enum: [authentication_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                '404':
+                    description: Purchase intent not found
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/Error'
+                                    - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_parameter] }, code: { enum: [purchase_intent_not_found] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                '500':
+                    description: Purchase intent cancellation failed unexpectedly
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/Error'
+                                    - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [unknown] }, code: { enum: [request_failed] }, fix_code: { enum: [contact_customer_support] }, type: { enum: [unknown_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+    /purchase_intents/lookup:
+        post:
+            summary: Lookup a purchase intent
+            description: |
+                Resolves the offer behind a hosted Buy link using only its opaque ID. Public
+                lookup requires no API key and returns active or expired intents; canceled
+                and used single-use intents are returned as not found. When the owning
+                application authenticates the request, lookup is application-scoped, returns
+                all lifecycle states.
+            operationId: lookupPurchaseIntent
+            tags:
+                - Purchase Intents
+            security:
+                - {}
+                - bearerAuth: []
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/LookupPurchaseIntentRequest'
+            responses:
+                '200':
+                    description: Purchase intent found successfully
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/PurchaseIntentResponse'
+                '400':
+                    description: Bad request - invalid parameters
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/Error'
+                                    - oneOf:
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [precondition_unmet] }, code: { enum: [purchase_intent_bundle_price_unavailable, purchase_intent_bundle_unavailable, purchase_intent_invalid, purchase_intent_price_unavailable, purchase_intent_product_unavailable] }, fix_code: { enum: [satisfy_precondition] }, type: { enum: [bad_request] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_body] }, code: { enum: [invalid_request_body] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_parameter] }, code: { enum: [invalid_request_parameter, request_parameter_null_rejected, request_parameter_parse_failed, request_parameter_too_large, request_parameter_too_small, request_parameter_type_mismatch, request_parameter_value_not_allowed, request_parameters_mutually_exclusive, unexpected_request_parameter] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/e/t-invalid_request_parameter"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_parameter] }, code: { enum: [request_parameter_choice_required, request_parameter_null_rejected, request_parameter_parse_failed, request_parameter_too_large, request_parameter_too_small, request_parameter_type_mismatch, request_parameter_value_not_allowed, request_parameters_mutually_exclusive, unexpected_request_parameter] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [missing_request_parameter] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/e/c-missing_request_parameter"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [request_parameter_choice_required] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/e/t-invalid_request_parameter"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [request_parameter_choice_required] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                '404':
+                    description: Purchase intent not found
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/Error'
+                                    - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_parameter] }, code: { enum: [purchase_intent_not_found] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                '500':
+                    description: Purchase intent lookup failed unexpectedly
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/Error'
+                                    - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [unknown] }, code: { enum: [request_failed] }, fix_code: { enum: [contact_customer_support] }, type: { enum: [unknown_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+    /purchase_intents/page:
+        post:
+            summary: List purchase intents
+            description: |
+                Lists purchase intents for the authenticated application, newest first.
+                Pagination is numbered. The response `page.size` is the number of records
+                actually returned, not the requested limit, and no total count or next-page
+                token is included.
+            operationId: pagePurchaseIntents
+            tags:
+                - Purchase Intents
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/PagePurchaseIntentsRequest'
+            responses:
+                '200':
+                    description: Purchase intents listed successfully
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/PagePurchaseIntentsResponse'
+                '400':
+                    description: Bad request - invalid pagination parameters
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/Error'
+                                    - oneOf:
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [precondition_unmet] }, code: { enum: [purchase_intent_bundle_price_unavailable, purchase_intent_bundle_unavailable, purchase_intent_price_unavailable, purchase_intent_product_unavailable] }, fix_code: { enum: [satisfy_precondition] }, type: { enum: [bad_request] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_body] }, code: { enum: [invalid_request_body] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_parameter] }, code: { enum: [invalid_request_parameter, request_parameter_null_rejected, request_parameter_parse_failed, request_parameter_too_large, request_parameter_too_small, request_parameter_type_mismatch, request_parameter_value_not_allowed, request_parameters_mutually_exclusive, unexpected_request_parameter] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/e/t-invalid_request_parameter"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_parameter] }, code: { enum: [request_parameter_choice_required, request_parameter_null_rejected, request_parameter_parse_failed, request_parameter_too_large, request_parameter_too_small, request_parameter_type_mismatch, request_parameter_value_not_allowed, request_parameters_mutually_exclusive, unexpected_request_parameter] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [missing_request_parameter] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/e/c-missing_request_parameter"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [request_parameter_choice_required] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/e/t-invalid_request_parameter"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [request_parameter_choice_required] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                '401':
+                    description: Unauthorized - invalid or missing API key
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/Error'
+                                    - oneOf:
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [authentication_failed] }, code: { enum: [authentication_failed] }, fix_code: { enum: [authenticate_request] }, type: { enum: [authentication_error] }, url: { enum: ["https://studio.inttegro.com/e/c-authentication_failed"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [authentication_failed] }, code: { enum: [endpoint_authentication_required] }, fix_code: { enum: [authenticate_request] }, type: { enum: [authentication_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                '404':
+                    description: A purchase intent could not be hydrated
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/Error'
+                                    - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_parameter] }, code: { enum: [purchase_intent_not_found] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                '500':
+                    description: Purchase intent page lookup failed unexpectedly
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/Error'
+                                    - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [unknown] }, code: { enum: [request_failed] }, fix_code: { enum: [contact_customer_support] }, type: { enum: [unknown_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+components:
+    schemas:
+        PurchaseIntentProductSelection:
+            type: object
+            additionalProperties: false
+            description: Product selection with optional variant-set configuration. Use this instead of product_id.
+            required:
+                - id
+            properties:
+                id:
+                    type: string
+                    description: Product ID to sell through the Buy link
+                    example: "prod_abc123"
+                variant_set_id:
+                    type: string
+                    description: Optional variant set ID the hosted checkout may use for sibling product selection
+                    example: "pg_variantset123"
+        PurchaseIntentBundleSelection:
+            type: object
+            additionalProperties: false
+            description: Bundle selection. Components are resolved from the live catalog. Omit price and price_id to use the current catalog bundle price.
+            required:
+                - id
+            properties:
+                id:
+                    type: string
+                    description: App-owned bundle ID to sell through the Buy link
+                    example: "pbd_abc123"
+        PurchaseIntentPriceSelection:
+            type: object
+            additionalProperties: false
+            description: Price selection for the Buy-link offer. Products require it; bundles may omit it to use the current catalog default. Send exactly one of id or nominal and at most one of original or original_id.
+            allOf:
+                - oneOf:
+                    - required:
+                        - id
+                      properties:
+                          id: {}
+                    - required:
+                        - nominal
+                      properties:
+                          nominal: {}
+                - not:
+                      properties:
+                          original: {}
+                          original_id: {}
+                      required:
+                          - original
+                          - original_id
+            properties:
+                id:
+                    type: string
+                    description: Active, unarchived app-owned price ID. It must belong to a selected product; for a bundle it must be fixed and use the bundle catalog currency.
+                    example: "pr_xyz789"
+                nominal:
+                    description: Inline offer amount when no price ID is provided
+                    allOf:
+                        - $ref: './catalog.yml#/components/schemas/PriceParams'
+                original:
+                    type: object
+                    additionalProperties: false
+                    description: Optional original price used for comparison display
+                    allOf:
+                        - oneOf:
+                            - required:
+                                - id
+                              properties:
+                                  id: {}
+                            - required:
+                                - nominal
+                              properties:
+                                  nominal: {}
+                    properties:
+                        id:
+                            type: string
+                            description: App-owned fixed comparison price ID. It must belong to a selected product; for a bundle it must use the bundle catalog currency.
+                            example: "pr_original123"
+                        nominal:
+                            description: Inline original price amount
+                            allOf:
+                                - $ref: './catalog.yml#/components/schemas/PriceParams'
+                original_id:
+                    type: string
+                    description: App-owned comparison price ID when not using original.id
+                    example: "pr_original123"
+        CreatePurchaseIntentRequest:
+            type: object
+            additionalProperties: false
+            required:
+                - quantity
+            # Why: spelling the ten public target/price alternatives directly makes the
+            # exclusivity rule constructible; the former nested allOf/oneOf graph was valid for
+            # callers but exceeded Simile's deterministic request-synthesis search.
+            oneOf:
+                - type: object
+                  required: [product, price]
+                  properties:
+                      product:
+                          $ref: '#/components/schemas/PurchaseIntentProductSelection'
+                      price:
+                          $ref: '#/components/schemas/PurchaseIntentPriceSelection'
+                  not:
+                      anyOf:
+                          - required: [product_id]
+                            properties: { product_id: {} }
+                          - required: [bundle]
+                            properties: { bundle: {} }
+                          - required: [bundle_id]
+                            properties: { bundle_id: {} }
+                          - required: [price_id]
+                            properties: { price_id: {} }
+                - type: object
+                  required: [product, price_id]
+                  properties:
+                      product:
+                          $ref: '#/components/schemas/PurchaseIntentProductSelection'
+                      price_id:
+                          type: string
+                  not:
+                      anyOf:
+                          - required: [product_id]
+                            properties: { product_id: {} }
+                          - required: [bundle]
+                            properties: { bundle: {} }
+                          - required: [bundle_id]
+                            properties: { bundle_id: {} }
+                          - required: [price]
+                            properties: { price: {} }
+                - type: object
+                  required: [product_id, price]
+                  properties:
+                      product_id:
+                          type: string
+                      price:
+                          $ref: '#/components/schemas/PurchaseIntentPriceSelection'
+                  not:
+                      anyOf:
+                          - required: [product]
+                            properties: { product: {} }
+                          - required: [bundle]
+                            properties: { bundle: {} }
+                          - required: [bundle_id]
+                            properties: { bundle_id: {} }
+                          - required: [price_id]
+                            properties: { price_id: {} }
+                - type: object
+                  required: [product_id, price_id]
+                  properties:
+                      product_id:
+                          type: string
+                      price_id:
+                          type: string
+                  not:
+                      anyOf:
+                          - required: [product]
+                            properties: { product: {} }
+                          - required: [bundle]
+                            properties: { bundle: {} }
+                          - required: [bundle_id]
+                            properties: { bundle_id: {} }
+                          - required: [price]
+                            properties: { price: {} }
+                - type: object
+                  required: [bundle]
+                  properties:
+                      bundle:
+                          $ref: '#/components/schemas/PurchaseIntentBundleSelection'
+                  not:
+                      anyOf:
+                          - required: [product]
+                            properties: { product: {} }
+                          - required: [product_id]
+                            properties: { product_id: {} }
+                          - required: [bundle_id]
+                            properties: { bundle_id: {} }
+                          - required: [price]
+                            properties: { price: {} }
+                          - required: [price_id]
+                            properties: { price_id: {} }
+                - type: object
+                  required: [bundle, price]
+                  properties:
+                      bundle:
+                          $ref: '#/components/schemas/PurchaseIntentBundleSelection'
+                      price:
+                          $ref: '#/components/schemas/PurchaseIntentPriceSelection'
+                  not:
+                      anyOf:
+                          - required: [product]
+                            properties: { product: {} }
+                          - required: [product_id]
+                            properties: { product_id: {} }
+                          - required: [bundle_id]
+                            properties: { bundle_id: {} }
+                          - required: [price_id]
+                            properties: { price_id: {} }
+                - type: object
+                  required: [bundle, price_id]
+                  properties:
+                      bundle:
+                          $ref: '#/components/schemas/PurchaseIntentBundleSelection'
+                      price_id:
+                          type: string
+                  not:
+                      anyOf:
+                          - required: [product]
+                            properties: { product: {} }
+                          - required: [product_id]
+                            properties: { product_id: {} }
+                          - required: [bundle_id]
+                            properties: { bundle_id: {} }
+                          - required: [price]
+                            properties: { price: {} }
+                - type: object
+                  required: [bundle_id]
+                  properties:
+                      bundle_id:
+                          type: string
+                  not:
+                      anyOf:
+                          - required: [product]
+                            properties: { product: {} }
+                          - required: [product_id]
+                            properties: { product_id: {} }
+                          - required: [bundle]
+                            properties: { bundle: {} }
+                          - required: [price]
+                            properties: { price: {} }
+                          - required: [price_id]
+                            properties: { price_id: {} }
+                - type: object
+                  required: [bundle_id, price]
+                  properties:
+                      bundle_id:
+                          type: string
+                      price:
+                          $ref: '#/components/schemas/PurchaseIntentPriceSelection'
+                  not:
+                      anyOf:
+                          - required: [product]
+                            properties: { product: {} }
+                          - required: [product_id]
+                            properties: { product_id: {} }
+                          - required: [bundle]
+                            properties: { bundle: {} }
+                          - required: [price_id]
+                            properties: { price_id: {} }
+                - type: object
+                  required: [bundle_id, price_id]
+                  properties:
+                      bundle_id:
+                          type: string
+                      price_id:
+                          type: string
+                  not:
+                      anyOf:
+                          - required: [product]
+                            properties: { product: {} }
+                          - required: [product_id]
+                            properties: { product_id: {} }
+                          - required: [bundle]
+                            properties: { bundle: {} }
+                          - required: [price]
+                            properties: { price: {} }
+            properties:
+                product:
+                    $ref: '#/components/schemas/PurchaseIntentProductSelection'
+                product_id:
+                    type: string
+                    description: App-owned product ID to sell through the Buy link when not using product
+                    example: "prod_abc123"
+                bundle:
+                    $ref: '#/components/schemas/PurchaseIntentBundleSelection'
+                bundle_id:
+                    type: string
+                    description: App-owned bundle ID to sell through the Buy link when not using bundle
+                    example: "pbd_abc123"
+                price:
+                    $ref: '#/components/schemas/PurchaseIntentPriceSelection'
+                price_id:
+                    type: string
+                    description: Active, unarchived app-owned price ID. It must belong to a selected product; for a bundle it must be fixed and use the bundle catalog currency.
+                    example: "pr_xyz789"
+                quantity:
+                    type: object
+                    additionalProperties: false
+                    description: Quantity bounds the Buy link should enforce. Omit max when the Buy link has no upper quantity bound. When present, max must be greater than or equal to min.
+                    required:
+                        - min
+                    x-simile-constraints:
+                        - bounded:
+                              path: /max
+                              minimum: { path: /min }
+                    properties:
+                        min:
+                            type: integer
+                            minimum: 1
+                            description: Minimum quantity the customer can buy
+                            example: 1
+                        max:
+                            type: integer
+                            minimum: 1
+                            description: Optional maximum quantity the customer can buy. It must be greater than or equal to min.
+                            example: 5
+                usage:
+                    type: object
+                    additionalProperties: false
+                    description: Optional link-use policy. Omit to create a reusable Buy link.
+                    not:
+                        properties:
+                            multi_use: {}
+                            single_use: {}
+                        required:
+                            - single_use
+                            - multi_use
+                    properties:
+                        single_use:
+                            type: boolean
+                            description: Creating the first order consumes the Buy link
+                            example: true
+                        multi_use:
+                            type: boolean
+                            description: The Buy link may create multiple orders
+                            example: true
+                expires_at:
+                    type: string
+                    format: date-time
+                    description: Future RFC3339 timestamp after which the Buy link stops accepting purchases
+                    example: "2030-12-01T09:00:00Z"
+                presentation:
+                    $ref: '#/components/schemas/CreatePurchaseIntentPresentation'
+        UpdatePurchaseIntentRequest:
+            allOf:
+                - $ref: '#/components/schemas/UpdatePurchaseIntentRequestFields'
+                - anyOf:
+                    - required:
+                        - id
+                      properties:
+                          id: {}
+                    - required:
+                        - purchase_intent_id
+                      properties:
+                          purchase_intent_id: {}
+        UpdatePurchaseIntentRequestFields:
+            type: object
+            additionalProperties: false
+            properties:
+                expires_at:
+                    type: string
+                    format: date-time
+                    nullable: true
+                    description: RFC3339 expiry timestamp, including a past time for immediate expiry, or null to clear expiry
+                id:
+                    type: string
+                    minLength: 1
+                    description: Purchase intent ID to update. Send this or purchase_intent_id.
+                    example: "sale_ABCXYZ"
+                quantity:
+                    type: object
+                    additionalProperties: false
+                    description: Replacement quantity bounds. Omit the object to preserve the current bounds. Within the object, min is required and omitting max removes the upper bound. When present, max must be greater than or equal to min.
+                    required:
+                        - min
+                    x-simile-constraints:
+                        - bounded:
+                              path: /max
+                              minimum: { path: /min }
+                    properties:
+                        min:
+                            type: integer
+                            minimum: 1
+                            description: Minimum quantity the customer can buy
+                            example: 1
+                        max:
+                            type: integer
+                            minimum: 1
+                            description: Optional maximum quantity the customer can buy. It must be greater than or equal to min.
+                            example: 3
+                purchase_intent_id:
+                    type: string
+                    minLength: 1
+                    description: Alias for id. If both are present, this value takes precedence.
+                    example: "sale_ABCXYZ"
+                reactivate:
+                    type: boolean
+                    description: |
+                        Clears the state that prevents new purchases. For canceled
+                        Buy links this removes inactive_at. For expired Buy links this
+                        clears an existing elapsed expires_at value. It does not remove
+                        the order claim from a used single-use intent.
+                    example: true
+                presentation:
+                    $ref: '#/components/schemas/UpdatePurchaseIntentPresentation'
+        CreatePurchaseIntentPresentation:
+            type: object
+            additionalProperties: false
+            description: Optional merchant-authored copy for the hosted Buy page. Omit it to use product-aware defaults.
+            required:
+                - buy_page
+            properties:
+                buy_page:
+                    type: object
+                    additionalProperties: false
+                    required:
+                        - text
+                    properties:
+                        text:
+                            type: object
+                            additionalProperties: false
+                            minProperties: 1
+                            properties:
+                                checkout_section_title:
+                                    type: string
+                                    minLength: 1
+                                    maxLength: 80
+                                    description: Plain, single-line title shown above the Buy page form
+                                    example: Support this cause
+                                amount_field_label:
+                                    type: string
+                                    minLength: 1
+                                    maxLength: 64
+                                    description: Plain, single-line label for a customer-selected amount field
+                                    example: Your contribution
+                                primary_action_label:
+                                    type: string
+                                    minLength: 1
+                                    maxLength: 48
+                                    description: Plain, single-line label used for the ready primary action. Validation and loading labels remain system-owned.
+                                    example: Continue to contribute
+        UpdatePurchaseIntentPresentation:
+            type: object
+            additionalProperties: false
+            description: Sparse Buy page copy update. Omit a field to preserve it, or send null to restore the product-aware default.
+            required:
+                - buy_page
+            properties:
+                buy_page:
+                    type: object
+                    additionalProperties: false
+                    required:
+                        - text
+                    properties:
+                        text:
+                            type: object
+                            additionalProperties: false
+                            minProperties: 1
+                            properties:
+                                checkout_section_title:
+                                    type: string
+                                    nullable: true
+                                    minLength: 1
+                                    maxLength: 80
+                                amount_field_label:
+                                    type: string
+                                    nullable: true
+                                    minLength: 1
+                                    maxLength: 64
+                                primary_action_label:
+                                    type: string
+                                    nullable: true
+                                    minLength: 1
+                                    maxLength: 48
+        CancelPurchaseIntentRequest:
+            type: object
+            additionalProperties: false
+            anyOf:
+                - required:
+                    - id
+                - required:
+                    - purchase_intent_id
+            properties:
+                id:
+                    type: string
+                    minLength: 1
+                    description: Purchase intent ID to cancel. Send this or purchase_intent_id.
+                    example: "sale_ABCXYZ"
+                purchase_intent_id:
+                    type: string
+                    minLength: 1
+                    description: Alias for id. If both are present, this value takes precedence.
+                    example: "sale_ABCXYZ"
+        LookupPurchaseIntentRequest:
+            type: object
+            additionalProperties: false
+            required:
+                - id
+            properties:
+                id:
+                    type: string
+                    minLength: 1
+                    description: Purchase intent ID to look up
+                    example: "sale_ABCXYZ"
+        PagePurchaseIntentsRequest:
+            type: object
+            additionalProperties: false
+            required:
+                - page_number
+                - page_size
+            properties:
+                page_number:
+                    type: integer
+                    minimum: 1
+                    maximum: 10
+                    description: One-based page number to retrieve
+                    example: 1
+                page_size:
+                    type: integer
+                    minimum: 1
+                    maximum: 256
+                    description: Maximum number of purchase intents to return on this page
+                    example: 20
+        PagePurchaseIntentsResponse:
+            type: object
+            additionalProperties: false
+            required:
+                - page
+            properties:
+                page:
+                    type: object
+                    additionalProperties: false
+                    required:
+                        - number
+                        - purchase_intents
+                        - size
+                    # `size` is emitted from the selected purchase-intent slice.
+                    x-simile-constraints:
+                        - aggregate:
+                              target: /size
+                              operation: count
+                              source: /purchase_intents/*
+                    properties:
+                        number:
+                            type: integer
+                            description: One-based page number returned
+                            example: 1
+                        purchase_intents:
+                            type: array
+                            items:
+                                $ref: '#/components/schemas/PurchaseIntent'
+                        size:
+                            type: integer
+                            description: Number of purchase intents actually returned
+                            example: 2
+        PurchaseIntentResponse:
+            type: object
+            additionalProperties: false
+            required:
+                - purchase_intent
+            properties:
+                purchase_intent:
+                    $ref: '#/components/schemas/PurchaseIntent'
+        PurchaseIntentMerchant:
+            type: object
+            additionalProperties: false
+            description: Current public merchant presentation resolved from the purchase intent's application. It is hydrated at lookup time and is not stored on the purchase intent.
+            required:
+                - branding
+                - profile
+            properties:
+                branding:
+                    $ref: '#/components/schemas/PurchaseIntentMerchantBranding'
+                profile:
+                    $ref: '#/components/schemas/PurchaseIntentMerchantProfile'
+        PurchaseIntentMerchantAsset:
+            type: object
+            additionalProperties: false
+            required:
+                - url
+            properties:
+                alt_text:
+                    type: string
+                    description: Accessible description of the merchant asset
+                    example: "Tea House"
+                url:
+                    type: string
+                    format: uri
+                    description: Public URL of the merchant asset
+                    example: "https://assets.example.com/tea-house.png"
+        PurchaseIntentMerchantBranding:
+            type: object
+            additionalProperties: false
+            required:
+                - accent_color
+                - color_scheme
+            properties:
+                accent_color:
+                    type: string
+                    description: Merchant accent color as a normalized six-digit hexadecimal value
+                    example: "#16a34a"
+                color_scheme:
+                    $ref: '#/components/schemas/PurchaseIntentMerchantColorScheme'
+                icon:
+                    $ref: '#/components/schemas/PurchaseIntentMerchantAsset'
+                logo:
+                    $ref: '#/components/schemas/PurchaseIntentMerchantAsset'
+        PurchaseIntentMerchantColorScheme:
+            type: object
+            additionalProperties: false
+            required:
+                - border
+                - link
+                - muted_text
+                - primary
+                - primary_foreground
+                - surface
+                - surface_muted
+                - text
+            properties:
+                border:
+                    type: string
+                    example: "#b9e3c8"
+                link:
+                    type: string
+                    example: "#128650"
+                muted_text:
+                    type: string
+                    example: "#096d2f"
+                primary:
+                    type: string
+                    example: "#16a34a"
+                primary_foreground:
+                    type: string
+                    example: "#ffffff"
+                surface:
+                    type: string
+                    example: "#f1faf5"
+                surface_muted:
+                    type: string
+                    example: "#e3f4e9"
+                text:
+                    type: string
+                    example: "#041d0d"
+        PurchaseIntentMerchantProfile:
+            type: object
+            additionalProperties: false
+            required:
+                - name
+            properties:
+                name:
+                    type: string
+                    description: Current public application alias, falling back to its current application name
+                    example: "Tea House"
+                support:
+                    $ref: '#/components/schemas/PurchaseIntentMerchantSupport'
+                website_url:
+                    type: string
+                    format: uri
+                    description: Public merchant website URL
+                    example: "https://teahouse.example"
+        PurchaseIntentMerchantSupport:
+            type: object
+            additionalProperties: false
+            properties:
+                email:
+                    type: string
+                    format: email
+                    description: Public merchant support email address
+                    example: "support@teahouse.example"
+                phone:
+                    type: string
+                    description: Public merchant support phone number
+                    example: "+233200000000"
+        PurchaseIntentOriginalPrice:
+            type: object
+            additionalProperties: false
+            required:
+                - active
+                - nominal
+            properties:
+                active:
+                    type: boolean
+                    description: Whether the resolved comparison price is active
+                    example: true
+                id:
+                    type: string
+                    # Public serializers always emit this resource with the pr_ type prefix.
+                    pattern: '^pr_'
+                    description: Catalog price ID when the comparison price is not inline
+                    example: "pr_original123"
+                label:
+                    type: string
+                    description: Catalog price label when available
+                    example: "Regular price"
+                nominal:
+                    $ref: './common.yml#/components/schemas/Amount'
+        PurchaseIntentPrice:
+            type: object
+            additionalProperties: false
+            required:
+                - active
+                - nominal
+            properties:
+                active:
+                    type: boolean
+                    description: Whether the resolved price can be used
+                    example: true
+                id:
+                    type: string
+                    # Public serializers always emit this resource with the pr_ type prefix.
+                    pattern: '^pr_'
+                    description: Catalog price ID when the offer price is not inline
+                    example: "pr_xyz789"
+                label:
+                    type: string
+                    description: Catalog price label when available
+                    example: "Campaign price"
+                nominal:
+                    $ref: './common.yml#/components/schemas/Amount'
+                original:
+                    $ref: '#/components/schemas/PurchaseIntentOriginalPrice'
+        PurchaseIntentBundleComponent:
+            type: object
+            additionalProperties: false
+            required:
+                - name
+                - quantity
+            properties:
+                about:
+                    type: string
+                category:
+                    type: string
+                image_url:
+                    type: string
+                    format: uri
+                name:
+                    type: string
+                price_id:
+                    type: string
+                    # Public serializers always emit this resource with the pr_ type prefix.
+                    pattern: '^pr_'
+                product_id:
+                    type: string
+                    # Public serializers always emit this resource with the prod_ type prefix.
+                    pattern: '^prod_'
+                quantity:
+                    type: integer
+                    minimum: 1
+                reference:
+                    type: string
+                type:
+                    type: string
+        PurchaseIntentBundle:
+            type: object
+            additionalProperties: false
+            required:
+                - id
+            properties:
+                about:
+                    type: string
+                components:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/PurchaseIntentBundleComponent'
+                id:
+                    type: string
+                    # Public serializers always emit this resource with the pbd_ type prefix.
+                    pattern: '^pbd_'
+                    description: Current app-owned bundle referenced by the Buy link
+                    example: "pbd_abc123"
+                media:
+                    $ref: './catalog.yml#/components/schemas/ProductMedia'
+                name:
+                    type: string
+                price:
+                    allOf:
+                        - $ref: '#/components/schemas/PurchaseIntentPrice'
+                    description: Current bundle catalog price reference. The top-level price is the effective Buy-link offer.
+                reference:
+                    type: string
+        PurchaseIntentProduct:
+            allOf:
+                - $ref: './catalog.yml#/components/schemas/PriceEmbeddedProduct'
+                - type: object
+                  properties:
+                      prices:
+                          type: array
+                          description: Non-archived catalog prices currently attached to the product
+                          items:
+                              $ref: './catalog.yml#/components/schemas/ProductPriceSummary'
+                      variant_set_id:
+                          type: string
+                          # Public serializers always emit this resource with the pg_ type prefix.
+                          pattern: '^pg_'
+                          description: Variant set configured for this Buy link
+                          example: "pg_variantset123"
+        PurchaseIntentUsage:
+            description: Exactly one of multi_use or single_use is returned as true. Order is present after a single-use intent is consumed.
+            oneOf:
+                - $ref: '#/components/schemas/PurchaseIntentMultiUseUsage'
+                - $ref: '#/components/schemas/PurchaseIntentSingleUseUsage'
+        PurchaseIntentMultiUseUsage:
+            type: object
+            additionalProperties: false
+            required: [multi_use]
+            properties:
+                multi_use:
+                    type: boolean
+                    enum: [true]
+        PurchaseIntentSingleUseUsage:
+            type: object
+            additionalProperties: false
+            required: [single_use]
+            properties:
+                order:
+                    $ref: '#/components/schemas/PurchaseIntentUsageOrder'
+                single_use:
+                    type: boolean
+                    enum: [true]
+        PurchaseIntentUsageOrder:
+            type: object
+            additionalProperties: false
+            required:
+                - created_at
+                - id
+            properties:
+                created_at:
+                    type: string
+                    format: date-time
+                    description: When order creation consumed the single-use Buy link
+                id:
+                    type: string
+                    # Public serializers always emit this resource with the or_ type prefix.
+                    pattern: '^or_'
+                    description: Order that consumed the Buy link
+                    example: "or_abc123"
+        PurchaseIntentVariantAxis:
+            type: object
+            additionalProperties: false
+            required:
+                - key
+                - label
+                - position
+            properties:
+                key:
+                    type: string
+                    example: "size"
+                label:
+                    type: string
+                    example: "Size"
+                position:
+                    type: integer
+                    example: 0
+        PurchaseIntentVariant:
+            type: object
+            additionalProperties: false
+            required:
+                - active
+                - product_id
+                - variant_values
+            properties:
+                active:
+                    type: boolean
+                    example: true
+                position:
+                    type: integer
+                    example: 0
+                price:
+                    $ref: '#/components/schemas/PurchaseIntentPrice'
+                product:
+                    $ref: '#/components/schemas/PurchaseIntentProduct'
+                product_id:
+                    type: string
+                    # Public serializers always emit this resource with the prod_ type prefix.
+                    pattern: '^prod_'
+                    example: "prod_variant123"
+                variant_values:
+                    $ref: './catalog.yml#/components/schemas/VariantValues'
+        PurchaseIntentVariantSet:
+            type: object
+            additionalProperties: false
+            required:
+                - active
+                - id
+                - name
+                - variant_axes
+                - variants
+            properties:
+                active:
+                    type: boolean
+                    example: true
+                default_product_id:
+                    type: string
+                    # Public serializers always emit this resource with the prod_ type prefix.
+                    pattern: '^prod_'
+                    example: "prod_abc123"
+                description:
+                    type: string
+                    example: "Choose a tin size"
+                id:
+                    type: string
+                    # Public serializers always emit this resource with the pg_ type prefix.
+                    pattern: '^pg_'
+                    example: "pg_variantset123"
+                name:
+                    type: string
+                    example: "Tin size"
+                reference:
+                    type: string
+                    example: "matcha-tin-size"
+                variant_axes:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/PurchaseIntentVariantAxis'
+                variants:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/PurchaseIntentVariant'
+        PurchaseIntent:
+            type: object
+            additionalProperties: false
+            required:
+                - allow_variants
+                - application_id
+                - created_at
+                - id
+                - quantity
+                - status
+                - usage
+            # Effective Buy-link status is derived from these persisted lifecycle facts.
+            x-simile-constraints:
+                - ordered:
+                      paths: [/created_at, /updated_at]
+                - ordered:
+                      paths: [/created_at, /inactive_at]
+                - implies:
+                      when: { path: /status, equals: active }
+                      then:
+                          all:
+                              - { path: /inactive_at, state: absent }
+                - implies:
+                      when: { path: /status, equals: inactive }
+                      then:
+                          all:
+                              - { path: /inactive_at, state: non-null }
+                - implies:
+                      when: { path: /status, equals: used }
+                      then:
+                          all:
+                              - { path: /inactive_at, state: absent }
+                - implies:
+                      when: { path: /status, equals: expired }
+                      then:
+                          all:
+                              - { path: /expires_at, state: non-null }
+                              - { path: /inactive_at, state: absent }
+            properties:
+                allow_variants:
+                    type: boolean
+                    description: Whether the intent was configured with a variant set
+                    example: false
+                application_id:
+                    type: string
+                    # Public serializers always emit this resource with the app_ type prefix.
+                    pattern: '^app_'
+                    description: Application that owns the purchase intent. This is routing metadata, not merchant presentation.
+                    example: "app_abc123"
+                bundle:
+                    $ref: '#/components/schemas/PurchaseIntentBundle'
+                created_at:
+                    type: string
+                    format: date-time
+                    description: Creation timestamp
+                expires_at:
+                    type: string
+                    format: date-time
+                    description: Timestamp at or after which the Buy link is expired
+                id:
+                    type: string
+                    # Public serializers always emit this resource with the sale_ type prefix.
+                    pattern: '^sale_'
+                    description: Unique purchase intent identifier with sale_ prefix. Append it to https://pages.inttegro.com/buy/ to build the hosted Buy link.
+                    example: "sale_ABCXYZ"
+                inactive_at:
+                    type: string
+                    format: date-time
+                    description: When the Buy link was explicitly canceled
+                merchant:
+                    $ref: '#/components/schemas/PurchaseIntentMerchant'
+                price:
+                    allOf:
+                        - $ref: '#/components/schemas/PurchaseIntentPrice'
+                    description: Effective Buy-link offer price. For a bundle without an explicit override, this is the current catalog default.
+                presentation:
+                    $ref: '#/components/schemas/PurchaseIntentPresentation'
+                product:
+                    $ref: '#/components/schemas/PurchaseIntentProduct'
+                quantity:
+                    type: object
+                    additionalProperties: false
+                    description: Quantity bounds enforced by the hosted checkout. max is omitted when the offer has no upper bound.
+                    required:
+                        - min
+                    x-simile-constraints:
+                        - bounded:
+                              path: /max
+                              minimum: { path: /min }
+                    properties:
+                        min:
+                            type: integer
+                            minimum: 1
+                            description: Minimum quantity the hosted checkout allows
+                            example: 1
+                        max:
+                            type: integer
+                            minimum: 1
+                            description: Optional maximum quantity the hosted checkout allows. It is always greater than or equal to min when present.
+                            example: 5
+                status:
+                    type: string
+                    enum: [active, expired, inactive, used]
+                    description: Effective lifecycle state derived from expiry, cancellation, and single-use order creation
+                    example: "active"
+                updated_at:
+                    type: string
+                    format: date-time
+                    description: Last mutation timestamp
+                usage:
+                    $ref: '#/components/schemas/PurchaseIntentUsage'
+                variant_set:
+                    $ref: '#/components/schemas/PurchaseIntentVariantSet'
+        PurchaseIntentPresentation:
+            type: object
+            additionalProperties: false
+            properties:
+                buy_page:
+                    type: object
+                    additionalProperties: false
+                    properties:
+                        text:
+                            type: object
+                            additionalProperties: false
+                            properties:
+                                checkout_section_title:
+                                    type: string
+                                amount_field_label:
+                                    type: string
+                                primary_action_label:
+                                    type: string

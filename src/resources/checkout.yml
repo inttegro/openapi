@@ -1,0 +1,1312 @@
+# Authoritative checkout resource contract.
+# Why: keeping each resource's operations and schemas together makes public invariants
+# reviewable without weakening the single bundled contract distributed to consumers.
+
+paths:
+    /checkout/lookup:
+        post:
+            summary: Look up checkout
+            description: |
+                Retrieve either the current public checkout representation of a finalized Order or
+                the canonical public Purchase Intent. Send exactly one reference. A Purchase Intent
+                response includes its resolved product and price, including customer-selected amount
+                policy when the price permits the customer to choose an amount. An Order response
+                includes editable pricing policy on each eligible line while payment has not begun.
+            operationId: lookupCheckoutResource
+            tags: [Checkout]
+            security: []
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/CheckoutLookupRequest'
+            responses:
+                '200':
+                    description: Checkout Order or Purchase Intent found
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/CheckoutLookupResponse'
+                '400':
+                    description: Invalid checkout lookup request
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/ErrorEnvelope'
+                                    - type: object
+                                      properties:
+                                          error:
+                                              oneOf:
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_body] }, code: { enum: [invalid_request_body] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_parameter] }, code: { enum: [invalid_request_parameter, request_parameter_null_rejected, request_parameter_parse_failed, request_parameter_too_large, request_parameter_too_small, request_parameter_type_mismatch, request_parameter_value_not_allowed, request_parameters_mutually_exclusive, unexpected_request_parameter] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/e/t-invalid_request_parameter"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_parameter] }, code: { enum: [request_parameter_choice_required, request_parameter_null_rejected, request_parameter_parse_failed, request_parameter_too_large, request_parameter_too_small, request_parameter_type_mismatch, request_parameter_value_not_allowed, request_parameters_mutually_exclusive, unexpected_request_parameter] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [missing_request_parameter] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/e/c-missing_request_parameter"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [request_parameter_choice_required] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/e/t-invalid_request_parameter"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [request_parameter_choice_required] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                '422':
+                    description: Checkout reference was not found or cannot be used
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/ErrorEnvelope'
+                                    - type: object
+                                      properties:
+                                          error:
+                                              oneOf:
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [precondition_unmet] }, code: { enum: [draft_mode_order_has_no_invoice] }, fix_code: { enum: [satisfy_precondition] }, type: { enum: [bad_request] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_parameter] }, code: { enum: [order_not_found] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [unknown] }, code: { enum: [request_failed] }, fix_code: { enum: [contact_customer_support] }, type: { enum: [unknown_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+    /checkout/select_amount:
+        post:
+            summary: Update customer-selected amounts on a checkout Order
+            description: |
+                Update customer-selected product amounts on an existing finalized Order while its
+                payment remains pristine. The Order cannot be changed after payment begins.
+                Suggested amounts are conveniences, not an allow-list. Purchase Intent checkouts
+                should send their selected amount directly to `/checkout/pay`, which creates the
+                Order and starts payment together. Retry an uncertain request with the same
+                idempotency key and body.
+            operationId: selectCheckoutAmount
+            tags: [Checkout]
+            security: []
+            parameters:
+                - $ref: './common.yml#/components/parameters/IdempotencyKey'
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/CheckoutSelectAmountRequest'
+            responses:
+                '200':
+                    description: Finalized Checkout Order created, updated, or replayed
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/CheckoutOrderResponse'
+                '400':
+                    description: Invalid amount-selection request
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/ErrorEnvelope'
+                                    - type: object
+                                      properties:
+                                          error:
+                                              oneOf:
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_parameter] }, code: { enum: [idempotency_key_invalid, idempotency_key_mismatch, idempotency_key_unsupported] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [idempotency_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_body] }, code: { enum: [invalid_request_body] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_parameter] }, code: { enum: [invalid_request_parameter, request_parameter_null_rejected, request_parameter_parse_failed, request_parameter_too_large, request_parameter_too_small, request_parameter_type_mismatch, request_parameter_value_not_allowed, request_parameters_mutually_exclusive, unexpected_request_parameter] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/e/t-invalid_request_parameter"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_parameter] }, code: { enum: [request_parameter_choice_required, request_parameter_null_rejected, request_parameter_parse_failed, request_parameter_too_large, request_parameter_too_small, request_parameter_type_mismatch, request_parameter_value_not_allowed, request_parameters_mutually_exclusive, unexpected_request_parameter] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [missing_request_parameter] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/e/c-missing_request_parameter"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [request_parameter_choice_required] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/e/t-invalid_request_parameter"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [request_parameter_choice_required] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                '409':
+                    description: Another request is currently using the same idempotency key
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/ErrorEnvelope'
+                                    - type: object
+                                      properties:
+                                          error:
+                                              { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [idempotency_in_progress] }, code: { enum: [idempotency_key_in_progress] }, fix_code: { enum: [repeat_same_request] }, type: { enum: [idempotency_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                '422':
+                    description: Purchase Intent or selected amount cannot be used
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/ErrorEnvelope'
+                                    - type: object
+                                      properties:
+                                          error:
+                                              oneOf:
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [idempotency_conflict] }, code: { enum: [idempotency_key_conflict] }, fix_code: { enum: [use_new_idempotency_key] }, type: { enum: [idempotency_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_parameter] }, code: { enum: [checkout_amount_locked, checkout_line_item_duplicate, checkout_line_item_invalid, checkout_line_item_not_found, checkout_order_not_found, customer_selected_amount_invalid, customer_selected_amount_required, purchase_intent_already_used, purchase_intent_not_found] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [unknown] }, code: { enum: [request_failed] }, fix_code: { enum: [contact_customer_support] }, type: { enum: [unknown_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                '503':
+                    description: Checkout Order preparation failed transiently
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                        Retry-After:
+                            $ref: './common.yml#/components/headers/RetryAfter'
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/ErrorEnvelope'
+                                    - type: object
+                                      properties:
+                                          error:
+                                              oneOf:
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [dependency_unavailable] }, code: { enum: [idempotency_storage_unavailable] }, fix_code: { enum: [repeat_same_request] }, type: { enum: [idempotency_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [service_unavailable] }, code: { enum: [idempotency_key_generation_failed] }, fix_code: { enum: [repeat_same_request] }, type: { enum: [idempotency_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [service_unavailable] }, code: { enum: [endpoint_unavailable] }, fix_code: { enum: [repeat_same_request] }, type: { enum: [transient_error] }, url: { enum: ["https://studio.inttegro.com/e/t-transient_error"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [service_unavailable] }, code: { enum: [checkout_amount_selection_failed] }, fix_code: { enum: [repeat_same_request] }, type: { enum: [transient_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+    /checkout/pay:
+        post:
+            summary: Pay a checkout
+            description: |
+                Send exactly one checkout reference. With `order_id`, Checkout pays the existing
+                finalized Order. With `purchase_intent_id`, Checkout validates the selected product,
+                quantity, and amount, creates the finalized Order, and starts payment as one
+                idempotent operation when the payer submits payment. Purchase Intent payments must
+                include `customer_data` and new `payment_method_data`; saved payment methods can be
+                used only with an existing Order.
+
+                Retry an uncertain request with the same idempotency key and body.
+            operationId: payCheckout
+            tags: [Checkout]
+            security: []
+            parameters:
+                - $ref: './common.yml#/components/parameters/IdempotencyKey'
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/CheckoutPayRequest'
+            responses:
+                '200':
+                    description: Checkout payment result
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/CheckoutOrderResponse'
+                '400':
+                    description: Checkout payment request cannot be satisfied
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: '#/components/schemas/CheckoutOrderErrorResponse'
+                                    - type: object
+                                      properties:
+                                          error:
+                                              oneOf:
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [precondition_unmet] }, code: { enum: [confirmation_pending] }, fix_code: { enum: [satisfy_precondition] }, type: { enum: [bad_request] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_parameter] }, code: { enum: [idempotency_key_invalid, idempotency_key_mismatch, idempotency_key_unsupported] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [idempotency_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_body] }, code: { enum: [invalid_request_body] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_parameter] }, code: { enum: [invalid_request_parameter, request_parameter_null_rejected, request_parameter_parse_failed, request_parameter_too_large, request_parameter_too_small, request_parameter_type_mismatch, request_parameter_value_not_allowed, request_parameters_mutually_exclusive, unexpected_request_parameter] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/e/t-invalid_request_parameter"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_parameter] }, code: { enum: [order_not_found, payment_method_invalid, request_parameter_choice_required, request_parameter_null_rejected, request_parameter_parse_failed, request_parameter_too_large, request_parameter_too_small, request_parameter_type_mismatch, request_parameter_value_not_allowed, request_parameters_mutually_exclusive, unexpected_request_parameter] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [missing_request_parameter] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/e/c-missing_request_parameter"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [request_parameter_choice_required] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/e/t-invalid_request_parameter"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [request_parameter_choice_required] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                '409':
+                    description: Another request is currently using the same idempotency key
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/ErrorEnvelope'
+                                    - type: object
+                                      properties:
+                                          error:
+                                              { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [idempotency_in_progress] }, code: { enum: [idempotency_key_in_progress] }, fix_code: { enum: [repeat_same_request] }, type: { enum: [idempotency_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                '422':
+                    description: Purchase Intent selection is invalid or the idempotency key was reused with a different request
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/ErrorEnvelope'
+                                    - type: object
+                                      properties:
+                                          error:
+                                              oneOf:
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [idempotency_conflict] }, code: { enum: [idempotency_key_conflict] }, fix_code: { enum: [use_new_idempotency_key] }, type: { enum: [idempotency_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_parameter] }, code: { enum: [customer_selected_amount_invalid, customer_selected_amount_required, fixed_price_unavailable, purchase_intent_already_used, purchase_intent_not_found, purchase_intent_quantity_invalid, purchase_intent_selection_invalid, purchase_intent_variant_invalid] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [unknown] }, code: { enum: [request_failed] }, fix_code: { enum: [contact_customer_support] }, type: { enum: [unknown_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                '503':
+                    description: Checkout payment or idempotency storage failed transiently
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                        Retry-After:
+                            $ref: './common.yml#/components/headers/RetryAfter'
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: '#/components/schemas/CheckoutOrderErrorResponse'
+                                    - type: object
+                                      properties:
+                                          error:
+                                              oneOf:
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [dependency_unavailable] }, code: { enum: [idempotency_storage_unavailable] }, fix_code: { enum: [repeat_same_request] }, type: { enum: [idempotency_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [service_unavailable] }, code: { enum: [idempotency_key_generation_failed] }, fix_code: { enum: [repeat_same_request] }, type: { enum: [idempotency_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [service_unavailable] }, code: { enum: [endpoint_unavailable] }, fix_code: { enum: [repeat_same_request] }, type: { enum: [transient_error] }, url: { enum: ["https://studio.inttegro.com/e/t-transient_error"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [service_unavailable] }, code: { enum: [checkout_payment_failed, confirmation_request_failed, payment_failed] }, fix_code: { enum: [repeat_same_request] }, type: { enum: [transient_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                '504':
+                    description: Checkout payment timed out
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/ErrorEnvelope'
+                                    - type: object
+                                      properties:
+                                          error:
+                                              { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [request_timeout] }, code: { enum: [request_timeout] }, fix_code: { enum: [retry_with_backoff] }, type: { enum: [transient_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+    /checkout/confirm_payment:
+        post:
+            summary: Confirm a checkout payment
+            description: |
+                Submit the payer's confirmation token for a checkout payment that requires customer
+                confirmation. Retry an uncertain request with the same idempotency key and body.
+            operationId: confirmCheckoutPayment
+            tags: [Checkout]
+            security: []
+            parameters:
+                - $ref: './common.yml#/components/parameters/IdempotencyKey'
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/CheckoutConfirmPaymentRequest'
+            responses:
+                '200':
+                    description: Checkout payment confirmation result
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/CheckoutOrderResponse'
+                '400':
+                    description: Invalid checkout payment confirmation request
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/ErrorEnvelope'
+                                    - type: object
+                                      properties:
+                                          error:
+                                              oneOf:
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_parameter] }, code: { enum: [idempotency_key_invalid, idempotency_key_mismatch, idempotency_key_unsupported] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [idempotency_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_body] }, code: { enum: [invalid_request_body] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_parameter] }, code: { enum: [invalid_request_parameter, request_parameter_null_rejected, request_parameter_parse_failed, request_parameter_too_large, request_parameter_too_small, request_parameter_type_mismatch, request_parameter_value_not_allowed, request_parameters_mutually_exclusive, unexpected_request_parameter] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/e/t-invalid_request_parameter"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_parameter] }, code: { enum: [request_parameter_choice_required, request_parameter_null_rejected, request_parameter_parse_failed, request_parameter_too_large, request_parameter_too_small, request_parameter_type_mismatch, request_parameter_value_not_allowed, request_parameters_mutually_exclusive, unexpected_request_parameter] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [missing_request_parameter] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/e/c-missing_request_parameter"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [request_parameter_choice_required] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/e/t-invalid_request_parameter"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [request_parameter_choice_required] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                '409':
+                    description: Another request is currently using the same idempotency key
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/ErrorEnvelope'
+                                    - type: object
+                                      properties:
+                                          error:
+                                              { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [idempotency_in_progress] }, code: { enum: [idempotency_key_in_progress] }, fix_code: { enum: [repeat_same_request] }, type: { enum: [idempotency_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                '422':
+                    description: Checkout payment confirmation failed or the idempotency key conflicts
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: '#/components/schemas/CheckoutOrderErrorResponse'
+                                    - type: object
+                                      properties:
+                                          error:
+                                              oneOf:
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [precondition_unmet] }, code: { enum: [confirmation_expired, confirmation_max_reached, confirmation_pending] }, fix_code: { enum: [satisfy_precondition] }, type: { enum: [bad_request] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [idempotency_conflict] }, code: { enum: [idempotency_key_conflict] }, fix_code: { enum: [use_new_idempotency_key] }, type: { enum: [idempotency_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_parameter] }, code: { enum: [confirmation_bad_token, confirmation_failed, confirmation_not_found, order_not_found] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [unknown] }, code: { enum: [request_failed] }, fix_code: { enum: [contact_customer_support] }, type: { enum: [unknown_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                '503':
+                    description: Checkout payment confirmation failed transiently
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                        Retry-After:
+                            $ref: './common.yml#/components/headers/RetryAfter'
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/ErrorEnvelope'
+                                    - type: object
+                                      properties:
+                                          error:
+                                              oneOf:
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [dependency_unavailable] }, code: { enum: [idempotency_storage_unavailable] }, fix_code: { enum: [repeat_same_request] }, type: { enum: [idempotency_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [service_unavailable] }, code: { enum: [idempotency_key_generation_failed] }, fix_code: { enum: [repeat_same_request] }, type: { enum: [idempotency_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [service_unavailable] }, code: { enum: [endpoint_unavailable] }, fix_code: { enum: [repeat_same_request] }, type: { enum: [transient_error] }, url: { enum: ["https://studio.inttegro.com/e/t-transient_error"] } } }
+                '504':
+                    description: Checkout payment confirmation timed out
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/ErrorEnvelope'
+                                    - type: object
+                                      properties:
+                                          error:
+                                              { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [request_timeout] }, code: { enum: [request_timeout] }, fix_code: { enum: [retry_with_backoff] }, type: { enum: [transient_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+    /checkout/request_confirmation:
+        post:
+            summary: Request checkout payment confirmation
+            description: |
+                Ask Inttegro to send or resend the confirmation challenge required by the Order's
+                current payment. Retry an uncertain request with the same idempotency key and body.
+            operationId: requestCheckoutConfirmation
+            tags: [Checkout]
+            security: []
+            parameters:
+                - $ref: './common.yml#/components/parameters/IdempotencyKey'
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/CheckoutOrderReferenceRequest'
+            responses:
+                '200':
+                    description: Checkout confirmation request result
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/CheckoutOrderResponse'
+                '400':
+                    description: Checkout confirmation request cannot be satisfied
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: '#/components/schemas/CheckoutOrderErrorResponse'
+                                    - type: object
+                                      properties:
+                                          error:
+                                              oneOf:
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [precondition_unmet] }, code: { enum: [confirmation_not_needed] }, fix_code: { enum: [satisfy_precondition] }, type: { enum: [bad_request] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_parameter] }, code: { enum: [idempotency_key_invalid, idempotency_key_mismatch, idempotency_key_unsupported] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [idempotency_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_body] }, code: { enum: [invalid_request_body] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_parameter] }, code: { enum: [invalid_request_parameter, request_parameter_null_rejected, request_parameter_parse_failed, request_parameter_too_large, request_parameter_too_small, request_parameter_type_mismatch, request_parameter_value_not_allowed, request_parameters_mutually_exclusive, unexpected_request_parameter] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/e/t-invalid_request_parameter"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_parameter] }, code: { enum: [order_not_found, request_parameter_choice_required, request_parameter_null_rejected, request_parameter_parse_failed, request_parameter_too_large, request_parameter_too_small, request_parameter_type_mismatch, request_parameter_value_not_allowed, request_parameters_mutually_exclusive, unexpected_request_parameter] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [missing_request_parameter] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/e/c-missing_request_parameter"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [request_parameter_choice_required] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/e/t-invalid_request_parameter"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [request_parameter_choice_required] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                '409':
+                    description: Another request is currently using the same idempotency key
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/ErrorEnvelope'
+                                    - type: object
+                                      properties:
+                                          error:
+                                              { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [idempotency_in_progress] }, code: { enum: [idempotency_key_in_progress] }, fix_code: { enum: [repeat_same_request] }, type: { enum: [idempotency_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                '422':
+                    description: The idempotency key was reused with a different request
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/ErrorEnvelope'
+                                    - type: object
+                                      properties:
+                                          error:
+                                              oneOf:
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [idempotency_conflict] }, code: { enum: [idempotency_key_conflict] }, fix_code: { enum: [use_new_idempotency_key] }, type: { enum: [idempotency_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [unknown] }, code: { enum: [request_failed] }, fix_code: { enum: [contact_customer_support] }, type: { enum: [unknown_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                '503':
+                    description: Checkout confirmation request or idempotency storage failed transiently
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                        Retry-After:
+                            $ref: './common.yml#/components/headers/RetryAfter'
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: '#/components/schemas/CheckoutOrderErrorResponse'
+                                    - type: object
+                                      properties:
+                                          error:
+                                              oneOf:
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [dependency_unavailable] }, code: { enum: [idempotency_storage_unavailable] }, fix_code: { enum: [repeat_same_request] }, type: { enum: [idempotency_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [service_unavailable] }, code: { enum: [idempotency_key_generation_failed] }, fix_code: { enum: [repeat_same_request] }, type: { enum: [idempotency_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [service_unavailable] }, code: { enum: [endpoint_unavailable] }, fix_code: { enum: [repeat_same_request] }, type: { enum: [transient_error] }, url: { enum: ["https://studio.inttegro.com/e/t-transient_error"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [service_unavailable] }, code: { enum: [confirmation_request_failed] }, fix_code: { enum: [repeat_same_request] }, type: { enum: [transient_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                '504':
+                    description: Checkout confirmation request timed out
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/ErrorEnvelope'
+                                    - type: object
+                                      properties:
+                                          error:
+                                              { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [request_timeout] }, code: { enum: [request_timeout] }, fix_code: { enum: [retry_with_backoff] }, type: { enum: [transient_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+components:
+    schemas:
+        CheckoutOrderReferenceRequest:
+            type: object
+            additionalProperties: false
+            required:
+                - order_id
+            properties:
+                order_id:
+                    type: string
+                    minLength: 1
+                    description: The finalized Order to inspect or pay.
+                    example: "or_a1b2c3d4e5f6"
+        CheckoutLookupRequest:
+            oneOf:
+                - $ref: '#/components/schemas/CheckoutOrderReferenceRequest'
+                - $ref: '#/components/schemas/LegacyCheckoutPurchaseIntentLookupRequest'
+        LegacyCheckoutPurchaseIntentLookupRequest:
+            type: object
+            deprecated: true
+            description: Legacy Purchase Intent amount selection. New integrations should use `/checkout/pay`.
+            additionalProperties: false
+            required: [purchase_intent_id]
+            properties:
+                purchase_intent_id:
+                    type: string
+                    minLength: 1
+                    description: Purchase Intent whose customer-selected amount policy should be loaded.
+                    example: "sale_a1b2c3d4e5f6"
+        CheckoutSelectAmountRequest:
+            oneOf:
+                - $ref: '#/components/schemas/CheckoutPurchaseIntentSelectAmountRequest'
+                - $ref: '#/components/schemas/CheckoutOrderSelectAmountRequest'
+        CheckoutPurchaseIntentSelectAmountRequest:
+            type: object
+            additionalProperties: false
+            required: [purchase_intent_id, selected_amount]
+            properties:
+                purchase_intent_id:
+                    type: string
+                    minLength: 1
+                    description: Purchase Intent used to create a new Checkout Order.
+                    example: "sale_a1b2c3d4e5f6"
+                selected_amount:
+                    $ref: '#/components/schemas/CheckoutSelectedAmount'
+        CheckoutOrderSelectAmountRequest:
+            type: object
+            additionalProperties: false
+            required: [order_id, line_items]
+            properties:
+                order_id:
+                    type: string
+                    minLength: 1
+                    description: Existing finalized Order whose amount should be changed before payment begins.
+                    example: "or_a1b2c3d4e5f6"
+                line_items:
+                    type: array
+                    minItems: 1
+                    description: Customer-selected amounts keyed by the Order line-item IDs returned by checkout lookup.
+                    items:
+                        $ref: '#/components/schemas/CheckoutOrderLineItemAmountSelection'
+        CheckoutOrderLineItemAmountSelection:
+            type: object
+            additionalProperties: false
+            required: [id, selected_amount]
+            properties:
+                id:
+                    type: string
+                    minLength: 1
+                    description: Product line-item ID whose amount should be changed.
+                    example: "oli_a1b2c3d4e5f6"
+                selected_amount:
+                    $ref: '#/components/schemas/CheckoutSelectedAmount'
+        CheckoutSelectedAmount:
+            type: object
+            additionalProperties: false
+            required:
+                - currency
+                - value
+            properties:
+                currency:
+                    $ref: './common.yml#/components/schemas/Currency'
+                value:
+                    type: integer
+                    minimum: 1
+                    description: Payer-selected amount in the currency's smallest unit.
+                    example: 5000
+        CheckoutPaymentAddress:
+            type: object
+            additionalProperties: false
+            required:
+                - country
+            properties:
+                name:
+                    type: string
+                phone_number:
+                    type: string
+                line1:
+                    type: string
+                line2:
+                    type: string
+                city:
+                    type: string
+                region:
+                    type: string
+                post_code:
+                    type: string
+                country:
+                    type: string
+                    description: ISO 3166-1 alpha-2 country code.
+                    example: GH
+        CheckoutBillingDetails:
+            type: object
+            additionalProperties: false
+            required:
+                - name
+                - address
+            properties:
+                name:
+                    type: string
+                    description: Name of the payer associated with the new payment method.
+                phone_number:
+                    type: string
+                    description: Phone number associated with the new payment method.
+                address:
+                    $ref: '#/components/schemas/CheckoutPaymentAddress'
+        CheckoutMobileMoneyData:
+            type: object
+            additionalProperties: false
+            required:
+                - network
+                - account_number
+            properties:
+                reference:
+                    type: string
+                network:
+                    type: string
+                    enum: [mtn, vodafone, airtel, telecel]
+                account_number:
+                    type: string
+        CheckoutPaymentMethodData:
+            type: object
+            additionalProperties: false
+            required:
+                - type
+                - mobile_money
+            properties:
+                type:
+                    type: string
+                    enum: [mobile_money]
+                mobile_money:
+                    $ref: '#/components/schemas/CheckoutMobileMoneyData'
+                billing_details:
+                    allOf:
+                        - $ref: '#/components/schemas/CheckoutBillingDetails'
+                    description: |
+                        Billing details for this new payment method. They do not replace the
+                        Order customer's identity or the Order's shipping address.
+        CheckoutCustomerData:
+            type: object
+            additionalProperties: false
+            required:
+                - name
+            anyOf:
+                - required: [email_address]
+                - required: [phone_number]
+            properties:
+                name:
+                    type: string
+                    minLength: 1
+                    description: Customer name recorded on the Order created from the Purchase Intent.
+                email_address:
+                    type: string
+                    minLength: 1
+                phone_number:
+                    type: string
+                    minLength: 1
+        CheckoutPayRequest:
+            oneOf:
+                - $ref: '#/components/schemas/CheckoutExistingOrderPayRequest'
+                - $ref: '#/components/schemas/CheckoutPurchaseIntentPayRequest'
+        CheckoutExistingOrderPayRequest:
+            type: object
+            title: Existing Order payment
+            description: Pays an existing finalized Order with either a saved or newly supplied payment method.
+            additionalProperties: false
+            required: [order_id]
+            allOf:
+                - not:
+                      required: [payment_method_id, payment_method_data]
+                      properties:
+                          payment_method_id: {}
+                          payment_method_data: {}
+                - anyOf:
+                    - not:
+                          required: [save_payment_method, payment_method_data]
+                          properties:
+                              save_payment_method:
+                                  enum: [true]
+                              payment_method_data: {}
+                    - properties:
+                          payment_method_data:
+                              type: object
+                              additionalProperties: true
+                              required: [billing_details]
+                              properties:
+                                  billing_details: {}
+            properties:
+                order_id:
+                    type: string
+                    minLength: 1
+                    description: The finalized Order to pay.
+                    example: "or_a1b2c3d4e5f6"
+                payment_method_id:
+                    type: string
+                    minLength: 1
+                    description: |
+                        A saved payment method owned by the Order's immutable customer. Mutually
+                        exclusive with `payment_method_data`.
+                payment_method_data:
+                    allOf:
+                        - $ref: '#/components/schemas/CheckoutPaymentMethodData'
+                    description: |
+                        New payment method details supplied by the payer. Mutually exclusive with
+                        `payment_method_id`. Shipping details are not accepted here because checkout
+                        cannot change the Order's shipping address.
+                save_payment_method:
+                    type: boolean
+                    default: false
+                    description: |
+                        Save a newly supplied payment method to the Order's customer. When true,
+                        `payment_method_data.billing_details` is required.
+        CheckoutPurchaseIntentPayRequest:
+            type: object
+            title: Purchase Intent payment
+            description: Creates an Order from a Purchase Intent and pays it with a newly supplied payment method.
+            additionalProperties: false
+            required: [purchase_intent_id, customer_data, payment_method_data]
+            allOf:
+                - anyOf:
+                    - not:
+                          required: [save_payment_method]
+                          properties:
+                              save_payment_method:
+                                  enum: [true]
+                    - properties:
+                          payment_method_data:
+                              type: object
+                              additionalProperties: true
+                              required: [billing_details]
+                              properties:
+                                  billing_details: {}
+            properties:
+                purchase_intent_id:
+                    type: string
+                    minLength: 1
+                    description: Purchase Intent to turn into an Order and pay in this request.
+                    example: "sale_a1b2c3d4e5f6"
+                variant_product_id:
+                    type: string
+                    minLength: 1
+                    description: Selected variant when the Purchase Intent offers product variants.
+                quantity:
+                    type: integer
+                    minimum: 1
+                    description: Quantity selected by the payer. Defaults to the Purchase Intent minimum.
+                selected_amount:
+                    allOf:
+                        - $ref: '#/components/schemas/CheckoutSelectedAmount'
+                    description: Amount selected by the payer when the Purchase Intent accepts customer-selected pricing.
+                customer_data:
+                    $ref: '#/components/schemas/CheckoutCustomerData'
+                payment_method_data:
+                    allOf:
+                        - $ref: '#/components/schemas/CheckoutPaymentMethodData'
+                    description: |
+                        New payment method details supplied by the payer. Shipping details are not
+                        accepted here because checkout cannot change the resulting Order's shipping address.
+                save_payment_method:
+                    type: boolean
+                    default: false
+                    description: Save the newly supplied payment method to the Order's customer.
+        CheckoutConfirmPaymentRequest:
+            type: object
+            additionalProperties: false
+            required:
+                - order_id
+                - token
+            properties:
+                order_id:
+                    type: string
+                    minLength: 1
+                    example: "or_a1b2c3d4e5f6"
+                payment_id:
+                    type: string
+                    description: Optional payment identifier when already known by the client.
+                confirmation_id:
+                    type: string
+                    description: Optional confirmation attempt identifier.
+                token:
+                    type: string
+                    minLength: 1
+                    description: Payer confirmation token.
+                    example: "123456"
+        CheckoutOrderResponse:
+            type: object
+            additionalProperties: false
+            description: Successful checkout response.
+            required: [order]
+            properties:
+                order:
+                    $ref: '#/components/schemas/CheckoutOrder'
+        CheckoutOrderErrorResponse:
+            type: object
+            additionalProperties: false
+            description: Checkout error response. The latest Order snapshot is included when available.
+            required: [error]
+            properties:
+                error:
+                    $ref: './common.yml#/components/schemas/Error'
+                order:
+                    $ref: '#/components/schemas/CheckoutOrder'
+        CheckoutLookupResponse:
+            description: |
+                Returns exactly one resource matching the supplied checkout reference. Purchase
+                Intent responses use the same public resource shape as Purchase Intent lookup.
+            oneOf:
+                - $ref: '#/components/schemas/CheckoutOrderLookupResponse'
+                - $ref: '#/components/schemas/CheckoutPurchaseIntentLookupResponse'
+        CheckoutOrderLookupResponse:
+            type: object
+            additionalProperties: false
+            required: [order]
+            properties:
+                order:
+                    $ref: '#/components/schemas/CheckoutOrder'
+        CheckoutPurchaseIntentLookupResponse:
+            type: object
+            additionalProperties: false
+            required: [purchase_intent]
+            properties:
+                purchase_intent:
+                    $ref: './purchase-intents.yml#/components/schemas/PurchaseIntent'
+        CheckoutOrder:
+            type: object
+            additionalProperties: false
+            description: |
+                Current checkout projection. Its existing fields are published unchanged for the
+                initial mobile SDK contract and may be narrowed in a future contract revision.
+            required:
+                - id
+                - initiated_at
+                - customer
+                - status
+            # Checkout returns the same order snapshot as the authenticated API:
+            # lifecycle evidence must match status and its payment amount must match
+            # the immutable order total whenever both projections are present.
+            x-simile-constraints:
+                - ordered:
+                      paths: [/initiated_at, /sealed_at, /paid_at, /completed_at]
+                - ordered:
+                      paths: [/initiated_at, /canceled_at]
+                - ordered:
+                      paths: [/initiated_at, /expires_at]
+                - implies:
+                      when: { path: /status, equals: preparing }
+                      then:
+                          all:
+                              - { path: /sealed_at, state: absent }
+                              - { path: /paid_at, state: absent }
+                              - { path: /completed_at, state: absent }
+                              - { path: /canceled_at, state: absent }
+                - implies:
+                      when: { path: /status, equals: requires_payment }
+                      then:
+                          all:
+                              - { path: /sealed_at, state: non-null }
+                              - { path: /paid_at, state: absent }
+                              - { path: /completed_at, state: absent }
+                              - { path: /canceled_at, state: absent }
+                - implies:
+                      when: { path: /status, equals: paid }
+                      then:
+                          all:
+                              - { path: /sealed_at, state: non-null }
+                              - { path: /paid_at, state: non-null }
+                              - { path: /completed_at, state: absent }
+                              - { path: /canceled_at, state: absent }
+                - implies:
+                      when: { path: /status, equals: completed }
+                      then:
+                          all:
+                              - { path: /sealed_at, state: non-null }
+                              - { path: /completed_at, state: non-null }
+                              - { path: /canceled_at, state: absent }
+                - implies:
+                      when: { path: /status, equals: canceled }
+                      then:
+                          all:
+                              - { path: /paid_at, state: absent }
+                              - { path: /completed_at, state: absent }
+                              - { path: /canceled_at, state: non-null }
+                - implies:
+                      when: { path: /status, equals: expired }
+                      then:
+                          all:
+                              - { path: /expires_at, state: non-null }
+                              - { path: /paid_at, state: absent }
+                              - { path: /completed_at, state: absent }
+                              - { path: /canceled_at, state: absent }
+                - implies:
+                      when: { path: /status, equals: unknown }
+                      then:
+                          all:
+                              - { path: /sealed_at, state: absent }
+                              - { path: /paid_at, state: absent }
+                              - { path: /completed_at, state: absent }
+                              - { path: /canceled_at, state: absent }
+                - equal:
+                      paths: [/line_item_group/total/currency, /payment/amount/currency]
+                - equal:
+                      paths: [/line_item_group/total/value, /payment/amount/value]
+                # Why: order construction rejects mixed-currency line items, so a response whose
+                # product, fee, or shipping currency differs from its total is unreachable.
+                - equal:
+                      paths: [/line_item_group/total/currency, /line_item_group/line_items/*/product/price/currency]
+                - equal:
+                      paths: [/line_item_group/total/currency, /line_item_group/line_items/*/fee/amount/currency]
+                - equal:
+                      paths: [/line_item_group/total/currency, /line_item_group/line_items/*/shipping/fee/currency]
+                # Why: the paid transition copies the payment completion instant onto the order,
+                # so different timestamps would claim two incompatible versions of the same event.
+                - equal:
+                      paths: [/paid_at, /payment/paid_at]
+            properties:
+                id:
+                    type: string
+                    # Public serializers always emit this resource with the or_ type prefix.
+                    pattern: '^or_'
+                    example: "or_a1b2c3d4e5f6"
+                number:
+                    type: string
+                receipt_number:
+                    type: string
+                reference:
+                    type: string
+                status:
+                    type: string
+                    enum: [preparing, requires_payment, completed, paid, canceled, expired, unknown]
+                initiated_at:
+                    type: string
+                    format: date-time
+                sealed_at:
+                    type: string
+                    format: date-time
+                completed_at:
+                    type: string
+                    format: date-time
+                paid_at:
+                    type: string
+                    format: date-time
+                canceled_at:
+                    type: string
+                    format: date-time
+                expires_at:
+                    type: string
+                    format: date-time
+                payment_due_at:
+                    type: string
+                    format: date-time
+                checkout_settings:
+                    type: object
+                    additionalProperties: false
+                    properties:
+                        redirect_url:
+                            type: string
+                            format: uri
+                        cancel_url:
+                            type: string
+                            format: uri
+                line_item_group:
+                    type: object
+                    additionalProperties: false
+                    properties:
+                        line_items:
+                            type: array
+                            items:
+                                $ref: './orders.yml#/components/schemas/LineItem'
+                        total:
+                            $ref: './common.yml#/components/schemas/Amount'
+                customer:
+                    type: object
+                    additionalProperties: false
+                    properties:
+                        id:
+                            type: string
+                            # Public serializers always emit this resource with the cu_ type prefix.
+                            pattern: '^cu_'
+                        guest:
+                            type: boolean
+                        name:
+                            type: string
+                        email_address:
+                            type: string
+                        phone_number:
+                            type: string
+                        billing_address:
+                            $ref: './orders.yml#/components/schemas/OrderAddress'
+                        shipping_address:
+                            $ref: './orders.yml#/components/schemas/OrderAddress'
+                created_from:
+                    type: object
+                    additionalProperties: false
+                    properties:
+                        source:
+                            type: string
+                        resource_type:
+                            type: string
+                        resource_id:
+                            type: string
+                payment:
+                    type: object
+                    additionalProperties: false
+                    # Payment status is derived from these public timestamps and
+                    # action fields; the amount is tied to the order at the parent.
+                    x-simile-constraints:
+                        - ordered:
+                              paths: [/initiated_at, /executed_at, /paid_at]
+                        - ordered:
+                              paths: [/initiated_at, /executed_at, /failed_at]
+                        - ordered:
+                              paths: [/initiated_at, /canceled_at]
+                        - ordered:
+                              paths: [/initiated_at, /expired_at]
+                        - implies:
+                              when: { path: /status, equals: initiated }
+                              then:
+                                  all:
+                                      - { path: /executed_at, state: absent }
+                                      - { path: /paid_at, state: absent }
+                                      - { path: /failed_at, state: absent }
+                                      - { path: /canceled_at, state: absent }
+                                      - { path: /expired_at, state: absent }
+                        - implies:
+                              when: { path: /status, equals: requires_action }
+                              then:
+                                  all:
+                                      - { path: /next_action, state: non-null }
+                                      - { path: /paid_at, state: absent }
+                                      - { path: /failed_at, state: absent }
+                                      - { path: /canceled_at, state: absent }
+                                      - { path: /expired_at, state: absent }
+                        - implies:
+                              when: { path: /status, equals: processing }
+                              then:
+                                  all:
+                                      - { path: /paid_at, state: absent }
+                                      - { path: /failed_at, state: absent }
+                                      - { path: /canceled_at, state: absent }
+                                      - { path: /expired_at, state: absent }
+                        - implies:
+                              when: { path: /status, equals: overdue }
+                              then:
+                                  all:
+                                      - { path: /due_at, state: non-null }
+                                      - { path: /paid_at, state: absent }
+                                      - { path: /failed_at, state: absent }
+                                      - { path: /canceled_at, state: absent }
+                                      - { path: /expired_at, state: absent }
+                        - implies:
+                              when: { path: /status, equals: executed }
+                              then:
+                                  all:
+                                      - { path: /executed_at, state: non-null }
+                                      - { path: /paid_at, state: absent }
+                                      - { path: /failed_at, state: absent }
+                                      - { path: /canceled_at, state: absent }
+                                      - { path: /expired_at, state: absent }
+                        - implies:
+                              when: { path: /status, equals: paid }
+                              then:
+                                  all:
+                                      - { path: /paid_at, state: non-null }
+                                      - { path: /failed_at, state: absent }
+                                      - { path: /canceled_at, state: absent }
+                                      - { path: /expired_at, state: absent }
+                        - implies:
+                              when: { path: /status, equals: failed }
+                              then:
+                                  all:
+                                      - { path: /paid_at, state: absent }
+                                      - { path: /failed_at, state: non-null }
+                                      - { path: /canceled_at, state: absent }
+                                      - { path: /expired_at, state: absent }
+                        - implies:
+                              when: { path: /status, equals: canceled }
+                              then:
+                                  all:
+                                      - { path: /paid_at, state: absent }
+                                      - { path: /failed_at, state: absent }
+                                      - { path: /canceled_at, state: non-null }
+                                      - { path: /expired_at, state: absent }
+                        - implies:
+                              when: { path: /status, equals: expired }
+                              then:
+                                  all:
+                                      - { path: /paid_at, state: absent }
+                                      - { path: /failed_at, state: absent }
+                                      - { path: /canceled_at, state: absent }
+                                      - { path: /expired_at, state: non-null }
+                        # `unknown` is retained for compatibility, but it cannot claim
+                        # any public signal that would deterministically select a real state.
+                        - implies:
+                              when: { path: /status, equals: unknown }
+                              then:
+                                  all:
+                                      - { path: /executed_at, state: absent }
+                                      - { path: /paid_at, state: absent }
+                                      - { path: /failed_at, state: absent }
+                                      - { path: /canceled_at, state: absent }
+                                      - { path: /expired_at, state: absent }
+                                      - { path: /next_action, state: absent }
+                    properties:
+                        id:
+                            type: string
+                            # Public serializers always emit this resource with the py_ type prefix.
+                            pattern: '^py_'
+                        statement_descriptor:
+                            type: string
+                        payment_method_types:
+                            type: array
+                            items:
+                                type: string
+                        payment_method:
+                            $ref: './orders.yml#/components/schemas/OrderPaymentMethod'
+                        billing_details:
+                            $ref: './orders.yml#/components/schemas/OrderPaymentBillingDetails'
+                        receipt:
+                            $ref: '#/components/schemas/CheckoutInvoiceView'
+                        latest_attempt:
+                            $ref: './orders.yml#/components/schemas/OrderPaymentAttempt'
+                        amount:
+                            $ref: './common.yml#/components/schemas/Amount'
+                        next_action:
+                            $ref: './orders.yml#/components/schemas/PaymentNextAction'
+                        latest_error:
+                            $ref: './orders.yml#/components/schemas/OrderPaymentError'
+                        status:
+                            type: string
+                            enum: [initiated, requires_action, processing, overdue, executed, paid, canceled, expired, failed, unknown]
+                        initiated_at:
+                            type: string
+                            format: date-time
+                        executed_at:
+                            type: string
+                            format: date-time
+                        due_at:
+                            type: string
+                            format: date-time
+                        canceled_at:
+                            type: string
+                            format: date-time
+                        expired_at:
+                            type: string
+                            format: date-time
+                        paid_at:
+                            type: string
+                            format: date-time
+                        paid_offline:
+                            type: boolean
+                        failed_at:
+                            type: string
+                            format: date-time
+                invoice:
+                    $ref: '#/components/schemas/CheckoutInvoiceView'
+        CheckoutInvoiceView:
+            type: object
+            additionalProperties: false
+            required:
+                - id
+                - created_at
+                - format
+            x-simile-constraints:
+                - ordered:
+                      paths: [/created_at, /due_at]
+            properties:
+                delivery_summary:
+                    $ref: './orders.yml#/components/schemas/OrderDocumentDeliverySummary'
+                id:
+                    type: string
+                    # Public serializers always emit this resource with the or_ type prefix.
+                    pattern: '^or_'
+                application_id:
+                    type: string
+                number:
+                    type: string
+                status:
+                    type: string
+                    enum: [draft, requires_payment, overdue, paid, expired, canceled]
+                created_at:
+                    type: string
+                    format: date-time
+                due_at:
+                    type: string
+                    format: date-time
+                format:
+                    type: object
+                    additionalProperties: false
+                    properties:
+                        web:
+                            type: object
+                            additionalProperties: false
+                            properties:
+                                url:
+                                    type: string
+                                    format: uri
+                        pdf:
+                            type: object
+                            additionalProperties: false
+                            properties:
+                                url:
+                                    type: string
+                                    format: uri
+                beneficiary:
+                    type: object
+                    additionalProperties: false
+                    properties:
+                        id:
+                            type: string
+                        legal_entity_type:
+                            type: string
+                        logo_url:
+                            type: string
+                            format: uri
+                        alias:
+                            type: string
+                        name:
+                            type: string
+                        support_email:
+                            type: string
+                        support_phone:
+                            type: string
+                        website_url:
+                            type: string
+                            format: uri
+                        accent_color:
+                            type: string
+                        invoice_support_line:
+                            type: string
+                        invoice_footer:
+                            type: string

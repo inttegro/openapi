@@ -1,0 +1,1521 @@
+# Authoritative payment-methods resource contract.
+# Why: keeping each resource's operations and schemas together makes public invariants
+# reviewable without weakening the single bundled contract distributed to consumers.
+
+paths:
+    /payment_methods/tokenize:
+        post:
+            summary: Tokenize a payment method
+            description: |
+                Save a mobile-money payment method for an existing customer without charging it.
+                Direct tokenization currently supports `mobile_money`; send the wallet details
+                and owner identity described by the request schema.
+
+                The returned payment method can be reused only while it is active, unarchived,
+                and non-ephemeral. This operation supports idempotency.
+            operationId: tokenizePaymentMethod
+            tags:
+                - Payment Methods
+            parameters:
+                - name: Idempotency-Key
+                  in: header
+                  required: false
+                  schema:
+                      type: string
+                  description: Stable key used to replay safe retries without saving the payment method twice.
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/TokenizeMobileMoneyPaymentMethodRequest'
+                        example:
+                            customer_id: cu_a1b2c3d4e5
+                            type: mobile_money
+                            mobile_money:
+                                account_number: "+233242057831"
+                                network: mtn
+                            owner:
+                                name: Jane Mensah
+                                address:
+                                    country: GH
+            responses:
+                '200':
+                    description: Payment method tokenized successfully
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/TokenizePaymentMethodResponse'
+                            # Why: this exact outcome proves that a successful tokenization never
+                            # exposes the raw wallet number and keeps its masked fields coherent.
+                            examples:
+                                tokenized:
+                                    summary: A reusable mobile-money payment method
+                                    value:
+                                        payment_method:
+                                            id: pm_example
+                                            active: true
+                                            customer_id: cu_example
+                                            fingerprint: fp_example
+                                            type: mobile_money
+                                            created_at: "2026-11-17T10:00:00Z"
+                                            mobile_money:
+                                                account_number: "****7831"
+                                                last4: "7831"
+                                                network: mtn
+                '400':
+                    description: Invalid payment method tokenization request
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/Error'
+                                    - oneOf:
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_parameter] }, code: { enum: [idempotency_key_invalid, idempotency_key_mismatch, idempotency_key_unsupported] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [idempotency_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_body] }, code: { enum: [invalid_request_body] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_parameter] }, code: { enum: [invalid_request_parameter, request_parameter_null_rejected, request_parameter_parse_failed, request_parameter_too_large, request_parameter_too_small, request_parameter_type_mismatch, request_parameter_value_not_allowed, request_parameters_mutually_exclusive, unexpected_request_parameter] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/e/t-invalid_request_parameter"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_parameter] }, code: { enum: [request_parameter_choice_required, request_parameter_null_rejected, request_parameter_parse_failed, request_parameter_too_large, request_parameter_too_small, request_parameter_type_mismatch, request_parameter_value_not_allowed, request_parameters_mutually_exclusive, unexpected_request_parameter] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [missing_request_parameter] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/e/c-missing_request_parameter"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [request_parameter_choice_required] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/e/t-invalid_request_parameter"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [request_parameter_choice_required] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                            examples:
+                                malformed_body:
+                                    summary: The payment-method payload is malformed
+                                    value:
+                                        cause: invalid_request_body
+                                        code: invalid_request_body
+                                        fix_code: change_request_parameters
+                                        type: invalid_request
+                                        url: https://studio.inttegro.com/errors
+                '401':
+                    description: Unauthorized - Missing or invalid authentication
+                    headers:
+                        X-Request-Id:
+                            $ref: "./common.yml#/components/headers/RequestId"
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/Error'
+                                    - oneOf:
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [authentication_failed] }, code: { enum: [authentication_failed] }, fix_code: { enum: [authenticate_request] }, type: { enum: [authentication_error] }, url: { enum: ["https://studio.inttegro.com/e/c-authentication_failed"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [authentication_failed] }, code: { enum: [endpoint_authentication_required] }, fix_code: { enum: [authenticate_request] }, type: { enum: [authentication_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                '422':
+                    description: Payment method tokenization failed
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/Error'
+                                    - oneOf:
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [idempotency_conflict] }, code: { enum: [idempotency_key_conflict] }, fix_code: { enum: [use_new_idempotency_key] }, type: { enum: [idempotency_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [unknown] }, code: { enum: [request_failed] }, fix_code: { enum: [contact_customer_support] }, type: { enum: [unknown_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+    /payment_methods/lookup:
+        post:
+            summary: Lookup a payment method
+            description: |
+                Retrieve details for a specific payment method by ID. Returns the full
+                payment method object including verification status, creation timestamp,
+                masked account details, and owner details when captured.
+            operationId: lookupPaymentMethod
+            tags:
+                - Payment Methods
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/LookupPaymentMethodRequest'
+            responses:
+                '200':
+                    description: Payment method found
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/LookupPaymentMethodResponse'
+                '400':
+                    description: Invalid payment method lookup request
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/Error'
+                                    - oneOf:
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_body] }, code: { enum: [invalid_request_body] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_parameter] }, code: { enum: [invalid_request_parameter, request_parameter_null_rejected, request_parameter_parse_failed, request_parameter_too_large, request_parameter_too_small, request_parameter_type_mismatch, request_parameter_value_not_allowed, request_parameters_mutually_exclusive, unexpected_request_parameter] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/e/t-invalid_request_parameter"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_parameter] }, code: { enum: [request_parameter_choice_required, request_parameter_null_rejected, request_parameter_parse_failed, request_parameter_too_large, request_parameter_too_small, request_parameter_type_mismatch, request_parameter_value_not_allowed, request_parameters_mutually_exclusive, unexpected_request_parameter] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [missing_request_parameter] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/e/c-missing_request_parameter"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [request_parameter_choice_required] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/e/t-invalid_request_parameter"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [request_parameter_choice_required] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                '404':
+                    description: Payment method not found
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/Error'
+                                    - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_parameter] }, code: { enum: [payment_method_not_found] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                '401':
+                    description: Unauthorized - Missing or invalid authentication
+                    headers:
+                        X-Request-Id:
+                            $ref: "./common.yml#/components/headers/RequestId"
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/Error'
+                                    - oneOf:
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [authentication_failed] }, code: { enum: [authentication_failed] }, fix_code: { enum: [authenticate_request] }, type: { enum: [authentication_error] }, url: { enum: ["https://studio.inttegro.com/e/c-authentication_failed"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [authentication_failed] }, code: { enum: [endpoint_authentication_required] }, fix_code: { enum: [authenticate_request] }, type: { enum: [authentication_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+
+    /payment_methods/page:
+        post:
+            summary: Page payment methods
+            description: |
+                Retrieve a paginated list of payment methods for the authenticated
+                application.
+
+                If `customer_id` is supplied, the page is scoped to payment methods
+                that belong to that customer. The supplied customer must belong to
+                your authenticated application.
+            operationId: pagePaymentMethods
+            tags:
+                - Payment Methods
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/PaymentMethodPageRequest'
+            responses:
+                '200':
+                    description: Page retrieved successfully
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/PaymentMethodPageResponse'
+                '400':
+                    description: Invalid payment methods page request
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/Error'
+                                    - oneOf:
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_body] }, code: { enum: [invalid_request_body] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_parameter] }, code: { enum: [invalid_request_parameter, request_parameter_null_rejected, request_parameter_parse_failed, request_parameter_too_large, request_parameter_too_small, request_parameter_type_mismatch, request_parameter_value_not_allowed, request_parameters_mutually_exclusive, unexpected_request_parameter] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/e/t-invalid_request_parameter"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_parameter] }, code: { enum: [request_parameter_choice_required, request_parameter_null_rejected, request_parameter_parse_failed, request_parameter_too_large, request_parameter_too_small, request_parameter_type_mismatch, request_parameter_value_not_allowed, request_parameters_mutually_exclusive, unexpected_request_parameter] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [missing_request_parameter] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/e/c-missing_request_parameter"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [request_parameter_choice_required] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/e/t-invalid_request_parameter"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [request_parameter_choice_required] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                '401':
+                    description: Unauthorized - Missing or invalid authentication
+                    headers:
+                        X-Request-Id:
+                            $ref: "./common.yml#/components/headers/RequestId"
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/Error'
+                                    - oneOf:
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [authentication_failed] }, code: { enum: [authentication_failed] }, fix_code: { enum: [authenticate_request] }, type: { enum: [authentication_error] }, url: { enum: ["https://studio.inttegro.com/e/c-authentication_failed"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [authentication_failed] }, code: { enum: [endpoint_authentication_required] }, fix_code: { enum: [authenticate_request] }, type: { enum: [authentication_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                '422':
+                    description: Payment methods page lookup failed
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/Error'
+                                    - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [unknown] }, code: { enum: [request_failed] }, fix_code: { enum: [contact_customer_support] }, type: { enum: [unknown_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+    /payment_methods/update:
+        post:
+            summary: Update a payment method
+            description: |
+                Update mutable payment method metadata for the authenticated
+                application.
+
+                Supported updates:
+                - `custom_data` merges into existing metadata
+                - `owner` applies patch semantics and updates only the
+                  provided owner fields
+                - `active` toggles whether the payment method can be reused
+                - `archived` archives or unarchives the payment method
+
+                **Custom Data Merge Semantics:**
+                - New keys are added to existing custom_data
+                - Existing keys are updated with new values
+                - JSON null explicitly deletes the key
+                - Keys not present in the update are preserved
+
+                When adding a new owner address to a payment method that does
+                not already have one, `owner.address.country` is required.
+
+                Archived payment methods reject all updates except a pure
+                unarchive request. Unarchiving leaves the payment method
+                inactive until you activate it again.
+            operationId: updatePaymentMethod
+            tags:
+                - Payment Methods
+            parameters:
+                - name: Idempotency-Key
+                  in: header
+                  required: false
+                  schema:
+                      type: string
+                  description: Stable key used to replay safe retries without applying the update twice.
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/UpdatePaymentMethodRequest'
+            responses:
+                '200':
+                    description: Payment method updated successfully
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/UpdatePaymentMethodResponse'
+                '404':
+                    description: Payment method not found
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/Error'
+                                    - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_parameter] }, code: { enum: [payment_method_not_found] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                '401':
+                    description: Unauthorized - Missing or invalid authentication
+                    headers:
+                        X-Request-Id:
+                            $ref: "./common.yml#/components/headers/RequestId"
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/Error'
+                                    - oneOf:
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [authentication_failed] }, code: { enum: [authentication_failed] }, fix_code: { enum: [authenticate_request] }, type: { enum: [authentication_error] }, url: { enum: ["https://studio.inttegro.com/e/c-authentication_failed"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [authentication_failed] }, code: { enum: [endpoint_authentication_required] }, fix_code: { enum: [authenticate_request] }, type: { enum: [authentication_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                '400':
+                    description: Invalid payment method update request
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/Error'
+                                    - oneOf:
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [precondition_unmet] }, code: { enum: [payment_method_already_active, payment_method_already_archived, payment_method_already_inactive, payment_method_archived, payment_method_inactive, payment_method_not_archived] }, fix_code: { enum: [satisfy_precondition] }, type: { enum: [bad_request] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_parameter] }, code: { enum: [idempotency_key_invalid, idempotency_key_mismatch, idempotency_key_unsupported] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [idempotency_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_body] }, code: { enum: [invalid_request_body] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_parameter] }, code: { enum: [invalid_request_parameter, request_parameter_null_rejected, request_parameter_parse_failed, request_parameter_too_large, request_parameter_too_small, request_parameter_type_mismatch, request_parameter_value_not_allowed, request_parameters_mutually_exclusive, unexpected_request_parameter] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/e/t-invalid_request_parameter"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_parameter] }, code: { enum: [payment_method_conflicting_state_updates, payment_method_no_updates, payment_method_owner_address_country_required, request_parameter_choice_required, request_parameter_null_rejected, request_parameter_parse_failed, request_parameter_too_large, request_parameter_too_small, request_parameter_type_mismatch, request_parameter_value_not_allowed, request_parameters_mutually_exclusive, unexpected_request_parameter] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [missing_request_parameter] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/e/c-missing_request_parameter"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [request_parameter_choice_required] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/e/t-invalid_request_parameter"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [request_parameter_choice_required] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+    /payment_methods/activate:
+        post:
+            summary: Activate a payment method
+            description: |
+                Mark an inactive payment method as active so it can be reused in
+                new payment flows.
+            operationId: activatePaymentMethod
+            tags:
+                - Payment Methods
+            parameters:
+                - name: Idempotency-Key
+                  in: header
+                  required: false
+                  schema:
+                      type: string
+                  description: Stable key used to replay safe retries without applying activation twice.
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/ActivatePaymentMethodRequest'
+            responses:
+                '200':
+                    description: Payment method activated successfully
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ActivatePaymentMethodResponse'
+                '404':
+                    description: Payment method not found
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/Error'
+                                    - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_parameter] }, code: { enum: [payment_method_not_found] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                '401':
+                    description: Unauthorized - Missing or invalid authentication
+                    headers:
+                        X-Request-Id:
+                            $ref: "./common.yml#/components/headers/RequestId"
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/Error'
+                                    - oneOf:
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [authentication_failed] }, code: { enum: [authentication_failed] }, fix_code: { enum: [authenticate_request] }, type: { enum: [authentication_error] }, url: { enum: ["https://studio.inttegro.com/e/c-authentication_failed"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [authentication_failed] }, code: { enum: [endpoint_authentication_required] }, fix_code: { enum: [authenticate_request] }, type: { enum: [authentication_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                '400':
+                    description: Invalid payment method activation request
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/Error'
+                                    - oneOf:
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [precondition_unmet] }, code: { enum: [payment_method_already_active, payment_method_already_archived, payment_method_already_inactive, payment_method_archived, payment_method_inactive, payment_method_not_archived] }, fix_code: { enum: [satisfy_precondition] }, type: { enum: [bad_request] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_parameter] }, code: { enum: [idempotency_key_invalid, idempotency_key_mismatch, idempotency_key_unsupported] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [idempotency_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_body] }, code: { enum: [invalid_request_body] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_parameter] }, code: { enum: [invalid_request_parameter, request_parameter_null_rejected, request_parameter_parse_failed, request_parameter_too_large, request_parameter_too_small, request_parameter_type_mismatch, request_parameter_value_not_allowed, request_parameters_mutually_exclusive, unexpected_request_parameter] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/e/t-invalid_request_parameter"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_parameter] }, code: { enum: [payment_method_conflicting_state_updates, payment_method_no_updates, payment_method_owner_address_country_required, request_parameter_choice_required, request_parameter_null_rejected, request_parameter_parse_failed, request_parameter_too_large, request_parameter_too_small, request_parameter_type_mismatch, request_parameter_value_not_allowed, request_parameters_mutually_exclusive, unexpected_request_parameter] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [missing_request_parameter] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/e/c-missing_request_parameter"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [request_parameter_choice_required] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/e/t-invalid_request_parameter"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [request_parameter_choice_required] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+    /payment_methods/disactivate:
+        post:
+            summary: Deactivate a payment method
+            description: |
+                Mark an active payment method as inactive so it cannot be reused
+                in new payment flows until reactivated.
+            operationId: disactivatePaymentMethod
+            tags:
+                - Payment Methods
+            parameters:
+                - name: Idempotency-Key
+                  in: header
+                  required: false
+                  schema:
+                      type: string
+                  description: Stable key used to replay safe retries without applying deactivation twice.
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/DisactivatePaymentMethodRequest'
+            responses:
+                '200':
+                    description: Payment method marked inactive successfully
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/DisactivatePaymentMethodResponse'
+                '404':
+                    description: Payment method not found
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/Error'
+                                    - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_parameter] }, code: { enum: [payment_method_not_found] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                '401':
+                    description: Unauthorized - Missing or invalid authentication
+                    headers:
+                        X-Request-Id:
+                            $ref: "./common.yml#/components/headers/RequestId"
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/Error'
+                                    - oneOf:
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [authentication_failed] }, code: { enum: [authentication_failed] }, fix_code: { enum: [authenticate_request] }, type: { enum: [authentication_error] }, url: { enum: ["https://studio.inttegro.com/e/c-authentication_failed"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [authentication_failed] }, code: { enum: [endpoint_authentication_required] }, fix_code: { enum: [authenticate_request] }, type: { enum: [authentication_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                '400':
+                    description: Invalid payment method deactivation request
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/Error'
+                                    - oneOf:
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [precondition_unmet] }, code: { enum: [payment_method_already_active, payment_method_already_archived, payment_method_already_inactive, payment_method_archived, payment_method_inactive, payment_method_not_archived] }, fix_code: { enum: [satisfy_precondition] }, type: { enum: [bad_request] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_parameter] }, code: { enum: [idempotency_key_invalid, idempotency_key_mismatch, idempotency_key_unsupported] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [idempotency_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_body] }, code: { enum: [invalid_request_body] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_parameter] }, code: { enum: [invalid_request_parameter, request_parameter_null_rejected, request_parameter_parse_failed, request_parameter_too_large, request_parameter_too_small, request_parameter_type_mismatch, request_parameter_value_not_allowed, request_parameters_mutually_exclusive, unexpected_request_parameter] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/e/t-invalid_request_parameter"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_parameter] }, code: { enum: [payment_method_conflicting_state_updates, payment_method_no_updates, payment_method_owner_address_country_required, request_parameter_choice_required, request_parameter_null_rejected, request_parameter_parse_failed, request_parameter_too_large, request_parameter_too_small, request_parameter_type_mismatch, request_parameter_value_not_allowed, request_parameters_mutually_exclusive, unexpected_request_parameter] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [missing_request_parameter] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/e/c-missing_request_parameter"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [request_parameter_choice_required] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/e/t-invalid_request_parameter"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [request_parameter_choice_required] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+    /payment_methods/archive:
+        post:
+            summary: Archive a payment method
+            description: |
+                Archive a payment method. Archived payment methods become
+                inactive immediately and reject further updates until they are
+                unarchived.
+            operationId: archivePaymentMethod
+            tags:
+                - Payment Methods
+            parameters:
+                - name: Idempotency-Key
+                  in: header
+                  required: false
+                  schema:
+                      type: string
+                  description: Stable key used to replay safe retries without applying archival twice.
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/ArchivePaymentMethodRequest'
+            responses:
+                '200':
+                    description: Payment method archived successfully
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ArchivePaymentMethodResponse'
+                '404':
+                    description: Payment method not found
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/Error'
+                                    - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_parameter] }, code: { enum: [payment_method_not_found] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                '401':
+                    description: Unauthorized - Missing or invalid authentication
+                    headers:
+                        X-Request-Id:
+                            $ref: "./common.yml#/components/headers/RequestId"
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/Error'
+                                    - oneOf:
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [authentication_failed] }, code: { enum: [authentication_failed] }, fix_code: { enum: [authenticate_request] }, type: { enum: [authentication_error] }, url: { enum: ["https://studio.inttegro.com/e/c-authentication_failed"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [authentication_failed] }, code: { enum: [endpoint_authentication_required] }, fix_code: { enum: [authenticate_request] }, type: { enum: [authentication_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                '400':
+                    description: Invalid payment method archive request
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/Error'
+                                    - oneOf:
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [precondition_unmet] }, code: { enum: [payment_method_already_active, payment_method_already_archived, payment_method_already_inactive, payment_method_archived, payment_method_inactive, payment_method_not_archived] }, fix_code: { enum: [satisfy_precondition] }, type: { enum: [bad_request] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_parameter] }, code: { enum: [idempotency_key_invalid, idempotency_key_mismatch, idempotency_key_unsupported] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [idempotency_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_body] }, code: { enum: [invalid_request_body] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_parameter] }, code: { enum: [invalid_request_parameter, request_parameter_null_rejected, request_parameter_parse_failed, request_parameter_too_large, request_parameter_too_small, request_parameter_type_mismatch, request_parameter_value_not_allowed, request_parameters_mutually_exclusive, unexpected_request_parameter] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/e/t-invalid_request_parameter"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_parameter] }, code: { enum: [payment_method_conflicting_state_updates, payment_method_no_updates, payment_method_owner_address_country_required, request_parameter_choice_required, request_parameter_null_rejected, request_parameter_parse_failed, request_parameter_too_large, request_parameter_too_small, request_parameter_type_mismatch, request_parameter_value_not_allowed, request_parameters_mutually_exclusive, unexpected_request_parameter] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [missing_request_parameter] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/e/c-missing_request_parameter"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [request_parameter_choice_required] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/e/t-invalid_request_parameter"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [request_parameter_choice_required] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+    /payment_methods/unarchive:
+        post:
+            summary: Unarchive a payment method
+            description: |
+                Unarchive an archived payment method so it can be updated again.
+                Unarchiving does not automatically reactivate the payment
+                method.
+            operationId: unarchivePaymentMethod
+            tags:
+                - Payment Methods
+            parameters:
+                - name: Idempotency-Key
+                  in: header
+                  required: false
+                  schema:
+                      type: string
+                  description: Stable key used to replay safe retries without applying unarchival twice.
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/UnarchivePaymentMethodRequest'
+            responses:
+                '200':
+                    description: Payment method unarchived successfully
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/UnarchivePaymentMethodResponse'
+                '404':
+                    description: Payment method not found
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/Error'
+                                    - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_parameter] }, code: { enum: [payment_method_not_found] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                '401':
+                    description: Unauthorized - Missing or invalid authentication
+                    headers:
+                        X-Request-Id:
+                            $ref: "./common.yml#/components/headers/RequestId"
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/Error'
+                                    - oneOf:
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [authentication_failed] }, code: { enum: [authentication_failed] }, fix_code: { enum: [authenticate_request] }, type: { enum: [authentication_error] }, url: { enum: ["https://studio.inttegro.com/e/c-authentication_failed"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [authentication_failed] }, code: { enum: [endpoint_authentication_required] }, fix_code: { enum: [authenticate_request] }, type: { enum: [authentication_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                '400':
+                    description: Invalid payment method unarchive request
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/Error'
+                                    - oneOf:
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [precondition_unmet] }, code: { enum: [payment_method_already_active, payment_method_already_archived, payment_method_already_inactive, payment_method_archived, payment_method_inactive, payment_method_not_archived] }, fix_code: { enum: [satisfy_precondition] }, type: { enum: [bad_request] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_parameter] }, code: { enum: [idempotency_key_invalid, idempotency_key_mismatch, idempotency_key_unsupported] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [idempotency_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_body] }, code: { enum: [invalid_request_body] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_parameter] }, code: { enum: [invalid_request_parameter, request_parameter_null_rejected, request_parameter_parse_failed, request_parameter_too_large, request_parameter_too_small, request_parameter_type_mismatch, request_parameter_value_not_allowed, request_parameters_mutually_exclusive, unexpected_request_parameter] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/e/t-invalid_request_parameter"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_parameter] }, code: { enum: [payment_method_conflicting_state_updates, payment_method_no_updates, payment_method_owner_address_country_required, request_parameter_choice_required, request_parameter_null_rejected, request_parameter_parse_failed, request_parameter_too_large, request_parameter_too_small, request_parameter_type_mismatch, request_parameter_value_not_allowed, request_parameters_mutually_exclusive, unexpected_request_parameter] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [missing_request_parameter] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/e/c-missing_request_parameter"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [request_parameter_choice_required] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/e/t-invalid_request_parameter"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [request_parameter_choice_required] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+    /payment_methods/settings:
+        post:
+            summary: Get payment method settings
+            description: |
+                Retrieve payment method acceptance settings for your application. Returns
+                configuration for all supported payment types (mobile money, bank accounts,
+                cards, Motito) including whether each type is enabled and requires customer
+                confirmation.
+
+                Use this to:
+                - Show only enabled payment methods in checkout
+                - Require explicit consent when confirms_use is true
+                - Display acceptance preferences to merchants
+            operationId: getPaymentMethodSettings
+            tags:
+                - Payment Methods
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/GetPaymentMethodSettingsRequest'
+            responses:
+                '200':
+                    description: Settings retrieved successfully
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/GetPaymentMethodSettingsResponse'
+                '400':
+                    description: Invalid payment method settings request
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/Error'
+                                    - oneOf:
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_body] }, code: { enum: [invalid_request_body] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_parameter] }, code: { enum: [invalid_request_parameter, request_parameter_null_rejected, request_parameter_parse_failed, request_parameter_too_large, request_parameter_too_small, request_parameter_type_mismatch, request_parameter_value_not_allowed, request_parameters_mutually_exclusive, unexpected_request_parameter] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/e/t-invalid_request_parameter"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_parameter] }, code: { enum: [request_parameter_choice_required, request_parameter_null_rejected, request_parameter_parse_failed, request_parameter_too_large, request_parameter_too_small, request_parameter_type_mismatch, request_parameter_value_not_allowed, request_parameters_mutually_exclusive, unexpected_request_parameter] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [missing_request_parameter] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/e/c-missing_request_parameter"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [request_parameter_choice_required] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/e/t-invalid_request_parameter"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [request_parameter_choice_required] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                '401':
+                    description: Unauthorized - Missing or invalid authentication
+                    headers:
+                        X-Request-Id:
+                            $ref: "./common.yml#/components/headers/RequestId"
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/Error'
+                                    - oneOf:
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [authentication_failed] }, code: { enum: [authentication_failed] }, fix_code: { enum: [authenticate_request] }, type: { enum: [authentication_error] }, url: { enum: ["https://studio.inttegro.com/e/c-authentication_failed"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [authentication_failed] }, code: { enum: [endpoint_authentication_required] }, fix_code: { enum: [authenticate_request] }, type: { enum: [authentication_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                '422':
+                    description: Payment method settings lookup failed
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/Error'
+                                    - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [unknown] }, code: { enum: [request_failed] }, fix_code: { enum: [contact_customer_support] }, type: { enum: [unknown_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+components:
+    schemas:
+        PaymentMethodPageRequest:
+            type: object
+            additionalProperties: false
+            properties:
+                customer_id:
+                    type: string
+                    description: Optional customer ID to scope the page to a single customer
+                    example: "cu_a1b2c3d4e5"
+                page_number:
+                    type: integer
+                    minimum: 0
+                    maximum: 10
+                    description: Page index to fetch. `0` is accepted and normalized to page 1; returned pages are numbered 1-10.
+                    default: 1
+                page_size:
+                    type: integer
+                    minimum: 1
+                    maximum: 256
+                    description: Number of payment methods per page (1-256)
+                    default: 256
+        PaymentMethodPageResponse:
+            type: object
+            additionalProperties: false
+            required:
+                - page
+            properties:
+                page:
+                    type: object
+                    additionalProperties: false
+                    required:
+                        - number
+                        - payment_methods
+                        - size
+                    # Hydration and customer scoping can reduce the returned method slice.
+                    x-simile-constraints:
+                        - aggregate:
+                              target: /size
+                              operation: count
+                              source: /payment_methods/*
+                    properties:
+                        number:
+                            type: integer
+                            description: The page number returned
+                        payment_methods:
+                            type: array
+                            items:
+                                $ref: '#/components/schemas/PaymentMethodObject'
+                        size:
+                            type: integer
+                            description: The number of payment methods in this page
+        PaymentMethodOwnerInput:
+            type: object
+            additionalProperties: false
+            required:
+                - address
+                - name
+            properties:
+                address:
+                    type: object
+                    additionalProperties: false
+                    required:
+                        - country
+                    properties:
+                        city:
+                            type: string
+                        country:
+                            type: string
+                            minLength: 1
+                            description: Country associated with the owner address.
+                            example: "GH"
+                        line1:
+                            type: string
+                        line2:
+                            type: string
+                        name:
+                            type: string
+                        phone_number:
+                            type: string
+                        post_code:
+                            type: string
+                        region:
+                            type: string
+                name:
+                    type: string
+                    minLength: 1
+                    description: Payment method owner's name.
+                    example: "Jane Mensah"
+        TokenizeMobileMoneyPaymentMethodRequest:
+            # Why: OpenAPI 3.0 closed allOf branches do not share evaluated properties; flattening
+            # prevents the base branch from rejecting the required mobile_money and owner fields.
+            type: object
+            additionalProperties: false
+            required: [customer_id, mobile_money, owner, type]
+            properties:
+                customer_id:
+                    type: string
+                    minLength: 1
+                    description: Existing customer in the authenticated application who will own the payment method.
+                    example: "cu_a1b2c3d4e5"
+                custom_data:
+                    $ref: './common.yml#/components/schemas/CustomData'
+                type:
+                    type: string
+                    enum: [mobile_money]
+                mobile_money:
+                    type: object
+                    additionalProperties: false
+                    required: [account_number, network]
+                    properties:
+                        account_number:
+                            type: string
+                            minLength: 1
+                            description: Mobile-money number in a valid local or international phone-number format.
+                            example: "+233242057831"
+                        network:
+                            type: string
+                            enum: [airtel, mtn, telecel, vodafone]
+                            example: "mtn"
+                owner:
+                    $ref: '#/components/schemas/PaymentMethodOwnerInput'
+        PaymentMethodObject:
+            type: object
+            additionalProperties: false
+            description: A tokenized payment instrument tied to a customer
+            required:
+                - id
+                - active
+                - customer_id
+                - fingerprint
+                - type
+                - created_at
+            # Archival makes a method unusable, while ownership verification exposes
+            # the same completion instant in both its summary and detailed record.
+            x-simile-constraints:
+                - ordered:
+                      paths: [/created_at, /archived_at]
+                - ordered:
+                      paths: [/created_at, /verification/initiated_at, /verification/completed_at]
+                # Supply provenance is captured before (or at) tokenization and
+                # therefore cannot claim that the method was supplied afterward.
+                - ordered:
+                      paths: [/supplied/supplied_at, /created_at]
+                - equal:
+                      paths: [/verified_at, /verification/completed_at]
+                - implies:
+                      when: { path: /active, equals: true }
+                      then:
+                          all:
+                              - { path: /archived_at, state: absent }
+                - implies:
+                      when: { path: /archived_at, state: non-null }
+                      then:
+                          all:
+                              - { path: /active, equals: false }
+                - implies:
+                      when: { path: /verified_at, state: non-null }
+                      then:
+                          all:
+                              - { path: /verification/completed_at, state: non-null }
+                - implies:
+                      when: { path: /verification/completed_at, state: non-null }
+                      then:
+                          all:
+                              - { path: /verified_at, state: non-null }
+                # Type-specific public details are mutually exclusive; card details
+                # remain optional here because this endpoint intentionally redacts them.
+                - implies:
+                      when: { path: /type, equals: mobile_money }
+                      then:
+                          all:
+                              - { path: /mobile_money, state: non-null }
+                              - { path: /bank_account, state: absent }
+                              - { path: /card, state: absent }
+                - implies:
+                      when: { path: /type, equals: bank_account }
+                      then:
+                          all:
+                              - { path: /bank_account, state: non-null }
+                              - { path: /mobile_money, state: absent }
+                              - { path: /card, state: absent }
+                - implies:
+                      when: { path: /type, equals: card }
+                      then:
+                          all:
+                              - { path: /mobile_money, state: absent }
+                              - { path: /bank_account, state: absent }
+                - implies:
+                      when: { path: /type, equals: motito }
+                      then:
+                          all:
+                              - { path: /mobile_money, state: absent }
+                              - { path: /bank_account, state: absent }
+                              - { path: /card, state: absent }
+                - implies:
+                      when: { path: /mobile_money, state: non-null }
+                      then:
+                          all:
+                              - { path: /type, equals: mobile_money }
+                - implies:
+                      when: { path: /bank_account, state: non-null }
+                      then:
+                          all:
+                              - { path: /type, equals: bank_account }
+                - implies:
+                      when: { path: /card, state: non-null }
+                      then:
+                          all:
+                              - { path: /type, equals: card }
+            properties:
+                active:
+                    type: boolean
+                    description: Whether this payment method is active and reusable in new payment flows
+                    example: true
+                archived_at:
+                    type: string
+                    format: date-time
+                    description: Timestamp when the payment method was archived. Omitted while unarchived.
+                bank_account:
+                    type: object
+                    additionalProperties: false
+                    description: Bank account details (present when type is bank_account)
+                    required:
+                        - type
+                    properties:
+                        ghana_bank_account:
+                            type: object
+                            additionalProperties: false
+                            description: Ghana bank account details
+                            required:
+                                - account_number
+                            properties:
+                                branch:
+                                    type: string
+                                    description: Branch name
+                                    example: "Accra Main"
+                                name:
+                                    type: string
+                                    description: Account holder name
+                                    example: "John Doe"
+                                account_number:
+                                    type: string
+                                    description: Account number
+                                    example: "1234567890"
+                                sort_code:
+                                    type: string
+                                    description: Bank sort code
+                                    example: "030100"
+                                swift_code:
+                                    type: string
+                                    description: SWIFT/BIC code
+                                    example: "GHBAGHAACCRA"
+                        type:
+                            type: string
+                            description: Bank account sub-type
+                            enum: [ghana_bank_account]
+                            example: "ghana_bank_account"
+                card:
+                    $ref: '#/components/schemas/PaymentMethodCard'
+                created_at:
+                    type: string
+                    format: date-time
+                    description: When this payment method was tokenized
+                    example: "2025-11-23T13:00:00Z"
+                custom_data:
+                    $ref: './common.yml#/components/schemas/CustomData'
+                customer_id:
+                    type: string
+                    # Public serializers always emit this resource with the cu_ type prefix.
+                    pattern: '^cu_'
+                    description: Customer who owns this payment method
+                    example: "cu_a1b2c3d4e5"
+                ephemeral:
+                    type: boolean
+                    description: Whether the method is limited to its originating flow and cannot be reused.
+                    example: false
+                expires_on:
+                    type: string
+                    format: date-time
+                    description: When this payment method expires. Omitted when no expiry is available.
+                fingerprint:
+                    type: string
+                    description: Customer-scoped fingerprint for this payment method within the merchant application. Matching nonempty values for the same customer indicate the same underlying method was added more than once. May be empty for records awaiting fingerprint backfill or methods lacking reliable fingerprint material. It does not identify the method across customers or applications.
+                id:
+                    type: string
+                    # Public serializers always emit this resource with the pm_ type prefix.
+                    pattern: '^pm_'
+                    description: Unique identifier for this payment method
+                    example: "pm_xyz789"
+                mobile_money:
+                    type: object
+                    additionalProperties: false
+                    description: Masked mobile-money wallet details (present when type is mobile_money)
+                    required:
+                        - account_number
+                        - last4
+                        - network
+                    # The public account number is not a second identifier: it is
+                    # exactly the fixed mask plus `last4`, preventing raw credentials.
+                    x-simile-constraints:
+                        - template:
+                              path: /account_number
+                              value: "****{/last4}"
+                    properties:
+                        account_number:
+                            type: string
+                            description: Masked wallet number. The full account number is never returned.
+                            example: "****7831"
+                            minLength: 8
+                            maxLength: 8
+                        last4:
+                            type: string
+                            description: Last four numeric digits of the normalized wallet number.
+                            example: "7831"
+                            minLength: 4
+                            maxLength: 4
+                        network:
+                            type: string
+                            enum: [airtel, mtn, telecel, vodafone]
+                            description: Mobile network operator
+                            example: "mtn"
+                owner:
+                    type: object
+                    additionalProperties: false
+                    description: Owner identity captured during tokenization when provided
+                    required:
+                        - name
+                    properties:
+                        address:
+                            type: object
+                            additionalProperties: false
+                            description: Postal address for the owner when available
+                            required:
+                                - country
+                            properties:
+                                city:
+                                    type: string
+                                    description: City or locality
+                                    example: "Accra"
+                                country:
+                                    type: string
+                                    description: Two-letter ISO country code
+                                    example: "GH"
+                                line_1:
+                                    type: string
+                                    description: First line of the street address
+                                    example: "1 High Street"
+                                line_2:
+                                    type: string
+                                    description: Second line of the street address
+                                    example: "Osu"
+                                name:
+                                    type: string
+                                    description: Recipient name at this address, if different from owner name
+                                    example: "Jane Mensah"
+                                phone_number:
+                                    type: string
+                                    description: Phone number for this address
+                                    example: "+233201234567"
+                                post_code:
+                                    type: string
+                                    description: Postal or ZIP code
+                                    example: "GA-123-4567"
+                                region:
+                                    type: string
+                                    description: Region, state, or province
+                                    example: "Greater Accra"
+                        name:
+                            type: string
+                            description: Owner full legal name
+                            example: "Yaw Boakye"
+                type:
+                    type: string
+                    enum: [mobile_money, bank_account, card, motito]
+                    description: Payment rail type
+                    example: "mobile_money"
+                supplied:
+                    type: object
+                    additionalProperties: false
+                    description: Public provenance for how the payment method was supplied.
+                    required:
+                        - by
+                        - supplied_at
+                    properties:
+                        attempt_id:
+                            type: string
+                        by:
+                            type: string
+                        channel:
+                            type: string
+                        resource_id:
+                            type: string
+                        resource_type:
+                            type: string
+                        supplied_at:
+                            type: string
+                            format: date-time
+                verification:
+                    type: object
+                    additionalProperties: false
+                    description: Most recent verification record when the payment method has entered a verification flow.
+                    required:
+                        - initiated_at
+                        - request_id
+                        - type
+                    properties:
+                        completed_at:
+                            type: string
+                            format: date-time
+                            description: When verification was completed
+                            example: "2025-11-23T13:07:00Z"
+                        initiated_at:
+                            type: string
+                            format: date-time
+                            description: When verification was initiated
+                            example: "2025-11-23T13:00:00Z"
+                        mechanism:
+                            type: string
+                            description: Verification mechanism used
+                            example: "otp"
+                        request_id:
+                            type: string
+                            description: ID of the verification request
+                            example: "req_abc123"
+                        type:
+                            type: string
+                            description: Verification type
+                            example: "sms_otp"
+                verified_at:
+                    type: string
+                    format: date-time
+                    description: When ownership verification was completed
+                    example: "2025-11-23T13:07:00Z"
+
+        PaymentMethodCard:
+            type: object
+            additionalProperties: false
+            description: Card marker. Nested card credentials are not returned.
+
+        PaymentMethodData:
+            type: object
+            additionalProperties: false
+            description: Payment instrument details supplied while creating an order.
+            required: [type, mobile_money]
+            properties:
+                type:
+                    type: string
+                    enum: [mobile_money]
+                    description: Payment rail type (currently only mobile_money supported)
+                    example: "mobile_money"
+                mobile_money:
+                    $ref: '#/components/schemas/PaymentMethodMobileMoneyInput'
+        PaymentMethodType:
+            type: string
+            enum: [bank_account, card, mobile_money, motito]
+        PaymentMethodMobileMoneyInput:
+            type: object
+            additionalProperties: false
+            description: Mobile-money wallet details.
+            required: [network, account_number]
+            properties:
+                reference:
+                    type: string
+                network:
+                    type: string
+                    enum: [airtel, mtn, telecel, vodafone]
+                    description: Mobile-money network provider.
+                    example: "mtn"
+                account_number:
+                    type: string
+                    description: Mobile-money account number in local or international form.
+                    example: "+233242057831"
+                    pattern: '^(\+?\d{10,15})$'
+        PaymentMethodBillingDetailsInput:
+            type: object
+            additionalProperties: false
+            required: [name, address]
+            properties:
+                name:
+                    type: string
+                phone_number:
+                    type: string
+                address:
+                    $ref: '#/components/schemas/PaymentMethodAddressInput'
+        PaymentMethodAddressInput:
+            type: object
+            additionalProperties: false
+            required: [country]
+            properties:
+                name:
+                    type: string
+                phone_number:
+                    type: string
+                line1:
+                    type: string
+                line2:
+                    type: string
+                city:
+                    type: string
+                region:
+                    type: string
+                post_code:
+                    type: string
+                country:
+                    type: string
+        PaymentMethodShippingInput:
+            type: object
+            additionalProperties: false
+            required: [address]
+            properties:
+                address:
+                    type: object
+                    additionalProperties: false
+                    required: [country]
+                    properties:
+                        country:
+                            type: string
+        PaymentMethodSettings:
+            type: object
+            additionalProperties: false
+            description: Payment method acceptance configuration for an application
+            properties:
+                mobile_money:
+                    $ref: '#/components/schemas/PaymentMethodTypeSetting'
+                bank_account:
+                    $ref: '#/components/schemas/PaymentMethodTypeSetting'
+                card:
+                    $ref: '#/components/schemas/PaymentMethodTypeSetting'
+                motito:
+                    $ref: '#/components/schemas/PaymentMethodTypeSetting'
+        PaymentMethodTypeSetting:
+            type: object
+            additionalProperties: false
+            description: Settings for a specific payment method type
+            required:
+                - confirms_use
+                - enabled
+            properties:
+                type:
+                    type: string
+                    enum: [mobile_money, bank_account, card, motito]
+                    description: Payment method type
+                    example: "mobile_money"
+                name:
+                    type: string
+                    description: Human-readable name
+                    example: "Mobile Money"
+                description:
+                    type: string
+                    description: Description of this payment method
+                    example: "Pay with supported mobile money wallets"
+                enabled:
+                    type: boolean
+                    description: Whether this payment type can be used
+                    example: true
+                confirms_use:
+                    type: boolean
+                    description: Whether customers must explicitly agree before using
+                    example: true
+        TokenizePaymentMethodResponse:
+            type: object
+            additionalProperties: false
+            required: [payment_method]
+            properties:
+                payment_method:
+                    $ref: '#/components/schemas/PaymentMethodObject'
+        LookupPaymentMethodRequest:
+            type: object
+            additionalProperties: false
+            required:
+                - payment_method_id
+            properties:
+                payment_method_id:
+                    type: string
+                    description: ID of the payment method to fetch
+                    example: "pm_xyz789"
+        LookupPaymentMethodResponse:
+            type: object
+            additionalProperties: false
+            required: [payment_method]
+            properties:
+                payment_method:
+                    $ref: '#/components/schemas/PaymentMethodObject'
+        UpdatePaymentMethodRequest:
+            type: object
+            additionalProperties: false
+            required:
+                - payment_method_id
+            properties:
+                payment_method_id:
+                    type: string
+                    description: ID of the payment method to update
+                    example: "pm_xyz789"
+                custom_data:
+                    $ref: './common.yml#/components/schemas/CustomDataPatch'
+                active:
+                    type: boolean
+                    description: Set to `true` to activate the payment method or `false` to mark it inactive.
+                    example: true
+                archived:
+                    type: boolean
+                    description: Set to `true` to archive the payment method or `false` to unarchive it.
+                    example: false
+                owner:
+                    type: object
+                    additionalProperties: false
+                    description: Owner details to patch onto the payment method.
+                    properties:
+                        name:
+                            type: string
+                            description: Full legal name of the account holder.
+                            example: "Jane Mensah"
+                        address:
+                            type: object
+                            additionalProperties: false
+                            description: Postal address for the payment method owner.
+                            properties:
+                                city:
+                                    type: string
+                                    description: City or locality.
+                                    example: "Accra"
+                                country:
+                                    type: string
+                                    description: Two-letter ISO country code. Required when adding a brand new owner address.
+                                    example: "GH"
+                                line1:
+                                    type: string
+                                    description: First address line.
+                                    example: "1 High Street"
+                                line2:
+                                    type: string
+                                    description: Second address line.
+                                    example: "Osu"
+                                name:
+                                    type: string
+                                    description: Recipient name for the address, if different from owner name.
+                                    example: "Jane Mensah"
+                                phone_number:
+                                    type: string
+                                    description: Phone number for the address.
+                                    example: "+233201234567"
+                                post_code:
+                                    type: string
+                                    description: Postal or ZIP code.
+                                    example: "GA-123-4567"
+                                region:
+                                    type: string
+                                    description: Region, state, or province.
+                                    example: "Greater Accra"
+        UpdatePaymentMethodResponse:
+            type: object
+            additionalProperties: false
+            required: [payment_method]
+            properties:
+                payment_method:
+                    $ref: '#/components/schemas/PaymentMethodObject'
+        ActivatePaymentMethodRequest:
+            type: object
+            additionalProperties: false
+            required:
+                - payment_method_id
+            properties:
+                payment_method_id:
+                    type: string
+                    description: ID of the payment method to activate
+                    example: "pm_xyz789"
+        ActivatePaymentMethodResponse:
+            type: object
+            additionalProperties: false
+            required: [payment_method]
+            properties:
+                payment_method:
+                    $ref: '#/components/schemas/PaymentMethodObject'
+        DisactivatePaymentMethodRequest:
+            type: object
+            additionalProperties: false
+            required:
+                - payment_method_id
+            properties:
+                payment_method_id:
+                    type: string
+                    description: ID of the payment method to mark inactive
+                    example: "pm_xyz789"
+        DisactivatePaymentMethodResponse:
+            type: object
+            additionalProperties: false
+            required: [payment_method]
+            properties:
+                payment_method:
+                    $ref: '#/components/schemas/PaymentMethodObject'
+        ArchivePaymentMethodRequest:
+            type: object
+            additionalProperties: false
+            required:
+                - payment_method_id
+            properties:
+                payment_method_id:
+                    type: string
+                    description: ID of the payment method to archive
+                    example: "pm_xyz789"
+        ArchivePaymentMethodResponse:
+            type: object
+            additionalProperties: false
+            required: [payment_method]
+            properties:
+                payment_method:
+                    $ref: '#/components/schemas/PaymentMethodObject'
+        UnarchivePaymentMethodRequest:
+            type: object
+            additionalProperties: false
+            required:
+                - payment_method_id
+            properties:
+                payment_method_id:
+                    type: string
+                    description: ID of the payment method to unarchive
+                    example: "pm_xyz789"
+        UnarchivePaymentMethodResponse:
+            type: object
+            additionalProperties: false
+            required: [payment_method]
+            properties:
+                payment_method:
+                    $ref: '#/components/schemas/PaymentMethodObject'
+        GetPaymentMethodSettingsRequest:
+            type: object
+            description: Send an empty JSON object.
+            additionalProperties: false
+            properties: {}
+        GetPaymentMethodSettingsResponse:
+            type: object
+            additionalProperties: false
+            required:
+                - settings
+            properties:
+                settings:
+                    $ref: '#/components/schemas/PaymentMethodSettings'

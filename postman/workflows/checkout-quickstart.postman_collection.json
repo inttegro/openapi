@@ -2,7 +2,7 @@
   "info": {
     "name": "Inttegro API — Checkout Quickstart",
     "description": "Create a hosted checkout and look it up without requesting or confirming payment. Includes portable defaults for desktop and Inso CLI use.\n\nGenerated from insomnia/workflows/checkout-quickstart.insomnia.yaml. Edit the Insomnia source and run npm run postman:generate.",
-    "version": "0.1.0-beta78",
+    "version": "0.1.0-beta80",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
@@ -23,10 +23,10 @@
             "url": {
               "raw": "{{base_url}}/orders/create"
             },
-            "description": "Creates and finalizes an order so the response contains a hosted checkout URL. This request does not execute payment.",
+            "description": "Creates and finalizes an order so the response contains a hosted checkout URL. The explicit execute_payment=false keeps this portable fixture on the non-executing branch.",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"request_meta\": {\n    \"idempotency_key\": \"{{idempotency_key}}\"\n  },\n  \"number\": \"{{order_number}}\",\n  \"finalize\": true,\n  \"checkout_settings\": {\n    \"redirect_url\": \"{{checkout_success_url}}\",\n    \"cancel_url\": \"{{checkout_cancel_url}}\"\n  },\n  \"customer_data\": {\n    \"name\": \"{{customer_name}}\",\n    \"email_address\": \"{{customer_email}}\",\n    \"phone_number\": \"{{customer_phone}}\"\n  },\n  \"line_items\": [\n    {\n      \"type\": \"product\",\n      \"product\": {\n        \"type\": \"physical\",\n        \"name\": \"{{product_name}}\",\n        \"quantity\": 1,\n        \"price\": {\n          \"currency\": \"{{currency}}\",\n          \"value\": 20000\n        }\n      }\n    }\n  ]\n}",
+              "raw": "{\n  \"request_meta\": {\n    \"idempotency_key\": \"{{idempotency_key}}\"\n  },\n  \"number\": \"{{order_number}}\",\n  \"finalize\": true,\n  \"execute_payment\": false,\n  \"checkout_settings\": {\n    \"redirect_url\": \"{{checkout_success_url}}\",\n    \"cancel_url\": \"{{checkout_cancel_url}}\"\n  },\n  \"customer_data\": {\n    \"name\": \"{{customer_name}}\",\n    \"email_address\": \"{{customer_email}}\",\n    \"phone_number\": \"{{customer_phone}}\"\n  },\n  \"line_items\": [\n    {\n      \"type\": \"product\",\n      \"product\": {\n        \"type\": \"physical\",\n        \"name\": \"{{product_name}}\",\n        \"quantity\": 1,\n        \"price\": {\n          \"currency\": \"{{currency}}\",\n          \"value\": 20000\n        }\n      }\n    }\n  ]\n}",
               "options": {
                 "raw": {
                   "language": "json"

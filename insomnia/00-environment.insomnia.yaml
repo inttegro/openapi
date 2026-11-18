@@ -11,7 +11,8 @@ environments:
     id: env_4441cc5f612fb445ed9428bf08deba0e
   data:
     base_url: https://api.inttegro.com
-    collection_version: 0.1.0-beta78
+    # Why: consumers must be able to identify the exact contract bundle their saved requests target.
+    collection_version: 0.1.0-beta80
     api_key: ''
     idempotency_key: ''
     future_timestamp: ''
