@@ -1,0 +1,1600 @@
+# Authoritative common resource contract.
+# Why: keeping each resource's operations and schemas together makes public invariants
+# reviewable without weakening the single bundled contract distributed to consumers.
+
+components:
+    securitySchemes:
+        bearerAuth:
+            type: http
+            scheme: bearer
+            description: Inttegro API key supplied in the Authorization header.
+    headers:
+        RequestId:
+            description: Unique Inttegro request identifier for support, tracing, and reconciliation.
+            schema:
+                type: string
+                example: req_01hzz8y7q5r4q4f6r6q6k2z3w1
+        RetryAfter:
+            description: Seconds to wait before retrying a temporarily unavailable or rate-limited request.
+            schema:
+                type: string
+                example: "30"
+    parameters:
+        IdempotencyKey:
+            name: Idempotency-Key
+            in: header
+            required: false
+            schema:
+                $ref: '#/components/schemas/IdempotencyKeyValue'
+            description: Stable key used to replay safe retries without applying the mutation twice.
+    schemas:
+        IdempotencyKeyValue:
+            type: string
+            minLength: 1
+            maxLength: 255
+            description: Stable caller-chosen retry key.
+        RequestPropertySelection:
+            type: object
+            additionalProperties: false
+            description: Public properties to include in or exclude from one named response resource. Supply exactly one of `pick` or `omit`.
+            properties:
+                pick:
+                    type: array
+                    minItems: 1
+                    uniqueItems: true
+                    items:
+                        type: string
+                        minLength: 1
+                    description: Include only these property paths and the ancestors needed to contain them.
+                omit:
+                    type: array
+                    minItems: 1
+                    uniqueItems: true
+                    items:
+                        type: string
+                        minLength: 1
+                    description: Exclude these property paths and all of their descendants.
+            oneOf:
+                - required: [pick]
+                - required: [omit]
+        RequestResponse:
+            type: object
+            additionalProperties: false
+            description: Caller-controlled preferences for computing and representing the successful response.
+            required: [projection]
+            properties:
+                projection:
+                    type: object
+                    minProperties: 1
+                    additionalProperties:
+                        $ref: '#/components/schemas/RequestPropertySelection'
+                    description: Public property selections keyed by the endpoint's response resource names.
+        ResourceSearchRequest:
+            type: object
+            additionalProperties: false
+            description: |
+                A resource-local search request. Send `text`, at least one filter, or both. Field
+                names are unqualified and depend on the endpoint. The application and resource type
+                are derived by Inttegro and cannot be supplied by the caller. To continue a search,
+                repeat the same request and add the returned `next_cursor`.
+            anyOf:
+                - required: [text]
+                - required: [filters]
+            properties:
+                text:
+                    type: string
+                    minLength: 1
+                    maxLength: 512
+                    description: Words, identifiers, or names to search for.
+                filters:
+                    type: array
+                    maxItems: 20
+                    uniqueItems: true
+                    items:
+                        $ref: '#/components/schemas/ResourceSearchFilter'
+                facets:
+                    type: array
+                    maxItems: 10
+                    uniqueItems: true
+                    items:
+                        $ref: '#/components/schemas/ResourceSearchFacet'
+                sort:
+                    $ref: '#/components/schemas/ResourceSearchSort'
+                page_size:
+                    type: integer
+                    minimum: 1
+                    maximum: 100
+                    default: 20
+                cursor:
+                    type: string
+                    maxLength: 8192
+                    description: Opaque continuation value returned as `next_cursor` by the preceding page.
+        ResourceSearchFilter:
+            oneOf:
+                - $ref: '#/components/schemas/ResourceSearchEqualsFilter'
+                - $ref: '#/components/schemas/ResourceSearchInFilter'
+        ResourceSearchEqualsFilter:
+            type: object
+            additionalProperties: false
+            required: [field, operator, values]
+            properties:
+                field:
+                    type: string
+                    description: Unqualified route-local field name documented by the selected endpoint.
+                operator:
+                    type: string
+                    enum: [eq]
+                    description: Exact equality comparison.
+                values:
+                    type: array
+                    minItems: 1
+                    maxItems: 1
+                    uniqueItems: true
+                    items:
+                        type: string
+                        minLength: 1
+                        maxLength: 256
+        ResourceSearchInFilter:
+            type: object
+            additionalProperties: false
+            required: [field, operator, values]
+            properties:
+                field:
+                    type: string
+                    description: Unqualified route-local field name documented by the selected endpoint.
+                operator:
+                    type: string
+                    enum: [in]
+                    description: Matches any supplied value.
+                values:
+                    type: array
+                    minItems: 1
+                    maxItems: 20
+                    uniqueItems: true
+                    items:
+                        type: string
+                        minLength: 1
+                        maxLength: 256
+        ResourceSearchFacet:
+            type: object
+            additionalProperties: false
+            required: [field]
+            properties:
+                field:
+                    type: string
+                    description: Unqualified route-local field to group and count.
+                limit:
+                    type: integer
+                    minimum: 1
+                    maximum: 50
+                    default: 10
+        ResourceSearchSort:
+            oneOf:
+                - $ref: '#/components/schemas/ResourceSearchRelevanceSort'
+                - $ref: '#/components/schemas/ResourceSearchChronologicalSort'
+        ResourceSearchRelevanceSort:
+            type: object
+            additionalProperties: false
+            required: [field, direction]
+            properties:
+                field:
+                    type: string
+                    enum: [relevance]
+                    description: Sort by search relevance.
+                direction:
+                    type: string
+                    enum: [desc]
+                    description: Relevance is always sorted in descending order.
+        ResourceSearchChronologicalSort:
+            type: object
+            additionalProperties: false
+            required: [field, direction]
+            properties:
+                field:
+                    type: string
+                    enum: [updated_at, published_at]
+                    description: "`published_at` is supported only by product search."
+                direction:
+                    type: string
+                    enum: [asc, desc]
+        ResourceSearchResponse:
+            type: object
+            additionalProperties: false
+            required: [search]
+            properties:
+                search:
+                    $ref: '#/components/schemas/ResourceSearchPage'
+        ResourceSearchPage:
+            type: object
+            additionalProperties: false
+            required: [resource_types, sort, page_size, result_count, has_more, total, resource_totals, results, facets, freshness]
+            # Ariadne rejects a page whose declared result count differs from
+            # the number of public result projections in that payload.
+            x-simile-constraints:
+                - aggregate:
+                      target: /result_count
+                      operation: count
+                      source: /results/*
+            properties:
+                resource_types:
+                    type: array
+                    minItems: 1
+                    maxItems: 1
+                    items:
+                        $ref: '#/components/schemas/SearchResourceType'
+                sort:
+                    $ref: '#/components/schemas/ResourceSearchSort'
+                page_size:
+                    type: integer
+                    minimum: 1
+                    maximum: 100
+                result_count:
+                    type: integer
+                    minimum: 0
+                    maximum: 100
+                has_more:
+                    type: boolean
+                total:
+                    $ref: '#/components/schemas/ResourceSearchTotal'
+                resource_totals:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/ResourceSearchResourceTotal'
+                results:
+                    type: array
+                    description: Search projections for discovery, not canonical resource snapshots.
+                    maxItems: 100
+                    items:
+                        $ref: '#/components/schemas/ResourceSearchResult'
+                facets:
+                    type: array
+                    maxItems: 10
+                    items:
+                        $ref: '#/components/schemas/ResourceSearchFacetResult'
+                next_cursor:
+                    type: string
+                    maxLength: 8192
+                freshness:
+                    $ref: '#/components/schemas/ResourceSearchFreshness'
+        SearchResourceType:
+            type: string
+            enum: [customer, financial_account, order, payout, product]
+        ResourceSearchTotal:
+            type: object
+            additionalProperties: false
+            required: [value, relation]
+            properties:
+                value:
+                    type: integer
+                    format: int64
+                    minimum: 0
+                relation:
+                    type: string
+                    enum: [exact, lower_bound]
+        ResourceSearchResourceTotal:
+            type: object
+            additionalProperties: false
+            required: [resource_type, value, relation]
+            properties:
+                resource_type:
+                    $ref: '#/components/schemas/SearchResourceType'
+                value:
+                    type: integer
+                    format: int64
+                    minimum: 0
+                relation:
+                    type: string
+                    enum: [exact, lower_bound]
+        ResourceSearchResourceReference:
+            type: object
+            additionalProperties: false
+            required: [type, id]
+            properties:
+                type:
+                    $ref: '#/components/schemas/SearchResourceType'
+                id:
+                    type: string
+        ResourceSearchAmount:
+            type: object
+            additionalProperties: false
+            required: [currency, value]
+            properties:
+                currency:
+                    type: string
+                    description: ISO 4217 currency code.
+                value:
+                    type: integer
+                    format: int64
+                    minimum: 0
+                    description: Amount in the currency's minor unit.
+        ResourceSearchResult:
+            type: object
+            additionalProperties: false
+            required: [resource, title, updated_at]
+            properties:
+                resource:
+                    $ref: '#/components/schemas/ResourceSearchResourceReference'
+                title:
+                    type: string
+                summary:
+                    type: string
+                status:
+                    type: string
+                customer_name:
+                    type: string
+                amount:
+                    $ref: '#/components/schemas/ResourceSearchAmount'
+                url:
+                    type: string
+                    format: uri
+                updated_at:
+                    type: string
+                    format: date-time
+        ResourceSearchFacetBucket:
+            type: object
+            additionalProperties: false
+            required: [value, count]
+            properties:
+                value:
+                    type: string
+                count:
+                    type: integer
+                    format: int64
+                    minimum: 0
+        ResourceSearchFacetResult:
+            type: object
+            additionalProperties: false
+            required: [field, buckets]
+            properties:
+                field:
+                    type: string
+                    description: The same unqualified route-local field requested by the caller.
+                buckets:
+                    type: array
+                    maxItems: 50
+                    items:
+                        $ref: '#/components/schemas/ResourceSearchFacetBucket'
+        ResourceSearchResourceFreshness:
+            type: object
+            additionalProperties: false
+            required: [resource_type, state]
+            properties:
+                resource_type:
+                    $ref: '#/components/schemas/SearchResourceType'
+                state:
+                    type: string
+                    enum: [current, delayed, partial, unknown, unavailable]
+                observed_at:
+                    type: string
+                    format: date-time
+                last_indexed_at:
+                    type: string
+                    format: date-time
+        ResourceSearchFreshness:
+            type: object
+            additionalProperties: false
+            required: [state]
+            properties:
+                state:
+                    type: string
+                    enum: [current, delayed, partial, unknown, unavailable]
+                observed_at:
+                    type: string
+                    format: date-time
+                resources:
+                    type: array
+                    maxItems: 1
+                    items:
+                        $ref: '#/components/schemas/ResourceSearchResourceFreshness'
+        CustomData:
+            type: object
+            description: Merchant-defined string values attached to a resource. SDKs expose this as a semantic collection rather than a raw map.
+            additionalProperties:
+                type: string
+        CustomDataInput:
+            type: object
+            description: Merchant-defined values accepted on resource creation. Values are serialized to strings before storage.
+            additionalProperties: true
+        CustomDataPatch:
+            type: object
+            description: Changes to merchant-defined data. JSON null removes a key; every other JSON value is serialized to a string.
+            additionalProperties: true
+        JSONData:
+            type: object
+            description: Deliberately extensible JSON object whose keys and values are defined by the selected integration or resource subtype.
+            additionalProperties: true
+        Currency:
+            type: string
+            description: A currency code recognized by the Inttegro API. Individual operations can support a subset of these currencies.
+            enum: [ghs, usd, gbp, eur, cny]
+            example: ghs
+        AmountParams:
+            type: object
+            additionalProperties: false
+            required:
+                - currency
+                - value
+            properties:
+                currency:
+                    $ref: '#/components/schemas/Currency'
+                value:
+                    type: integer
+                    description: Amount in smallest currency unit (e.g., pesewas for GHS)
+                    example: 20000
+                    minimum: 0
+        Amount:
+            type: object
+            additionalProperties: false
+            required:
+                - currency
+                - value
+            properties:
+                currency:
+                    $ref: '#/components/schemas/Currency'
+                value:
+                    type: integer
+                    description: Amount in the currency's smallest unit.
+                    example: 20000
+        ErrorCause:
+            type: string
+            description: Stable public category identifying why an API request failed.
+            # Public error constructors emit only these categories; keeping the set finite prevents
+            # synthesized errors from inventing retry and remediation semantics clients do not know.
+            enum:
+                - authentication_failed
+                - authorization_failed
+                - capability_unsupported
+                - configuration_missing
+                - dependency_failed
+                - dependency_unavailable
+                - idempotency_conflict
+                - idempotency_in_progress
+                - invalid_request_body
+                - invalid_request_parameter
+                - limit_exceeded
+                - method_not_allowed
+                - missing_request_parameter
+                - operation_in_progress
+                - payload_too_large
+                - precondition_unmet
+                - provider_declined
+                - provider_unavailable
+                - quota_exceeded
+                - rate_limited
+                - request_timeout
+                - resource_locked
+                - resource_not_found
+                - resource_state_conflict
+                - resource_state_invalid
+                - service_unavailable
+                - unknown
+                - unsupported_content_type
+        ErrorType:
+            type: string
+            description: Stable public class used by clients to select broad error-handling behavior.
+            # Error types are protocol values, not free-form diagnostics, so generated responses must
+            # stay within the classifications emitted by the shared HTTP error packages.
+            enum:
+                - authentication_error
+                - authorization_error
+                - authorization_failed
+                - bad_request
+                - configuration_error
+                - dependency_failed
+                - idempotency_error
+                - invalid_request
+                - invalid_request_parameter
+                - limit_error
+                - not_found
+                - provider_error
+                - resource_lock
+                - service_unavailable
+                - state_conflict
+                - state_invalid
+                - transient_error
+                - unknown_error
+        ErrorFixCode:
+            type: string
+            description: Stable public instruction describing the caller's next safe action.
+            # Clients automate remediation from this field; an invented value would make a generated
+            # error unusable even when the surrounding JSON is structurally valid.
+            enum:
+                - abandon_request
+                - authenticate_request
+                - change_request_parameters
+                - contact_customer_support
+                - reduce_request_size
+                - refresh_resource_state
+                - repeat_same_request
+                - resolve_account_configuration
+                - retry_with_backoff
+                - satisfy_precondition
+                - use_allowed_method
+                - use_authorized_credentials
+                - use_different_provider_method
+                - use_new_idempotency_key
+                - use_supported_media_type
+                - use_valid_api_key
+        ErrorCode:
+            type: string
+            description: Stable public identifier for a documented endpoint or shared HTTP failure.
+            # This union follows the documented catalog plus publicly routed handler and shared
+            # HTTP codes. Internal-only endpoint codes stay private while Simile remains unable
+            # to invent a value that a public Commerce API response can never emit.
+            enum:
+                - application_create_failed
+                - application_create_unavailable
+                - application_lookup_failed
+                - application_update_failed
+                - authentication_failed
+                - cannot_change_price_amount
+                - cannot_change_product_id
+                - cannot_clear_field_once_set
+                - cannot_update_immutable_field
+                - capabilities_authentication_required
+                - capabilities_scope_required
+                - capabilities_temporarily_unavailable
+                - capabilities_unavailable
+                - checkout_amount_locked
+                - checkout_amount_selection_failed
+                - checkout_line_item_duplicate
+                - checkout_line_item_invalid
+                - checkout_line_item_not_found
+                - checkout_order_not_found
+                - checkout_payment_failed
+                - checkout_reference_not_found
+                - children_policy_invalid
+                - children_policy_not_found
+                - children_policy_request_failed
+                - children_policy_required
+                - children_policy_validation_unavailable
+                - children_policy_version_conflict
+                - chime_broadcast_already_canceled
+                - chime_broadcast_already_completed
+                - chime_broadcast_cancel_failed
+                - chime_broadcast_failed
+                - chime_broadcast_lookup_failed
+                - chime_broadcast_not_found
+                - chime_cooldown_active
+                - chime_cooldown_unavailable
+                - chime_lookup_failed
+                - chime_not_found
+                - chime_page_failed
+                - chime_schedule_already_canceled
+                - chime_schedule_already_completed
+                - chime_schedule_cancel_failed
+                - chime_schedule_failed
+                - chime_schedule_lookup_failed
+                - chime_schedule_not_found
+                - chime_send_failed
+                - confirmation_already_satisfied
+                - confirmation_bad_token
+                - confirmation_expired
+                - confirmation_failed
+                - confirmation_max_reached
+                - confirmation_not_found
+                - confirmation_not_needed
+                - confirmation_pending
+                - confirmation_request_failed
+                - coupon_duplicate
+                - coupon_not_applicable
+                - coupon_not_found
+                - coupon_unavailable
+                - customer_not_found
+                - customer_resolution_unavailable
+                - customer_selected_amount_invalid
+                - customer_selected_amount_required
+                - customers_search_invalid
+                - customers_search_response_unsafe
+                - customers_search_unavailable
+                - discount_duplicate
+                - draft_mode_order_has_no_invoice
+                - email_message_unsafe
+                - email_recipient_domain_blocked
+                - email_recipient_suppressed
+                - email_sender_unauthorized
+                - empty_file
+                - endpoint_authentication_required
+                - endpoint_authorization_denied
+                - endpoint_caller_denied
+                - endpoint_caller_required
+                - endpoint_control_authentication_required
+                - endpoint_control_denied
+                - endpoint_control_unavailable
+                - endpoint_unavailable
+                - fa_is_payout_dest
+                - file_api_unavailable
+                - file_content_type_not_allowed
+                - file_contents_unavailable
+                - file_extension_not_allowed
+                - file_has_live_references
+                - file_link_access_denied
+                - file_link_access_limit_reached
+                - file_link_already_exists
+                - file_link_delivery_invalid
+                - file_link_expired
+                - file_link_inactive
+                - file_link_not_found
+                - file_link_operation_failed
+                - file_link_purpose_not_allowed
+                - file_metadata_unavailable
+                - file_name_mismatch
+                - file_not_found
+                - file_operation_failed
+                - file_purpose_not_allowed
+                - file_reference_reconcile_failed
+                - file_row_limit_exceeded
+                - file_schema_mismatch
+                - file_size_mismatch
+                - file_storage_encoding_unsupported
+                - file_too_large
+                - file_too_small
+                - financial_account_not_found
+                - financial_accounts_search_invalid
+                - financial_accounts_search_response_unsafe
+                - financial_accounts_search_unavailable
+                - fixed_price_unavailable
+                - ghana_bank_identifiers_conflict
+                - idempotency_key_conflict
+                - idempotency_key_generation_failed
+                - idempotency_key_in_progress
+                - idempotency_key_invalid
+                - idempotency_key_mismatch
+                - idempotency_key_unsupported
+                - idempotency_scope_unavailable
+                - idempotency_storage_unavailable
+                - image_metadata_unreadable
+                - invalid_chime_broadcast_request
+                - invalid_chime_request
+                - invalid_chime_schedule_request
+                - invalid_line_items
+                - invalid_otp_initiation_request
+                - invalid_product_type
+                - invalid_purchase_intent_quantity_range
+                - invalid_purchase_intent_target
+                - invalid_recipient
+                - invalid_refund
+                - invalid_request_body
+                - invalid_request_parameter
+                - invalid_response_projection
+                - invalid_secret_key_request
+                - message_template_archived
+                - message_template_attachments_unsupported
+                - message_template_channel_mismatch
+                - message_template_create_failed
+                - message_template_email_subject_empty
+                - message_template_email_text_empty
+                - message_template_email_unsafe
+                - message_template_id_required
+                - message_template_invalid
+                - message_template_not_found
+                - message_template_not_published
+                - message_template_render_invalid
+                - message_template_render_too_long
+                - message_template_render_unsafe
+                - message_template_request_invalid
+                - message_template_required
+                - message_template_sms_empty
+                - message_template_update_failed
+                - message_template_variables_invalid
+                - method_not_allowed
+                - missing_message_content
+                - missing_request_parameter
+                - mixed_message_content
+                - offer_rejected
+                - offer_unavailable
+                - operating_policy_children_policy_conflict
+                - operating_policy_invalid
+                - operating_policy_not_found
+                - operating_policy_request_failed
+                - operating_policy_required
+                - operating_policy_resolution_conflict
+                - operating_policy_validation_unavailable
+                - operating_policy_version_conflict
+                - order_application_not_found
+                - order_canceled
+                - order_completed
+                - order_customer_invalid
+                - order_customer_resolution_unavailable
+                - order_delivery_auth_failed
+                - order_delivery_contact_missing
+                - order_delivery_failed
+                - order_delivery_history_failed
+                - order_expired
+                - order_finalize_failed
+                - order_finalize_required
+                - order_line_item_limit_exceeded
+                - order_not_found
+                - order_not_payable
+                - order_paid
+                - order_payment_create_failed
+                - order_payment_execution_failed
+                - order_payment_missing
+                - order_payment_not_paid
+                - order_payment_touched
+                - order_receipt_missing
+                - order_receipt_number_invalid
+                - order_terminated
+                - order_total_limit_exceeded
+                - order_update_empty
+                - orders_page_unavailable
+                - orders_search_invalid
+                - orders_search_response_unsafe
+                - orders_search_unavailable
+                - otp_already_verified
+                - otp_idempotency_key_already_used
+                - otp_initiation_failed
+                - otp_lookup_failed
+                - otp_max_verification_attempts_exceeded
+                - otp_token_size_invalid
+                - otp_transaction_canceled
+                - otp_transaction_expired
+                - otp_transaction_not_found
+                - otp_verification_failed
+                - payment_acceptance_restricted
+                - payment_cant_pay_offline
+                - payment_failed
+                - payment_method_already_active
+                - payment_method_already_archived
+                - payment_method_already_inactive
+                - payment_method_archived
+                - payment_method_conflicting_state_updates
+                - payment_method_inactive
+                - payment_method_invalid
+                - payment_method_no_updates
+                - payment_method_not_archived
+                - payment_method_not_found
+                - payment_method_owner_address_country_required
+                - payment_refresh_failed
+                - payment_transition_conflict
+                - payout_not_found
+                - payout_restricted
+                - payouts_search_invalid
+                - payouts_search_response_unsafe
+                - payouts_search_unavailable
+                - price_already_active
+                - price_already_archived
+                - price_already_inactive
+                - price_archived
+                - price_create_failed
+                - price_inactive
+                - price_not_found
+                - product_add_price_failed
+                - product_already_archived
+                - product_already_published
+                - product_already_unpublished
+                - product_archived
+                - product_media_downloads_too_large
+                - product_media_gallery_too_large
+                - product_modifier_groups_invalid
+                - product_mutation_conflict
+                - product_not_found
+                - products_search_invalid
+                - products_search_response_unsafe
+                - products_search_unavailable
+                - purchase_intent_already_used
+                - purchase_intent_bundle_not_found
+                - purchase_intent_bundle_price_unavailable
+                - purchase_intent_bundle_unavailable
+                - purchase_intent_invalid
+                - purchase_intent_not_found
+                - purchase_intent_price_not_found
+                - purchase_intent_price_product_mismatch
+                - purchase_intent_price_unavailable
+                - purchase_intent_product_not_found
+                - purchase_intent_product_unavailable
+                - purchase_intent_quantity_invalid
+                - purchase_intent_selection_invalid
+                - purchase_intent_variant_invalid
+                - refund_amount_exceeds_line_item
+                - refund_cancel_failed
+                - refund_cannot_cancel
+                - refund_capacity_changed
+                - refund_create_failed
+                - refund_currency_mismatch
+                - refund_customer_unavailable
+                - refund_duplicate_line_item
+                - refund_insufficient_merchant_balance
+                - refund_line_item_not_found
+                - refund_merchant_balance_unavailable
+                - refund_not_found
+                - refund_order_not_found
+                - refund_order_not_paid
+                - refund_original_payment_method_unavailable
+                - refund_page_unavailable
+                - refund_paid_allocation_unavailable
+                - request_failed
+                - request_parameter_choice_required
+                - request_parameter_null_rejected
+                - request_parameter_parse_failed
+                - request_parameter_too_large
+                - request_parameter_too_small
+                - request_parameter_type_mismatch
+                - request_parameter_value_not_allowed
+                - request_parameters_mutually_exclusive
+                - request_timeout
+                - request_too_large
+                - secret_key_generation_failed
+                - secret_key_not_found
+                - secret_key_read_failed
+                - secret_key_request_failed
+                - sms_sender_id_authorization_unavailable
+                - sms_sender_id_not_approved
+                - storage_quota_exceeded
+                - unexpected_request_parameter
+                - unprocessable_request
+                - unsupported_content_type
+                - upload_request_already_exists
+                - upload_request_attempt_limit_reached
+                - upload_request_expired
+                - upload_request_expiry_invalid
+                - upload_request_inactive
+                - upload_request_not_found
+                - upload_request_operation_failed
+                - upload_request_policy_invalid
+                - upload_request_state_conflict
+                - upload_request_upload_failed
+        ErrorDocumentationURL:
+            type: string
+            format: uri
+            description: Canonical Studio documentation URL selected by the public error URL resolver.
+            # Production resolvers return a known error page or the safe guide fallback; allowing any
+            # URI would let synthesis invent a documentation host that the API never returns.
+            enum:
+                - "https://studio.inttegro.com/e/c-authentication_failed"
+                - "https://studio.inttegro.com/e/c-authorization_failed"
+                - "https://studio.inttegro.com/e/c-invalid_request_parameter"
+                - "https://studio.inttegro.com/e/c-missing_request_parameter"
+                - "https://studio.inttegro.com/e/c-precondition_unmet"
+                - "https://studio.inttegro.com/e/c-unknown"
+                - "https://studio.inttegro.com/e/f-abandon_request"
+                - "https://studio.inttegro.com/e/f-change_request_parameters"
+                - "https://studio.inttegro.com/e/f-contact_customer_support"
+                - "https://studio.inttegro.com/e/f-repeat_same_request"
+                - "https://studio.inttegro.com/e/f-satisfy_precondition"
+                - "https://studio.inttegro.com/e/payment_transition_conflict"
+                - "https://studio.inttegro.com/e/t-bad_request"
+                - "https://studio.inttegro.com/e/t-invalid_request_parameter"
+                - "https://studio.inttegro.com/e/t-transient_error"
+                - "https://studio.inttegro.com/e/t-unknown_error"
+                - "https://studio.inttegro.com/errors"
+        Error:
+            type: object
+            additionalProperties: false
+            description: |
+                Standard error response structure returned by all API endpoints.
+                Provides machine-readable codes, human-readable messages, and actionable guidance for resolution.
+            # Public handlers construct these fields as one protocol tuple. Keeping the tuple in a
+            # oneOf prevents synthesis from combining individually valid values into an error that
+            # no public Commerce API path can emit.
+            oneOf:
+                - type: object
+                  required: [cause, code, fix_code, type, url]
+                  properties:
+                      cause: { enum: [authentication_failed] }
+                      code: { enum: [authentication_failed] }
+                      fix_code: { enum: [authenticate_request] }
+                      type: { enum: [authentication_error] }
+                      url: { enum: ["https://studio.inttegro.com/e/c-authentication_failed"] }
+                - type: object
+                  required: [cause, code, fix_code, type, url]
+                  properties:
+                      cause: { enum: [authentication_failed] }
+                      code:
+                          enum:
+                              - capabilities_authentication_required
+                              - endpoint_authentication_required
+                              - endpoint_caller_required
+                              - endpoint_control_authentication_required
+                      fix_code: { enum: [authenticate_request] }
+                      type: { enum: [authentication_error] }
+                      url: { enum: ["https://studio.inttegro.com/errors"] }
+                - type: object
+                  required: [cause, code, fix_code, type, url]
+                  properties:
+                      cause: { enum: [authorization_failed] }
+                      code:
+                          enum:
+                              - capabilities_scope_required
+                              - endpoint_authorization_denied
+                              - endpoint_caller_denied
+                              - endpoint_control_denied
+                              - endpoint_control_unavailable
+                      fix_code: { enum: [use_authorized_credentials] }
+                      type: { enum: [authorization_error] }
+                      url: { enum: ["https://studio.inttegro.com/errors"] }
+                - type: object
+                  required: [cause, code, fix_code, type, url]
+                  properties:
+                      cause: { enum: [authorization_failed] }
+                      code: { enum: [file_link_access_denied] }
+                      fix_code: { enum: [change_request_parameters] }
+                      type: { enum: [authorization_failed] }
+                      url: { enum: ["https://studio.inttegro.com/e/c-authorization_failed"] }
+                - type: object
+                  required: [cause, code, fix_code, type, url]
+                  properties:
+                      cause: { enum: [precondition_unmet] }
+                      code: { enum: [confirmation_not_needed] }
+                      fix_code: { enum: [refresh_resource_state] }
+                      type: { enum: [bad_request] }
+                      url: { enum: ["https://studio.inttegro.com/errors"] }
+                - type: object
+                  required: [cause, code, fix_code, type, url]
+                  properties:
+                      cause: { enum: [precondition_unmet] }
+                      code:
+                          enum:
+                              - chime_broadcast_already_completed
+                              - chime_cooldown_active
+                              - chime_schedule_already_completed
+                              - confirmation_already_satisfied
+                              - confirmation_expired
+                              - confirmation_max_reached
+                              - confirmation_not_needed
+                              - confirmation_pending
+                              - coupon_not_applicable
+                              - coupon_unavailable
+                              - draft_mode_order_has_no_invoice
+                              - email_recipient_suppressed
+                              - fa_is_payout_dest
+                              - message_template_attachments_unsupported
+                              - message_template_not_published
+                              - offer_rejected
+                              - offer_unavailable
+                              - order_canceled
+                              - order_completed
+                              - order_delivery_contact_missing
+                              - order_expired
+                              - order_finalize_required
+                              - order_not_payable
+                              - order_paid
+                              - order_payment_missing
+                              - order_payment_not_paid
+                              - order_payment_touched
+                              - order_receipt_missing
+                              - order_terminated
+                              - otp_max_verification_attempts_exceeded
+                              - otp_transaction_canceled
+                              - otp_transaction_expired
+                              - payment_acceptance_restricted
+                              - payment_cant_pay_offline
+                              - payment_method_already_active
+                              - payment_method_already_archived
+                              - payment_method_already_inactive
+                              - payment_method_archived
+                              - payment_method_inactive
+                              - payment_method_not_archived
+                              - payout_restricted
+                              - price_already_active
+                              - price_already_archived
+                              - price_already_inactive
+                              - price_archived
+                              - price_inactive
+                              - product_already_archived
+                              - product_already_published
+                              - product_already_unpublished
+                              - product_archived
+                              - product_mutation_conflict
+                              - purchase_intent_already_used
+                              - purchase_intent_bundle_price_unavailable
+                              - purchase_intent_bundle_unavailable
+                              - purchase_intent_invalid
+                              - purchase_intent_price_unavailable
+                              - purchase_intent_product_unavailable
+                              - refund_customer_unavailable
+                              - refund_insufficient_merchant_balance
+                              - refund_merchant_balance_unavailable
+                              - refund_order_not_paid
+                              - refund_original_payment_method_unavailable
+                              - refund_paid_allocation_unavailable
+                              - sms_sender_id_not_approved
+                      fix_code: { enum: [satisfy_precondition] }
+                      type: { enum: [bad_request] }
+                      url: { enum: ["https://studio.inttegro.com/errors"] }
+                - type: object
+                  required: [cause, code, fix_code, type, url]
+                  properties:
+                      cause: { enum: [configuration_missing] }
+                      code: { enum: [idempotency_scope_unavailable] }
+                      fix_code: { enum: [resolve_account_configuration] }
+                      type: { enum: [configuration_error] }
+                      url: { enum: ["https://studio.inttegro.com/errors"] }
+                - type: object
+                  required: [cause, code, fix_code, type, url]
+                  properties:
+                      cause: { enum: [configuration_missing] }
+                      code: { enum: [capabilities_unavailable] }
+                      fix_code: { enum: [contact_customer_support] }
+                      type: { enum: [configuration_error] }
+                      url: { enum: ["https://studio.inttegro.com/errors"] }
+                - type: object
+                  required: [cause, code, fix_code, type, url]
+                  properties:
+                      cause: { enum: [dependency_failed] }
+                      code: { enum: [file_contents_unavailable] }
+                      fix_code: { enum: [contact_customer_support] }
+                      type: { enum: [dependency_failed] }
+                      url: { enum: ["https://studio.inttegro.com/e/f-contact_customer_support"] }
+                - type: object
+                  required: [cause, code, fix_code, type, url]
+                  properties:
+                      cause: { enum: [dependency_unavailable] }
+                      code: { enum: [idempotency_storage_unavailable] }
+                      fix_code: { enum: [repeat_same_request] }
+                      type: { enum: [idempotency_error] }
+                      url: { enum: ["https://studio.inttegro.com/errors"] }
+                - type: object
+                  required: [cause, code, fix_code, type, url]
+                  properties:
+                      cause: { enum: [idempotency_conflict] }
+                      code: { enum: [idempotency_key_conflict] }
+                      fix_code: { enum: [use_new_idempotency_key] }
+                      type: { enum: [idempotency_error] }
+                      url: { enum: ["https://studio.inttegro.com/errors"] }
+                - type: object
+                  required: [cause, code, fix_code, type, url]
+                  properties:
+                      cause: { enum: [idempotency_in_progress] }
+                      code: { enum: [idempotency_key_in_progress] }
+                      fix_code: { enum: [repeat_same_request] }
+                      type: { enum: [idempotency_error] }
+                      url: { enum: ["https://studio.inttegro.com/errors"] }
+                - type: object
+                  required: [cause, code, fix_code, type, url]
+                  properties:
+                      cause: { enum: [invalid_request_parameter] }
+                      code:
+                          enum:
+                              - idempotency_key_invalid
+                              - idempotency_key_mismatch
+                              - idempotency_key_unsupported
+                      fix_code: { enum: [change_request_parameters] }
+                      type: { enum: [idempotency_error] }
+                      url: { enum: ["https://studio.inttegro.com/errors"] }
+                - type: object
+                  required: [cause, code, fix_code, type, url]
+                  properties:
+                      cause: { enum: [service_unavailable] }
+                      code: { enum: [idempotency_key_generation_failed] }
+                      fix_code: { enum: [repeat_same_request] }
+                      type: { enum: [idempotency_error] }
+                      url: { enum: ["https://studio.inttegro.com/errors"] }
+                - type: object
+                  required: [cause, code, fix_code, type, url]
+                  properties:
+                      cause: { enum: [invalid_request_body] }
+                      code: { enum: [invalid_request_body] }
+                      fix_code: { enum: [change_request_parameters] }
+                      type: { enum: [invalid_request] }
+                      url: { enum: ["https://studio.inttegro.com/errors"] }
+                - type: object
+                  required: [cause, code, fix_code, type, url]
+                  properties:
+                      cause: { enum: [method_not_allowed] }
+                      code: { enum: [method_not_allowed] }
+                      fix_code: { enum: [use_allowed_method] }
+                      type: { enum: [invalid_request] }
+                      url: { enum: ["https://studio.inttegro.com/errors"] }
+                - type: object
+                  required: [cause, code, fix_code, type, url]
+                  properties:
+                      cause: { enum: [unsupported_content_type] }
+                      code: { enum: [unsupported_content_type] }
+                      fix_code: { enum: [use_supported_media_type] }
+                      type: { enum: [invalid_request] }
+                      url: { enum: ["https://studio.inttegro.com/errors"] }
+                - type: object
+                  required: [cause, code, fix_code, type, url]
+                  properties:
+                      cause: { enum: [invalid_request_parameter] }
+                      code:
+                          enum:
+                              - children_policy_invalid
+                              - children_policy_version_conflict
+                              - empty_file
+                              - file_content_type_not_allowed
+                              - file_extension_not_allowed
+                              - file_link_delivery_invalid
+                              - file_link_purpose_not_allowed
+                              - file_name_mismatch
+                              - file_purpose_not_allowed
+                              - file_row_limit_exceeded
+                              - file_schema_mismatch
+                              - file_size_mismatch
+                              - file_too_large
+                              - file_too_small
+                              - image_metadata_unreadable
+                              - invalid_request_parameter
+                              - invalid_response_projection
+                              - invalid_secret_key_request
+                              - operating_policy_invalid
+                              - request_parameter_null_rejected
+                              - request_parameter_parse_failed
+                              - request_parameter_too_large
+                              - request_parameter_too_small
+                              - request_parameter_type_mismatch
+                              - request_parameter_value_not_allowed
+                              - request_parameters_mutually_exclusive
+                              - unexpected_request_parameter
+                              - upload_request_expiry_invalid
+                              - upload_request_policy_invalid
+                      fix_code: { enum: [change_request_parameters] }
+                      type: { enum: [invalid_request_parameter] }
+                      url: { enum: ["https://studio.inttegro.com/e/t-invalid_request_parameter"] }
+                - type: object
+                  required: [cause, code, fix_code, type, url]
+                  properties:
+                      cause: { enum: [invalid_request_parameter] }
+                      code:
+                          enum:
+                              - cannot_change_price_amount
+                              - cannot_change_product_id
+                              - cannot_clear_field_once_set
+                              - cannot_update_immutable_field
+                              - checkout_amount_locked
+                              - checkout_line_item_duplicate
+                              - checkout_line_item_invalid
+                              - checkout_line_item_not_found
+                              - checkout_order_not_found
+                              - checkout_reference_not_found
+                              - chime_broadcast_not_found
+                              - chime_not_found
+                              - chime_schedule_not_found
+                              - confirmation_bad_token
+                              - confirmation_failed
+                              - confirmation_not_found
+                              - coupon_duplicate
+                              - coupon_not_found
+                              - customer_not_found
+                              - customer_selected_amount_invalid
+                              - customer_selected_amount_required
+                              - customers_search_invalid
+                              - discount_duplicate
+                              - email_message_unsafe
+                              - email_recipient_domain_blocked
+                              - email_sender_unauthorized
+                              - financial_account_not_found
+                              - financial_accounts_search_invalid
+                              - fixed_price_unavailable
+                              - ghana_bank_identifiers_conflict
+                              - invalid_chime_broadcast_request
+                              - invalid_chime_request
+                              - invalid_chime_schedule_request
+                              - invalid_line_items
+                              - invalid_otp_initiation_request
+                              - invalid_product_type
+                              - invalid_purchase_intent_quantity_range
+                              - invalid_purchase_intent_target
+                              - invalid_recipient
+                              - invalid_refund
+                              - invalid_response_projection
+                              - message_template_channel_mismatch
+                              - message_template_email_subject_empty
+                              - message_template_email_text_empty
+                              - message_template_email_unsafe
+                              - message_template_id_required
+                              - message_template_invalid
+                              - message_template_not_found
+                              - message_template_render_invalid
+                              - message_template_render_too_long
+                              - message_template_render_unsafe
+                              - message_template_request_invalid
+                              - message_template_required
+                              - message_template_sms_empty
+                              - message_template_variables_invalid
+                              - missing_message_content
+                              - mixed_message_content
+                              - order_customer_invalid
+                              - order_line_item_limit_exceeded
+                              - order_not_found
+                              - order_receipt_number_invalid
+                              - order_total_limit_exceeded
+                              - order_update_empty
+                              - orders_search_invalid
+                              - otp_token_size_invalid
+                              - otp_transaction_not_found
+                              - payment_method_conflicting_state_updates
+                              - payment_method_invalid
+                              - payment_method_no_updates
+                              - payment_method_not_found
+                              - payment_method_owner_address_country_required
+                              - payout_not_found
+                              - payouts_search_invalid
+                              - price_not_found
+                              - product_media_downloads_too_large
+                              - product_media_gallery_too_large
+                              - product_modifier_groups_invalid
+                              - product_not_found
+                              - products_search_invalid
+                              - purchase_intent_already_used
+                              - purchase_intent_bundle_not_found
+                              - purchase_intent_not_found
+                              - purchase_intent_price_not_found
+                              - purchase_intent_price_product_mismatch
+                              - purchase_intent_product_not_found
+                              - purchase_intent_quantity_invalid
+                              - purchase_intent_selection_invalid
+                              - purchase_intent_variant_invalid
+                              - refund_amount_exceeds_line_item
+                              - refund_currency_mismatch
+                              - refund_duplicate_line_item
+                              - refund_line_item_not_found
+                              - refund_not_found
+                              - refund_order_not_found
+                              - request_parameter_choice_required
+                              - request_parameter_null_rejected
+                              - request_parameter_parse_failed
+                              - request_parameter_too_large
+                              - request_parameter_too_small
+                              - request_parameter_type_mismatch
+                              - request_parameter_value_not_allowed
+                              - request_parameters_mutually_exclusive
+                              - unexpected_request_parameter
+                      fix_code: { enum: [change_request_parameters] }
+                      type: { enum: [invalid_request_parameter] }
+                      url: { enum: ["https://studio.inttegro.com/errors"] }
+                - type: object
+                  required: [cause, code, fix_code, type, url]
+                  properties:
+                      cause: { enum: [invalid_request_parameter] }
+                      code: { enum: [order_application_not_found] }
+                      fix_code: { enum: [contact_customer_support] }
+                      type: { enum: [invalid_request_parameter] }
+                      url: { enum: ["https://studio.inttegro.com/errors"] }
+                - type: object
+                  required: [cause, code, fix_code, type, url]
+                  properties:
+                      cause: { enum: [missing_request_parameter] }
+                      code: { enum: [missing_request_parameter] }
+                      fix_code: { enum: [change_request_parameters] }
+                      type: { enum: [invalid_request_parameter] }
+                      url: { enum: ["https://studio.inttegro.com/e/c-missing_request_parameter"] }
+                - type: object
+                  required: [cause, code, fix_code, type, url]
+                  properties:
+                      cause: { enum: [missing_request_parameter] }
+                      code: { enum: [request_parameter_choice_required] }
+                      fix_code: { enum: [change_request_parameters] }
+                      type: { enum: [invalid_request_parameter] }
+                      url: { enum: ["https://studio.inttegro.com/e/t-invalid_request_parameter"] }
+                - type: object
+                  required: [cause, code, fix_code, type, url]
+                  properties:
+                      cause: { enum: [missing_request_parameter] }
+                      code: { enum: [request_parameter_choice_required] }
+                      fix_code: { enum: [change_request_parameters] }
+                      type: { enum: [invalid_request_parameter] }
+                      url: { enum: ["https://studio.inttegro.com/errors"] }
+                - type: object
+                  required: [cause, code, fix_code, type, url]
+                  properties:
+                      cause: { enum: [payload_too_large] }
+                      code: { enum: [request_too_large] }
+                      fix_code: { enum: [reduce_request_size] }
+                      type: { enum: [limit_error] }
+                      url: { enum: ["https://studio.inttegro.com/errors"] }
+                - type: object
+                  required: [cause, code, fix_code, type, url]
+                  properties:
+                      cause: { enum: [resource_not_found] }
+                      code:
+                          enum:
+                              - children_policy_not_found
+                              - operating_policy_not_found
+                              - secret_key_not_found
+                      fix_code: { enum: [change_request_parameters] }
+                      type: { enum: [not_found] }
+                      url: { enum: ["https://studio.inttegro.com/e/f-change_request_parameters"] }
+                - type: object
+                  required: [cause, code, fix_code, type, url]
+                  properties:
+                      cause: { enum: [resource_not_found] }
+                      code:
+                          enum:
+                              - file_link_not_found
+                              - file_not_found
+                              - upload_request_not_found
+                      fix_code: { enum: [refresh_resource_state] }
+                      type: { enum: [not_found] }
+                      url: { enum: ["https://studio.inttegro.com/errors"] }
+                - type: object
+                  required: [cause, code, fix_code, type, url]
+                  properties:
+                      cause: { enum: [dependency_unavailable] }
+                      code:
+                          enum:
+                              - application_create_unavailable
+                              - children_policy_validation_unavailable
+                              - operating_policy_validation_unavailable
+                      fix_code: { enum: [retry_with_backoff] }
+                      type: { enum: [service_unavailable] }
+                      url: { enum: ["https://studio.inttegro.com/errors"] }
+                - type: object
+                  required: [cause, code, fix_code, type, url]
+                  properties:
+                      cause: { enum: [service_unavailable] }
+                      code:
+                          enum:
+                              - file_api_unavailable
+                              - file_metadata_unavailable
+                              - file_reference_reconcile_failed
+                      fix_code: { enum: [contact_customer_support] }
+                      type: { enum: [service_unavailable] }
+                      url: { enum: ["https://studio.inttegro.com/e/f-contact_customer_support"] }
+                - type: object
+                  required: [cause, code, fix_code, type, url]
+                  properties:
+                      cause: { enum: [invalid_request_parameter] }
+                      code:
+                          enum:
+                              - operating_policy_children_policy_conflict
+                              - operating_policy_resolution_conflict
+                              - operating_policy_version_conflict
+                      fix_code: { enum: [refresh_resource_state] }
+                      type: { enum: [state_conflict] }
+                      url: { enum: ["https://studio.inttegro.com/e/c-invalid_request_parameter"] }
+                - type: object
+                  required: [cause, code, fix_code, type, url]
+                  properties:
+                      cause: { enum: [precondition_unmet] }
+                      code: { enum: [storage_quota_exceeded] }
+                      fix_code: { enum: [contact_customer_support] }
+                      type: { enum: [state_conflict] }
+                      url: { enum: ["https://studio.inttegro.com/e/c-precondition_unmet"] }
+                - type: object
+                  required: [cause, code, fix_code, type, url]
+                  properties:
+                      cause: { enum: [precondition_unmet] }
+                      code: { enum: [file_has_live_references] }
+                      fix_code: { enum: [satisfy_precondition] }
+                      type: { enum: [state_conflict] }
+                      url: { enum: ["https://studio.inttegro.com/e/c-precondition_unmet"] }
+                - type: object
+                  required: [cause, code, fix_code, type, url]
+                  properties:
+                      cause: { enum: [resource_state_conflict] }
+                      code: { enum: [idempotency_key_conflict] }
+                      fix_code: { enum: [change_request_parameters] }
+                      type: { enum: [state_conflict] }
+                      url: { enum: ["https://studio.inttegro.com/e/f-change_request_parameters"] }
+                - type: object
+                  required: [cause, code, fix_code, type, url]
+                  properties:
+                      cause: { enum: [resource_state_conflict] }
+                      code: { enum: [payment_transition_conflict] }
+                      fix_code: { enum: [refresh_resource_state] }
+                      type: { enum: [state_conflict] }
+                      url: { enum: ["https://studio.inttegro.com/e/payment_transition_conflict"] }
+                - type: object
+                  required: [cause, code, fix_code, type, url]
+                  properties:
+                      cause: { enum: [resource_state_conflict] }
+                      code:
+                          enum:
+                              - chime_broadcast_already_canceled
+                              - chime_schedule_already_canceled
+                              - file_link_already_exists
+                              - message_template_archived
+                              - otp_already_verified
+                              - otp_idempotency_key_already_used
+                              - purchase_intent_already_used
+                              - refund_cannot_cancel
+                              - refund_capacity_changed
+                              - upload_request_already_exists
+                              - upload_request_state_conflict
+                      fix_code: { enum: [refresh_resource_state] }
+                      type: { enum: [state_conflict] }
+                      url: { enum: ["https://studio.inttegro.com/errors"] }
+                - type: object
+                  required: [cause, code, fix_code, type, url]
+                  properties:
+                      cause: { enum: [invalid_request_parameter] }
+                      code: { enum: [operating_policy_required] }
+                      fix_code: { enum: [change_request_parameters] }
+                      type: { enum: [state_invalid] }
+                      url: { enum: ["https://studio.inttegro.com/e/c-invalid_request_parameter"] }
+                - type: object
+                  required: [cause, code, fix_code, type, url]
+                  properties:
+                      cause: { enum: [invalid_request_parameter] }
+                      code: { enum: [children_policy_required] }
+                      fix_code: { enum: [resolve_account_configuration] }
+                      type: { enum: [state_invalid] }
+                      url: { enum: ["https://studio.inttegro.com/e/c-invalid_request_parameter"] }
+                - type: object
+                  required: [cause, code, fix_code, type, url]
+                  properties:
+                      cause: { enum: [resource_state_invalid] }
+                      code: { enum: [file_storage_encoding_unsupported] }
+                      fix_code: { enum: [contact_customer_support] }
+                      type: { enum: [state_invalid] }
+                      url: { enum: ["https://studio.inttegro.com/e/f-contact_customer_support"] }
+                - type: object
+                  required: [cause, code, fix_code, type, url]
+                  properties:
+                      cause: { enum: [resource_state_invalid] }
+                      code:
+                          enum:
+                              - file_link_access_limit_reached
+                              - file_link_expired
+                              - file_link_inactive
+                              - upload_request_attempt_limit_reached
+                              - upload_request_expired
+                              - upload_request_inactive
+                      fix_code: { enum: [refresh_resource_state] }
+                      type: { enum: [state_invalid] }
+                      url: { enum: ["https://studio.inttegro.com/errors"] }
+                - type: object
+                  required: [cause, code, fix_code, type, url]
+                  properties:
+                      cause: { enum: [dependency_unavailable] }
+                      code:
+                          enum:
+                              - capabilities_temporarily_unavailable
+                              - order_delivery_auth_failed
+                              - order_delivery_failed
+                              - order_delivery_history_failed
+                      fix_code: { enum: [retry_with_backoff] }
+                      type: { enum: [transient_error] }
+                      url: { enum: ["https://studio.inttegro.com/errors"] }
+                - type: object
+                  required: [cause, code, fix_code, type, url]
+                  properties:
+                      cause: { enum: [request_timeout] }
+                      code: { enum: [request_timeout] }
+                      fix_code: { enum: [retry_with_backoff] }
+                      type: { enum: [transient_error] }
+                      url: { enum: ["https://studio.inttegro.com/errors"] }
+                - type: object
+                  required: [cause, code, fix_code, type, url]
+                  properties:
+                      cause: { enum: [service_unavailable] }
+                      code:
+                          enum:
+                              - endpoint_unavailable
+                              - secret_key_read_failed
+                      fix_code: { enum: [repeat_same_request] }
+                      type: { enum: [transient_error] }
+                      url: { enum: ["https://studio.inttegro.com/e/t-transient_error"] }
+                - type: object
+                  required: [cause, code, fix_code, type, url]
+                  properties:
+                      cause: { enum: [service_unavailable] }
+                      code:
+                          enum:
+                              - checkout_amount_selection_failed
+                              - checkout_payment_failed
+                              - chime_broadcast_cancel_failed
+                              - chime_broadcast_failed
+                              - chime_broadcast_lookup_failed
+                              - chime_cooldown_unavailable
+                              - chime_lookup_failed
+                              - chime_page_failed
+                              - chime_schedule_cancel_failed
+                              - chime_schedule_failed
+                              - chime_schedule_lookup_failed
+                              - chime_send_failed
+                              - confirmation_request_failed
+                              - customer_resolution_unavailable
+                              - customers_search_response_unsafe
+                              - customers_search_unavailable
+                              - financial_accounts_search_response_unsafe
+                              - financial_accounts_search_unavailable
+                              - message_template_create_failed
+                              - message_template_update_failed
+                              - order_customer_resolution_unavailable
+                              - order_finalize_failed
+                              - order_payment_create_failed
+                              - order_payment_execution_failed
+                              - orders_page_unavailable
+                              - orders_search_response_unsafe
+                              - orders_search_unavailable
+                              - otp_initiation_failed
+                              - otp_lookup_failed
+                              - otp_verification_failed
+                              - payment_failed
+                              - payment_refresh_failed
+                              - payouts_search_response_unsafe
+                              - payouts_search_unavailable
+                              - price_create_failed
+                              - product_add_price_failed
+                              - products_search_response_unsafe
+                              - products_search_unavailable
+                              - refund_cancel_failed
+                              - refund_create_failed
+                              - refund_page_unavailable
+                              - sms_sender_id_authorization_unavailable
+                      fix_code: { enum: [repeat_same_request] }
+                      type: { enum: [transient_error] }
+                      url: { enum: ["https://studio.inttegro.com/errors"] }
+                - type: object
+                  required: [cause, code, fix_code, type, url]
+                  properties:
+                      cause: { enum: [unknown] }
+                      code: { enum: [unprocessable_request] }
+                      fix_code: { enum: [contact_customer_support] }
+                      type: { enum: [transient_error] }
+                      url: { enum: ["https://studio.inttegro.com/errors"] }
+                - type: object
+                  required: [cause, code, fix_code, type, url]
+                  properties:
+                      cause: { enum: [unknown] }
+                      code:
+                          enum:
+                              - application_lookup_failed
+                              - application_update_failed
+                      fix_code: { enum: [repeat_same_request] }
+                      type: { enum: [transient_error] }
+                      url: { enum: ["https://studio.inttegro.com/e/t-transient_error"] }
+                - type: object
+                  required: [cause, code, fix_code, type, url]
+                  properties:
+                      cause: { enum: [unknown] }
+                      code:
+                          enum:
+                              - application_create_failed
+                              - children_policy_request_failed
+                              - file_link_operation_failed
+                              - file_operation_failed
+                              - operating_policy_request_failed
+                              - secret_key_generation_failed
+                              - secret_key_request_failed
+                              - upload_request_operation_failed
+                              - upload_request_upload_failed
+                      fix_code: { enum: [contact_customer_support] }
+                      type: { enum: [unknown_error] }
+                      url: { enum: ["https://studio.inttegro.com/e/t-unknown_error"] }
+                - type: object
+                  required: [cause, code, fix_code, type, url]
+                  properties:
+                      cause: { enum: [unknown] }
+                      code: { enum: [request_failed] }
+                      fix_code: { enum: [contact_customer_support] }
+                      type: { enum: [unknown_error] }
+                      url: { enum: ["https://studio.inttegro.com/errors"] }
+            required:
+                - type
+                - code
+                - url
+            properties:
+                message:
+                    type: string
+                    description: Concise, caller-safe explanation of why the request was rejected or could not finish.
+                    example: "payment method could not be used for this order"
+                fix_code:
+                    allOf:
+                        - $ref: '#/components/schemas/ErrorFixCode'
+                    description: Machine-readable suggestion for how to resolve the error (e.g., "retry_with_exponential_backoff", "change_request_parameters").
+                    example: "change_request_parameters"
+                detail:
+                    type: string
+                    description: Explanation of the relevant rule and next safe action. It never contains raw dependency, storage, or implementation errors.
+                    example: "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
+                cause:
+                    allOf:
+                        - $ref: '#/components/schemas/ErrorCause'
+                    description: Stable category describing the reason for failure, such as invalid input, an unmet precondition, or a state conflict.
+                    example: "invalid_request_parameter"
+                type:
+                    allOf:
+                        - $ref: '#/components/schemas/ErrorType'
+                    description: Broad error category to help clients determine retry strategies (e.g., "invalid_request_parameter", "transient_error").
+                    example: "invalid_request_parameter"
+                code:
+                    allOf:
+                        - $ref: '#/components/schemas/ErrorCode'
+                    description: Unique machine-readable identifier for this specific error condition. Unlike type and cause which group errors, code pinpoints the exact problem.
+                    example: "payment_method_invalid"
+                url:
+                    allOf:
+                        - $ref: '#/components/schemas/ErrorDocumentationURL'
+                    description: Link to error reference documentation with detailed explanation, common causes, and resolution guidance.
+                    example: "https://studio.inttegro.com/e/c-invalid_request_parameter"
+        ErrorEnvelope:
+            type: object
+            additionalProperties: false
+            required: [error]
+            properties:
+                error:
+                    $ref: '#/components/schemas/Error'

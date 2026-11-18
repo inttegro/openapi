@@ -2,7 +2,7 @@
   "info": {
     "name": "Inttegro API — Checkout and Orders",
     "description": "Create hosted checkout sessions and manage the complete order lifecycle. Uses the shared Inttegro API global environment.\n\nGenerated from insomnia/01-checkout.insomnia.yaml. Edit the Insomnia source and run npm run postman:generate.",
-    "version": "0.1.0-beta78",
+    "version": "0.1.0-beta80",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
@@ -23,10 +23,10 @@
             "url": {
               "raw": "{{base_url}}/orders/create"
             },
-            "description": "Public reference: https://studio.inttegro.com/orders#create-an-order. To execute immediately, provide payment_method_data together with execute_payment. Conflict reference: https://studio.inttegro.com/e/payment_transition_conflict",
+            "description": "Public reference: https://studio.inttegro.com/orders#create-an-order. This fixture explicitly disables payment execution so it deterministically creates the hosted-checkout branch; to execute immediately, provide payment_method_data and set execute_payment to true. Conflict reference: https://studio.inttegro.com/e/payment_transition_conflict",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"request_meta\": {\n    \"idempotency_key\": \"{{idempotency_key}}\"\n  },\n  \"number\": \"{{order_number}}\",\n  \"finalize\": true,\n  \"checkout_settings\": {\n    \"redirect_url\": \"{{checkout_success_url}}\",\n    \"cancel_url\": \"{{checkout_cancel_url}}\"\n  },\n  \"customer_data\": {\n    \"name\": \"{{customer_name}}\",\n    \"email_address\": \"{{customer_email}}\",\n    \"phone_number\": \"{{customer_phone}}\"\n  },\n  \"line_items\": [\n    {\n      \"type\": \"product\",\n      \"product\": {\n        \"type\": \"physical\",\n        \"name\": \"{{product_name}}\",\n        \"quantity\": 1,\n        \"price\": {\n          \"currency\": \"{{currency}}\",\n          \"value\": 20000\n        }\n      }\n    }\n  ]\n}",
+              "raw": "{\n  \"request_meta\": {\n    \"idempotency_key\": \"{{idempotency_key}}\"\n  },\n  \"number\": \"{{order_number}}\",\n  \"finalize\": true,\n  \"execute_payment\": false,\n  \"checkout_settings\": {\n    \"redirect_url\": \"{{checkout_success_url}}\",\n    \"cancel_url\": \"{{checkout_cancel_url}}\"\n  },\n  \"customer_data\": {\n    \"name\": \"{{customer_name}}\",\n    \"email_address\": \"{{customer_email}}\",\n    \"phone_number\": \"{{customer_phone}}\"\n  },\n  \"line_items\": [\n    {\n      \"type\": \"product\",\n      \"product\": {\n        \"type\": \"physical\",\n        \"name\": \"{{product_name}}\",\n        \"quantity\": 1,\n        \"price\": {\n          \"currency\": \"{{currency}}\",\n          \"value\": 20000\n        }\n      }\n    }\n  ]\n}",
               "options": {
                 "raw": {
                   "language": "json"

@@ -1,0 +1,857 @@
+# Authoritative customers resource contract.
+# Why: keeping each resource's operations and schemas together makes public invariants
+# reviewable without weakening the single bundled contract distributed to consumers.
+
+paths:
+    /customers/create:
+        post:
+            summary: Create a customer
+            description: Create a reusable customer profile for orders and saved payment methods.
+            operationId: createCustomer
+            tags: [Customers]
+            parameters:
+                - $ref: './common.yml#/components/parameters/IdempotencyKey'
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/CreateCustomerRequest'
+            responses:
+                '200':
+                    description: Customer created
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/CustomerResponse'
+                '400':
+                    description: Invalid request
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/Error'
+                                    - oneOf:
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_parameter] }, code: { enum: [idempotency_key_invalid, idempotency_key_mismatch, idempotency_key_unsupported] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [idempotency_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_body] }, code: { enum: [invalid_request_body] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_parameter] }, code: { enum: [invalid_request_parameter, request_parameter_null_rejected, request_parameter_parse_failed, request_parameter_too_large, request_parameter_too_small, request_parameter_type_mismatch, request_parameter_value_not_allowed, request_parameters_mutually_exclusive, unexpected_request_parameter] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/e/t-invalid_request_parameter"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_parameter] }, code: { enum: [request_parameter_choice_required, request_parameter_null_rejected, request_parameter_parse_failed, request_parameter_too_large, request_parameter_too_small, request_parameter_type_mismatch, request_parameter_value_not_allowed, request_parameters_mutually_exclusive, unexpected_request_parameter] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [missing_request_parameter] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/e/c-missing_request_parameter"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [request_parameter_choice_required] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/e/t-invalid_request_parameter"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [request_parameter_choice_required] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                '401':
+                    description: Authorization is required
+                    headers:
+                        X-Request-Id:
+                            $ref: "./common.yml#/components/headers/RequestId"
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/Error'
+                                    - oneOf:
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [authentication_failed] }, code: { enum: [authentication_failed] }, fix_code: { enum: [authenticate_request] }, type: { enum: [authentication_error] }, url: { enum: ["https://studio.inttegro.com/e/c-authentication_failed"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [authentication_failed] }, code: { enum: [endpoint_authentication_required] }, fix_code: { enum: [authenticate_request] }, type: { enum: [authentication_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                '422':
+                    description: Customer creation failed
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/Error'
+                                    - oneOf:
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [idempotency_conflict] }, code: { enum: [idempotency_key_conflict] }, fix_code: { enum: [use_new_idempotency_key] }, type: { enum: [idempotency_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [unknown] }, code: { enum: [request_failed] }, fix_code: { enum: [contact_customer_support] }, type: { enum: [unknown_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                '500':
+                    description: Customer creation or balance lookup failed unexpectedly
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/Error'
+                                    - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [unknown] }, code: { enum: [request_failed] }, fix_code: { enum: [contact_customer_support] }, type: { enum: [unknown_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+    /customers/lookup:
+        post:
+            summary: Look up a customer
+            operationId: lookupCustomer
+            tags: [Customers]
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/LookupCustomerRequest'
+            responses:
+                '200':
+                    description: Customer found
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/CustomerResponse'
+                '400':
+                    description: Invalid request
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/Error'
+                                    - oneOf:
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_body] }, code: { enum: [invalid_request_body] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_parameter] }, code: { enum: [invalid_request_parameter, request_parameter_null_rejected, request_parameter_parse_failed, request_parameter_too_large, request_parameter_too_small, request_parameter_type_mismatch, request_parameter_value_not_allowed, request_parameters_mutually_exclusive, unexpected_request_parameter] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/e/t-invalid_request_parameter"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_parameter] }, code: { enum: [request_parameter_choice_required, request_parameter_null_rejected, request_parameter_parse_failed, request_parameter_too_large, request_parameter_too_small, request_parameter_type_mismatch, request_parameter_value_not_allowed, request_parameters_mutually_exclusive, unexpected_request_parameter] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [missing_request_parameter] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/e/c-missing_request_parameter"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [request_parameter_choice_required] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/e/t-invalid_request_parameter"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [request_parameter_choice_required] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                '401':
+                    description: Authorization is required
+                    headers:
+                        X-Request-Id:
+                            $ref: "./common.yml#/components/headers/RequestId"
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/Error'
+                                    - oneOf:
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [authentication_failed] }, code: { enum: [authentication_failed] }, fix_code: { enum: [authenticate_request] }, type: { enum: [authentication_error] }, url: { enum: ["https://studio.inttegro.com/e/c-authentication_failed"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [authentication_failed] }, code: { enum: [endpoint_authentication_required] }, fix_code: { enum: [authenticate_request] }, type: { enum: [authentication_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                '404':
+                    description: Customer not found
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/Error'
+                                    - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_parameter] }, code: { enum: [customer_not_found] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                '500':
+                    description: Customer lookup failed unexpectedly
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/Error'
+                                    - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [unknown] }, code: { enum: [request_failed] }, fix_code: { enum: [contact_customer_support] }, type: { enum: [unknown_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+    /customers/update:
+        post:
+            summary: Update a customer
+            description: Replace any supplied customer profile fields while leaving omitted fields unchanged.
+            operationId: updateCustomer
+            tags: [Customers]
+            parameters:
+                - $ref: './common.yml#/components/parameters/IdempotencyKey'
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/UpdateCustomerRequest'
+            responses:
+                '200':
+                    description: Customer updated
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/CustomerResponse'
+                '400':
+                    description: Invalid request
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/Error'
+                                    - oneOf:
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_parameter] }, code: { enum: [idempotency_key_invalid, idempotency_key_mismatch, idempotency_key_unsupported] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [idempotency_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_body] }, code: { enum: [invalid_request_body] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_parameter] }, code: { enum: [invalid_request_parameter, request_parameter_null_rejected, request_parameter_parse_failed, request_parameter_too_large, request_parameter_too_small, request_parameter_type_mismatch, request_parameter_value_not_allowed, request_parameters_mutually_exclusive, unexpected_request_parameter] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/e/t-invalid_request_parameter"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_parameter] }, code: { enum: [request_parameter_choice_required, request_parameter_null_rejected, request_parameter_parse_failed, request_parameter_too_large, request_parameter_too_small, request_parameter_type_mismatch, request_parameter_value_not_allowed, request_parameters_mutually_exclusive, unexpected_request_parameter] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [missing_request_parameter] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/e/c-missing_request_parameter"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [request_parameter_choice_required] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/e/t-invalid_request_parameter"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [request_parameter_choice_required] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                '401':
+                    description: Authorization is required
+                    headers:
+                        X-Request-Id:
+                            $ref: "./common.yml#/components/headers/RequestId"
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/Error'
+                                    - oneOf:
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [authentication_failed] }, code: { enum: [authentication_failed] }, fix_code: { enum: [authenticate_request] }, type: { enum: [authentication_error] }, url: { enum: ["https://studio.inttegro.com/e/c-authentication_failed"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [authentication_failed] }, code: { enum: [endpoint_authentication_required] }, fix_code: { enum: [authenticate_request] }, type: { enum: [authentication_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                '422':
+                    description: Customer update failed
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/Error'
+                                    - oneOf:
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [idempotency_conflict] }, code: { enum: [idempotency_key_conflict] }, fix_code: { enum: [use_new_idempotency_key] }, type: { enum: [idempotency_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [unknown] }, code: { enum: [request_failed] }, fix_code: { enum: [contact_customer_support] }, type: { enum: [unknown_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                '500':
+                    description: Customer update or balance lookup failed unexpectedly
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/Error'
+                                    - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [unknown] }, code: { enum: [request_failed] }, fix_code: { enum: [contact_customer_support] }, type: { enum: [unknown_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+    /customers/page:
+        post:
+            summary: Page through customers
+            description: Retrieve a page of customers for the authenticated application.
+            operationId: pageCustomers
+            tags: [Customers]
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/PageCustomersRequest'
+            responses:
+                '200':
+                    description: Customer page found
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/PageCustomersResponse'
+                '400':
+                    description: Invalid page request
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/Error'
+                                    - oneOf:
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_body] }, code: { enum: [invalid_request_body] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_parameter] }, code: { enum: [invalid_request_parameter, request_parameter_null_rejected, request_parameter_parse_failed, request_parameter_too_large, request_parameter_too_small, request_parameter_type_mismatch, request_parameter_value_not_allowed, request_parameters_mutually_exclusive, unexpected_request_parameter] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/e/t-invalid_request_parameter"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_parameter] }, code: { enum: [request_parameter_choice_required, request_parameter_null_rejected, request_parameter_parse_failed, request_parameter_too_large, request_parameter_too_small, request_parameter_type_mismatch, request_parameter_value_not_allowed, request_parameters_mutually_exclusive, unexpected_request_parameter] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [missing_request_parameter] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/e/c-missing_request_parameter"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [request_parameter_choice_required] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/e/t-invalid_request_parameter"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [request_parameter_choice_required] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                '401':
+                    description: Authorization is required
+                    headers:
+                        X-Request-Id:
+                            $ref: "./common.yml#/components/headers/RequestId"
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/Error'
+                                    - oneOf:
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [authentication_failed] }, code: { enum: [authentication_failed] }, fix_code: { enum: [authenticate_request] }, type: { enum: [authentication_error] }, url: { enum: ["https://studio.inttegro.com/e/c-authentication_failed"] } } }
+                                          - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [authentication_failed] }, code: { enum: [endpoint_authentication_required] }, fix_code: { enum: [authenticate_request] }, type: { enum: [authentication_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                '422':
+                    description: Customer page unavailable
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/Error'
+                                    - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [unknown] }, code: { enum: [request_failed] }, fix_code: { enum: [contact_customer_support] }, type: { enum: [unknown_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                '500':
+                    description: Customer page or balance lookup failed unexpectedly
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/Error'
+                                    - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [unknown] }, code: { enum: [request_failed] }, fix_code: { enum: [contact_customer_support] }, type: { enum: [unknown_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+    /customers/search:
+        post:
+            summary: Search customers
+            description: |
+                Search customers owned by the authenticated application. Customer searches support
+                the route-local `kind` filter and facet. Results are projections for discovery;
+                retrieve a customer by ID before making decisions that require canonical state.
+            operationId: searchCustomers
+            tags:
+                - Customers
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: './common.yml#/components/schemas/ResourceSearchRequest'
+                        example:
+                            text: Ama Mensah
+                            filters:
+                                - field: kind
+                                  operator: in
+                                  values: [registered, guest]
+                            facets:
+                                - field: kind
+                                  limit: 10
+                            page_size: 25
+            responses:
+                '200':
+                    description: Customer search completed successfully
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                $ref: './common.yml#/components/schemas/ResourceSearchResponse'
+                '400':
+                    description: Search parameters or cursor are invalid
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/ErrorEnvelope'
+                                    - type: object
+                                      properties:
+                                          error:
+                                              oneOf:
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_body] }, code: { enum: [invalid_request_body] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_parameter] }, code: { enum: [invalid_request_parameter, request_parameter_null_rejected, request_parameter_parse_failed, request_parameter_too_large, request_parameter_too_small, request_parameter_type_mismatch, request_parameter_value_not_allowed, request_parameters_mutually_exclusive, unexpected_request_parameter] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/e/t-invalid_request_parameter"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_parameter] }, code: { enum: [customers_search_invalid, request_parameter_choice_required, request_parameter_null_rejected, request_parameter_parse_failed, request_parameter_too_large, request_parameter_too_small, request_parameter_type_mismatch, request_parameter_value_not_allowed, request_parameters_mutually_exclusive, unexpected_request_parameter] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [missing_request_parameter] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/e/c-missing_request_parameter"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [request_parameter_choice_required] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/e/t-invalid_request_parameter"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [request_parameter_choice_required] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                '401':
+                    description: Unauthorized - invalid or missing API key
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/ErrorEnvelope'
+                                    - type: object
+                                      properties:
+                                          error:
+                                              oneOf:
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [authentication_failed] }, code: { enum: [authentication_failed] }, fix_code: { enum: [authenticate_request] }, type: { enum: [authentication_error] }, url: { enum: ["https://studio.inttegro.com/e/c-authentication_failed"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [authentication_failed] }, code: { enum: [endpoint_authentication_required] }, fix_code: { enum: [authenticate_request] }, type: { enum: [authentication_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                '503':
+                    description: Customer search is temporarily unavailable
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/ErrorEnvelope'
+                                    - type: object
+                                      properties:
+                                          error:
+                                              oneOf:
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [service_unavailable] }, code: { enum: [endpoint_unavailable] }, fix_code: { enum: [repeat_same_request] }, type: { enum: [transient_error] }, url: { enum: ["https://studio.inttegro.com/e/t-transient_error"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [service_unavailable] }, code: { enum: [customers_search_response_unsafe, customers_search_unavailable] }, fix_code: { enum: [repeat_same_request] }, type: { enum: [transient_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+components:
+    schemas:
+        CustomerData:
+            type: object
+            additionalProperties: false
+            anyOf:
+                - required: [email_address]
+                - required: [phone_number]
+            properties:
+                name:
+                    type: string
+                    description: Customer's full name
+                    example: "Customer Name"
+                email_address:
+                    type: string
+                    format: email
+                    description: Customer's email address
+                    example: "customer@example.com"
+                phone_number:
+                    type: string
+                    description: Customer's phone number
+                    example: "0559714200"
+                custom_data:
+                    $ref: './common.yml#/components/schemas/CustomDataInput'
+        CustomerAddressInput:
+            type: object
+            additionalProperties: false
+            required: [country]
+            properties:
+                city:
+                    type: string
+                country:
+                    type: string
+                line1:
+                    type: string
+                line2:
+                    type: string
+                name:
+                    type: string
+                phone_number:
+                    type: string
+                post_code:
+                    type: string
+                region:
+                    type: string
+        CreateCustomerRequest:
+            type: object
+            additionalProperties: false
+            required: [name]
+            properties:
+                billing_address:
+                    $ref: '#/components/schemas/CustomerAddressInput'
+                custom_data:
+                    $ref: './common.yml#/components/schemas/CustomDataInput'
+                email_address:
+                    type: string
+                    minLength: 3
+                    maxLength: 254
+                name:
+                    type: string
+                    maxLength: 200
+                phone_number:
+                    type: string
+                    minLength: 7
+                    maxLength: 20
+                reference:
+                    type: string
+                    minLength: 1
+                    maxLength: 100
+                shipping_address:
+                    $ref: '#/components/schemas/CustomerAddressInput'
+                title:
+                    type: string
+                    minLength: 1
+                    maxLength: 20
+        UpdateCustomerRequest:
+            type: object
+            additionalProperties: false
+            required: [customer_id]
+            properties:
+                billing_address:
+                    $ref: '#/components/schemas/CustomerAddressInput'
+                custom_data:
+                    $ref: './common.yml#/components/schemas/CustomDataInput'
+                customer_id:
+                    type: string
+                email_address:
+                    type: string
+                    minLength: 3
+                    maxLength: 254
+                name:
+                    type: string
+                    minLength: 1
+                    maxLength: 200
+                phone_number:
+                    type: string
+                    minLength: 7
+                    maxLength: 20
+                reference:
+                    type: string
+                    minLength: 1
+                    maxLength: 100
+                shipping_address:
+                    $ref: '#/components/schemas/CustomerAddressInput'
+                suffix:
+                    type: string
+                    minLength: 1
+                    maxLength: 10
+                title:
+                    type: string
+                    minLength: 1
+                    maxLength: 20
+        PageCustomersRequest:
+            type: object
+            additionalProperties: false
+            required: [page_number]
+            properties:
+                page_number:
+                    type: integer
+                    minimum: 1
+                    maximum: 10
+                page_size:
+                    type: integer
+                    minimum: 1
+                    maximum: 256
+                    default: 256
+        LookupCustomerRequest:
+            type: object
+            additionalProperties: false
+            required:
+                - customer_id
+            properties:
+                customer_id:
+                    type: string
+                    minLength: 1
+                    maxLength: 100
+                    description: The customer identifier (with or without cu_ prefix)
+                    example: "cu_abc123xyz"
+        Customer:
+            type: object
+            additionalProperties: false
+            required: [balance, created_at, fingerprint, guest, id, name]
+            properties:
+                balance:
+                    $ref: './finance.yml#/components/schemas/CustomerBalance'
+                billing_address:
+                    $ref: '#/components/schemas/CustomerAddress'
+                created_at:
+                    type: string
+                    format: date-time
+                custom_data:
+                    $ref: './common.yml#/components/schemas/CustomData'
+                email_address:
+                    type: string
+                fingerprint:
+                    type: string
+                    description: Application-scoped value for spotting possible duplicate customer records. Matching nonempty fingerprints within the same application indicate that the records likely belong to the same buyer. Compare fingerprints only within that application, and continue to use each customer ID for API operations.
+                guest:
+                    type: boolean
+                id:
+                    type: string
+                    # Public serializers always emit this resource with the cu_ type prefix.
+                    pattern: '^cu_'
+                name:
+                    type: string
+                phone_number:
+                    type: string
+                reference:
+                    type: string
+                shipping_address:
+                    $ref: '#/components/schemas/CustomerAddress'
+                suffix:
+                    type: string
+                title:
+                    type: string
+                updated_at:
+                    type: string
+                    format: date-time
+        CustomerAddress:
+            type: object
+            additionalProperties: false
+            required: [country]
+            properties:
+                city:
+                    type: string
+                country:
+                    type: string
+                line1:
+                    type: string
+                line2:
+                    type: string
+                name:
+                    type: string
+                phone_number:
+                    type: string
+                post_code:
+                    type: string
+                region:
+                    type: string
+        CustomerResponse:
+            type: object
+            additionalProperties: false
+            required: [customer]
+            properties:
+                customer:
+                    $ref: '#/components/schemas/Customer'
+        CustomerPage:
+            type: object
+            additionalProperties: false
+            required: [customers, number, size]
+            # Upper emits the number of customer objects actually returned.
+            x-simile-constraints:
+                - aggregate:
+                      target: /size
+                      operation: count
+                      source: /customers/*
+            properties:
+                customers:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/Customer'
+                number:
+                    type: integer
+                size:
+                    type: integer
+                    description: Number of customers returned
+        CustomerSelectedProductPriceSummary:
+            type: object
+            additionalProperties: false
+            required: [id, active, type, customer_selected_amount]
+            properties:
+                id:
+                    type: string
+                    # Public serializers always emit this resource with the pr_ type prefix.
+                    pattern: '^pr_'
+                    description: Unique price identifier with pr_ prefix
+                    example: "pr_xyz789"
+                active:
+                    type: boolean
+                    description: Whether this price is active and usable in new flows
+                    example: true
+                label:
+                    type: string
+                    nullable: true
+                    description: Short label for this price
+                    example: "Wholesale"
+                type:
+                    type: string
+                    enum: [customer_selected_amount]
+                customer_selected_amount:
+                    $ref: '#/components/schemas/CustomerSelectedAmount'
+        CustomerSelectedCatalogPriceParams:
+            type: object
+            additionalProperties: false
+            required: [product_id, type, customer_selected_amount]
+            properties:
+                product_id:
+                    type: string
+                    description: Product ID to associate this price with. It is immutable once set.
+                    example: "prod_abc123"
+                label:
+                    type: string
+                    maxLength: 100
+                    description: Short label for this price
+                    example: "Standard pricing"
+                about:
+                    type: string
+                    maxLength: 500
+                    description: Longer description of this price
+                    example: "Standard pricing for individual customers"
+                type:
+                    type: string
+                    enum: [customer_selected_amount]
+                customer_selected_amount:
+                    allOf:
+                        - $ref: '#/components/schemas/CustomerSelectedAmountParams'
+                    description: Available only to Commerce internal services and Upper private beta organizations and applications.
+        CustomerSelectedCatalogPrice:
+            allOf:
+                - $ref: '#/components/schemas/CustomerSelectedCatalogPriceFields'
+                - anyOf:
+                    - required: [product_id]
+                      properties:
+                          product_id: {}
+                    - required: [product]
+                      properties:
+                          product: {}
+        CustomerSelectedCatalogPriceFields:
+            type: object
+            additionalProperties: false
+            required: [id, active, type, created_at, customer_selected_amount]
+            # Customer-selected prices follow the same active-versus-archived contract as fixed prices.
+            x-simile-constraints:
+                - ordered:
+                      paths: [/created_at, /updated_at]
+                - ordered:
+                      paths: [/created_at, /archived_at]
+                - implies:
+                      when: { path: /active, equals: true }
+                      then:
+                          all:
+                              - { path: /archived_at, state: null-or-absent }
+            properties:
+                id:
+                    type: string
+                    # Public serializers always emit this resource with the pr_ type prefix.
+                    pattern: '^pr_'
+                    description: Unique price identifier with pr_ prefix
+                    example: "pr_xyz789"
+                label:
+                    type: string
+                    nullable: true
+                    description: Short label for this price
+                    example: "Standard pricing"
+                about:
+                    type: string
+                    nullable: true
+                    description: Longer description for this price
+                    example: "Standard pricing for individual customers"
+                active:
+                    type: boolean
+                    description: Whether this price is active and usable in new flows
+                    example: true
+                type:
+                    type: string
+                    enum: [customer_selected_amount]
+                customer_selected_amount:
+                    $ref: '#/components/schemas/CustomerSelectedAmount'
+                product_id:
+                    type: string
+                    # Public serializers always emit this resource with the prod_ type prefix.
+                    pattern: '^prod_'
+                    description: Product ID when the operation returns the relationship by reference
+                    example: "prod_abc123"
+                product:
+                    type: object
+                    allOf:
+                        - $ref: './catalog.yml#/components/schemas/PriceEmbeddedProduct'
+                    nullable: true
+                    description: Embedded product details, if this price belongs to a product
+                created_at:
+                    type: string
+                    format: date-time
+                    description: Price creation timestamp
+                    example: "2024-01-15T10:30:00Z"
+                updated_at:
+                    type: string
+                    format: date-time
+                    nullable: true
+                    description: Last update timestamp
+                    example: "2024-01-20T14:45:00Z"
+                archived_at:
+                    type: string
+                    format: date-time
+                    nullable: true
+                    description: Archive timestamp (if archived). A non-null value means `active` is false.
+                    example: null
+        CustomerSelectedAmountParams:
+            type: object
+            additionalProperties: false
+            required: [currency, minimum]
+            x-simile-constraints:
+                - bounded:
+                      path: /maximum
+                      minimum: { path: /minimum }
+            properties:
+                currency:
+                    description: Currency accepted for customer-selected amounts
+                    allOf:
+                        - $ref: './common.yml#/components/schemas/Currency'
+                minimum:
+                    type: integer
+                    minimum: 1
+                    description: Minimum selectable amount in the currency's smallest unit
+                    example: 10000
+                maximum:
+                    type: integer
+                    minimum: 1
+                    description: Optional maximum selectable amount; it must be at least minimum
+                    example: 500000
+                suggested_amounts:
+                    type: array
+                    description: Convenient choices, not an allow-list. IDs and values must be unique and at most one can be recommended.
+                    items:
+                        $ref: './catalog.yml#/components/schemas/SuggestedAmountParams'
+        CustomerSelectedAmount:
+            type: object
+            additionalProperties: false
+            required: [currency, minimum]
+            x-simile-constraints:
+                - bounded:
+                      path: /maximum
+                      minimum: { path: /minimum }
+            properties:
+                currency:
+                    description: Currency accepted for customer-selected amounts
+                    allOf:
+                        - $ref: './common.yml#/components/schemas/Currency'
+                minimum:
+                    type: integer
+                    description: Minimum selectable amount in the currency's smallest unit
+                maximum:
+                    type: integer
+                    description: Optional maximum selectable amount
+                suggested_amounts:
+                    type: array
+                    description: Convenient choices, not an allow-list
+                    items:
+                        $ref: './catalog.yml#/components/schemas/SuggestedAmount'
+        CustomerSelectedPriceInput:
+            type: object
+            additionalProperties: false
+            description: Available only to Commerce internal services and Upper private beta organizations and applications.
+            required: [price_id, selected_amount]
+            properties:
+                price_id:
+                    type: string
+                    description: Existing customer_selected_amount price belonging to the catalog product
+                    example: "pr_donation"
+                selected_amount:
+                    allOf:
+                        - $ref: './common.yml#/components/schemas/AmountParams'
+                    description: Concrete unit amount selected for this order; it must satisfy the referenced price's currency and range
+        PageCustomersResponse:
+            type: object
+            additionalProperties: false
+            required: [page]
+            properties:
+                page:
+                    $ref: '#/components/schemas/CustomerPage'

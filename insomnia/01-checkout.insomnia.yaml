@@ -31,7 +31,7 @@ collection:
     method: POST
     meta:
       id: req_b9eabb5dcab52ea543d7359be9172d38
-      description: 'Public reference: https://studio.inttegro.com/orders#create-an-order. To execute immediately, provide payment_method_data together with execute_payment. Conflict reference: https://studio.inttegro.com/e/payment_transition_conflict'
+      description: 'Public reference: https://studio.inttegro.com/orders#create-an-order. This fixture explicitly disables payment execution so it deterministically creates the hosted-checkout branch; to execute immediately, provide payment_method_data and set execute_payment to true. Conflict reference: https://studio.inttegro.com/e/payment_transition_conflict'
     headers:
     - name: Content-Type
       value: application/json
@@ -44,6 +44,7 @@ collection:
           },
           "number": "{{ order_number }}",
           "finalize": true,
+          "execute_payment": false,
           "checkout_settings": {
             "redirect_url": "{{ checkout_success_url }}",
             "cancel_url": "{{ checkout_cancel_url }}"

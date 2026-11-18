@@ -1,10 +1,13 @@
+# Generated from src/openapi.yml by `npm run openapi:bundle`. Do not edit directly.
 ---
 openapi: 3.0.3
 info:
     title: Inttegro API
     description: Machine-readable reference for the public Inttegro API
-    version: 0.1.0-beta78
-    x-inttegro-collection-version: 0.1.0-beta78
+    # Why: contract and client artifacts are reviewed as one immutable bundle;
+    # changing soundness rules or executable examples requires a new bundle identity.
+    version: 0.1.0-beta80
+    x-inttegro-collection-version: 0.1.0-beta80
     contact:
         name: Inttegro Engineering
         url: "https://inttegro.com"
@@ -2931,6 +2934,33 @@ paths:
                     application/json:
                         schema:
                             $ref: '#/components/schemas/CreateOrderRequest'
+                        # Why: a provider-authored request gives integrators a stable, executable
+                        # finalized-order fixture instead of relying on unrelated random field values.
+                        examples:
+                            finalized_requires_payment:
+                                summary: Create and finalize an order without executing payment
+                                value:
+                                    request_meta:
+                                        idempotency_key: simile-order-create-001
+                                    number: SIMILE-ORDER-001
+                                    finalize: true
+                                    execute_payment: false
+                                    checkout_settings:
+                                        redirect_url: https://example.test/checkout/success
+                                        cancel_url: https://example.test/checkout/cancel
+                                    customer_data:
+                                        name: Ama Mensah
+                                        email_address: ama@example.test
+                                        phone_number: '+233242057831'
+                                    line_items:
+                                        - type: product
+                                          product:
+                                              type: physical
+                                              name: Premium Cotton T-Shirt
+                                              quantity: 1
+                                              price:
+                                                  currency: ghs
+                                                  value: 20000
             responses:
                 '200':
                     description: Order created successfully
@@ -2988,6 +3018,135 @@ paths:
                                       then:
                                           set: { /order/status: preparing }
                                           omit: [/order/sealed_at, /order/paid_at, /order/completed_at, /order/canceled_at, /order/payment, /order/refunds]
+                            # Why: these are the public create-order branches callers must handle;
+                            # exact coherent payloads are safer integration fixtures than random synthesis.
+                            examples:
+                                requires_payment:
+                                    summary: Finalized order awaiting payment
+                                    value:
+                                        order:
+                                            checkout_settings:
+                                                redirect_url: https://example.test/checkout/success?order_id=or_simile_requires_payment
+                                                cancel_url: https://example.test/checkout/cancel?order_id=or_simile_requires_payment
+                                            customer:
+                                                guest: true
+                                                id: cu_simile_guest
+                                                name: Ama Mensah
+                                                email_address: ama@example.test
+                                                phone_number: '+233242057831'
+                                            expires_at: '2026-11-25T12:00:00Z'
+                                            id: or_simile_requires_payment
+                                            initiated_at: '2026-11-18T12:00:00Z'
+                                            line_item_group:
+                                                line_items:
+                                                    - type: product
+                                                      product:
+                                                          id: oli_simile_tshirt
+                                                          name: Premium Cotton T-Shirt
+                                                          price: { currency: ghs, value: 20000 }
+                                                          quantity: 1
+                                                total: { currency: ghs, value: 20000 }
+                                            number: SIMILE-ORDER-001
+                                            payment:
+                                                amount: { currency: ghs, value: 20000 }
+                                                id: py_simile_requires_payment
+                                                initiated_at: '2026-11-18T12:00:00Z'
+                                                statement_descriptor: INTTEGRO ORDER
+                                                status: initiated
+                                            sealed_at: '2026-11-18T12:00:01Z'
+                                            status: requires_payment
+                                requires_action:
+                                    summary: Finalized order whose payment needs customer action
+                                    value:
+                                        order:
+                                            customer:
+                                                guest: true
+                                                id: cu_simile_action
+                                                name: Ama Mensah
+                                                email_address: ama@example.test
+                                            expires_at: '2026-11-25T12:00:00Z'
+                                            id: or_simile_requires_action
+                                            initiated_at: '2026-11-18T12:00:00Z'
+                                            line_item_group:
+                                                line_items:
+                                                    - type: product
+                                                      product:
+                                                          id: oli_simile_action_tshirt
+                                                          name: Premium Cotton T-Shirt
+                                                          price: { currency: ghs, value: 20000 }
+                                                          quantity: 1
+                                                total: { currency: ghs, value: 20000 }
+                                            number: SIMILE-ORDER-ACTION
+                                            payment:
+                                                amount: { currency: ghs, value: 20000 }
+                                                id: py_simile_requires_action
+                                                initiated_at: '2026-11-18T12:00:00Z'
+                                                next_action:
+                                                    type: redirect
+                                                    redirect:
+                                                        redirect_url: https://example.test/payments/authorize
+                                                        valid_until: '2026-11-18T13:00:00Z'
+                                                statement_descriptor: INTTEGRO ORDER
+                                                status: requires_action
+                                            sealed_at: '2026-11-18T12:00:01Z'
+                                            status: requires_payment
+                                paid:
+                                    summary: Order paid during creation
+                                    value:
+                                        order:
+                                            customer:
+                                                guest: false
+                                                id: cu_simile_existing
+                                                name: Ama Mensah
+                                            expires_at: '2026-11-25T12:00:00Z'
+                                            id: or_simile_paid
+                                            initiated_at: '2026-11-18T12:00:00Z'
+                                            line_item_group:
+                                                line_items:
+                                                    - type: product
+                                                      product:
+                                                          id: oli_simile_paid_tshirt
+                                                          name: Premium Cotton T-Shirt
+                                                          price: { currency: ghs, value: 20000 }
+                                                          quantity: 1
+                                                total: { currency: ghs, value: 20000 }
+                                            number: SIMILE-ORDER-PAID
+                                            paid_at: '2026-11-18T12:00:05Z'
+                                            payment:
+                                                amount: { currency: ghs, value: 20000 }
+                                                executed_at: '2026-11-18T12:00:02Z'
+                                                id: py_simile_paid
+                                                initiated_at: '2026-11-18T12:00:00Z'
+                                                paid_at: '2026-11-18T12:00:05Z'
+                                                statement_descriptor: INTTEGRO ORDER
+                                                status: paid
+                                            sealed_at: '2026-11-18T12:00:01Z'
+                                            status: paid
+                                zero_total_completed:
+                                    summary: Finalized zero-total order completed without a payment
+                                    value:
+                                        order:
+                                            customer:
+                                                guest: true
+                                                id: cu_simile_zero_total
+                                                name: Ama Mensah
+                                                email_address: ama@example.test
+                                            completed_at: '2026-11-18T12:00:02Z'
+                                            expires_at: '2026-11-25T12:00:00Z'
+                                            id: or_simile_zero_total
+                                            initiated_at: '2026-11-18T12:00:00Z'
+                                            line_item_group:
+                                                line_items:
+                                                    - type: product
+                                                      product:
+                                                          id: oli_simile_zero_total_product
+                                                          name: Promotional Item
+                                                          price: { currency: ghs, value: 0 }
+                                                          quantity: 1
+                                                total: { currency: ghs, value: 0 }
+                                            number: SIMILE-ORDER-ZERO
+                                            sealed_at: '2026-11-18T12:00:01Z'
+                                            status: completed
                 '400':
                     description: Bad request - invalid parameters
                     headers:
@@ -19595,6 +19754,18 @@ components:
                       paths: [/line_item_group/total/currency, /payment/amount/currency]
                 - equal:
                       paths: [/line_item_group/total/value, /payment/amount/value]
+                # Why: order construction rejects mixed-currency line items, so a response whose
+                # product, fee, or shipping currency differs from its total is unreachable.
+                - equal:
+                      paths: [/line_item_group/total/currency, /line_item_group/line_items/*/product/price/currency]
+                - equal:
+                      paths: [/line_item_group/total/currency, /line_item_group/line_items/*/fee/amount/currency]
+                - equal:
+                      paths: [/line_item_group/total/currency, /line_item_group/line_items/*/shipping/fee/currency]
+                # Why: the paid transition copies the payment completion instant onto the order,
+                # so different timestamps would claim two incompatible versions of the same event.
+                - equal:
+                      paths: [/paid_at, /payment/paid_at]
             properties:
                 id:
                     type: string
@@ -20347,6 +20518,9 @@ components:
                         line_items:
                             type: array
                             description: Array of products, fees, and shipping charges
+                            # Why: the order builder rejects an empty resolved group, so a persisted
+                            # order can never expose a line-item group without at least one item.
+                            minItems: 1
                             items:
                                 $ref: '#/components/schemas/OrderLineItem'
                         total:

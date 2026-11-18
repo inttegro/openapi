@@ -24,7 +24,7 @@ collection:
     method: POST
     meta:
       id: req_e541038be0344630962df1d0058d7acf
-      description: Creates and finalizes an order so the response contains a hosted checkout URL. This request does not execute payment.
+      description: Creates and finalizes an order so the response contains a hosted checkout URL. The explicit execute_payment=false keeps this portable fixture on the non-executing branch.
     headers:
     - name: Content-Type
       value: application/json
@@ -37,6 +37,7 @@ collection:
           },
           "number": "{{ order_number }}",
           "finalize": true,
+          "execute_payment": false,
           "checkout_settings": {
             "redirect_url": "{{ checkout_success_url }}",
             "cancel_url": "{{ checkout_cancel_url }}"

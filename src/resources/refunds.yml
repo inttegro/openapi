@@ -1,0 +1,1161 @@
+# Authoritative refunds resource contract.
+# Why: keeping each resource's operations and schemas together makes public invariants
+# reviewable without weakening the single bundled contract distributed to consumers.
+
+paths:
+    /refunds/create:
+        post:
+            summary: Create a refund
+            description: |
+                Starts a refund for one or more paid order line items. Refund processing is
+                asynchronous: a successful request returns the new refund in `pending` status.
+                Retry an uncertain request with the same URL, idempotency key, and body.
+            operationId: createRefund
+            tags:
+                - Refunds
+            parameters:
+                - $ref: './common.yml#/components/parameters/IdempotencyKey'
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/CreateRefundRequest'
+            responses:
+                '200':
+                    description: Refund created
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/RefundResponse'
+                '400':
+                    description: Invalid refund request
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/ErrorEnvelope'
+                                    - type: object
+                                      properties:
+                                          error:
+                                              oneOf:
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [precondition_unmet] }, code: { enum: [refund_customer_unavailable, refund_insufficient_merchant_balance, refund_merchant_balance_unavailable, refund_order_not_paid, refund_original_payment_method_unavailable, refund_paid_allocation_unavailable] }, fix_code: { enum: [satisfy_precondition] }, type: { enum: [bad_request] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_parameter] }, code: { enum: [idempotency_key_invalid, idempotency_key_mismatch, idempotency_key_unsupported] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [idempotency_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_body] }, code: { enum: [invalid_request_body] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_parameter] }, code: { enum: [invalid_request_parameter, request_parameter_null_rejected, request_parameter_parse_failed, request_parameter_too_large, request_parameter_too_small, request_parameter_type_mismatch, request_parameter_value_not_allowed, request_parameters_mutually_exclusive, unexpected_request_parameter] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/e/t-invalid_request_parameter"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_parameter] }, code: { enum: [invalid_refund, refund_amount_exceeds_line_item, refund_currency_mismatch, refund_duplicate_line_item, refund_line_item_not_found, refund_order_not_found, request_parameter_choice_required, request_parameter_null_rejected, request_parameter_parse_failed, request_parameter_too_large, request_parameter_too_small, request_parameter_type_mismatch, request_parameter_value_not_allowed, request_parameters_mutually_exclusive, unexpected_request_parameter] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [missing_request_parameter] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/e/c-missing_request_parameter"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [request_parameter_choice_required] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/e/t-invalid_request_parameter"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [request_parameter_choice_required] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                            examples:
+                                currency_mismatch:
+                                    summary: The refund currency differs from the paid order currency
+                                    value:
+                                        error:
+                                            cause: invalid_request_parameter
+                                            code: refund_currency_mismatch
+                                            fix_code: change_request_parameters
+                                            type: invalid_request_parameter
+                                            url: https://studio.inttegro.com/errors
+                '401':
+                    description: Authorization is required
+                    headers:
+                        X-Request-Id:
+                            $ref: "./common.yml#/components/headers/RequestId"
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/ErrorEnvelope'
+                                    - type: object
+                                      properties:
+                                          error:
+                                              oneOf:
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [authentication_failed] }, code: { enum: [authentication_failed] }, fix_code: { enum: [authenticate_request] }, type: { enum: [authentication_error] }, url: { enum: ["https://studio.inttegro.com/e/c-authentication_failed"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [authentication_failed] }, code: { enum: [endpoint_authentication_required] }, fix_code: { enum: [authenticate_request] }, type: { enum: [authentication_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                '409':
+                    description: The refund conflicts with current order or line-item state
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/ErrorEnvelope'
+                                    - type: object
+                                      properties:
+                                          error:
+                                              oneOf:
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [idempotency_in_progress] }, code: { enum: [idempotency_key_in_progress] }, fix_code: { enum: [repeat_same_request] }, type: { enum: [idempotency_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [resource_state_conflict] }, code: { enum: [refund_capacity_changed] }, fix_code: { enum: [refresh_resource_state] }, type: { enum: [state_conflict] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                '422':
+                    description: The refund could not be accepted
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/ErrorEnvelope'
+                                    - type: object
+                                      properties:
+                                          error:
+                                              { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [idempotency_conflict] }, code: { enum: [idempotency_key_conflict] }, fix_code: { enum: [use_new_idempotency_key] }, type: { enum: [idempotency_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                '500':
+                    description: Refund creation failed unexpectedly
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/ErrorEnvelope'
+                                    - type: object
+                                      properties:
+                                          error:
+                                              { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [unknown] }, code: { enum: [request_failed] }, fix_code: { enum: [contact_customer_support] }, type: { enum: [unknown_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                '503':
+                    description: Refund creation hit a transient dependency failure
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                        Retry-After:
+                            $ref: './common.yml#/components/headers/RetryAfter'
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/ErrorEnvelope'
+                                    - type: object
+                                      properties:
+                                          error:
+                                              oneOf:
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [dependency_unavailable] }, code: { enum: [idempotency_storage_unavailable] }, fix_code: { enum: [repeat_same_request] }, type: { enum: [idempotency_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [service_unavailable] }, code: { enum: [idempotency_key_generation_failed] }, fix_code: { enum: [repeat_same_request] }, type: { enum: [idempotency_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [service_unavailable] }, code: { enum: [endpoint_unavailable] }, fix_code: { enum: [repeat_same_request] }, type: { enum: [transient_error] }, url: { enum: ["https://studio.inttegro.com/e/t-transient_error"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [service_unavailable] }, code: { enum: [refund_create_failed] }, fix_code: { enum: [repeat_same_request] }, type: { enum: [transient_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+    /refunds/cancel:
+        post:
+            summary: Cancel a refund
+            description: |
+                Cancels a pending refund before processing claims it. Cancellation releases the
+                merchant balance hold and restores the refundable capacity reserved against its
+                order line items. An optional cancellation reason is retained with the refund.
+                Repeating cancellation returns the same canceled refund without replacing the
+                first successful reason or actor. Actor provenance is derived from authentication,
+                stored for audit, and omitted from the public request and Refund representation.
+            operationId: cancelRefund
+            tags:
+                - Refunds
+            parameters:
+                - $ref: './common.yml#/components/parameters/IdempotencyKey'
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/CancelRefundRequest'
+            responses:
+                '200':
+                    description: Refund canceled
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/RefundResponse'
+                '400':
+                    description: Invalid refund cancellation request
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/ErrorEnvelope'
+                                    - type: object
+                                      properties:
+                                          error:
+                                              oneOf:
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_parameter] }, code: { enum: [idempotency_key_invalid, idempotency_key_mismatch, idempotency_key_unsupported] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [idempotency_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_body] }, code: { enum: [invalid_request_body] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_parameter] }, code: { enum: [invalid_request_parameter, request_parameter_null_rejected, request_parameter_parse_failed, request_parameter_too_large, request_parameter_too_small, request_parameter_type_mismatch, request_parameter_value_not_allowed, request_parameters_mutually_exclusive, unexpected_request_parameter] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/e/t-invalid_request_parameter"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_parameter] }, code: { enum: [request_parameter_choice_required, request_parameter_null_rejected, request_parameter_parse_failed, request_parameter_too_large, request_parameter_too_small, request_parameter_type_mismatch, request_parameter_value_not_allowed, request_parameters_mutually_exclusive, unexpected_request_parameter] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [missing_request_parameter] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/e/c-missing_request_parameter"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [request_parameter_choice_required] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/e/t-invalid_request_parameter"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [request_parameter_choice_required] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                '401':
+                    description: Authorization is required
+                    headers:
+                        X-Request-Id:
+                            $ref: "./common.yml#/components/headers/RequestId"
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/ErrorEnvelope'
+                                    - type: object
+                                      properties:
+                                          error:
+                                              oneOf:
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [authentication_failed] }, code: { enum: [authentication_failed] }, fix_code: { enum: [authenticate_request] }, type: { enum: [authentication_error] }, url: { enum: ["https://studio.inttegro.com/e/c-authentication_failed"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [authentication_failed] }, code: { enum: [endpoint_authentication_required] }, fix_code: { enum: [authenticate_request] }, type: { enum: [authentication_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                '404':
+                    description: Refund not found
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/ErrorEnvelope'
+                                    - type: object
+                                      properties:
+                                          error:
+                                              { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_parameter] }, code: { enum: [refund_not_found] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                '409':
+                    description: Refund cannot be canceled or the idempotency key is still being processed
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/ErrorEnvelope'
+                                    - type: object
+                                      properties:
+                                          error:
+                                              oneOf:
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [idempotency_in_progress] }, code: { enum: [idempotency_key_in_progress] }, fix_code: { enum: [repeat_same_request] }, type: { enum: [idempotency_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [resource_state_conflict] }, code: { enum: [refund_cannot_cancel] }, fix_code: { enum: [refresh_resource_state] }, type: { enum: [state_conflict] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                '422':
+                    description: The idempotency key was previously used with a different request body
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/ErrorEnvelope'
+                                    - type: object
+                                      properties:
+                                          error:
+                                              { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [idempotency_conflict] }, code: { enum: [idempotency_key_conflict] }, fix_code: { enum: [use_new_idempotency_key] }, type: { enum: [idempotency_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                '500':
+                    description: Refund cancellation failed unexpectedly
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/ErrorEnvelope'
+                                    - type: object
+                                      properties:
+                                          error:
+                                              { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [unknown] }, code: { enum: [request_failed] }, fix_code: { enum: [contact_customer_support] }, type: { enum: [unknown_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                '503':
+                    description: Refund cancellation or idempotency storage is temporarily unavailable
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                        Retry-After:
+                            $ref: './common.yml#/components/headers/RetryAfter'
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/ErrorEnvelope'
+                                    - type: object
+                                      properties:
+                                          error:
+                                              oneOf:
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [dependency_unavailable] }, code: { enum: [idempotency_storage_unavailable] }, fix_code: { enum: [repeat_same_request] }, type: { enum: [idempotency_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [service_unavailable] }, code: { enum: [idempotency_key_generation_failed] }, fix_code: { enum: [repeat_same_request] }, type: { enum: [idempotency_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [service_unavailable] }, code: { enum: [endpoint_unavailable] }, fix_code: { enum: [repeat_same_request] }, type: { enum: [transient_error] }, url: { enum: ["https://studio.inttegro.com/e/t-transient_error"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [service_unavailable] }, code: { enum: [refund_cancel_failed] }, fix_code: { enum: [repeat_same_request] }, type: { enum: [transient_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+    /refunds/lookup:
+        post:
+            summary: Look up a refund
+            description: Returns the current lifecycle state and amounts for one refund.
+            operationId: lookupRefund
+            tags:
+                - Refunds
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/LookupRefundRequest'
+            responses:
+                '200':
+                    description: Refund found
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/RefundResponse'
+                '400':
+                    description: Invalid refund lookup request
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/ErrorEnvelope'
+                                    - type: object
+                                      properties:
+                                          error:
+                                              oneOf:
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_parameter] }, code: { enum: [idempotency_key_invalid, idempotency_key_mismatch, idempotency_key_unsupported] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [idempotency_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_body] }, code: { enum: [invalid_request_body] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_parameter] }, code: { enum: [invalid_request_parameter, request_parameter_null_rejected, request_parameter_parse_failed, request_parameter_too_large, request_parameter_too_small, request_parameter_type_mismatch, request_parameter_value_not_allowed, request_parameters_mutually_exclusive, unexpected_request_parameter] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/e/t-invalid_request_parameter"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_parameter] }, code: { enum: [request_parameter_choice_required, request_parameter_null_rejected, request_parameter_parse_failed, request_parameter_too_large, request_parameter_too_small, request_parameter_type_mismatch, request_parameter_value_not_allowed, request_parameters_mutually_exclusive, unexpected_request_parameter] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [missing_request_parameter] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/e/c-missing_request_parameter"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [request_parameter_choice_required] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/e/t-invalid_request_parameter"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [request_parameter_choice_required] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                '401':
+                    description: Authorization is required
+                    headers:
+                        X-Request-Id:
+                            $ref: "./common.yml#/components/headers/RequestId"
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/ErrorEnvelope'
+                                    - type: object
+                                      properties:
+                                          error:
+                                              oneOf:
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [authentication_failed] }, code: { enum: [authentication_failed] }, fix_code: { enum: [authenticate_request] }, type: { enum: [authentication_error] }, url: { enum: ["https://studio.inttegro.com/e/c-authentication_failed"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [authentication_failed] }, code: { enum: [endpoint_authentication_required] }, fix_code: { enum: [authenticate_request] }, type: { enum: [authentication_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                '404':
+                    description: Refund not found
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/ErrorEnvelope'
+                                    - type: object
+                                      properties:
+                                          error:
+                                              { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_parameter] }, code: { enum: [refund_not_found] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                '500':
+                    description: Refund lookup failed unexpectedly
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/ErrorEnvelope'
+                                    - type: object
+                                      properties:
+                                          error:
+                                              { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [unknown] }, code: { enum: [request_failed] }, fix_code: { enum: [contact_customer_support] }, type: { enum: [unknown_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+    /refunds/page:
+        post:
+            summary: Page through refunds
+            description: Returns refunds in pages of the requested size. Page numbering starts at 1.
+            operationId: pageRefunds
+            tags:
+                - Refunds
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/PageRefundsRequest'
+            responses:
+                '200':
+                    description: Refund page returned
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/RefundPageResponse'
+                '400':
+                    description: Invalid refund page request
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/ErrorEnvelope'
+                                    - type: object
+                                      properties:
+                                          error:
+                                              oneOf:
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_parameter] }, code: { enum: [idempotency_key_invalid, idempotency_key_mismatch, idempotency_key_unsupported] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [idempotency_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_body] }, code: { enum: [invalid_request_body] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_parameter] }, code: { enum: [invalid_request_parameter, request_parameter_null_rejected, request_parameter_parse_failed, request_parameter_too_large, request_parameter_too_small, request_parameter_type_mismatch, request_parameter_value_not_allowed, request_parameters_mutually_exclusive, unexpected_request_parameter] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/e/t-invalid_request_parameter"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [invalid_request_parameter] }, code: { enum: [request_parameter_choice_required, request_parameter_null_rejected, request_parameter_parse_failed, request_parameter_too_large, request_parameter_too_small, request_parameter_type_mismatch, request_parameter_value_not_allowed, request_parameters_mutually_exclusive, unexpected_request_parameter] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [missing_request_parameter] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/e/c-missing_request_parameter"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [request_parameter_choice_required] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/e/t-invalid_request_parameter"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [missing_request_parameter] }, code: { enum: [request_parameter_choice_required] }, fix_code: { enum: [change_request_parameters] }, type: { enum: [invalid_request_parameter] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                '401':
+                    description: Authorization is required
+                    headers:
+                        X-Request-Id:
+                            $ref: "./common.yml#/components/headers/RequestId"
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/ErrorEnvelope'
+                                    - type: object
+                                      properties:
+                                          error:
+                                              oneOf:
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [authentication_failed] }, code: { enum: [authentication_failed] }, fix_code: { enum: [authenticate_request] }, type: { enum: [authentication_error] }, url: { enum: ["https://studio.inttegro.com/e/c-authentication_failed"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [authentication_failed] }, code: { enum: [endpoint_authentication_required] }, fix_code: { enum: [authenticate_request] }, type: { enum: [authentication_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                '500':
+                    description: Refund page lookup failed unexpectedly
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/ErrorEnvelope'
+                                    - type: object
+                                      properties:
+                                          error:
+                                              { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [unknown] }, code: { enum: [request_failed] }, fix_code: { enum: [contact_customer_support] }, type: { enum: [unknown_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                '503':
+                    description: Refund page lookup hit a transient dependency failure
+                    headers:
+                        X-Request-Id:
+                            $ref: './common.yml#/components/headers/RequestId'
+                        Retry-After:
+                            $ref: './common.yml#/components/headers/RetryAfter'
+                    content:
+                        application/json:
+                            schema:
+                                # Why: narrowing by operation and status prevents synthesized clients from receiving
+                                # a globally valid error code that this public handler cannot emit.
+                                allOf:
+                                    - $ref: './common.yml#/components/schemas/ErrorEnvelope'
+                                    - type: object
+                                      properties:
+                                          error:
+                                              oneOf:
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [dependency_unavailable] }, code: { enum: [idempotency_storage_unavailable] }, fix_code: { enum: [repeat_same_request] }, type: { enum: [idempotency_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [service_unavailable] }, code: { enum: [idempotency_key_generation_failed] }, fix_code: { enum: [repeat_same_request] }, type: { enum: [idempotency_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [service_unavailable] }, code: { enum: [endpoint_unavailable] }, fix_code: { enum: [repeat_same_request] }, type: { enum: [transient_error] }, url: { enum: ["https://studio.inttegro.com/e/t-transient_error"] } } }
+                                                  - { type: object, required: [cause, code, fix_code, type, url], properties: { cause: { enum: [service_unavailable] }, code: { enum: [refund_page_unavailable] }, fix_code: { enum: [repeat_same_request] }, type: { enum: [transient_error] }, url: { enum: ["https://studio.inttegro.com/errors"] } } }
+components:
+    schemas:
+        RefundReason:
+            type: string
+            enum:
+                - requested_by_customer
+                - duplicate
+                - fraudulent
+                - order_canceled
+                - item_returned
+                - item_damaged
+                - item_not_received
+                - item_not_as_described
+                - custom
+        RefundFailureReason:
+            type: string
+            description: Stable, caller-safe reason that terminal refund processing failed. `unknown` is the fail-closed fallback for an unclassified internal failure.
+            enum:
+                - insufficient_balance
+                - original_payment_method_unavailable
+                - original_payment_not_refundable
+                - refund_not_supported
+                - amount_not_supported
+                - refund_declined
+                - refund_not_permitted
+                - temporarily_unavailable
+                - unknown
+        RefundFailure:
+            type: object
+            additionalProperties: false
+            required: [detail, reason, retryable]
+            properties:
+                detail:
+                    type: string
+                    description: Safe explanation intended for the merchant. Raw provider and internal diagnostic messages are never returned.
+                reason:
+                    $ref: '#/components/schemas/RefundFailureReason'
+                retryable:
+                    type: boolean
+                    description: Whether the underlying condition may be resolved before creating a new, intentional refund request. It never instructs clients to repeat an uncertain money movement.
+        RefundSettlement:
+            description: Immutable destination snapshot for the refund. `payment_method` returns money to the original payment method; `offline` records settlement for an order paid outside Inttegro.
+            oneOf:
+                - $ref: '#/components/schemas/RefundOfflineSettlement'
+                - $ref: '#/components/schemas/RefundPaymentMethodSettlement'
+            discriminator:
+                propertyName: type
+                mapping:
+                    offline: '#/components/schemas/RefundOfflineSettlement'
+                    payment_method: '#/components/schemas/RefundPaymentMethodSettlement'
+        RefundOfflineSettlement:
+            type: object
+            additionalProperties: false
+            required: [type]
+            properties:
+                type:
+                    type: string
+                    enum: [offline]
+                    description: The order was paid offline, so no Inttegro payment method is attached.
+        RefundPaymentMethodSettlement:
+            type: object
+            additionalProperties: false
+            required: [payment_method, type]
+            properties:
+                payment_method:
+                    $ref: '#/components/schemas/RefundSettlementPaymentMethod'
+                type:
+                    type: string
+                    enum: [payment_method]
+                    description: The refund returns to the original payment method used for the order.
+        RefundSettlementPaymentMethod:
+            description: Caller-safe immutable snapshot of the original payment method. Account values are masked and management-only payment-method data is never included.
+            oneOf:
+                - $ref: '#/components/schemas/RefundSettlementMobileMoneyPaymentMethod'
+                - $ref: '#/components/schemas/RefundSettlementBankAccountPaymentMethod'
+            discriminator:
+                propertyName: type
+                mapping:
+                    bank_account: '#/components/schemas/RefundSettlementBankAccountPaymentMethod'
+                    mobile_money: '#/components/schemas/RefundSettlementMobileMoneyPaymentMethod'
+        RefundSettlementMobileMoneyPaymentMethod:
+            type: object
+            additionalProperties: false
+            required: [id, mobile_money, type]
+            properties:
+                id:
+                    type: string
+                    # Public serializers always emit this resource with the pm_ type prefix.
+                    pattern: '^pm_'
+                    description: Public identifier of the original payment method.
+                    example: pm_xyz789
+                mobile_money:
+                    type: object
+                    additionalProperties: false
+                    required: [account_number, last4, network]
+                    properties:
+                        account_number:
+                            type: string
+                            pattern: '^\*{4}[0-9]{4}$'
+                            description: Masked mobile-money account number. The full number is never returned.
+                            example: '****7831'
+                        last4:
+                            type: string
+                            pattern: '^[0-9]{4}$'
+                            description: Last four numeric digits of the original account number.
+                            example: '7831'
+                        network:
+                            type: string
+                            enum: [airtel, mtn, telecel, vodafone]
+                            example: mtn
+                type:
+                    type: string
+                    enum: [mobile_money]
+        RefundSettlementBankAccountPaymentMethod:
+            type: object
+            additionalProperties: false
+            required: [bank_account, id, type]
+            properties:
+                bank_account:
+                    type: object
+                    additionalProperties: false
+                    required: [ghana_bank_account, type]
+                    properties:
+                        ghana_bank_account:
+                            type: object
+                            additionalProperties: false
+                            required: [account_number, last4]
+                            properties:
+                                account_number:
+                                    type: string
+                                    pattern: '^\*{4}[0-9]{4}$'
+                                    description: Masked bank-account number. The full number is never returned.
+                                    example: '****7890'
+                                last4:
+                                    type: string
+                                    pattern: '^[0-9]{4}$'
+                                    description: Last four numeric digits of the original bank-account number.
+                                    example: '7890'
+                        type:
+                            type: string
+                            enum: [ghana_bank_account]
+                id:
+                    type: string
+                    # Public serializers always emit this resource with the pm_ type prefix.
+                    pattern: '^pm_'
+                    description: Public identifier of the original payment method.
+                    example: pm_xyz789
+                type:
+                    type: string
+                    enum: [bank_account]
+        CreateRefundLineItem:
+            type: object
+            additionalProperties: false
+            required: [order_line_item_id, refund_amount]
+            allOf:
+                - oneOf:
+                    - not:
+                          anyOf:
+                              - required: [reason]
+                                properties:
+                                    reason: {}
+                              - required: [reason_details]
+                                properties:
+                                    reason_details: {}
+                    - required: [reason]
+                      properties:
+                          reason:
+                              type: string
+                              enum: [requested_by_customer, duplicate, fraudulent, order_canceled, item_returned, item_damaged, item_not_received, item_not_as_described]
+                    - required: [reason, reason_details]
+                      properties:
+                          reason:
+                              type: string
+                              enum: [custom]
+                          reason_details: {}
+            properties:
+                order_line_item_id:
+                    type: string
+                    description: Strong identifier for the paid order line item being refunded.
+                    example: oli_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMN
+                reason:
+                    $ref: '#/components/schemas/RefundReason'
+                reason_details:
+                    type: string
+                    maxLength: 2048
+                    description: Line-specific explanation. Requires a line-level reason; required when that reason is `custom`.
+                refund_amount:
+                    $ref: './common.yml#/components/schemas/AmountParams'
+        RefundRequestMeta:
+            type: object
+            additionalProperties: false
+            minProperties: 1
+            properties:
+                idempotency_key:
+                    type: string
+                    minLength: 1
+                    maxLength: 255
+                    description: Stable retry key carried inside `request_meta`. It must match the `Idempotency-Key` header when both are provided.
+                response:
+                    $ref: './common.yml#/components/schemas/RequestResponse'
+        CreateRefundRequest:
+            type: object
+            additionalProperties: false
+            required: [line_items, order_id, reason]
+            allOf:
+                - oneOf:
+                    - required: [reason]
+                      properties:
+                          reason:
+                              type: string
+                              enum: [requested_by_customer, duplicate, fraudulent, order_canceled, item_returned, item_damaged, item_not_received, item_not_as_described]
+                    - required: [reason, reason_details]
+                      properties:
+                          reason:
+                              type: string
+                              enum: [custom]
+                          reason_details: {}
+            properties:
+                custom_data:
+                    $ref: './common.yml#/components/schemas/CustomData'
+                line_items:
+                    type: array
+                    minItems: 1
+                    maxItems: 64
+                    items:
+                        $ref: '#/components/schemas/CreateRefundLineItem'
+                order_id:
+                    type: string
+                    description: Paid order to refund.
+                    example: or_0123456789abcdefghijklmnopqrstuvwxyzABCD
+                reason:
+                    $ref: '#/components/schemas/RefundReason'
+                reason_details:
+                    type: string
+                    maxLength: 2048
+                    description: Overall explanation. Required when `reason` is `custom`.
+                reference:
+                    type: string
+                    maxLength: 256
+                    description: Your reconciliation reference.
+                request_meta:
+                    $ref: '#/components/schemas/RefundRequestMeta'
+        CancelRefundRequest:
+            type: object
+            additionalProperties: false
+            required: [refund_id]
+            properties:
+                refund_id:
+                    type: string
+                    description: Refund to cancel before processing begins.
+                    example: rf_1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcd
+                reason:
+                    type: string
+                    minLength: 1
+                    maxLength: 2048
+                    description: Optional explanation for canceling the refund. Leading and trailing whitespace is removed.
+                request_meta:
+                    $ref: '#/components/schemas/RefundRequestMeta'
+        LookupRefundRequest:
+            type: object
+            additionalProperties: false
+            required: [refund_id]
+            properties:
+                refund_id:
+                    type: string
+                    description: Refund identifier to retrieve.
+                    example: rf_1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcd
+        PageRefundsRequest:
+            type: object
+            additionalProperties: false
+            required: [page_number]
+            properties:
+                page_number:
+                    type: integer
+                    minimum: 1
+                    maximum: 10
+                    description: One-based page number.
+                page_size:
+                    type: integer
+                    minimum: 1
+                    maximum: 256
+                    default: 256
+                    description: Maximum number of refunds to return.
+        RefundLineItem:
+            type: object
+            additionalProperties: false
+            required: [id, order_line_item_id, original_amount_paid, refund_amount]
+            # A line refund is denominated in the original line currency and may
+            # return no more than the amount originally paid for that line.
+            x-simile-constraints:
+                - equal:
+                      paths: [/original_amount_paid/currency, /refund_amount/currency]
+                - bounded:
+                      path: /refund_amount/value
+                      maximum: { path: /original_amount_paid/value }
+            allOf:
+                - oneOf:
+                    - not:
+                          anyOf:
+                              - required: [reason]
+                                properties:
+                                    reason: {}
+                              - required: [reason_details]
+                                properties:
+                                    reason_details: {}
+                    - required: [reason]
+                      properties:
+                          reason:
+                              type: string
+                              enum: [requested_by_customer, duplicate, fraudulent, order_canceled, item_returned, item_damaged, item_not_received, item_not_as_described]
+                    - required: [reason, reason_details]
+                      properties:
+                          reason:
+                              type: string
+                              enum: [custom]
+                          reason_details: {}
+            properties:
+                id:
+                    type: string
+                    # Public serializers always emit this resource with the rli_ type prefix.
+                    pattern: '^rli_'
+                    description: Server-generated refund line-item identifier.
+                order_line_item_id:
+                    type: string
+                    # Public serializers always emit this resource with the oli_ type prefix.
+                    pattern: '^oli_'
+                    deprecated: true
+                    description: Deprecated compatibility identifier. Use `order_line_item.id` when `order_line_item` is present.
+                order_line_item:
+                    $ref: '#/components/schemas/RefundOrderLineItem'
+                original_amount_paid:
+                    allOf:
+                        - $ref: './common.yml#/components/schemas/Amount'
+                        - type: object
+                          properties:
+                              value:
+                                  type: integer
+                                  minimum: 1
+                reason:
+                    $ref: '#/components/schemas/RefundReason'
+                reason_details:
+                    type: string
+                    maxLength: 2048
+                refund_amount:
+                    allOf:
+                        - $ref: './common.yml#/components/schemas/Amount'
+                        - type: object
+                          properties:
+                              value:
+                                  type: integer
+                                  minimum: 1
+        RefundOrderLineItem:
+            description: Immutable display snapshot of the refunded order line. Omitted when the originating order cannot be resolved.
+            oneOf:
+                - $ref: '#/components/schemas/RefundOrderProductLineItem'
+                - $ref: '#/components/schemas/RefundOrderFeeLineItem'
+                - $ref: '#/components/schemas/RefundOrderShippingLineItem'
+            discriminator:
+                propertyName: type
+                mapping:
+                    product: '#/components/schemas/RefundOrderProductLineItem'
+                    fee: '#/components/schemas/RefundOrderFeeLineItem'
+                    shipping: '#/components/schemas/RefundOrderShippingLineItem'
+        RefundOrderProductLineItem:
+            type: object
+            additionalProperties: false
+            required: [id, product, quantity, type]
+            properties:
+                id:
+                    type: string
+                    # Public serializers always emit this resource with the oli_ type prefix.
+                    pattern: '^oli_'
+                    description: Immutable order-line identifier with the `oli_` prefix.
+                    example: oli_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMN
+                type:
+                    type: string
+                    enum: [product]
+                quantity:
+                    type: integer
+                    minimum: 1
+                product:
+                    type: object
+                    additionalProperties: false
+                    required: [name]
+                    properties:
+                        id:
+                            type: string
+                            # Public serializers always emit this resource with the prod_ type prefix.
+                            pattern: '^prod_'
+                            description: Source catalog product identifier. Omitted for inline products.
+                            example: prod_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMN
+                        name:
+                            type: string
+                            description: Product name captured on the order.
+        RefundOrderFeeLineItem:
+            type: object
+            additionalProperties: false
+            required: [fee, id, type]
+            properties:
+                id:
+                    type: string
+                    # Public serializers always emit this resource with the oli_ type prefix.
+                    pattern: '^oli_'
+                    description: Immutable order-line identifier with the `oli_` prefix.
+                    example: oli_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMN
+                type:
+                    type: string
+                    enum: [fee]
+                fee:
+                    type: object
+                    additionalProperties: false
+                    properties:
+                        label:
+                            type: string
+                        description:
+                            type: string
+        RefundOrderShippingLineItem:
+            type: object
+            additionalProperties: false
+            required: [id, shipping, type]
+            properties:
+                id:
+                    type: string
+                    # Public serializers always emit this resource with the oli_ type prefix.
+                    pattern: '^oli_'
+                    description: Immutable order-line identifier with the `oli_` prefix.
+                    example: oli_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMN
+                type:
+                    type: string
+                    enum: [shipping]
+                shipping:
+                    type: object
+                    additionalProperties: false
+                    properties:
+                        label:
+                            type: string
+                        description:
+                            type: string
+        Refund:
+            type: object
+            additionalProperties: false
+            required: [created_at, id, line_items, order_id, reason, settlement, status, total]
+            allOf:
+                - oneOf:
+                    - required: [reason]
+                      properties:
+                          reason:
+                              type: string
+                              enum: [requested_by_customer, duplicate, fraudulent, order_canceled, item_returned, item_damaged, item_not_received, item_not_as_described]
+                    - required: [reason, reason_details]
+                      properties:
+                          reason:
+                              type: string
+                              enum: [custom]
+                          reason_details: {}
+            # Refund timestamps and failure metadata form a mutually exclusive public state machine.
+            x-simile-constraints:
+                - lifecycle:
+                      state: /status
+                      created-at: /created_at
+                      transitions:
+                          - { from: pending, to: processing, at: /processing_at }
+                          - { from: processing, to: succeeded, at: /succeeded_at }
+                          - { from: processing, to: failed, at: /failed_at }
+                          - { from: pending, to: canceled, at: /canceled_at }
+                - implies:
+                      when: { path: /status, equals: pending }
+                      then:
+                          all:
+                              - { path: /failure, state: absent }
+                              - { path: /cancel_reason, state: absent }
+                - implies:
+                      when: { path: /status, equals: processing }
+                      then:
+                          all:
+                              - { path: /failure, state: absent }
+                              - { path: /cancel_reason, state: absent }
+                - implies:
+                      when: { path: /status, equals: succeeded }
+                      then:
+                          all:
+                              - { path: /failure, state: absent }
+                              - { path: /cancel_reason, state: absent }
+                - implies:
+                      when: { path: /status, equals: failed }
+                      then:
+                          all:
+                              - { path: /failure, state: non-null }
+                              - { path: /cancel_reason, state: absent }
+                - implies:
+                      when: { path: /status, equals: canceled }
+                      then:
+                          all:
+                              - { path: /failure, state: absent }
+                # Refund accounting is a complete, immutable allocation snapshot:
+                # every line uses one currency, lines sum to total, and total cannot
+                # exceed the captured originating-order amount when that snapshot exists.
+                - equal:
+                      paths:
+                          - /total/currency
+                          - /order_amount/currency
+                          - /line_items/*/original_amount_paid/currency
+                          - /line_items/*/refund_amount/currency
+                - aggregate:
+                      target: /total/value
+                      operation: sum
+                      source: /line_items/*/refund_amount/value
+                - ordered:
+                      paths: [/total/value, /order_amount/value]
+            properties:
+                cancel_reason:
+                    type: string
+                    maxLength: 2048
+                    description: Omitted unless a reason was supplied when the refund was canceled.
+                canceled_at:
+                    type: string
+                    format: date-time
+                    description: Omitted unless the refund was canceled before processing began.
+                created_at:
+                    type: string
+                    format: date-time
+                custom_data:
+                    $ref: './common.yml#/components/schemas/CustomData'
+                failed_at:
+                    type: string
+                    format: date-time
+                    description: Omitted unless processing failed.
+                failure:
+                    allOf:
+                        - $ref: '#/components/schemas/RefundFailure'
+                    description: Sanitized terminal failure information. Present only when `status` is `failed`. An uncertain provider outcome remains `processing` and does not produce this object.
+                id:
+                    type: string
+                    # Public serializers always emit this resource with the rf_ type prefix.
+                    pattern: '^rf_'
+                line_items:
+                    type: array
+                    minItems: 1
+                    description: One or more immutable line-level refund allocations.
+                    items:
+                        $ref: '#/components/schemas/RefundLineItem'
+                order_id:
+                    type: string
+                    # Public serializers always emit this resource with the or_ type prefix.
+                    pattern: '^or_'
+                order_amount:
+                    allOf:
+                        - $ref: './common.yml#/components/schemas/Amount'
+                        - type: object
+                          properties:
+                              value:
+                                  type: integer
+                                  minimum: 1
+                    description: Total amount of the originating order captured when the refund was created.
+                processing_at:
+                    type: string
+                    format: date-time
+                    description: Omitted until processing starts.
+                reason:
+                    $ref: '#/components/schemas/RefundReason'
+                reason_details:
+                    type: string
+                    maxLength: 2048
+                reference:
+                    type: string
+                settlement:
+                    $ref: '#/components/schemas/RefundSettlement'
+                status:
+                    type: string
+                    enum: [canceled, failed, pending, processing, succeeded]
+                succeeded_at:
+                    type: string
+                    format: date-time
+                    description: Omitted unless processing succeeded.
+                total:
+                    allOf:
+                        - $ref: './common.yml#/components/schemas/Amount'
+                        - type: object
+                          properties:
+                              value:
+                                  type: integer
+                                  minimum: 1
+        RefundResponse:
+            type: object
+            additionalProperties: false
+            required: [refund]
+            properties:
+                refund:
+                    $ref: '#/components/schemas/Refund'
+        RefundPage:
+            type: object
+            additionalProperties: false
+            required: [number, refunds, size]
+            # The page size is the count of decoded public refunds in this response.
+            x-simile-constraints:
+                - aggregate:
+                      target: /size
+                      operation: count
+                      source: /refunds/*
+            properties:
+                number:
+                    type: integer
+                    minimum: 1
+                refunds:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/Refund'
+                size:
+                    type: integer
+                    minimum: 0
+                    description: Number of refunds returned in this page.
+        RefundPageResponse:
+            type: object
+            additionalProperties: false
+            required: [page]
+            properties:
+                page:
+                    $ref: '#/components/schemas/RefundPage'
+        RefundBalanceTransaction:
+            type: object
+            additionalProperties: false
+            required: [amount, created_at, id, order_id, refund_id, type]
+            properties:
+                amount:
+                    $ref: './finance.yml#/components/schemas/BalanceTransactionAmount'
+                created_at:
+                    type: string
+                    format: date-time
+                id:
+                    type: string
+                    # Public serializers always emit this resource with the bt_ type prefix.
+                    pattern: '^bt_'
+                    example: bt_0123456789abcdefghijklmnopqrstuvwxyzABCD
+                order_id:
+                    type: string
+                    # Public serializers always emit this resource with the or_ type prefix.
+                    pattern: '^or_'
+                    example: or_0123456789abcdefghijklmnopqrstuvwxyzABCD
+                refund_id:
+                    type: string
+                    # Public serializers always emit this resource with the rf_ type prefix.
+                    pattern: '^rf_'
+                    example: rf_1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcd
+                type:
+                    type: string
+                    enum: [refund]

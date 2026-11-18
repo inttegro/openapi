@@ -1,0 +1,1496 @@
+---
+openapi: 3.0.3
+info:
+    title: Inttegro API
+    description: Machine-readable reference for the public Inttegro API
+    # Why: contract and client artifacts are reviewed as one immutable bundle;
+    # changing soundness rules or executable examples requires a new bundle identity.
+    version: 0.1.0-beta80
+    x-inttegro-collection-version: 0.1.0-beta80
+    contact:
+        name: Inttegro Engineering
+        url: "https://inttegro.com"
+    license:
+        name: MIT
+        url: "https://opensource.org/license/mit"
+servers:
+    - url: "https://api.inttegro.com"
+      description: Production
+security:
+    - bearerAuth: []
+# Authoritative modular OpenAPI source. Generate ../commerce.yml; do not edit the bundle.
+# Why: consumers still receive one portable document while maintainers review resource-sized files.
+paths:
+    /otp/initiate:
+        $ref: './resources/otp.yml#/paths/~1otp~1initiate'
+    /otp/verify:
+        $ref: './resources/otp.yml#/paths/~1otp~1verify'
+    /otp/lookup:
+        $ref: './resources/otp.yml#/paths/~1otp~1lookup'
+    /chimes/send:
+        $ref: './resources/messaging.yml#/paths/~1chimes~1send'
+    /chimes/lookup:
+        $ref: './resources/messaging.yml#/paths/~1chimes~1lookup'
+    /chimes/page:
+        $ref: './resources/messaging.yml#/paths/~1chimes~1page'
+    /chimes/settings:
+        $ref: './resources/messaging.yml#/paths/~1chimes~1settings'
+    /chimes/schedule:
+        $ref: './resources/messaging.yml#/paths/~1chimes~1schedule'
+    /chimes/broadcast:
+        $ref: './resources/messaging.yml#/paths/~1chimes~1broadcast'
+    /schedules/lookup:
+        $ref: './resources/messaging.yml#/paths/~1schedules~1lookup'
+    /schedules/cancel:
+        $ref: './resources/messaging.yml#/paths/~1schedules~1cancel'
+    /broadcasts/lookup:
+        $ref: './resources/messaging.yml#/paths/~1broadcasts~1lookup'
+    /broadcasts/cancel:
+        $ref: './resources/messaging.yml#/paths/~1broadcasts~1cancel'
+    /message_templates/create:
+        $ref: './resources/messaging.yml#/paths/~1message_templates~1create'
+    /message_templates/update:
+        $ref: './resources/messaging.yml#/paths/~1message_templates~1update'
+    /message_templates/publish:
+        $ref: './resources/messaging.yml#/paths/~1message_templates~1publish'
+    /message_templates/archive:
+        $ref: './resources/messaging.yml#/paths/~1message_templates~1archive'
+    /message_templates/lookup:
+        $ref: './resources/messaging.yml#/paths/~1message_templates~1lookup'
+    /message_templates/page:
+        $ref: './resources/messaging.yml#/paths/~1message_templates~1page'
+    /message_templates/render_preview:
+        $ref: './resources/messaging.yml#/paths/~1message_templates~1render_preview'
+    /customers/create:
+        $ref: './resources/customers.yml#/paths/~1customers~1create'
+    /customers/lookup:
+        $ref: './resources/customers.yml#/paths/~1customers~1lookup'
+    /customers/update:
+        $ref: './resources/customers.yml#/paths/~1customers~1update'
+    /customers/page:
+        $ref: './resources/customers.yml#/paths/~1customers~1page'
+    /checkout/lookup:
+        $ref: './resources/checkout.yml#/paths/~1checkout~1lookup'
+    /checkout/select_amount:
+        $ref: './resources/checkout.yml#/paths/~1checkout~1select_amount'
+    /checkout/pay:
+        $ref: './resources/checkout.yml#/paths/~1checkout~1pay'
+    /checkout/confirm_payment:
+        $ref: './resources/checkout.yml#/paths/~1checkout~1confirm_payment'
+    /checkout/request_confirmation:
+        $ref: './resources/checkout.yml#/paths/~1checkout~1request_confirmation'
+    /orders/create:
+        $ref: './resources/orders.yml#/paths/~1orders~1create'
+    /orders/lookup:
+        $ref: './resources/orders.yml#/paths/~1orders~1lookup'
+    /orders/update:
+        $ref: './resources/orders.yml#/paths/~1orders~1update'
+    /orders/pay:
+        $ref: './resources/orders.yml#/paths/~1orders~1pay'
+    /orders/confirm_payment:
+        $ref: './resources/orders.yml#/paths/~1orders~1confirm_payment'
+    /orders/request_confirmation:
+        $ref: './resources/orders.yml#/paths/~1orders~1request_confirmation'
+    /orders/cancel:
+        $ref: './resources/orders.yml#/paths/~1orders~1cancel'
+    /orders/finalize:
+        $ref: './resources/orders.yml#/paths/~1orders~1finalize'
+    /orders/complete:
+        $ref: './resources/orders.yml#/paths/~1orders~1complete'
+    /orders/send_invoice:
+        $ref: './resources/orders.yml#/paths/~1orders~1send_invoice'
+    /orders/send_receipt:
+        $ref: './resources/orders.yml#/paths/~1orders~1send_receipt'
+    /orders/page:
+        $ref: './resources/orders.yml#/paths/~1orders~1page'
+    /refunds/create:
+        $ref: './resources/refunds.yml#/paths/~1refunds~1create'
+    /refunds/cancel:
+        $ref: './resources/refunds.yml#/paths/~1refunds~1cancel'
+    /refunds/lookup:
+        $ref: './resources/refunds.yml#/paths/~1refunds~1lookup'
+    /refunds/page:
+        $ref: './resources/refunds.yml#/paths/~1refunds~1page'
+    /apps/create:
+        $ref: './resources/platform.yml#/paths/~1apps~1create'
+    /apps/capabilities:
+        $ref: './resources/platform.yml#/paths/~1apps~1capabilities'
+    /apps/lookup:
+        $ref: './resources/platform.yml#/paths/~1apps~1lookup'
+    /apps/update:
+        $ref: './resources/platform.yml#/paths/~1apps~1update'
+    /children_policies/lookup:
+        $ref: './resources/platform.yml#/paths/~1children_policies~1lookup'
+    /children_policies/page:
+        $ref: './resources/platform.yml#/paths/~1children_policies~1page'
+    /operating_policies/create:
+        $ref: './resources/platform.yml#/paths/~1operating_policies~1create'
+    /operating_policies/lookup:
+        $ref: './resources/platform.yml#/paths/~1operating_policies~1lookup'
+    /operating_policies/page:
+        $ref: './resources/platform.yml#/paths/~1operating_policies~1page'
+    /operating_policies/update:
+        $ref: './resources/platform.yml#/paths/~1operating_policies~1update'
+    /keys/generate:
+        $ref: './resources/platform.yml#/paths/~1keys~1generate'
+    /keys/page:
+        $ref: './resources/platform.yml#/paths/~1keys~1page'
+    /keys/lookup:
+        $ref: './resources/platform.yml#/paths/~1keys~1lookup'
+    /keys/update:
+        $ref: './resources/platform.yml#/paths/~1keys~1update'
+    /keys/destroy:
+        $ref: './resources/platform.yml#/paths/~1keys~1destroy'
+    /keys/usage:
+        $ref: './resources/platform.yml#/paths/~1keys~1usage'
+    /financial_accounts/create:
+        $ref: './resources/finance.yml#/paths/~1financial_accounts~1create'
+    /financial_accounts/lookup:
+        $ref: './resources/finance.yml#/paths/~1financial_accounts~1lookup'
+    /financial_accounts/page:
+        $ref: './resources/finance.yml#/paths/~1financial_accounts~1page'
+    /financial_accounts/connect:
+        $ref: './resources/finance.yml#/paths/~1financial_accounts~1connect'
+    /financial_accounts/update:
+        $ref: './resources/finance.yml#/paths/~1financial_accounts~1update'
+    /financial_accounts/enable_push:
+        $ref: './resources/finance.yml#/paths/~1financial_accounts~1enable_push'
+    /financial_accounts/disable_push:
+        $ref: './resources/finance.yml#/paths/~1financial_accounts~1disable_push'
+    /financial_accounts/disconnect:
+        $ref: './resources/finance.yml#/paths/~1financial_accounts~1disconnect'
+    /financial_accounts/reconnect:
+        $ref: './resources/finance.yml#/paths/~1financial_accounts~1reconnect'
+    /financial_accounts/enable_pull:
+        $ref: './resources/finance.yml#/paths/~1financial_accounts~1enable_pull'
+    /financial_accounts/disable_pull:
+        $ref: './resources/finance.yml#/paths/~1financial_accounts~1disable_pull'
+    /balances:
+        $ref: './resources/finance.yml#/paths/~1balances'
+    /balance_transactions/lookup:
+        $ref: './resources/finance.yml#/paths/~1balance_transactions~1lookup'
+    /balance_transactions/page:
+        $ref: './resources/finance.yml#/paths/~1balance_transactions~1page'
+    /payouts/schedule:
+        $ref: './resources/finance.yml#/paths/~1payouts~1schedule'
+    /payouts/lookup:
+        $ref: './resources/finance.yml#/paths/~1payouts~1lookup'
+    /payouts/set_destinations:
+        $ref: './resources/finance.yml#/paths/~1payouts~1set_destinations'
+    /payouts/settings:
+        $ref: './resources/finance.yml#/paths/~1payouts~1settings'
+    /payouts/disable:
+        $ref: './resources/finance.yml#/paths/~1payouts~1disable'
+    /payouts/enable:
+        $ref: './resources/finance.yml#/paths/~1payouts~1enable'
+    /payouts/page:
+        $ref: './resources/finance.yml#/paths/~1payouts~1page'
+    /payouts/cancel:
+        $ref: './resources/finance.yml#/paths/~1payouts~1cancel'
+    /files/create:
+        $ref: './resources/files.yml#/paths/~1files~1create'
+    /files/lookup:
+        $ref: './resources/files.yml#/paths/~1files~1lookup'
+    /files/page:
+        $ref: './resources/files.yml#/paths/~1files~1page'
+    /files/contents:
+        $ref: './resources/files.yml#/paths/~1files~1contents'
+    /files/delete:
+        $ref: './resources/files.yml#/paths/~1files~1delete'
+    /file_links/create:
+        $ref: './resources/files.yml#/paths/~1file_links~1create'
+    /file_links/lookup:
+        $ref: './resources/files.yml#/paths/~1file_links~1lookup'
+    /file_links/page:
+        $ref: './resources/files.yml#/paths/~1file_links~1page'
+    /file_links/revoke:
+        $ref: './resources/files.yml#/paths/~1file_links~1revoke'
+    /file_links/open:
+        $ref: './resources/files.yml#/paths/~1file_links~1open'
+    /upload_requests/create:
+        $ref: './resources/files.yml#/paths/~1upload_requests~1create'
+    /upload_requests/lookup:
+        $ref: './resources/files.yml#/paths/~1upload_requests~1lookup'
+    /upload_requests/page:
+        $ref: './resources/files.yml#/paths/~1upload_requests~1page'
+    /upload_requests/cancel:
+        $ref: './resources/files.yml#/paths/~1upload_requests~1cancel'
+    /upload_requests/review:
+        $ref: './resources/files.yml#/paths/~1upload_requests~1review'
+    /upload_requests/upload:
+        $ref: './resources/files.yml#/paths/~1upload_requests~1upload'
+    /file_references/reconcile:
+        $ref: './resources/files.yml#/paths/~1file_references~1reconcile'
+    /payment_methods/tokenize:
+        $ref: './resources/payment-methods.yml#/paths/~1payment_methods~1tokenize'
+    /payment_methods/lookup:
+        $ref: './resources/payment-methods.yml#/paths/~1payment_methods~1lookup'
+    /payment_methods/page:
+        $ref: './resources/payment-methods.yml#/paths/~1payment_methods~1page'
+    /payment_methods/update:
+        $ref: './resources/payment-methods.yml#/paths/~1payment_methods~1update'
+    /payment_methods/activate:
+        $ref: './resources/payment-methods.yml#/paths/~1payment_methods~1activate'
+    /payment_methods/disactivate:
+        $ref: './resources/payment-methods.yml#/paths/~1payment_methods~1disactivate'
+    /payment_methods/archive:
+        $ref: './resources/payment-methods.yml#/paths/~1payment_methods~1archive'
+    /payment_methods/unarchive:
+        $ref: './resources/payment-methods.yml#/paths/~1payment_methods~1unarchive'
+    /payment_methods/settings:
+        $ref: './resources/payment-methods.yml#/paths/~1payment_methods~1settings'
+    /products/create:
+        $ref: './resources/catalog.yml#/paths/~1products~1create'
+    /products/add_price:
+        $ref: './resources/catalog.yml#/paths/~1products~1add_price'
+    /products/lookup:
+        $ref: './resources/catalog.yml#/paths/~1products~1lookup'
+    /products/update:
+        $ref: './resources/catalog.yml#/paths/~1products~1update'
+    /products/publish:
+        $ref: './resources/catalog.yml#/paths/~1products~1publish'
+    /products/unpublish:
+        $ref: './resources/catalog.yml#/paths/~1products~1unpublish'
+    /products/archive:
+        $ref: './resources/catalog.yml#/paths/~1products~1archive'
+    /products/page:
+        $ref: './resources/catalog.yml#/paths/~1products~1page'
+    /purchase_intents/create:
+        $ref: './resources/purchase-intents.yml#/paths/~1purchase_intents~1create'
+    /purchase_intents/update:
+        $ref: './resources/purchase-intents.yml#/paths/~1purchase_intents~1update'
+    /purchase_intents/cancel:
+        $ref: './resources/purchase-intents.yml#/paths/~1purchase_intents~1cancel'
+    /purchase_intents/lookup:
+        $ref: './resources/purchase-intents.yml#/paths/~1purchase_intents~1lookup'
+    /purchase_intents/page:
+        $ref: './resources/purchase-intents.yml#/paths/~1purchase_intents~1page'
+    /prices/create:
+        $ref: './resources/catalog.yml#/paths/~1prices~1create'
+    /prices/lookup:
+        $ref: './resources/catalog.yml#/paths/~1prices~1lookup'
+    /prices/page:
+        $ref: './resources/catalog.yml#/paths/~1prices~1page'
+    /prices/update:
+        $ref: './resources/catalog.yml#/paths/~1prices~1update'
+    /prices/activate:
+        $ref: './resources/catalog.yml#/paths/~1prices~1activate'
+    /prices/deactivate:
+        $ref: './resources/catalog.yml#/paths/~1prices~1deactivate'
+    /prices/archive:
+        $ref: './resources/catalog.yml#/paths/~1prices~1archive'
+    /spec/countries:
+        $ref: './resources/specifications.yml#/paths/~1spec~1countries'
+    /customers/search:
+        $ref: './resources/customers.yml#/paths/~1customers~1search'
+    /financial_accounts/search:
+        $ref: './resources/finance.yml#/paths/~1financial_accounts~1search'
+    /orders/search:
+        $ref: './resources/orders.yml#/paths/~1orders~1search'
+    /payouts/search:
+        $ref: './resources/finance.yml#/paths/~1payouts~1search'
+    /products/search:
+        $ref: './resources/catalog.yml#/paths/~1products~1search'
+components:
+    securitySchemes:
+        bearerAuth:
+            $ref: './resources/common.yml#/components/securitySchemes/bearerAuth'
+    headers:
+        RequestId:
+            $ref: './resources/common.yml#/components/headers/RequestId'
+        RetryAfter:
+            $ref: './resources/common.yml#/components/headers/RetryAfter'
+    parameters:
+        IdempotencyKey:
+            $ref: './resources/common.yml#/components/parameters/IdempotencyKey'
+    schemas:
+        IdempotencyKeyValue:
+            $ref: './resources/common.yml#/components/schemas/IdempotencyKeyValue'
+        RequestPropertySelection:
+            $ref: './resources/common.yml#/components/schemas/RequestPropertySelection'
+        RequestResponse:
+            $ref: './resources/common.yml#/components/schemas/RequestResponse'
+        ApplicationCapabilityRequirement:
+            $ref: './resources/platform.yml#/components/schemas/ApplicationCapabilityRequirement'
+        ApplicationCapabilityRequirements:
+            $ref: './resources/platform.yml#/components/schemas/ApplicationCapabilityRequirements'
+        EnabledApplicationCapability:
+            $ref: './resources/platform.yml#/components/schemas/EnabledApplicationCapability'
+        RestrictedApplicationCapability:
+            $ref: './resources/platform.yml#/components/schemas/RestrictedApplicationCapability'
+        PendingReviewApplicationCapability:
+            $ref: './resources/platform.yml#/components/schemas/PendingReviewApplicationCapability'
+        ApplicationCapabilitiesResponse:
+            $ref: './resources/platform.yml#/components/schemas/ApplicationCapabilitiesResponse'
+        ApplicationCapabilityProjection:
+            $ref: './resources/platform.yml#/components/schemas/ApplicationCapabilityProjection'
+        PolicyAmountRange:
+            $ref: './resources/platform.yml#/components/schemas/PolicyAmountRange'
+        PolicyLimits:
+            $ref: './resources/platform.yml#/components/schemas/PolicyLimits'
+        PolicyBTAgingSpec:
+            $ref: './resources/platform.yml#/components/schemas/PolicyBTAgingSpec'
+        PolicyBTAgingSpecReference:
+            $ref: './resources/platform.yml#/components/schemas/PolicyBTAgingSpecReference'
+        ChildrenPolicyPaymentsCapabilities:
+            $ref: './resources/platform.yml#/components/schemas/ChildrenPolicyPaymentsCapabilities'
+        ChildrenPolicyPayoutsCapabilities:
+            $ref: './resources/platform.yml#/components/schemas/ChildrenPolicyPayoutsCapabilities'
+        ChildrenPolicyPaymentMethodCapabilities:
+            $ref: './resources/platform.yml#/components/schemas/ChildrenPolicyPaymentMethodCapabilities'
+        ChildrenPolicyPaymentMethodsCapabilities:
+            $ref: './resources/platform.yml#/components/schemas/ChildrenPolicyPaymentMethodsCapabilities'
+        ChildrenPolicyCapabilities:
+            $ref: './resources/platform.yml#/components/schemas/ChildrenPolicyCapabilities'
+        ChildrenPolicy:
+            $ref: './resources/platform.yml#/components/schemas/ChildrenPolicy'
+        LookupChildrenPolicyRequest:
+            $ref: './resources/platform.yml#/components/schemas/LookupChildrenPolicyRequest'
+        PageChildrenPolicyVersionsRequest:
+            $ref: './resources/platform.yml#/components/schemas/PageChildrenPolicyVersionsRequest'
+        ChildrenPolicyResponse:
+            $ref: './resources/platform.yml#/components/schemas/ChildrenPolicyResponse'
+        ChildrenPolicyVersionsPage:
+            $ref: './resources/platform.yml#/components/schemas/ChildrenPolicyVersionsPage'
+        ChildrenPolicyVersionsPageResponse:
+            $ref: './resources/platform.yml#/components/schemas/ChildrenPolicyVersionsPageResponse'
+        OperatingPolicyPaymentsCapabilitiesInput:
+            $ref: './resources/platform.yml#/components/schemas/OperatingPolicyPaymentsCapabilitiesInput'
+        OperatingPolicyPayoutsCapabilitiesInput:
+            $ref: './resources/platform.yml#/components/schemas/OperatingPolicyPayoutsCapabilitiesInput'
+        OperatingPolicyPaymentMethodCapabilities:
+            $ref: './resources/platform.yml#/components/schemas/OperatingPolicyPaymentMethodCapabilities'
+        OperatingPolicyPaymentMethodsCapabilities:
+            $ref: './resources/platform.yml#/components/schemas/OperatingPolicyPaymentMethodsCapabilities'
+        OperatingPolicyCapabilitiesInput:
+            $ref: './resources/platform.yml#/components/schemas/OperatingPolicyCapabilitiesInput'
+        OperatingPolicyPaymentsCapabilities:
+            $ref: './resources/platform.yml#/components/schemas/OperatingPolicyPaymentsCapabilities'
+        OperatingPolicyPayoutsCapabilities:
+            $ref: './resources/platform.yml#/components/schemas/OperatingPolicyPayoutsCapabilities'
+        OperatingPolicyCapabilities:
+            $ref: './resources/platform.yml#/components/schemas/OperatingPolicyCapabilities'
+        OperatingPolicySelectionByID:
+            $ref: './resources/platform.yml#/components/schemas/OperatingPolicySelectionByID'
+        InlineOperatingPolicySelection:
+            $ref: './resources/platform.yml#/components/schemas/InlineOperatingPolicySelection'
+        OperatingPolicySelection:
+            $ref: './resources/platform.yml#/components/schemas/OperatingPolicySelection'
+        OperatingPolicySource:
+            $ref: './resources/platform.yml#/components/schemas/OperatingPolicySource'
+        InlineOperatingPolicySource:
+            $ref: './resources/platform.yml#/components/schemas/InlineOperatingPolicySource'
+        TemplateOperatingPolicySource:
+            $ref: './resources/platform.yml#/components/schemas/TemplateOperatingPolicySource'
+        ApplicationOperatingPolicy:
+            $ref: './resources/platform.yml#/components/schemas/ApplicationOperatingPolicy'
+        OperatingPolicy:
+            $ref: './resources/platform.yml#/components/schemas/OperatingPolicy'
+        CreateOperatingPolicyRequest:
+            $ref: './resources/platform.yml#/components/schemas/CreateOperatingPolicyRequest'
+        LookupOperatingPolicyRequest:
+            $ref: './resources/platform.yml#/components/schemas/LookupOperatingPolicyRequest'
+        PageOperatingPolicyVersionsRequest:
+            $ref: './resources/platform.yml#/components/schemas/PageOperatingPolicyVersionsRequest'
+        UpdateOperatingPolicyRequest:
+            $ref: './resources/platform.yml#/components/schemas/UpdateOperatingPolicyRequest'
+        OperatingPolicyResponse:
+            $ref: './resources/platform.yml#/components/schemas/OperatingPolicyResponse'
+        OperatingPolicyVersionsPage:
+            $ref: './resources/platform.yml#/components/schemas/OperatingPolicyVersionsPage'
+        OperatingPolicyVersionsPageResponse:
+            $ref: './resources/platform.yml#/components/schemas/OperatingPolicyVersionsPageResponse'
+        ResourceSearchRequest:
+            $ref: './resources/common.yml#/components/schemas/ResourceSearchRequest'
+        ResourceSearchFilter:
+            $ref: './resources/common.yml#/components/schemas/ResourceSearchFilter'
+        ResourceSearchEqualsFilter:
+            $ref: './resources/common.yml#/components/schemas/ResourceSearchEqualsFilter'
+        ResourceSearchInFilter:
+            $ref: './resources/common.yml#/components/schemas/ResourceSearchInFilter'
+        ResourceSearchFacet:
+            $ref: './resources/common.yml#/components/schemas/ResourceSearchFacet'
+        ResourceSearchSort:
+            $ref: './resources/common.yml#/components/schemas/ResourceSearchSort'
+        ResourceSearchRelevanceSort:
+            $ref: './resources/common.yml#/components/schemas/ResourceSearchRelevanceSort'
+        ResourceSearchChronologicalSort:
+            $ref: './resources/common.yml#/components/schemas/ResourceSearchChronologicalSort'
+        ResourceSearchResponse:
+            $ref: './resources/common.yml#/components/schemas/ResourceSearchResponse'
+        ResourceSearchPage:
+            $ref: './resources/common.yml#/components/schemas/ResourceSearchPage'
+        SearchResourceType:
+            $ref: './resources/common.yml#/components/schemas/SearchResourceType'
+        ResourceSearchTotal:
+            $ref: './resources/common.yml#/components/schemas/ResourceSearchTotal'
+        ResourceSearchResourceTotal:
+            $ref: './resources/common.yml#/components/schemas/ResourceSearchResourceTotal'
+        ResourceSearchResourceReference:
+            $ref: './resources/common.yml#/components/schemas/ResourceSearchResourceReference'
+        ResourceSearchAmount:
+            $ref: './resources/common.yml#/components/schemas/ResourceSearchAmount'
+        ResourceSearchResult:
+            $ref: './resources/common.yml#/components/schemas/ResourceSearchResult'
+        ResourceSearchFacetBucket:
+            $ref: './resources/common.yml#/components/schemas/ResourceSearchFacetBucket'
+        ResourceSearchFacetResult:
+            $ref: './resources/common.yml#/components/schemas/ResourceSearchFacetResult'
+        ResourceSearchResourceFreshness:
+            $ref: './resources/common.yml#/components/schemas/ResourceSearchResourceFreshness'
+        ResourceSearchFreshness:
+            $ref: './resources/common.yml#/components/schemas/ResourceSearchFreshness'
+        CustomData:
+            $ref: './resources/common.yml#/components/schemas/CustomData'
+        CustomDataInput:
+            $ref: './resources/common.yml#/components/schemas/CustomDataInput'
+        CustomDataPatch:
+            $ref: './resources/common.yml#/components/schemas/CustomDataPatch'
+        JSONData:
+            $ref: './resources/common.yml#/components/schemas/JSONData'
+        FileMetadata:
+            $ref: './resources/files.yml#/components/schemas/FileMetadata'
+        MessageHeaders:
+            $ref: './resources/messaging.yml#/components/schemas/MessageHeaders'
+        PayoutDestinations:
+            $ref: './resources/finance.yml#/components/schemas/PayoutDestinations'
+        ProductDimensionDetails:
+            $ref: './resources/catalog.yml#/components/schemas/ProductDimensionDetails'
+        VariantValues:
+            $ref: './resources/catalog.yml#/components/schemas/VariantValues'
+        BalanceSnapshot:
+            $ref: './resources/finance.yml#/components/schemas/BalanceSnapshot'
+        CustomerBalanceValue:
+            $ref: './resources/finance.yml#/components/schemas/CustomerBalanceValue'
+        CustomerBalance:
+            $ref: './resources/finance.yml#/components/schemas/CustomerBalance'
+        CountrySpecifications:
+            $ref: './resources/catalog.yml#/components/schemas/CountrySpecifications'
+        GenerateSecretKeyRequest:
+            $ref: './resources/platform.yml#/components/schemas/GenerateSecretKeyRequest'
+        GenerateSecretKeyResponse:
+            $ref: './resources/platform.yml#/components/schemas/GenerateSecretKeyResponse'
+        GeneratedSecretKey:
+            $ref: './resources/platform.yml#/components/schemas/GeneratedSecretKey'
+        PageSecretKeysRequest:
+            $ref: './resources/platform.yml#/components/schemas/PageSecretKeysRequest'
+        PageSecretKeysResponse:
+            $ref: './resources/platform.yml#/components/schemas/PageSecretKeysResponse'
+        LookupSecretKeyRequest:
+            $ref: './resources/platform.yml#/components/schemas/LookupSecretKeyRequest'
+        LookupSecretKeyResponse:
+            $ref: './resources/platform.yml#/components/schemas/LookupSecretKeyResponse'
+        UpdateSecretKeyRequest:
+            $ref: './resources/platform.yml#/components/schemas/UpdateSecretKeyRequest'
+        UpdateSecretKeyResponse:
+            $ref: './resources/platform.yml#/components/schemas/UpdateSecretKeyResponse'
+        DestroySecretKeyRequest:
+            $ref: './resources/platform.yml#/components/schemas/DestroySecretKeyRequest'
+        DestroySecretKeyResponse:
+            $ref: './resources/platform.yml#/components/schemas/DestroySecretKeyResponse'
+        SecretKeyUsageRequest:
+            $ref: './resources/platform.yml#/components/schemas/SecretKeyUsageRequest'
+        SecretKeyUsageResponse:
+            $ref: './resources/platform.yml#/components/schemas/SecretKeyUsageResponse'
+        SecretKey:
+            $ref: './resources/platform.yml#/components/schemas/SecretKey'
+        SecretKeyPage:
+            $ref: './resources/platform.yml#/components/schemas/SecretKeyPage'
+        SecretKeyUsagePage:
+            $ref: './resources/platform.yml#/components/schemas/SecretKeyUsagePage'
+        SecretKeyUsageRow:
+            $ref: './resources/platform.yml#/components/schemas/SecretKeyUsageRow'
+        FileApiError:
+            $ref: './resources/files.yml#/components/schemas/FileApiError'
+        CreateFileRequest:
+            $ref: './resources/files.yml#/components/schemas/CreateFileRequest'
+        LookupFileRequest:
+            $ref: './resources/files.yml#/components/schemas/LookupFileRequest'
+        PageFilesRequest:
+            $ref: './resources/files.yml#/components/schemas/PageFilesRequest'
+        FileContentsRequest:
+            $ref: './resources/files.yml#/components/schemas/FileContentsRequest'
+        DeleteFileRequest:
+            $ref: './resources/files.yml#/components/schemas/DeleteFileRequest'
+        FileResponse:
+            $ref: './resources/files.yml#/components/schemas/FileResponse'
+        FilePageResponse:
+            $ref: './resources/files.yml#/components/schemas/FilePageResponse'
+        FilePage:
+            $ref: './resources/files.yml#/components/schemas/FilePage'
+        FileObject:
+            $ref: './resources/files.yml#/components/schemas/FileObject'
+        FileUploadReceipt:
+            $ref: './resources/files.yml#/components/schemas/FileUploadReceipt'
+        FileActor:
+            $ref: './resources/files.yml#/components/schemas/FileActor'
+        FileSource:
+            $ref: './resources/files.yml#/components/schemas/FileSource'
+        FileMedia:
+            $ref: './resources/files.yml#/components/schemas/FileMedia'
+        PublicFileStorage:
+            $ref: './resources/files.yml#/components/schemas/PublicFileStorage'
+        FileDelivery:
+            $ref: './resources/files.yml#/components/schemas/FileDelivery'
+        FileLatestError:
+            $ref: './resources/files.yml#/components/schemas/FileLatestError'
+        CreateFileLinkRequest:
+            $ref: './resources/files.yml#/components/schemas/CreateFileLinkRequest'
+        LookupFileLinkRequest:
+            $ref: './resources/files.yml#/components/schemas/LookupFileLinkRequest'
+        PageFileLinksRequest:
+            $ref: './resources/files.yml#/components/schemas/PageFileLinksRequest'
+        RevokeFileLinkRequest:
+            $ref: './resources/files.yml#/components/schemas/RevokeFileLinkRequest'
+        CreateFileLinkResponse:
+            $ref: './resources/files.yml#/components/schemas/CreateFileLinkResponse'
+        FileLinkResponse:
+            $ref: './resources/files.yml#/components/schemas/FileLinkResponse'
+        FileLinkPageResponse:
+            $ref: './resources/files.yml#/components/schemas/FileLinkPageResponse'
+        FileLinkPage:
+            $ref: './resources/files.yml#/components/schemas/FileLinkPage'
+        FileLinkObject:
+            $ref: './resources/files.yml#/components/schemas/FileLinkObject'
+        FileLinkActor:
+            $ref: './resources/files.yml#/components/schemas/FileLinkActor'
+        FileActorInput:
+            $ref: './resources/files.yml#/components/schemas/FileActorInput'
+        FileLinkDelivery:
+            $ref: './resources/files.yml#/components/schemas/FileLinkDelivery'
+        FileLinkAccessRequest:
+            $ref: './resources/files.yml#/components/schemas/FileLinkAccessRequest'
+        FileLinkAccess:
+            $ref: './resources/files.yml#/components/schemas/FileLinkAccess'
+        CreateUploadRequestRequest:
+            $ref: './resources/files.yml#/components/schemas/CreateUploadRequestRequest'
+        LookupUploadRequestRequest:
+            $ref: './resources/files.yml#/components/schemas/LookupUploadRequestRequest'
+        PageUploadRequestsRequest:
+            $ref: './resources/files.yml#/components/schemas/PageUploadRequestsRequest'
+        CancelUploadRequestRequest:
+            $ref: './resources/files.yml#/components/schemas/CancelUploadRequestRequest'
+        FulfillUploadRequestRequest:
+            $ref: './resources/files.yml#/components/schemas/FulfillUploadRequestRequest'
+        ReviewUploadRequestAttemptRequest:
+            $ref: './resources/files.yml#/components/schemas/ReviewUploadRequestAttemptRequest'
+        ReviewUploadRequestAttemptByIDRequest:
+            $ref: './resources/files.yml#/components/schemas/ReviewUploadRequestAttemptByIDRequest'
+        ReviewUploadRequestAttemptByOrdinalRequest:
+            $ref: './resources/files.yml#/components/schemas/ReviewUploadRequestAttemptByOrdinalRequest'
+        UploadRequestReviewReasonInput:
+            $ref: './resources/files.yml#/components/schemas/UploadRequestReviewReasonInput'
+        UploadRequestResponse:
+            $ref: './resources/files.yml#/components/schemas/UploadRequestResponse'
+        UploadRequestWithAttemptResponse:
+            $ref: './resources/files.yml#/components/schemas/UploadRequestWithAttemptResponse'
+        UploadRequestPageResponse:
+            $ref: './resources/files.yml#/components/schemas/UploadRequestPageResponse'
+        UploadRequestPage:
+            $ref: './resources/files.yml#/components/schemas/UploadRequestPage'
+        FulfillUploadRequestResponse:
+            $ref: './resources/files.yml#/components/schemas/FulfillUploadRequestResponse'
+        UploadRequestValidationErrorResponse:
+            $ref: './resources/files.yml#/components/schemas/UploadRequestValidationErrorResponse'
+        UploadRequestObject:
+            $ref: './resources/files.yml#/components/schemas/UploadRequestObject'
+        UploadRequestWithAttemptObject:
+            $ref: './resources/files.yml#/components/schemas/UploadRequestWithAttemptObject'
+        UploadRequestConstraints:
+            $ref: './resources/files.yml#/components/schemas/UploadRequestConstraints'
+        UploadRequestDisplay:
+            $ref: './resources/files.yml#/components/schemas/UploadRequestDisplay'
+        FileParty:
+            $ref: './resources/files.yml#/components/schemas/FileParty'
+        FileResource:
+            $ref: './resources/files.yml#/components/schemas/FileResource'
+        UploadRequestAttemptsRequest:
+            $ref: './resources/files.yml#/components/schemas/UploadRequestAttemptsRequest'
+        UploadRequestAttempts:
+            $ref: './resources/files.yml#/components/schemas/UploadRequestAttempts'
+        UploadRequestActor:
+            $ref: './resources/files.yml#/components/schemas/UploadRequestActor'
+        UploadRequestAttempt:
+            $ref: './resources/files.yml#/components/schemas/UploadRequestAttempt'
+        UploadRequestReview:
+            $ref: './resources/files.yml#/components/schemas/UploadRequestReview'
+        UploadRequestReviewReason:
+            $ref: './resources/files.yml#/components/schemas/UploadRequestReviewReason'
+        UploadRequestLatestError:
+            $ref: './resources/files.yml#/components/schemas/UploadRequestLatestError'
+        FileReferenceReconcileRequest:
+            $ref: './resources/files.yml#/components/schemas/FileReferenceReconcileRequest'
+        FileReferenceInput:
+            $ref: './resources/files.yml#/components/schemas/FileReferenceInput'
+        FileReferenceReconcileResponse:
+            $ref: './resources/files.yml#/components/schemas/FileReferenceReconcileResponse'
+        PaymentNextAction:
+            $ref: './resources/orders.yml#/components/schemas/PaymentNextAction'
+        CreateOrderNewCustomer:
+            $ref: './resources/orders.yml#/components/schemas/CreateOrderNewCustomer'
+        CreateOrderExistingCustomer:
+            $ref: './resources/orders.yml#/components/schemas/CreateOrderExistingCustomer'
+        InvoiceSettings:
+            $ref: './resources/orders.yml#/components/schemas/InvoiceSettings'
+        OrderPayoutSettingsRequest:
+            $ref: './resources/orders.yml#/components/schemas/OrderPayoutSettingsRequest'
+        CustomerData:
+            $ref: './resources/customers.yml#/components/schemas/CustomerData'
+        CustomerAddressInput:
+            $ref: './resources/customers.yml#/components/schemas/CustomerAddressInput'
+        CreateCustomerRequest:
+            $ref: './resources/customers.yml#/components/schemas/CreateCustomerRequest'
+        UpdateCustomerRequest:
+            $ref: './resources/customers.yml#/components/schemas/UpdateCustomerRequest'
+        PageCustomersRequest:
+            $ref: './resources/customers.yml#/components/schemas/PageCustomersRequest'
+        LookupCustomerRequest:
+            $ref: './resources/customers.yml#/components/schemas/LookupCustomerRequest'
+        Customer:
+            $ref: './resources/customers.yml#/components/schemas/Customer'
+        CustomerAddress:
+            $ref: './resources/customers.yml#/components/schemas/CustomerAddress'
+        CustomerResponse:
+            $ref: './resources/customers.yml#/components/schemas/CustomerResponse'
+        CustomerPage:
+            $ref: './resources/customers.yml#/components/schemas/CustomerPage'
+        ProductAttribute:
+            $ref: './resources/catalog.yml#/components/schemas/ProductAttribute'
+        ProductDimensions:
+            $ref: './resources/catalog.yml#/components/schemas/ProductDimensions'
+        ProductMediaFileReference:
+            $ref: './resources/catalog.yml#/components/schemas/ProductMediaFileReference'
+        ProductMedia:
+            $ref: './resources/catalog.yml#/components/schemas/ProductMedia'
+        ProductShipmentInput:
+            $ref: './resources/catalog.yml#/components/schemas/ProductShipmentInput'
+        ProductShipment:
+            $ref: './resources/catalog.yml#/components/schemas/ProductShipment'
+        ProductDelivery:
+            $ref: './resources/catalog.yml#/components/schemas/ProductDelivery'
+        ProductDownload:
+            $ref: './resources/catalog.yml#/components/schemas/ProductDownload'
+        ProductRender:
+            $ref: './resources/catalog.yml#/components/schemas/ProductRender'
+        ProductService:
+            $ref: './resources/catalog.yml#/components/schemas/ProductService'
+        ProductStream:
+            $ref: './resources/catalog.yml#/components/schemas/ProductStream'
+        CreateProductRequest:
+            $ref: './resources/catalog.yml#/components/schemas/CreateProductRequest'
+        LookupProductRequest:
+            $ref: './resources/catalog.yml#/components/schemas/LookupProductRequest'
+        UpdateProductRequest:
+            $ref: './resources/catalog.yml#/components/schemas/UpdateProductRequest'
+        AddProductPriceRequest:
+            $ref: './resources/catalog.yml#/components/schemas/AddProductPriceRequest'
+        AddFixedProductPriceRequest:
+            $ref: './resources/catalog.yml#/components/schemas/AddFixedProductPriceRequest'
+        AddCustomerSelectedProductPriceRequest:
+            $ref: './resources/catalog.yml#/components/schemas/AddCustomerSelectedProductPriceRequest'
+        AddProductPriceResponse:
+            $ref: './resources/catalog.yml#/components/schemas/AddProductPriceResponse'
+        ProductPriceSummary:
+            $ref: './resources/catalog.yml#/components/schemas/ProductPriceSummary'
+        FixedProductPriceSummary:
+            $ref: './resources/catalog.yml#/components/schemas/FixedProductPriceSummary'
+        CustomerSelectedProductPriceSummary:
+            $ref: './resources/customers.yml#/components/schemas/CustomerSelectedProductPriceSummary'
+        ProductActionRequest:
+            $ref: './resources/catalog.yml#/components/schemas/ProductActionRequest'
+        ProductResponse:
+            $ref: './resources/catalog.yml#/components/schemas/ProductResponse'
+        UpdateProductResponse:
+            $ref: './resources/catalog.yml#/components/schemas/UpdateProductResponse'
+        UpdatedProduct:
+            $ref: './resources/catalog.yml#/components/schemas/UpdatedProduct'
+        PurchaseIntentProductSelection:
+            $ref: './resources/purchase-intents.yml#/components/schemas/PurchaseIntentProductSelection'
+        PurchaseIntentBundleSelection:
+            $ref: './resources/purchase-intents.yml#/components/schemas/PurchaseIntentBundleSelection'
+        PurchaseIntentPriceSelection:
+            $ref: './resources/purchase-intents.yml#/components/schemas/PurchaseIntentPriceSelection'
+        CreatePurchaseIntentRequest:
+            $ref: './resources/purchase-intents.yml#/components/schemas/CreatePurchaseIntentRequest'
+        UpdatePurchaseIntentRequest:
+            $ref: './resources/purchase-intents.yml#/components/schemas/UpdatePurchaseIntentRequest'
+        UpdatePurchaseIntentRequestFields:
+            $ref: './resources/purchase-intents.yml#/components/schemas/UpdatePurchaseIntentRequestFields'
+        CreatePurchaseIntentPresentation:
+            $ref: './resources/purchase-intents.yml#/components/schemas/CreatePurchaseIntentPresentation'
+        UpdatePurchaseIntentPresentation:
+            $ref: './resources/purchase-intents.yml#/components/schemas/UpdatePurchaseIntentPresentation'
+        CancelPurchaseIntentRequest:
+            $ref: './resources/purchase-intents.yml#/components/schemas/CancelPurchaseIntentRequest'
+        LookupPurchaseIntentRequest:
+            $ref: './resources/purchase-intents.yml#/components/schemas/LookupPurchaseIntentRequest'
+        PagePurchaseIntentsRequest:
+            $ref: './resources/purchase-intents.yml#/components/schemas/PagePurchaseIntentsRequest'
+        PagePurchaseIntentsResponse:
+            $ref: './resources/purchase-intents.yml#/components/schemas/PagePurchaseIntentsResponse'
+        PurchaseIntentResponse:
+            $ref: './resources/purchase-intents.yml#/components/schemas/PurchaseIntentResponse'
+        PurchaseIntentMerchant:
+            $ref: './resources/purchase-intents.yml#/components/schemas/PurchaseIntentMerchant'
+        PurchaseIntentMerchantAsset:
+            $ref: './resources/purchase-intents.yml#/components/schemas/PurchaseIntentMerchantAsset'
+        PurchaseIntentMerchantBranding:
+            $ref: './resources/purchase-intents.yml#/components/schemas/PurchaseIntentMerchantBranding'
+        PurchaseIntentMerchantColorScheme:
+            $ref: './resources/purchase-intents.yml#/components/schemas/PurchaseIntentMerchantColorScheme'
+        PurchaseIntentMerchantProfile:
+            $ref: './resources/purchase-intents.yml#/components/schemas/PurchaseIntentMerchantProfile'
+        PurchaseIntentMerchantSupport:
+            $ref: './resources/purchase-intents.yml#/components/schemas/PurchaseIntentMerchantSupport'
+        PurchaseIntentOriginalPrice:
+            $ref: './resources/purchase-intents.yml#/components/schemas/PurchaseIntentOriginalPrice'
+        PurchaseIntentPrice:
+            $ref: './resources/purchase-intents.yml#/components/schemas/PurchaseIntentPrice'
+        PurchaseIntentBundleComponent:
+            $ref: './resources/purchase-intents.yml#/components/schemas/PurchaseIntentBundleComponent'
+        PurchaseIntentBundle:
+            $ref: './resources/purchase-intents.yml#/components/schemas/PurchaseIntentBundle'
+        PurchaseIntentProduct:
+            $ref: './resources/purchase-intents.yml#/components/schemas/PurchaseIntentProduct'
+        PurchaseIntentUsage:
+            $ref: './resources/purchase-intents.yml#/components/schemas/PurchaseIntentUsage'
+        PurchaseIntentMultiUseUsage:
+            $ref: './resources/purchase-intents.yml#/components/schemas/PurchaseIntentMultiUseUsage'
+        PurchaseIntentSingleUseUsage:
+            $ref: './resources/purchase-intents.yml#/components/schemas/PurchaseIntentSingleUseUsage'
+        PurchaseIntentUsageOrder:
+            $ref: './resources/purchase-intents.yml#/components/schemas/PurchaseIntentUsageOrder'
+        PurchaseIntentVariantAxis:
+            $ref: './resources/purchase-intents.yml#/components/schemas/PurchaseIntentVariantAxis'
+        PurchaseIntentVariant:
+            $ref: './resources/purchase-intents.yml#/components/schemas/PurchaseIntentVariant'
+        PurchaseIntentVariantSet:
+            $ref: './resources/purchase-intents.yml#/components/schemas/PurchaseIntentVariantSet'
+        PurchaseIntent:
+            $ref: './resources/purchase-intents.yml#/components/schemas/PurchaseIntent'
+        PurchaseIntentPresentation:
+            $ref: './resources/purchase-intents.yml#/components/schemas/PurchaseIntentPresentation'
+        Product:
+            $ref: './resources/catalog.yml#/components/schemas/Product'
+        PriceEmbeddedProduct:
+            $ref: './resources/catalog.yml#/components/schemas/PriceEmbeddedProduct'
+        PricePageRequest:
+            $ref: './resources/catalog.yml#/components/schemas/PricePageRequest'
+        PricePageResponse:
+            $ref: './resources/catalog.yml#/components/schemas/PricePageResponse'
+        PricePageItem:
+            $ref: './resources/catalog.yml#/components/schemas/PricePageItem'
+        PriceActionRequest:
+            $ref: './resources/catalog.yml#/components/schemas/PriceActionRequest'
+        PriceResponse:
+            $ref: './resources/catalog.yml#/components/schemas/PriceResponse'
+        CatalogPriceParams:
+            $ref: './resources/catalog.yml#/components/schemas/CatalogPriceParams'
+        FixedCatalogPriceParams:
+            $ref: './resources/catalog.yml#/components/schemas/FixedCatalogPriceParams'
+        CustomerSelectedCatalogPriceParams:
+            $ref: './resources/customers.yml#/components/schemas/CustomerSelectedCatalogPriceParams'
+        CatalogPrice:
+            $ref: './resources/catalog.yml#/components/schemas/CatalogPrice'
+        FixedCatalogPrice:
+            $ref: './resources/catalog.yml#/components/schemas/FixedCatalogPrice'
+        CustomerSelectedCatalogPrice:
+            $ref: './resources/customers.yml#/components/schemas/CustomerSelectedCatalogPrice'
+        CustomerSelectedCatalogPriceFields:
+            $ref: './resources/customers.yml#/components/schemas/CustomerSelectedCatalogPriceFields'
+        SuggestedAmountParams:
+            $ref: './resources/catalog.yml#/components/schemas/SuggestedAmountParams'
+        SuggestedAmount:
+            $ref: './resources/catalog.yml#/components/schemas/SuggestedAmount'
+        CustomerSelectedAmountParams:
+            $ref: './resources/customers.yml#/components/schemas/CustomerSelectedAmountParams'
+        CustomerSelectedAmount:
+            $ref: './resources/customers.yml#/components/schemas/CustomerSelectedAmount'
+        PageFinancialAccountsResponse:
+            $ref: './resources/finance.yml#/components/schemas/PageFinancialAccountsResponse'
+        OrderLineItem:
+            $ref: './resources/orders.yml#/components/schemas/OrderLineItem'
+        OrderProductLineItem:
+            $ref: './resources/orders.yml#/components/schemas/OrderProductLineItem'
+        OrderFeeLineItem:
+            $ref: './resources/orders.yml#/components/schemas/OrderFeeLineItem'
+        OrderShippingLineItem:
+            $ref: './resources/orders.yml#/components/schemas/OrderShippingLineItem'
+        OrderDiscountLineItem:
+            $ref: './resources/orders.yml#/components/schemas/OrderDiscountLineItem'
+        OrderDiscount:
+            $ref: './resources/orders.yml#/components/schemas/OrderDiscount'
+        LineItem:
+            $ref: './resources/orders.yml#/components/schemas/LineItem'
+        ProductLineItem:
+            $ref: './resources/orders.yml#/components/schemas/ProductLineItem'
+        FeeLineItem:
+            $ref: './resources/orders.yml#/components/schemas/FeeLineItem'
+        ShippingLineItem:
+            $ref: './resources/orders.yml#/components/schemas/ShippingLineItem'
+        ProductDetails:
+            $ref: './resources/orders.yml#/components/schemas/ProductDetails'
+        InlineProductDetails:
+            $ref: './resources/orders.yml#/components/schemas/InlineProductDetails'
+        CatalogProductWithPriceData:
+            $ref: './resources/orders.yml#/components/schemas/CatalogProductWithPriceData'
+        CatalogProductWithPriceReference:
+            $ref: './resources/orders.yml#/components/schemas/CatalogProductWithPriceReference'
+        CustomerSelectedPriceInput:
+            $ref: './resources/customers.yml#/components/schemas/CustomerSelectedPriceInput'
+        CatalogProductWithCustomerSelectedPrice:
+            $ref: './resources/orders.yml#/components/schemas/CatalogProductWithCustomerSelectedPrice'
+        FeeDetails:
+            $ref: './resources/orders.yml#/components/schemas/FeeDetails'
+        ShippingDetails:
+            $ref: './resources/orders.yml#/components/schemas/ShippingDetails'
+        Currency:
+            $ref: './resources/common.yml#/components/schemas/Currency'
+        AmountParams:
+            $ref: './resources/common.yml#/components/schemas/AmountParams'
+        Amount:
+            $ref: './resources/common.yml#/components/schemas/Amount'
+        PriceParams:
+            $ref: './resources/catalog.yml#/components/schemas/PriceParams'
+        Price:
+            $ref: './resources/catalog.yml#/components/schemas/Price'
+        BillingDetails:
+            $ref: './resources/orders.yml#/components/schemas/BillingDetails'
+        Shipping:
+            $ref: './resources/orders.yml#/components/schemas/Shipping'
+        Address:
+            $ref: './resources/orders.yml#/components/schemas/Address'
+        CreateMessageTemplateRequest:
+            $ref: './resources/messaging.yml#/components/schemas/CreateMessageTemplateRequest'
+        CreateSMSMessageTemplateRequest:
+            $ref: './resources/messaging.yml#/components/schemas/CreateSMSMessageTemplateRequest'
+        CreateEmailMessageTemplateRequest:
+            $ref: './resources/messaging.yml#/components/schemas/CreateEmailMessageTemplateRequest'
+        UpdateMessageTemplateRequest:
+            $ref: './resources/messaging.yml#/components/schemas/UpdateMessageTemplateRequest'
+        MessageTemplateIDRequest:
+            $ref: './resources/messaging.yml#/components/schemas/MessageTemplateIDRequest'
+        PageMessageTemplatesRequest:
+            $ref: './resources/messaging.yml#/components/schemas/PageMessageTemplatesRequest'
+        RenderMessageTemplatePreviewRequest:
+            $ref: './resources/messaging.yml#/components/schemas/RenderMessageTemplatePreviewRequest'
+        MessageTemplateReference:
+            $ref: './resources/messaging.yml#/components/schemas/MessageTemplateReference'
+        MessageTemplateVariables:
+            $ref: './resources/messaging.yml#/components/schemas/MessageTemplateVariables'
+        MessageTemplateAttachmentIDs:
+            $ref: './resources/messaging.yml#/components/schemas/MessageTemplateAttachmentIDs'
+        MessageTemplateVariableInput:
+            $ref: './resources/messaging.yml#/components/schemas/MessageTemplateVariableInput'
+        MessageTemplateVariableItemInput:
+            $ref: './resources/messaging.yml#/components/schemas/MessageTemplateVariableItemInput'
+        MessageTemplateVariable:
+            $ref: './resources/messaging.yml#/components/schemas/MessageTemplateVariable'
+        MessageTemplateVariableItem:
+            $ref: './resources/messaging.yml#/components/schemas/MessageTemplateVariableItem'
+        MessageTemplateSMSContent:
+            $ref: './resources/messaging.yml#/components/schemas/MessageTemplateSMSContent'
+        MessageTemplateEmailContent:
+            $ref: './resources/messaging.yml#/components/schemas/MessageTemplateEmailContent'
+        MessageTemplateMailbox:
+            $ref: './resources/messaging.yml#/components/schemas/MessageTemplateMailbox'
+        MessageTemplateSafetyResult:
+            $ref: './resources/messaging.yml#/components/schemas/MessageTemplateSafetyResult'
+        MessageTemplateScannedLink:
+            $ref: './resources/messaging.yml#/components/schemas/MessageTemplateScannedLink'
+        MessageTemplate:
+            $ref: './resources/messaging.yml#/components/schemas/MessageTemplate'
+        MessageTemplateEnvelope:
+            $ref: './resources/messaging.yml#/components/schemas/MessageTemplateEnvelope'
+        MessageTemplatesPageEnvelope:
+            $ref: './resources/messaging.yml#/components/schemas/MessageTemplatesPageEnvelope'
+        MessageTemplatesPage:
+            $ref: './resources/messaging.yml#/components/schemas/MessageTemplatesPage'
+        RenderMessageTemplatePreviewResponse:
+            $ref: './resources/messaging.yml#/components/schemas/RenderMessageTemplatePreviewResponse'
+        RenderedMessageTemplate:
+            $ref: './resources/messaging.yml#/components/schemas/RenderedMessageTemplate'
+        RenderedSMSMessageTemplate:
+            $ref: './resources/messaging.yml#/components/schemas/RenderedSMSMessageTemplate'
+        RenderedEmailMessageTemplate:
+            $ref: './resources/messaging.yml#/components/schemas/RenderedEmailMessageTemplate'
+        OrderDocumentDeliveryRequest:
+            $ref: './resources/orders.yml#/components/schemas/OrderDocumentDeliveryRequest'
+        OrderDocumentDeliveryResponse:
+            $ref: './resources/orders.yml#/components/schemas/OrderDocumentDeliveryResponse'
+        OrderDocumentDeliveryErrorResponse:
+            $ref: './resources/orders.yml#/components/schemas/OrderDocumentDeliveryErrorResponse'
+        OrderDocumentDelivery:
+            $ref: './resources/orders.yml#/components/schemas/OrderDocumentDelivery'
+        OrderDocumentDeliveryAttempt:
+            $ref: './resources/orders.yml#/components/schemas/OrderDocumentDeliveryAttempt'
+        OrderDocumentDeliveryFailure:
+            $ref: './resources/orders.yml#/components/schemas/OrderDocumentDeliveryFailure'
+        OrderDocumentDeliverySummary:
+            $ref: './resources/orders.yml#/components/schemas/OrderDocumentDeliverySummary'
+        OrderDocumentDeliveryChannelSummary:
+            $ref: './resources/orders.yml#/components/schemas/OrderDocumentDeliveryChannelSummary'
+        PaymentMethodPageRequest:
+            $ref: './resources/payment-methods.yml#/components/schemas/PaymentMethodPageRequest'
+        PaymentMethodPageResponse:
+            $ref: './resources/payment-methods.yml#/components/schemas/PaymentMethodPageResponse'
+        CheckoutOrderReferenceRequest:
+            $ref: './resources/checkout.yml#/components/schemas/CheckoutOrderReferenceRequest'
+        CheckoutLookupRequest:
+            $ref: './resources/checkout.yml#/components/schemas/CheckoutLookupRequest'
+        LegacyCheckoutPurchaseIntentLookupRequest:
+            $ref: './resources/checkout.yml#/components/schemas/LegacyCheckoutPurchaseIntentLookupRequest'
+        CheckoutSelectAmountRequest:
+            $ref: './resources/checkout.yml#/components/schemas/CheckoutSelectAmountRequest'
+        CheckoutPurchaseIntentSelectAmountRequest:
+            $ref: './resources/checkout.yml#/components/schemas/CheckoutPurchaseIntentSelectAmountRequest'
+        CheckoutOrderSelectAmountRequest:
+            $ref: './resources/checkout.yml#/components/schemas/CheckoutOrderSelectAmountRequest'
+        CheckoutOrderLineItemAmountSelection:
+            $ref: './resources/checkout.yml#/components/schemas/CheckoutOrderLineItemAmountSelection'
+        CheckoutSelectedAmount:
+            $ref: './resources/checkout.yml#/components/schemas/CheckoutSelectedAmount'
+        CheckoutPaymentAddress:
+            $ref: './resources/checkout.yml#/components/schemas/CheckoutPaymentAddress'
+        CheckoutBillingDetails:
+            $ref: './resources/checkout.yml#/components/schemas/CheckoutBillingDetails'
+        CheckoutMobileMoneyData:
+            $ref: './resources/checkout.yml#/components/schemas/CheckoutMobileMoneyData'
+        CheckoutPaymentMethodData:
+            $ref: './resources/checkout.yml#/components/schemas/CheckoutPaymentMethodData'
+        CheckoutCustomerData:
+            $ref: './resources/checkout.yml#/components/schemas/CheckoutCustomerData'
+        CheckoutPayRequest:
+            $ref: './resources/checkout.yml#/components/schemas/CheckoutPayRequest'
+        CheckoutExistingOrderPayRequest:
+            $ref: './resources/checkout.yml#/components/schemas/CheckoutExistingOrderPayRequest'
+        CheckoutPurchaseIntentPayRequest:
+            $ref: './resources/checkout.yml#/components/schemas/CheckoutPurchaseIntentPayRequest'
+        CheckoutConfirmPaymentRequest:
+            $ref: './resources/checkout.yml#/components/schemas/CheckoutConfirmPaymentRequest'
+        CheckoutOrderResponse:
+            $ref: './resources/checkout.yml#/components/schemas/CheckoutOrderResponse'
+        CheckoutOrderErrorResponse:
+            $ref: './resources/checkout.yml#/components/schemas/CheckoutOrderErrorResponse'
+        CheckoutLookupResponse:
+            $ref: './resources/checkout.yml#/components/schemas/CheckoutLookupResponse'
+        CheckoutOrderLookupResponse:
+            $ref: './resources/checkout.yml#/components/schemas/CheckoutOrderLookupResponse'
+        CheckoutPurchaseIntentLookupResponse:
+            $ref: './resources/checkout.yml#/components/schemas/CheckoutPurchaseIntentLookupResponse'
+        CheckoutOrder:
+            $ref: './resources/checkout.yml#/components/schemas/CheckoutOrder'
+        CheckoutInvoiceView:
+            $ref: './resources/checkout.yml#/components/schemas/CheckoutInvoiceView'
+        OrderAddress:
+            $ref: './resources/orders.yml#/components/schemas/OrderAddress'
+        OrderPaymentMethod:
+            $ref: './resources/orders.yml#/components/schemas/OrderPaymentMethod'
+        OrderPaymentBillingDetails:
+            $ref: './resources/orders.yml#/components/schemas/OrderPaymentBillingDetails'
+        OrderPaymentAttempt:
+            $ref: './resources/orders.yml#/components/schemas/OrderPaymentAttempt'
+        OrderPaymentError:
+            $ref: './resources/orders.yml#/components/schemas/OrderPaymentError'
+        OrderResponse:
+            $ref: './resources/orders.yml#/components/schemas/OrderResponse'
+        OrderErrorResponse:
+            $ref: './resources/orders.yml#/components/schemas/OrderErrorResponse'
+        Order:
+            $ref: './resources/orders.yml#/components/schemas/Order'
+        OrderDocumentFormat:
+            $ref: './resources/orders.yml#/components/schemas/OrderDocumentFormat'
+        OrderReceipt:
+            $ref: './resources/orders.yml#/components/schemas/OrderReceipt'
+        ErrorCause:
+            $ref: './resources/common.yml#/components/schemas/ErrorCause'
+        ErrorType:
+            $ref: './resources/common.yml#/components/schemas/ErrorType'
+        ErrorFixCode:
+            $ref: './resources/common.yml#/components/schemas/ErrorFixCode'
+        ErrorCode:
+            $ref: './resources/common.yml#/components/schemas/ErrorCode'
+        ErrorDocumentationURL:
+            $ref: './resources/common.yml#/components/schemas/ErrorDocumentationURL'
+        Error:
+            $ref: './resources/common.yml#/components/schemas/Error'
+        ErrorEnvelope:
+            $ref: './resources/common.yml#/components/schemas/ErrorEnvelope'
+        RefundReason:
+            $ref: './resources/refunds.yml#/components/schemas/RefundReason'
+        RefundFailureReason:
+            $ref: './resources/refunds.yml#/components/schemas/RefundFailureReason'
+        RefundFailure:
+            $ref: './resources/refunds.yml#/components/schemas/RefundFailure'
+        RefundSettlement:
+            $ref: './resources/refunds.yml#/components/schemas/RefundSettlement'
+        RefundOfflineSettlement:
+            $ref: './resources/refunds.yml#/components/schemas/RefundOfflineSettlement'
+        RefundPaymentMethodSettlement:
+            $ref: './resources/refunds.yml#/components/schemas/RefundPaymentMethodSettlement'
+        RefundSettlementPaymentMethod:
+            $ref: './resources/refunds.yml#/components/schemas/RefundSettlementPaymentMethod'
+        RefundSettlementMobileMoneyPaymentMethod:
+            $ref: './resources/refunds.yml#/components/schemas/RefundSettlementMobileMoneyPaymentMethod'
+        RefundSettlementBankAccountPaymentMethod:
+            $ref: './resources/refunds.yml#/components/schemas/RefundSettlementBankAccountPaymentMethod'
+        CreateRefundLineItem:
+            $ref: './resources/refunds.yml#/components/schemas/CreateRefundLineItem'
+        RefundRequestMeta:
+            $ref: './resources/refunds.yml#/components/schemas/RefundRequestMeta'
+        CreateRefundRequest:
+            $ref: './resources/refunds.yml#/components/schemas/CreateRefundRequest'
+        CancelRefundRequest:
+            $ref: './resources/refunds.yml#/components/schemas/CancelRefundRequest'
+        LookupRefundRequest:
+            $ref: './resources/refunds.yml#/components/schemas/LookupRefundRequest'
+        PageRefundsRequest:
+            $ref: './resources/refunds.yml#/components/schemas/PageRefundsRequest'
+        RefundLineItem:
+            $ref: './resources/refunds.yml#/components/schemas/RefundLineItem'
+        RefundOrderLineItem:
+            $ref: './resources/refunds.yml#/components/schemas/RefundOrderLineItem'
+        RefundOrderProductLineItem:
+            $ref: './resources/refunds.yml#/components/schemas/RefundOrderProductLineItem'
+        RefundOrderFeeLineItem:
+            $ref: './resources/refunds.yml#/components/schemas/RefundOrderFeeLineItem'
+        RefundOrderShippingLineItem:
+            $ref: './resources/refunds.yml#/components/schemas/RefundOrderShippingLineItem'
+        Refund:
+            $ref: './resources/refunds.yml#/components/schemas/Refund'
+        RefundResponse:
+            $ref: './resources/refunds.yml#/components/schemas/RefundResponse'
+        RefundPage:
+            $ref: './resources/refunds.yml#/components/schemas/RefundPage'
+        RefundPageResponse:
+            $ref: './resources/refunds.yml#/components/schemas/RefundPageResponse'
+        BalanceSnapshotResponse:
+            $ref: './resources/finance.yml#/components/schemas/BalanceSnapshotResponse'
+        CurrencyBalanceSnapshot:
+            $ref: './resources/finance.yml#/components/schemas/CurrencyBalanceSnapshot'
+        BalanceHolds:
+            $ref: './resources/finance.yml#/components/schemas/BalanceHolds'
+        BalanceValue:
+            $ref: './resources/finance.yml#/components/schemas/BalanceValue'
+        BalanceTransactionAmount:
+            $ref: './resources/finance.yml#/components/schemas/BalanceTransactionAmount'
+        BalanceTransactionAllocationStatus:
+            $ref: './resources/finance.yml#/components/schemas/BalanceTransactionAllocationStatus'
+        BalanceTransactionAllocation:
+            $ref: './resources/finance.yml#/components/schemas/BalanceTransactionAllocation'
+        BalanceTransactionAllocationBase:
+            $ref: './resources/finance.yml#/components/schemas/BalanceTransactionAllocationBase'
+        BalanceTransactionRefundAllocation:
+            $ref: './resources/finance.yml#/components/schemas/BalanceTransactionRefundAllocation'
+        BalanceTransactionPayoutAllocation:
+            $ref: './resources/finance.yml#/components/schemas/BalanceTransactionPayoutAllocation'
+        BalanceTransaction:
+            $ref: './resources/finance.yml#/components/schemas/BalanceTransaction'
+        BalanceTransactionBase:
+            $ref: './resources/finance.yml#/components/schemas/BalanceTransactionBase'
+        PaymentBalanceTransaction:
+            $ref: './resources/finance.yml#/components/schemas/PaymentBalanceTransaction'
+        RefundBalanceTransaction:
+            $ref: './resources/refunds.yml#/components/schemas/RefundBalanceTransaction'
+        PayoutDebitBalanceTransaction:
+            $ref: './resources/finance.yml#/components/schemas/PayoutDebitBalanceTransaction'
+        BalanceTransactionResponse:
+            $ref: './resources/finance.yml#/components/schemas/BalanceTransactionResponse'
+        BalanceTransactionPageResponse:
+            $ref: './resources/finance.yml#/components/schemas/BalanceTransactionPageResponse'
+        FinancialAccountCreateRequest:
+            $ref: './resources/finance.yml#/components/schemas/FinancialAccountCreateRequest'
+        FinancialAccountCurrency:
+            $ref: './resources/finance.yml#/components/schemas/FinancialAccountCurrency'
+        FinancialAccountWalletRequest:
+            $ref: './resources/finance.yml#/components/schemas/FinancialAccountWalletRequest'
+        FinancialAccountBankRequest:
+            $ref: './resources/finance.yml#/components/schemas/FinancialAccountBankRequest'
+        FinancialAccountDoshRequest:
+            $ref: './resources/finance.yml#/components/schemas/FinancialAccountDoshRequest'
+        DoshAccount:
+            $ref: './resources/finance.yml#/components/schemas/DoshAccount'
+        FinancialAccountOwnerInput:
+            $ref: './resources/finance.yml#/components/schemas/FinancialAccountOwnerInput'
+        FinancialAccountIDRequest:
+            $ref: './resources/finance.yml#/components/schemas/FinancialAccountIDRequest'
+        FinancialAccountDisableRequest:
+            $ref: './resources/finance.yml#/components/schemas/FinancialAccountDisableRequest'
+        FinancialAccountEnablePullRequest:
+            $ref: './resources/finance.yml#/components/schemas/FinancialAccountEnablePullRequest'
+        FinancialAccountPageRequest:
+            $ref: './resources/finance.yml#/components/schemas/FinancialAccountPageRequest'
+        FinancialAccountUpdateRequest:
+            $ref: './resources/finance.yml#/components/schemas/FinancialAccountUpdateRequest'
+        FinancialAccountOwnerUpdateInput:
+            $ref: './resources/finance.yml#/components/schemas/FinancialAccountOwnerUpdateInput'
+        FinancialAccountCommonResponse:
+            $ref: './resources/finance.yml#/components/schemas/FinancialAccountCommonResponse'
+        FinancialAccountNameEnquiry:
+            $ref: './resources/finance.yml#/components/schemas/FinancialAccountNameEnquiry'
+        FinancialAccountVerification:
+            $ref: './resources/finance.yml#/components/schemas/FinancialAccountVerification'
+        FinancialAccountVerificationRequest:
+            $ref: './resources/finance.yml#/components/schemas/FinancialAccountVerificationRequest'
+        FinancialAccount:
+            $ref: './resources/finance.yml#/components/schemas/FinancialAccount'
+        FinancialAccountConnectedResponse:
+            $ref: './resources/finance.yml#/components/schemas/FinancialAccountConnectedResponse'
+        FinancialAccountCreateResponse:
+            $ref: './resources/finance.yml#/components/schemas/FinancialAccountCreateResponse'
+        FinancialAccountUpdateResponse:
+            $ref: './resources/finance.yml#/components/schemas/FinancialAccountUpdateResponse'
+        FinancialAccountCompactResponse:
+            $ref: './resources/finance.yml#/components/schemas/FinancialAccountCompactResponse'
+        FinancialAccountPage:
+            $ref: './resources/finance.yml#/components/schemas/FinancialAccountPage'
+        FinancialAccountPushConfiguration:
+            $ref: './resources/finance.yml#/components/schemas/FinancialAccountPushConfiguration'
+        FinancialAccountPullConfiguration:
+            $ref: './resources/finance.yml#/components/schemas/FinancialAccountPullConfiguration'
+        FinancialAccountMandate:
+            $ref: './resources/finance.yml#/components/schemas/FinancialAccountMandate'
+        FinancialAccountWalletResponse:
+            $ref: './resources/finance.yml#/components/schemas/FinancialAccountWalletResponse'
+        FinancialAccountWalletRawResponse:
+            $ref: './resources/finance.yml#/components/schemas/FinancialAccountWalletRawResponse'
+        FinancialAccountBankResponse:
+            $ref: './resources/finance.yml#/components/schemas/FinancialAccountBankResponse'
+        FinancialAccountBankCreateResponse:
+            $ref: './resources/finance.yml#/components/schemas/FinancialAccountBankCreateResponse'
+        FinancialAccountBankUpdateResponse:
+            $ref: './resources/finance.yml#/components/schemas/FinancialAccountBankUpdateResponse'
+        GhanaBankAccountResponse:
+            $ref: './resources/finance.yml#/components/schemas/GhanaBankAccountResponse'
+        GhanaBankAccountCreateResponse:
+            $ref: './resources/finance.yml#/components/schemas/GhanaBankAccountCreateResponse'
+        GhanaBankAccountUpdateResponse:
+            $ref: './resources/finance.yml#/components/schemas/GhanaBankAccountUpdateResponse'
+        FinancialAccountOwnerResponse:
+            $ref: './resources/finance.yml#/components/schemas/FinancialAccountOwnerResponse'
+        FinancialAccountOwnerCreateResponse:
+            $ref: './resources/finance.yml#/components/schemas/FinancialAccountOwnerCreateResponse'
+        FinancialAccountOwnerUpdateResponse:
+            $ref: './resources/finance.yml#/components/schemas/FinancialAccountOwnerUpdateResponse'
+        FinancialAccountAddressResponse:
+            $ref: './resources/finance.yml#/components/schemas/FinancialAccountAddressResponse'
+        FinancialAccountAddressCreateResponse:
+            $ref: './resources/finance.yml#/components/schemas/FinancialAccountAddressCreateResponse'
+        FinancialAccountAddressUpdateResponse:
+            $ref: './resources/finance.yml#/components/schemas/FinancialAccountAddressUpdateResponse'
+        FinancialInstitution:
+            $ref: './resources/finance.yml#/components/schemas/FinancialInstitution'
+        ResourceSupply:
+            $ref: './resources/finance.yml#/components/schemas/ResourceSupply'
+        Payout:
+            $ref: './resources/finance.yml#/components/schemas/Payout'
+        PayoutBalanceTransaction:
+            $ref: './resources/finance.yml#/components/schemas/PayoutBalanceTransaction'
+        PayoutCancellation:
+            $ref: './resources/finance.yml#/components/schemas/PayoutCancellation'
+        PayoutError:
+            $ref: './resources/finance.yml#/components/schemas/PayoutError'
+        PayoutFailure:
+            $ref: './resources/finance.yml#/components/schemas/PayoutFailure'
+        PayoutSettingsLookupScheduleAgingSpec:
+            $ref: './resources/finance.yml#/components/schemas/PayoutSettingsLookupScheduleAgingSpec'
+        PayoutSettingsLookupSchedule:
+            $ref: './resources/finance.yml#/components/schemas/PayoutSettingsLookupSchedule'
+        PayoutSettingsLookup:
+            $ref: './resources/finance.yml#/components/schemas/PayoutSettingsLookup'
+        PayoutSettingsLimits:
+            $ref: './resources/finance.yml#/components/schemas/PayoutSettingsLimits'
+        PayoutAmountLimits:
+            $ref: './resources/finance.yml#/components/schemas/PayoutAmountLimits'
+        PayoutLimitValue:
+            $ref: './resources/finance.yml#/components/schemas/PayoutLimitValue'
+        PayoutSettingsMutationScheduleSpec:
+            $ref: './resources/finance.yml#/components/schemas/PayoutSettingsMutationScheduleSpec'
+        PayoutSettingsMutationSchedule:
+            $ref: './resources/finance.yml#/components/schemas/PayoutSettingsMutationSchedule'
+        PayoutSettingsMutation:
+            $ref: './resources/finance.yml#/components/schemas/PayoutSettingsMutation'
+        SchedulePayoutRequest:
+            $ref: './resources/messaging.yml#/components/schemas/SchedulePayoutRequest'
+        LookupPayoutRequest:
+            $ref: './resources/finance.yml#/components/schemas/LookupPayoutRequest'
+        CancelPayoutRequest:
+            $ref: './resources/finance.yml#/components/schemas/CancelPayoutRequest'
+        SetPayoutDestinationsRequest:
+            $ref: './resources/finance.yml#/components/schemas/SetPayoutDestinationsRequest'
+        PagePayoutsRequest:
+            $ref: './resources/finance.yml#/components/schemas/PagePayoutsRequest'
+        PayoutPage:
+            $ref: './resources/finance.yml#/components/schemas/PayoutPage'
+        PayoutResponse:
+            $ref: './resources/finance.yml#/components/schemas/PayoutResponse'
+        PayoutSettingsLookupResponse:
+            $ref: './resources/finance.yml#/components/schemas/PayoutSettingsLookupResponse'
+        PayoutSettingsMutationResponse:
+            $ref: './resources/finance.yml#/components/schemas/PayoutSettingsMutationResponse'
+        PayoutPageResponse:
+            $ref: './resources/finance.yml#/components/schemas/PayoutPageResponse'
+        PaymentMethodOwnerInput:
+            $ref: './resources/payment-methods.yml#/components/schemas/PaymentMethodOwnerInput'
+        TokenizeMobileMoneyPaymentMethodRequest:
+            $ref: './resources/payment-methods.yml#/components/schemas/TokenizeMobileMoneyPaymentMethodRequest'
+        PaymentMethodObject:
+            $ref: './resources/payment-methods.yml#/components/schemas/PaymentMethodObject'
+        PaymentMethodCard:
+            $ref: './resources/payment-methods.yml#/components/schemas/PaymentMethodCard'
+        PaymentMethodData:
+            $ref: './resources/payment-methods.yml#/components/schemas/PaymentMethodData'
+        UpdateOrderPaymentMethodData:
+            $ref: './resources/orders.yml#/components/schemas/UpdateOrderPaymentMethodData'
+        PayOrderPaymentMethodData:
+            $ref: './resources/orders.yml#/components/schemas/PayOrderPaymentMethodData'
+        PaymentMethodType:
+            $ref: './resources/payment-methods.yml#/components/schemas/PaymentMethodType'
+        PaymentMethodMobileMoneyInput:
+            $ref: './resources/payment-methods.yml#/components/schemas/PaymentMethodMobileMoneyInput'
+        UpdateOrderMobileMoneyInput:
+            $ref: './resources/orders.yml#/components/schemas/UpdateOrderMobileMoneyInput'
+        UpdateOrderPaymentMethodOwnerInput:
+            $ref: './resources/orders.yml#/components/schemas/UpdateOrderPaymentMethodOwnerInput'
+        PaymentMethodBillingDetailsInput:
+            $ref: './resources/payment-methods.yml#/components/schemas/PaymentMethodBillingDetailsInput'
+        PaymentMethodAddressInput:
+            $ref: './resources/payment-methods.yml#/components/schemas/PaymentMethodAddressInput'
+        PaymentMethodShippingInput:
+            $ref: './resources/payment-methods.yml#/components/schemas/PaymentMethodShippingInput'
+        PaymentMethodSettings:
+            $ref: './resources/payment-methods.yml#/components/schemas/PaymentMethodSettings'
+        PaymentMethodTypeSetting:
+            $ref: './resources/payment-methods.yml#/components/schemas/PaymentMethodTypeSetting'
+        CountrySpecification:
+            $ref: './resources/catalog.yml#/components/schemas/CountrySpecification'
+        CountryBankDirectory:
+            $ref: './resources/catalog.yml#/components/schemas/CountryBankDirectory'
+        CountryBank:
+            $ref: './resources/catalog.yml#/components/schemas/CountryBank'
+        CountryBankBranch:
+            $ref: './resources/catalog.yml#/components/schemas/CountryBankBranch'
+        LookupChimeRequest:
+            $ref: './resources/messaging.yml#/components/schemas/LookupChimeRequest'
+        PageChimesRequest:
+            $ref: './resources/messaging.yml#/components/schemas/PageChimesRequest'
+        SendChimeRequest:
+            $ref: './resources/messaging.yml#/components/schemas/SendChimeRequest'
+        ChimeRecipient:
+            $ref: './resources/messaging.yml#/components/schemas/ChimeRecipient'
+        ChimePhoneRecipient:
+            $ref: './resources/messaging.yml#/components/schemas/ChimePhoneRecipient'
+        ChimeEmailRecipient:
+            $ref: './resources/messaging.yml#/components/schemas/ChimeEmailRecipient'
+        ChimeSavedCustomerRecipient:
+            $ref: './resources/messaging.yml#/components/schemas/ChimeSavedCustomerRecipient'
+        ChimeResponse:
+            $ref: './resources/messaging.yml#/components/schemas/ChimeResponse'
+        PageChimesResponse:
+            $ref: './resources/messaging.yml#/components/schemas/PageChimesResponse'
+        ChimeSettingsResponse:
+            $ref: './resources/messaging.yml#/components/schemas/ChimeSettingsResponse'
+        ChimeSettings:
+            $ref: './resources/messaging.yml#/components/schemas/ChimeSettings'
+        ChimeSMSSettings:
+            $ref: './resources/messaging.yml#/components/schemas/ChimeSMSSettings'
+        ChimeEmailSettings:
+            $ref: './resources/messaging.yml#/components/schemas/ChimeEmailSettings'
+        Chime:
+            $ref: './resources/messaging.yml#/components/schemas/Chime'
+        ChimeTransmission:
+            $ref: './resources/messaging.yml#/components/schemas/ChimeTransmission'
+        ChimeEmailEvent:
+            $ref: './resources/messaging.yml#/components/schemas/ChimeEmailEvent'
+        ChimeEmailMessageInput:
+            $ref: './resources/messaging.yml#/components/schemas/ChimeEmailMessageInput'
+        ChimeEmailMessage:
+            $ref: './resources/messaging.yml#/components/schemas/ChimeEmailMessage'
+        ChimeEmailMailbox:
+            $ref: './resources/messaging.yml#/components/schemas/ChimeEmailMailbox'
+        ChimeEmailSafetyResult:
+            $ref: './resources/messaging.yml#/components/schemas/ChimeEmailSafetyResult'
+        ChimeEmailScannedLink:
+            $ref: './resources/messaging.yml#/components/schemas/ChimeEmailScannedLink'
+        ChimeEmailSchemaMarkup:
+            $ref: './resources/messaging.yml#/components/schemas/ChimeEmailSchemaMarkup'
+        ChimeRecipientResponse:
+            $ref: './resources/messaging.yml#/components/schemas/ChimeRecipientResponse'
+        ScheduleChimeRequest:
+            $ref: './resources/messaging.yml#/components/schemas/ScheduleChimeRequest'
+        ScheduleResponse:
+            $ref: './resources/messaging.yml#/components/schemas/ScheduleResponse'
+        ScheduleCreationDetail:
+            $ref: './resources/messaging.yml#/components/schemas/ScheduleCreationDetail'
+        LookupScheduleRequest:
+            $ref: './resources/messaging.yml#/components/schemas/LookupScheduleRequest'
+        CancelScheduleRequest:
+            $ref: './resources/messaging.yml#/components/schemas/CancelScheduleRequest'
+        ScheduleLookupResponse:
+            $ref: './resources/messaging.yml#/components/schemas/ScheduleLookupResponse'
+        ScheduleCancelResponse:
+            $ref: './resources/messaging.yml#/components/schemas/ScheduleCancelResponse'
+        ScheduleDetail:
+            $ref: './resources/messaging.yml#/components/schemas/ScheduleDetail'
+        ScheduleCancelDetail:
+            $ref: './resources/messaging.yml#/components/schemas/ScheduleCancelDetail'
+        ScheduleError:
+            $ref: './resources/messaging.yml#/components/schemas/ScheduleError'
+        BroadcastRequest:
+            $ref: './resources/messaging.yml#/components/schemas/BroadcastRequest'
+        BroadcastRawSMSContent:
+            $ref: './resources/messaging.yml#/components/schemas/BroadcastRawSMSContent'
+        BroadcastResponse:
+            $ref: './resources/messaging.yml#/components/schemas/BroadcastResponse'
+        BroadcastCreationDetail:
+            $ref: './resources/messaging.yml#/components/schemas/BroadcastCreationDetail'
+        LookupBroadcastRequest:
+            $ref: './resources/messaging.yml#/components/schemas/LookupBroadcastRequest'
+        LookupBroadcastResponse:
+            $ref: './resources/messaging.yml#/components/schemas/LookupBroadcastResponse'
+        CancelBroadcastRequest:
+            $ref: './resources/messaging.yml#/components/schemas/CancelBroadcastRequest'
+        BroadcastCancelResponse:
+            $ref: './resources/messaging.yml#/components/schemas/BroadcastCancelResponse'
+        BroadcastDetail:
+            $ref: './resources/messaging.yml#/components/schemas/BroadcastDetail'
+        BroadcastCancelDetail:
+            $ref: './resources/messaging.yml#/components/schemas/BroadcastCancelDetail'
+        BroadcastError:
+            $ref: './resources/messaging.yml#/components/schemas/BroadcastError'
+        InitiateOTPRequest:
+            $ref: './resources/otp.yml#/components/schemas/InitiateOTPRequest'
+        InitiateOTPResponse:
+            $ref: './resources/otp.yml#/components/schemas/InitiateOTPResponse'
+        VerifyOTPRequest:
+            $ref: './resources/otp.yml#/components/schemas/VerifyOTPRequest'
+        VerifyOTPResponse:
+            $ref: './resources/otp.yml#/components/schemas/VerifyOTPResponse'
+        LookupOTPRequest:
+            $ref: './resources/otp.yml#/components/schemas/LookupOTPRequest'
+        LookupOTPResponse:
+            $ref: './resources/otp.yml#/components/schemas/LookupOTPResponse'
+        OTPPurpose:
+            $ref: './resources/otp.yml#/components/schemas/OTPPurpose'
+        OTPTransaction:
+            $ref: './resources/otp.yml#/components/schemas/OTPTransaction'
+        OTPTransmission:
+            $ref: './resources/otp.yml#/components/schemas/OTPTransmission'
+        OTPVerificationAttempt:
+            $ref: './resources/otp.yml#/components/schemas/OTPVerificationAttempt'
+        PageCustomersResponse:
+            $ref: './resources/customers.yml#/components/schemas/PageCustomersResponse'
+        CreateOrderRequest:
+            $ref: './resources/orders.yml#/components/schemas/CreateOrderRequest'
+        LookupOrderRequest:
+            $ref: './resources/orders.yml#/components/schemas/LookupOrderRequest'
+        UpdateOrderRequest:
+            $ref: './resources/orders.yml#/components/schemas/UpdateOrderRequest'
+        PayOrderRequest:
+            $ref: './resources/orders.yml#/components/schemas/PayOrderRequest'
+        ConfirmPaymentRequest:
+            $ref: './resources/orders.yml#/components/schemas/ConfirmPaymentRequest'
+        RequestConfirmationRequest:
+            $ref: './resources/orders.yml#/components/schemas/RequestConfirmationRequest'
+        CancelOrderRequest:
+            $ref: './resources/orders.yml#/components/schemas/CancelOrderRequest'
+        FinalizeOrderRequest:
+            $ref: './resources/orders.yml#/components/schemas/FinalizeOrderRequest'
+        FinalizeOrderResponse:
+            $ref: './resources/orders.yml#/components/schemas/FinalizeOrderResponse'
+        CompleteOrderRequest:
+            $ref: './resources/orders.yml#/components/schemas/CompleteOrderRequest'
+        CompleteOrderResponse:
+            $ref: './resources/orders.yml#/components/schemas/CompleteOrderResponse'
+        PageOrdersRequest:
+            $ref: './resources/orders.yml#/components/schemas/PageOrdersRequest'
+        PageOrdersResponse:
+            $ref: './resources/orders.yml#/components/schemas/PageOrdersResponse'
+        CreateApplicationRequest:
+            $ref: './resources/platform.yml#/components/schemas/CreateApplicationRequest'
+        CreateApplicationResponse:
+            $ref: './resources/platform.yml#/components/schemas/CreateApplicationResponse'
+        LookupApplicationCapabilitiesRequest:
+            $ref: './resources/platform.yml#/components/schemas/LookupApplicationCapabilitiesRequest'
+        LookupApplicationResponse:
+            $ref: './resources/platform.yml#/components/schemas/LookupApplicationResponse'
+        UpdateApplicationRequest:
+            $ref: './resources/platform.yml#/components/schemas/UpdateApplicationRequest'
+        UpdateApplicationResponse:
+            $ref: './resources/platform.yml#/components/schemas/UpdateApplicationResponse'
+        CreateFinancialAccountResponse:
+            $ref: './resources/finance.yml#/components/schemas/CreateFinancialAccountResponse'
+        LookupFinancialAccountResponse:
+            $ref: './resources/finance.yml#/components/schemas/LookupFinancialAccountResponse'
+        ConnectFinancialAccountResponse:
+            $ref: './resources/finance.yml#/components/schemas/ConnectFinancialAccountResponse'
+        UpdateFinancialAccountResponse:
+            $ref: './resources/finance.yml#/components/schemas/UpdateFinancialAccountResponse'
+        EnableFinancialAccountPushResponse:
+            $ref: './resources/finance.yml#/components/schemas/EnableFinancialAccountPushResponse'
+        DisableFinancialAccountPushResponse:
+            $ref: './resources/finance.yml#/components/schemas/DisableFinancialAccountPushResponse'
+        DisconnectFinancialAccountResponse:
+            $ref: './resources/finance.yml#/components/schemas/DisconnectFinancialAccountResponse'
+        ReconnectFinancialAccountResponse:
+            $ref: './resources/finance.yml#/components/schemas/ReconnectFinancialAccountResponse'
+        EnableFinancialAccountPullResponse:
+            $ref: './resources/finance.yml#/components/schemas/EnableFinancialAccountPullResponse'
+        DisableFinancialAccountPullResponse:
+            $ref: './resources/finance.yml#/components/schemas/DisableFinancialAccountPullResponse'
+        LookupBalancesRequest:
+            $ref: './resources/finance.yml#/components/schemas/LookupBalancesRequest'
+        LookupBalanceTransactionRequest:
+            $ref: './resources/finance.yml#/components/schemas/LookupBalanceTransactionRequest'
+        PageBalanceTransactionsRequest:
+            $ref: './resources/finance.yml#/components/schemas/PageBalanceTransactionsRequest'
+        GetPayoutSettingsRequest:
+            $ref: './resources/finance.yml#/components/schemas/GetPayoutSettingsRequest'
+        DisableAutomaticPayoutsRequest:
+            $ref: './resources/finance.yml#/components/schemas/DisableAutomaticPayoutsRequest'
+        DisableAutomaticPayoutsResponse:
+            $ref: './resources/finance.yml#/components/schemas/DisableAutomaticPayoutsResponse'
+        EnableAutomaticPayoutsRequest:
+            $ref: './resources/finance.yml#/components/schemas/EnableAutomaticPayoutsRequest'
+        TokenizePaymentMethodResponse:
+            $ref: './resources/payment-methods.yml#/components/schemas/TokenizePaymentMethodResponse'
+        LookupPaymentMethodRequest:
+            $ref: './resources/payment-methods.yml#/components/schemas/LookupPaymentMethodRequest'
+        LookupPaymentMethodResponse:
+            $ref: './resources/payment-methods.yml#/components/schemas/LookupPaymentMethodResponse'
+        UpdatePaymentMethodRequest:
+            $ref: './resources/payment-methods.yml#/components/schemas/UpdatePaymentMethodRequest'
+        UpdatePaymentMethodResponse:
+            $ref: './resources/payment-methods.yml#/components/schemas/UpdatePaymentMethodResponse'
+        ActivatePaymentMethodRequest:
+            $ref: './resources/payment-methods.yml#/components/schemas/ActivatePaymentMethodRequest'
+        ActivatePaymentMethodResponse:
+            $ref: './resources/payment-methods.yml#/components/schemas/ActivatePaymentMethodResponse'
+        DisactivatePaymentMethodRequest:
+            $ref: './resources/payment-methods.yml#/components/schemas/DisactivatePaymentMethodRequest'
+        DisactivatePaymentMethodResponse:
+            $ref: './resources/payment-methods.yml#/components/schemas/DisactivatePaymentMethodResponse'
+        ArchivePaymentMethodRequest:
+            $ref: './resources/payment-methods.yml#/components/schemas/ArchivePaymentMethodRequest'
+        ArchivePaymentMethodResponse:
+            $ref: './resources/payment-methods.yml#/components/schemas/ArchivePaymentMethodResponse'
+        UnarchivePaymentMethodRequest:
+            $ref: './resources/payment-methods.yml#/components/schemas/UnarchivePaymentMethodRequest'
+        UnarchivePaymentMethodResponse:
+            $ref: './resources/payment-methods.yml#/components/schemas/UnarchivePaymentMethodResponse'
+        GetPaymentMethodSettingsRequest:
+            $ref: './resources/payment-methods.yml#/components/schemas/GetPaymentMethodSettingsRequest'
+        GetPaymentMethodSettingsResponse:
+            $ref: './resources/payment-methods.yml#/components/schemas/GetPaymentMethodSettingsResponse'
+        PageProductsRequest:
+            $ref: './resources/catalog.yml#/components/schemas/PageProductsRequest'
+        PageProductsResponse:
+            $ref: './resources/catalog.yml#/components/schemas/PageProductsResponse'
+        LookupPriceRequest:
+            $ref: './resources/catalog.yml#/components/schemas/LookupPriceRequest'
+        UpdatePriceRequest:
+            $ref: './resources/catalog.yml#/components/schemas/UpdatePriceRequest'
+        ListCountrySpecsRequest:
+            $ref: './resources/catalog.yml#/components/schemas/ListCountrySpecsRequest'
+        ListCountrySpecsResponse:
+            $ref: './resources/catalog.yml#/components/schemas/ListCountrySpecsResponse'
