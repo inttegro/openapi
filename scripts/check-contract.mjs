@@ -29,6 +29,7 @@ const PUBLIC_CHECKOUT_OPERATIONS = new Set([
 
 const rootDir = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const specPath = join(rootDir, "commerce.yml");
+const smithyAstPath = join(rootDir, "commerce.smithy.json");
 const insomniaDir = join(rootDir, "insomnia");
 const postmanDir = join(rootDir, "postman");
 const lockPath = join(rootDir, "contract.lock.json");
@@ -976,9 +977,10 @@ function inferType(schema) {
 
 function buildLock(operations, insomniaRequests, postmanRequests) {
   return {
-    version: 3,
+    version: 4,
     collection_version: spec.info?.["x-inttegro-collection-version"] ?? "",
     openapi_sha256: hashFile(specPath),
+    smithy_sha256: hashFile(smithyAstPath),
     insomnia_sha256: hashArtifacts(insomniaDir, (filePath) =>
       filePath.endsWith(".insomnia.yaml"),
     ),
@@ -1010,20 +1012,20 @@ function checkLock(actual) {
 
   if (mismatches.length > 0) {
     console.error(
-      "OpenAPI or a client collection changed without refreshing the reviewed contract lock:\n",
+      "A generated contract or client collection changed without refreshing the reviewed contract lock:\n",
     );
     for (const mismatch of mismatches) {
       console.error(`- ${mismatch}`);
     }
     console.error(
-      "\nUpdate OpenAPI and Insomnia, regenerate Postman, review parity, then run npm run contract:update.",
+      "\nUpdate OpenAPI and Insomnia, regenerate Smithy and Postman, review parity, then run npm run contract:update.",
     );
     process.exitCode = 1;
     return;
   }
 
   console.log(
-    `OpenAPI, Insomnia, and Postman agree on ${actual.operation_count} operations and the reviewed contract lock is current.`,
+    `OpenAPI, Smithy, Insomnia, and Postman agree on ${actual.operation_count} operations and the reviewed contract lock is current.`,
   );
 }
 
@@ -1061,7 +1063,7 @@ function updateContractLock(actual) {
     );
     if (!lockChanged) {
       console.log(
-        "OpenAPI and client collections are unchanged; the reviewed contract lock is already current.",
+        "OpenAPI, Smithy, and client collections are unchanged; the reviewed contract lock is already current.",
       );
       return;
     }
@@ -1069,7 +1071,7 @@ function updateContractLock(actual) {
 
   writeFileSync(lockPath, `${JSON.stringify(actual, null, 2)}\n`);
   console.log(
-    `Updated ${relative(rootDir, lockPath)} for ${actual.operation_count} operations.`,
+    `Updated ${relative(rootDir, lockPath)} for ${actual.operation_count} OpenAPI and Smithy operations.`,
   );
 }
 

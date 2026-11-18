@@ -1,4 +1,17 @@
 commerce.yml whitespace=-indent-with-non-tab
+# Why: these are deterministic projections; reviewing the generator and source
+# contract is more useful than treating their multi-megabyte bodies as hand code.
+commerce.smithy.json linguist-generated=true whitespace=-indent-with-non-tab
+smithy/commerce.smithy linguist-generated=true
+# Why: repository source and workflow files intentionally use spaces for
+# indentation, so the global non-tab indentation warning is inapplicable.
+.github/workflows/*.yml whitespace=-indent-with-non-tab
+scripts/*.mjs whitespace=-indent-with-non-tab
+smithy/*.smithy whitespace=-indent-with-non-tab
+# Why: modular resource contracts use the same deliberate space-indented YAML style as the bundle.
+src/**/*.yml whitespace=-indent-with-non-tab
 insomnia/*.yaml whitespace=-indent-with-non-tab
+# Why: workflow collections use YAML block scalars with space-indented JSON just like top-level collections.
+insomnia/**/*.yaml whitespace=-indent-with-non-tab
 postman/*.json whitespace=-indent-with-non-tab
 postman/workflows/*.json whitespace=-indent-with-non-tab
