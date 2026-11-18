@@ -2941,6 +2941,53 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/OrderResponse'
+                            # OpenAPI proves the request and response independently. This relation
+                            # additionally proves that the returned Order is reachable from this
+                            # particular create request.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /customer_id, to: /order/customer/id }
+                                    - { from: /customer_data/name, to: /order/customer/name }
+                                    - { from: /customer_data/email_address, to: /order/customer/email_address }
+                                    - { from: /customer_data/phone_number, to: /order/customer/phone_number }
+                                    - { from: /number, to: /order/number }
+                                    - { from: /receipt_number, to: /order/receipt_number }
+                                    - { from: /checkout_settings, to: /order/checkout_settings }
+                                    - { from: /custom_data, to: /order/custom_data }
+                                    - { from: /line_items, to: /order/line_item_group/line_items }
+                                    - { from: /line_items/*/product/price/currency, to: /order/line_item_group/total/currency }
+                                    - { from: /line_items/*/fee/amount/currency, to: /order/line_item_group/total/currency }
+                                    - { from: /line_items/*/shipping/fee/currency, to: /order/line_item_group/total/currency }
+                                    - to: /order/line_item_group/total/value
+                                      value:
+                                          add:
+                                              - sum:
+                                                    each: /line_items/*/product
+                                                    value:
+                                                        multiply:
+                                                            - { path: /quantity }
+                                                            - { path: /price/value }
+                                              - sum:
+                                                    each: /line_items/*/fee
+                                                    value: { path: /amount/value }
+                                              - sum:
+                                                    each: /line_items/*/shipping
+                                                    value: { path: /fee/value }
+                                rules:
+                                    - when:
+                                          all:
+                                              - { request: /execute_payment, equals: false, default: false }
+                                              - { request: /finalize, equals: true, default: false }
+                                      then:
+                                          set: { /order/status: requires_payment }
+                                          omit: [/order/paid_at, /order/completed_at, /order/canceled_at, /order/refunds]
+                                    - when:
+                                          all:
+                                              - { request: /execute_payment, equals: false, default: false }
+                                              - { request: /finalize, equals: false, default: false }
+                                      then:
+                                          set: { /order/status: preparing }
+                                          omit: [/order/sealed_at, /order/paid_at, /order/completed_at, /order/canceled_at, /order/payment, /order/refunds]
                 '400':
                     description: Bad request - invalid parameters
                     headers:
