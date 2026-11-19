@@ -119,7 +119,7 @@ type WithNullable<Schema, Value> = Schema extends { readonly nullable: true }
   ? Value | null
   : Value;
 
-/** Infer the payload represented by a generated OpenAPI schema algebra node. */
+/** Infer the payload represented by a generated schema-algebra node. */
 export type InferSchema<Schema, Registry> = Schema extends unknown
   ? WithNullable<
       Schema,
