@@ -3,11 +3,5 @@
   "sources": [
     "commerce.smithy"
   ],
-  "outputDirectory": "../build/smithy",
-  "maven": {
-    "dependencies": [
-      "com.disneystreaming.alloy:alloy-core:0.3.40",
-      "com.disneystreaming.smithy:smithytranslate-traits:0.7.10"
-    ]
-  }
+  "outputDirectory": "../build/smithy"
 }

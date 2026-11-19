@@ -7,7 +7,7 @@ This repository contains the public, machine-readable contract and ready-to-run 
 - [`src/openapi.yml`](src/openapi.yml) — the authoritative modular OpenAPI 3.0.3 source.
 - [`src/resources/`](src/resources/) — operations and schemas grouped by public API resource.
 - [`commerce.yml`](commerce.yml) — the generated, portable public OpenAPI specification.
-- [`smithy/commerce.smithy`](smithy/commerce.smithy) — the generated, readable Smithy 2.0 projection.
+- [`smithy/commerce.smithy`](smithy/commerce.smithy) — the generated, standalone Smithy 2.0 contract.
 - [`commerce.smithy.json`](commerce.smithy.json) — the generated, fully assembled Smithy JSON AST for consumers that need one portable file.
 - [`typescript/commerce.d.ts`](typescript/commerce.d.ts) — the small public entrypoint for generated semantic modules containing direct payload types, resource-grouped operations, business invariants, request-dependent responses, and literal examples.
 - [`typescript/contract-ir.d.ts`](typescript/contract-ir.d.ts) — the internal lossless OpenAPI projection used only for parity and proof compilation.
@@ -46,9 +46,9 @@ npm run lint:openapi
 
 ## Use the Smithy specification
 
-Consumers that work with Smithy can load `smithy/commerce.smithy` as Smithy 2.0 IDL. Consumers that require a single final artifact can load `commerce.smithy.json`; it is the compiled JSON AST and includes the model dependency closure, so it does not rely on local source discovery.
+Consumers that work with Smithy can load `smithy/commerce.smithy` as Smithy 2.0 IDL. Consumers that require a single final artifact can load `commerce.smithy.json`; it is the compiled JSON AST and does not rely on local source discovery.
 
-OpenAPI remains the authored authority for the HTTP contract. The Smithy files are deterministic projections of `commerce.yml`, not a second hand-maintained contract. The projection uses Smithy-native HTTP, authentication, validation, examples, errors, and operation traits wherever Smithy can represent the behavior directly. It retains `x-simile-constraints`, records the exact OpenAPI source digest on the service, preserves OpenAPI-only schema fragments under `x-inttegro-openapi-source-schema`, preserves multi-success response alternatives under `x-inttegro-http-success-responses`, and carries each operation's status/content-type request-to-response bindings under `x-inttegro-simile-response-relations`. Those fidelity extensions are machine-readable evidence for semantics that generic Smithy validators cannot enforce natively.
+The Smithy files are generated deterministically from the canonical contract source, but the published model is independent: it contains no references to another contract format and requires no third-party trait libraries. Standard Smithy traits express HTTP bindings, authentication, validation, examples, errors, and operations. Locally declared Smithy traits—`simileConstraints`, `simileSchema`, `httpSuccessResponses`, and `responseRelations`—carry the remaining public semantics that Smithy's base shape algebra cannot state directly. Smithy consumers can therefore compile, inspect, or implement the model without loading the source used to generate it.
 
 Generation is pinned to Smithy CLI 1.75.0 and smithytranslate 0.7.10. Install the Smithy CLI, then install the translator with Coursier:
 
