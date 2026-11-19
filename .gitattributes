@@ -4,6 +4,15 @@ commerce.yml whitespace=-indent-with-non-tab
 commerce.smithy.json linguist-generated=true whitespace=-indent-with-non-tab
 smithy/commerce.smithy linguist-generated=true
 typescript/commerce.d.ts linguist-generated=true
+typescript/core.d.ts linguist-generated=true
+typescript/examples.d.ts linguist-generated=true
+typescript/input.d.ts linguist-generated=true
+typescript/models.d.ts linguist-generated=true
+typescript/operations.d.ts linguist-generated=true
+typescript/operations/*.d.ts linguist-generated=true
+typescript/output.d.ts linguist-generated=true
+typescript/soundness.d.ts linguist-generated=true
+typescript/contract-ir.d.ts linguist-generated=true
 # Why: repository source and workflow files intentionally use spaces for
 # indentation, so the global non-tab indentation warning is inapplicable.
 .github/workflows/*.yml whitespace=-indent-with-non-tab
@@ -11,6 +20,8 @@ scripts/*.mjs whitespace=-indent-with-non-tab
 package-lock.json whitespace=-indent-with-non-tab
 smithy/*.smithy whitespace=-indent-with-non-tab
 typescript/*.d.ts whitespace=-indent-with-non-tab
+# Why: generated operation modules use the same deliberate TypeScript indentation as the top-level declarations.
+typescript/operations/*.d.ts whitespace=-indent-with-non-tab
 # Why: modular resource contracts use the same deliberate space-indented YAML style as the bundle.
 src/**/*.yml whitespace=-indent-with-non-tab
 insomnia/*.yaml whitespace=-indent-with-non-tab

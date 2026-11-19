@@ -2896,14 +2896,14 @@
                     {
                         "json": [
                             {
-                                "customer_id": "cu_abc123def456",
-                                "transport": "email"
+                                "transport": "email",
+                                "customer_id": "cu_abc123def456"
                             },
                             {
-                                "type": "email",
                                 "email": {
                                     "address": "user@example.com"
-                                }
+                                },
+                                "type": "email"
                             }
                         ]
                     }
@@ -6846,17 +6846,17 @@
                     {
                         "json": {
                             "order": {
-                                "customer": {
-                                    "guest": false,
-                                    "name": "Akua Mensah",
-                                    "id": "cu_abc123def456"
-                                },
-                                "sealed_at": "2025-01-25T10:30:00Z",
-                                "expires_at": "2025-02-01T10:25:00Z",
-                                "completed_at": "2025-01-25T11:00:00Z",
-                                "initiated_at": "2025-01-25T10:25:00Z",
-                                "id": "or_48ZW7BGvYUBWc1i6WBkL2jr0iPQP5jUy76mmmHpt",
                                 "status": "completed",
+                                "sealed_at": "2025-01-25T10:30:00Z",
+                                "customer": {
+                                    "id": "cu_abc123def456",
+                                    "guest": false,
+                                    "name": "Akua Mensah"
+                                },
+                                "completed_at": "2025-01-25T11:00:00Z",
+                                "id": "or_48ZW7BGvYUBWc1i6WBkL2jr0iPQP5jUy76mmmHpt",
+                                "initiated_at": "2025-01-25T10:25:00Z",
+                                "expires_at": "2025-02-01T10:25:00Z",
                                 "number": "ORDER-12345"
                             }
                         }
@@ -15161,16 +15161,16 @@
                     {
                         "json": {
                             "order": {
-                                "customer": {
-                                    "guest": false,
-                                    "name": "Akua Mensah",
-                                    "id": "cu_abc123def456"
-                                },
-                                "sealed_at": "2025-01-25T10:30:00Z",
-                                "expires_at": "2025-02-01T10:25:00Z",
-                                "initiated_at": "2025-01-25T10:25:00Z",
-                                "id": "or_48ZW7BGvYUBWc1i6WBkL2jr0iPQP5jUy76mmmHpt",
                                 "status": "requires_payment",
+                                "sealed_at": "2025-01-25T10:30:00Z",
+                                "customer": {
+                                    "id": "cu_abc123def456",
+                                    "guest": false,
+                                    "name": "Akua Mensah"
+                                },
+                                "id": "or_48ZW7BGvYUBWc1i6WBkL2jr0iPQP5jUy76mmmHpt",
+                                "initiated_at": "2025-01-25T10:25:00Z",
+                                "expires_at": "2025-02-01T10:25:00Z",
                                 "number": "ORDER-12345"
                             }
                         }
@@ -18127,7 +18127,7 @@
         },
         "com.inttegro.api#Inttegro": {
             "type": "service",
-            "version": "0.1.0-beta82",
+            "version": "0.1.0-beta86",
             "operations": [
                 {
                     "target": "com.inttegro.api#activatePaymentMethod"
@@ -18537,14 +18537,14 @@
             ],
             "traits": {
                 "alloy.openapi#openapiExtensions": {
-                    "x-inttegro-collection-version": "0.1.0-beta82",
+                    "x-inttegro-collection-version": "0.1.0-beta86",
                     "x-inttegro-smithy-projection": {
                         "namespace": "com.inttegro.api",
                         "service": "Inttegro",
                         "smithy": "1.75.0",
                         "smithytranslate": "0.7.10"
                     },
-                    "x-inttegro-source-openapi-sha256": "913409e7feabefca0dcde1725ebdae102191d9e5cc3a92ad8ffbbaff84131831"
+                    "x-inttegro-source-openapi-sha256": "26a0f6bb3b2ddf203eccb317381499e167fdce974da7f05c2c736bbe5d2fce36"
                 },
                 "smithy.api#auth": [
                     "smithy.api#httpBearerAuth"
@@ -18689,59 +18689,59 @@
                         "json": {
                             "countries": {
                                 "gh": {
-                                    "legal_entity_types": [
-                                        "individual",
-                                        "business"
-                                    ],
-                                    "currencies": [
-                                        "ghs",
-                                        "usd"
-                                    ],
                                     "banks": {
                                         "code_scheme": "sort_code",
                                         "items": [
                                             {
-                                                "name": "ABSA (GH) LTD",
                                                 "sort_code_prefix": "03",
-                                                "swift_code": "BARCGHAC",
                                                 "branches": [
                                                     {
+                                                        "id": "absa_gh_ltd_kasoa_branch",
                                                         "sort_code": "030101",
-                                                        "name": "ABSA (GH) LTD-KASOA BRANCH",
-                                                        "id": "absa_gh_ltd_kasoa_branch"
+                                                        "name": "ABSA (GH) LTD-KASOA BRANCH"
                                                     }
                                                 ],
-                                                "id": "absa_gh_ltd"
+                                                "id": "absa_gh_ltd",
+                                                "name": "ABSA (GH) LTD",
+                                                "swift_code": "BARCGHAC"
                                             }
                                         ],
                                         "bank_account_type": "ghana_bank_account"
                                     },
-                                    "country_code": "gh",
-                                    "id_document_types": [
-                                        "ghana_card",
-                                        "passport"
-                                    ],
-                                    "financial_account_types": [
-                                        "wallet",
-                                        "bank_account"
-                                    ],
-                                    "country_name": "Ghana",
                                     "bt_aging_specs": [
                                         "bt_aging_spec_immediate",
                                         "bt_aging_spec_24_hourly",
                                         "bt_aging_spec_48_hourly",
                                         "bt_aging_spec_168_hourly"
                                     ],
-                                    "payout_schedules": [
-                                        "weekly",
-                                        "manual"
+                                    "financial_account_types": [
+                                        "wallet",
+                                        "bank_account"
+                                    ],
+                                    "id_document_types": [
+                                        "ghana_card",
+                                        "passport"
+                                    ],
+                                    "currencies": [
+                                        "ghs",
+                                        "usd"
                                     ],
                                     "payment_methods": [
                                         "mobile_money",
                                         "bank_account",
                                         "payment_card",
                                         "motito"
-                                    ]
+                                    ],
+                                    "country_name": "Ghana",
+                                    "payout_schedules": [
+                                        "weekly",
+                                        "manual"
+                                    ],
+                                    "legal_entity_types": [
+                                        "individual",
+                                        "business"
+                                    ],
+                                    "country_code": "gh"
                                 }
                             }
                         }
@@ -37217,14 +37217,14 @@
                     {
                         "json": [
                             {
-                                "customer_id": "cu_abc123def456",
-                                "transport": "sms"
+                                "transport": "sms",
+                                "customer_id": "cu_abc123def456"
                             },
                             {
+                                "type": "phone",
                                 "phone": {
                                     "number": "+233544998605"
-                                },
-                                "type": "phone"
+                                }
                             }
                         ]
                     }

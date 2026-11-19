@@ -1,4 +1,4 @@
-import type { ResponseRelation } from "./commerce";
+import type { ResponseRelation } from "./contract-ir";
 import type { Assert, RelationHolds, SetPath } from "./proof-kernel";
 
 type PagePaymentMethodsRelation = ResponseRelation<

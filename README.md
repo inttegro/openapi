@@ -9,7 +9,8 @@ This repository contains the public, machine-readable contract and ready-to-run 
 - [`commerce.yml`](commerce.yml) — the generated, portable public OpenAPI specification.
 - [`smithy/commerce.smithy`](smithy/commerce.smithy) — the generated, readable Smithy 2.0 projection.
 - [`commerce.smithy.json`](commerce.smithy.json) — the generated, fully assembled Smithy JSON AST for consumers that need one portable file.
-- [`typescript/commerce.d.ts`](typescript/commerce.d.ts) — the generated, types-only contract containing public payloads, operations, constraints, relations, and literal examples.
+- [`typescript/commerce.d.ts`](typescript/commerce.d.ts) — the small public entrypoint for generated semantic modules containing direct payload types, resource-grouped operations, business invariants, request-dependent responses, and literal examples.
+- [`typescript/contract-ir.d.ts`](typescript/contract-ir.d.ts) — the internal lossless OpenAPI projection used only for parity and proof compilation.
 - [`typescript/proof-kernel.d.ts`](typescript/proof-kernel.d.ts) — the runtime-free type algebra that proves schema paths and request-to-response scenarios.
 - [`insomnia/`](insomnia/) — Insomnia v5.1 collections covering the public API.
 - [`postman/`](postman/) — equivalent Postman Collection v2.1 artifacts generated from Insomnia.
@@ -67,14 +68,22 @@ npm run smithy:compile
 
 Consumers that use TypeScript's type system can load `typescript/commerce.d.ts`
 without installing or executing a runtime library. `RequestBody`,
-`ResponseBody`, and `ResponseRelation` expose each operation's payloads and
-soundness proposition. `SchemaDefinitions`, `SchemaConstraintSites`, and
-`OperationExamples` expose the closed source algebra when a consumer needs to
-inspect or prove the contract itself.
+`ResponseBody`, `OperationResult`, and `SoundResponse` expose each operation's
+payloads, observable alternatives, and request-dependent soundness proposition.
+`SchemaSoundness` states cross-field business invariants over those payload
+types without exposing OpenAPI keywords or JSON Pointer extension objects.
+Direct-field implications also refine the payload types themselves, making
+invalid lifecycle combinations fail ordinary TypeScript assignment.
+
+The entrypoint re-exports focused `core`, `models`, `input`, `output`,
+`soundness`, `operations`, and `examples` modules. Operations are further split
+by their public OpenAPI tag under `typescript/operations/`; existing imports
+from `typescript/commerce.d.ts` remain unchanged.
 
 The declarations retain all 601 public schemas, all 135 operations, all 238
 cross-field constraints, all 111 request-to-response relations, and every
-named example. The included `createOrder` proof establishes the documented
+named example. A separate internal projection preserves lossless source parity.
+The included `createOrder` proof establishes the documented
 request and response as a valid witness and proves that incorrect totals,
 currencies, lifecycle branches, and operation error codes are rejected.
 

@@ -3,7 +3,7 @@ import type {
   RequestBody,
   ResponseBody,
   ResponseRelation,
-} from "./commerce";
+} from "./contract-ir";
 import type {
   Assert,
   RelationHolds,
