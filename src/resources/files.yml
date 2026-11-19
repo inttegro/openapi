@@ -270,7 +270,7 @@ paths:
     /files/contents:
         post:
             summary: Deliver file contents
-            description: Streams original file bytes for a file owned by the authorized application, or returns a 303 redirect to a short-lived signed delivery URL when delivery is redirect.
+            description: Streams original file bytes for a file owned by the authorized application, or returns a 303 redirect to its purpose-authorized public asset URL or a short-lived signed delivery URL when delivery is redirect.
             operationId: streamFileContents
             tags:
                 - Files
@@ -292,7 +292,7 @@ paths:
                                 type: string
                                 format: binary
                 '303':
-                    description: Redirect to a short-lived signed delivery URL
+                    description: Redirect to a purpose-authorized public asset URL or a short-lived signed delivery URL
                     headers:
                         X-Request-Id:
                             $ref: './common.yml#/components/headers/RequestId'
