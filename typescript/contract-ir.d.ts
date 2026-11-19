@@ -1,5 +1,5 @@
 // Internal compiler IR generated from commerce.yml; DO NOT EDIT OR PUBLISH AS THE TYPESCRIPT CONTRACT.
-// OpenAPI SHA-256: 26a0f6bb3b2ddf203eccb317381499e167fdce974da7f05c2c736bbe5d2fce36
+// OpenAPI SHA-256: 8fe16cafb48f0cd17300007a3a959834f35d005a2ce5d977921457f293f5e8fc
 // This file contains declarations only and emits no JavaScript.
 
 import type {
@@ -10,8 +10,8 @@ import type {
   RelationWellFormed,
 } from "./proof-kernel";
 
-export type CollectionVersion = "0.1.0-beta86";
-export type SourceOpenApiSha256 = "26a0f6bb3b2ddf203eccb317381499e167fdce974da7f05c2c736bbe5d2fce36";
+export type CollectionVersion = "0.1.0-beta87";
+export type SourceOpenApiSha256 = "8fe16cafb48f0cd17300007a3a959834f35d005a2ce5d977921457f293f5e8fc";
 export type OperationCount = 135;
 export type SchemaCount = 601;
 export type ConstraintCount = 238;
