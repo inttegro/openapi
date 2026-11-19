@@ -1,4 +1,3 @@
-import { createHash } from "node:crypto";
 import {
   cpSync,
   existsSync,
@@ -39,11 +38,10 @@ const tempDir = mkdtempSync(join(tmpdir(), "inttegro-smithy-"));
 
 try {
   const openApiBytes = readFileSync(openApiPath);
-  const sourceDigest = createHash("sha256").update(openApiBytes).digest("hex");
   const sourceDocument = parse(openApiBytes.toString("utf8"));
   const projectionDocument = structuredClone(sourceDocument);
 
-  prepareProjectionInput(projectionDocument, sourceDocument, sourceDigest);
+  prepareProjectionInput(projectionDocument, sourceDocument);
 
   const translator = commandFromEnvironment(
     "SMITHY_TRANSLATE_COMMAND",
@@ -88,8 +86,8 @@ try {
   }
 
   let idl = readFileSync(translatedPath, "utf8");
-  idl = projectSmithy(idl, sourceDocument, sourceDigest);
-  validateProjectedIdl(idl, sourceDocument, sourceDigest);
+  idl = projectSmithy(idl, sourceDocument);
+  validateProjectedIdl(idl, sourceDocument);
 
   const buildDir = join(tempDir, "build-input");
   mkdirSync(buildDir, { recursive: true });
@@ -118,7 +116,7 @@ try {
   }
 
   const ast = JSON.parse(readFileSync(compiledModelPath, "utf8"));
-  validateCompiledModel(ast, sourceDocument, sourceDigest);
+  validateCompiledModel(ast, sourceDocument);
 
   if (check) {
     compareGeneratedFile(smithyIdlPath, Buffer.from(idl));
@@ -138,16 +136,7 @@ try {
   rmSync(tempDir, { recursive: true, force: true });
 }
 
-function prepareProjectionInput(document, source, sourceDigest) {
-  document.info ??= {};
-  document.info["x-inttegro-source-openapi-sha256"] = sourceDigest;
-  document.info["x-inttegro-smithy-projection"] = {
-    namespace: NAMESPACE,
-    service: SERVICE_NAME,
-    smithy: SMITHY_VERSION,
-    smithytranslate: SMITHY_TRANSLATE_VERSION,
-  };
-
+function prepareProjectionInput(document, source) {
   let pureReferenceCount = 0;
   for (const [name, schema] of Object.entries(
     document.components?.schemas ?? {},
@@ -189,17 +178,65 @@ function prepareProjectionInput(document, source, sourceDigest) {
   )) {
     const sourceSchema = source.components.schemas[name];
     if (containsUnsupportedSchemaKeyword(sourceSchema)) {
-      // Why: Smithy has no native equivalent for every OpenAPI composition and
-      // nullability rule. Retaining the exact source fragment prevents consumers
-      // from mistaking a necessarily looser Smithy projection for lost contract.
-      schema["x-inttegro-openapi-source-schema"] = sourceSchema;
+      // Why: some public JSON refinements have no direct Smithy shape equivalent. Carry them
+      // through translation so they can become a local Smithy trait in the standalone model.
+      schema["x-inttegro-smithy-schema"] = standaloneSchema(sourceSchema);
     }
   }
 }
 
-function projectSmithy(input, openApi, sourceDigest) {
+function standaloneSchema(value, parentKey) {
+  if (Array.isArray(value)) {
+    return value.map((child) => standaloneSchema(child, parentKey));
+  }
+  if (!isPlainObject(value)) {
+    if (
+      parentKey === "mapping" &&
+      typeof value === "string" &&
+      value.startsWith("#/components/schemas/")
+    ) {
+      return value.slice("#/components/schemas/".length);
+    }
+    return value;
+  }
+
+  const result = {};
+  for (const [name, child] of Object.entries(value)) {
+    if (name === "$ref") {
+      const prefix = "#/components/schemas/";
+      if (typeof child !== "string" || !child.startsWith(prefix)) {
+        throw new Error(`Unsupported Smithy schema reference ${JSON.stringify(child)}`);
+      }
+      result.shape = child.slice(prefix.length);
+      continue;
+    }
+    if (name === "nullable") {
+      continue;
+    }
+    const nativeName = name === "x-simile-constraints" ? "simileConstraints" : name;
+    result[nativeName] = standaloneSchema(
+      child,
+      parentKey === "mapping" ? "mapping" : name,
+    );
+  }
+
+  if (value.nullable === true) {
+    if (typeof result.type === "string") {
+      result.type = [result.type, "null"];
+    } else {
+      return { anyOf: [result, { type: "null" }] };
+    }
+  }
+  return result;
+}
+
+function projectSmithy(input, openApi) {
   let idl = input.replace("namespace commerce", `namespace ${NAMESPACE}`);
   idl = idl.replace("use alloy#discriminated\n", "");
+  idl = idl.replace("use alloy#dataExamples\n", "");
+  idl = idl.replace("use alloy#untagged\n", "");
+  idl = idl.replace("use alloy.openapi#openapiExtensions\n", "");
+  idl = idl.replace("use smithytranslate#contentType\n", "");
   idl = renameComponentShapes(idl, Object.keys(openApi.components.schemas));
   idl = renameConverterPrefixedShapes(idl);
   idl = renameRemainingCaseConflicts(idl);
@@ -231,33 +268,28 @@ function projectSmithy(input, openApi, sourceDigest) {
     }
     const relations = responseRelations(operation.value);
     if (Object.keys(relations).length > 0) {
-      // Why: Smithy has no native request-to-response binding trait. Retaining the exact
-      // status/content-type map prevents Smithy consumers from losing the reachability rules
-      // that make synthesized responses coherent with submitted requests in OpenAPI.
+      // Why: Smithy has no standard request-to-response binding trait. A local trait preserves
+      // the public reachability rules without coupling the model to another contract language.
       idl = addOperationTrait(
         idl,
         operation.id,
-        openApiExtensionsTrait({
-          "x-inttegro-simile-response-relations": relations,
-        }),
+        nativeTrait("responseRelations", relations),
       );
     }
   }
 
-  // Why: smithytranslate emits Alloy discriminated unions whose target
-  // structures still contain the discriminator member. Alloy rejects that
-  // combination. Untagged unions preserve the one-of alternatives, while the
-  // exact OpenAPI discriminator remains in x-inttegro-openapi-source-schema.
+  // Why: the translator emits discriminated unions whose target structures still contain the
+  // discriminator member. Local untagged unions preserve the public alternatives coherently.
   idl = idl.replace(/^@discriminated\([^\n]+\)$/gm, "@untagged");
 
   idl = mergeAlternateSuccessResponses(idl, openApi);
   idl = appendStatusCodeEnums(idl);
-  idl = canonicalizeOpenApiExtensions(idl);
+  idl = projectNativeTraits(idl);
+  idl = insertNativeTraitDefinitions(idl);
 
   const header = [
-    "// Code generated by scripts/generate-smithy.mjs from commerce.yml; DO NOT EDIT.",
-    `// OpenAPI SHA-256: ${sourceDigest}`,
-    "// Why: commerce.yml remains authoritative while this portable Smithy projection serves Smithy-native consumers.",
+    "// Code generated by scripts/generate-smithy.mjs; DO NOT EDIT.",
+    "// This standalone model is the complete public contract for Smithy consumers.",
     "",
   ].join("\n");
   // Why: converter-generated documentation inherits YAML block padding. Strip
@@ -452,9 +484,7 @@ function addResponseStatusMember(
     members = `    ${extraMember}\n${members}`;
   }
   members = `    @httpResponseCode\n    @required\n    statusCode: ${statusType}\n${members}`;
-  const trait = openApiExtensionsTrait({
-    "x-inttegro-http-success-responses": variants,
-  });
+  const trait = nativeTrait("httpSuccessResponses", variants);
   return idl.replace(
     pattern,
     `${trait}\nstructure ${shapeName} {\n${members}}\n`,
@@ -531,18 +561,11 @@ function responseVariants(openApi, operationId) {
   );
 }
 
-function openApiExtensionsTrait(extensions) {
-  const entries = Object.entries(extensions).map(([name, value]) => {
-    const json = JSON.stringify(value, null, 2)
-      .split("\n")
-      .map((line, index) => (index === 0 ? line : `    ${line}`))
-      .join("\n");
-    return `    ${JSON.stringify(name)}: ${json}`;
-  });
-  return `@openapiExtensions(\n${entries.join("\n")}\n)`;
+function nativeTrait(name, value) {
+  return `@${name}(\n${formatSmithyNode(value, 1)}\n)`;
 }
 
-function canonicalizeOpenApiExtensions(idl) {
+function projectNativeTraits(idl) {
   const marker = "@openapiExtensions(";
   let cursor = 0;
   let result = "";
@@ -556,9 +579,76 @@ function canonicalizeOpenApiExtensions(idl) {
     const end = findBalancedParenthesis(idl, bodyStart);
     const tokens = tokenizeSmithyNode(idl.slice(bodyStart, end));
     const entries = parseSmithyNodeEntries(tokens);
-    result += `@openapiExtensions(\n${formatSmithyNodeEntries(entries, 1)}\n)`;
+    result += nativeTraits(entries);
     cursor = end + 1;
   }
+}
+
+function nativeTraits(entries) {
+  const names = {
+    "x-inttegro-availability": "availability",
+    "x-inttegro-collection-version": "collectionVersion",
+    "x-inttegro-http-success-responses": "httpSuccessResponses",
+    "x-inttegro-simile-response-relations": "responseRelations",
+    "x-inttegro-smithy-schema": "simileSchema",
+    "x-simile-constraints": "simileConstraints",
+  };
+  return Object.keys(entries)
+    .sort()
+    .filter(
+      (extension) =>
+        extension !== "x-inttegro-smithy-projection",
+    )
+    .map((extension) => {
+      const name = names[extension];
+      if (!name) {
+        throw new Error(`Unsupported source extension for Smithy ${extension}`);
+      }
+      const value =
+        name === "simileSchema"
+          ? standaloneSchema(entries[extension])
+          : entries[extension];
+      return nativeTrait(name, value);
+    })
+    .join("\n");
+}
+
+function insertNativeTraitDefinitions(idl) {
+  const definitions = `
+@trait(selector: "*")
+document availability
+
+@trait(selector: "service")
+string collectionVersion
+
+@trait(selector: "member")
+string contentType
+
+@trait(selector: "*")
+document dataExamples
+
+@trait(selector: "structure")
+document httpSuccessResponses
+
+@trait(selector: "operation")
+document responseRelations
+
+@trait(selector: "*")
+document simileConstraints
+
+@trait(selector: "*")
+document simileSchema
+
+@trait(selector: "union")
+structure untagged {}
+`;
+  const namespace = `namespace ${NAMESPACE}\n`;
+  return replaceOnce(
+    idl,
+    namespace,
+    `${namespace}${definitions}`,
+    "define standalone Smithy traits",
+  );
 }
 
 function findBalancedParenthesis(input, bodyStart) {
@@ -758,15 +848,18 @@ function formatSmithyNode(value, depth) {
   return JSON.stringify(value);
 }
 
-function validateProjectedIdl(idl, openApi, sourceDigest) {
+function validateProjectedIdl(idl, openApi) {
   if (!idl.includes(`namespace ${NAMESPACE}`)) {
     throw new Error("Generated IDL has the wrong namespace");
   }
   if (!idl.includes(`service ${SERVICE_NAME} {`)) {
     throw new Error("Generated IDL has the wrong service name");
   }
-  if (!idl.includes(`OpenAPI SHA-256: ${sourceDigest}`)) {
-    throw new Error("Generated IDL is missing its source digest");
+  if (/openapi/i.test(idl)) {
+    throw new Error("Standalone Smithy IDL contains foreign contract vocabulary");
+  }
+  if (/^use\s/m.test(idl)) {
+    throw new Error("Standalone Smithy IDL contains an external shape import");
   }
   if (idl.includes("componentsschemas")) {
     throw new Error("Generated IDL still contains converter component prefixes");
@@ -786,11 +879,22 @@ function validateProjectedIdl(idl, openApi, sourceDigest) {
   }
 }
 
-function validateCompiledModel(ast, openApi, sourceDigest) {
+function validateCompiledModel(ast, openApi) {
   if (ast.smithy !== "2.0") {
     throw new Error(`Expected Smithy 2.0 JSON AST, received ${ast.smithy}`);
   }
+  if (/openapi/i.test(JSON.stringify(ast))) {
+    throw new Error("Standalone Smithy AST contains foreign contract vocabulary");
+  }
   const shapes = ast.shapes ?? {};
+  const externalShapes = Object.keys(shapes).filter(
+    (name) => !name.startsWith(`${NAMESPACE}#`),
+  );
+  if (externalShapes.length > 0) {
+    throw new Error(
+      `Standalone Smithy AST contains external shapes: ${externalShapes.join(", ")}`,
+    );
+  }
   const operationShapes = Object.entries(shapes).filter(
     ([name, shape]) => name.startsWith(`${NAMESPACE}#`) && shape.type === "operation",
   );
@@ -812,9 +916,8 @@ function validateCompiledModel(ast, openApi, sourceDigest) {
   if ((service.operations ?? []).length !== expectedIds.length) {
     throw new Error("Compiled Smithy service does not bind every operation");
   }
-  const extensions = service.traits?.["alloy.openapi#openapiExtensions"] ?? {};
-  if (extensions["x-inttegro-source-openapi-sha256"] !== sourceDigest) {
-    throw new Error("Compiled Smithy service is missing the OpenAPI source digest");
+  if (service.traits?.[`${NAMESPACE}#collectionVersion`] !== openApi.info.version) {
+    throw new Error("Compiled Smithy service is missing its collection version");
   }
 
   const auth = collectAuthOverrides(openApi);
@@ -847,10 +950,7 @@ function validateSimileConstraints(shapes, openApi) {
   const expected = collectExtensionValues(openApi, "x-simile-constraints");
   const actual = [];
   for (const shape of Object.values(shapes)) {
-    const value =
-      shape.traits?.["alloy.openapi#openapiExtensions"]?.[
-        "x-simile-constraints"
-      ];
+    const value = shape.traits?.[`${NAMESPACE}#simileConstraints`];
     if (value !== undefined) {
       actual.push(value);
     }
@@ -870,16 +970,16 @@ function validateResponseRelations(shapes, openApi) {
     const expected = responseRelations(operation.value);
     const actual =
       shapes[`${NAMESPACE}#${operation.id}`]?.traits?.[
-        "alloy.openapi#openapiExtensions"
-      ]?.["x-inttegro-simile-response-relations"];
+        `${NAMESPACE}#responseRelations`
+      ];
     if (Object.keys(expected).length === 0) {
       if (actual !== undefined) {
-        throw new Error(`${operation.id} retained a response relation that OpenAPI does not declare`);
+        throw new Error(`${operation.id} retained an undeclared response relation`);
       }
       continue;
     }
     if (stableJson(actual) !== stableJson(expected)) {
-      throw new Error(`${operation.id} lost an OpenAPI request-response relation in Smithy`);
+      throw new Error(`${operation.id} lost a request-response relation in Smithy`);
     }
     retained += 1;
   }
@@ -1084,12 +1184,6 @@ function buildConfig(sourcePath, outputDirectory) {
     version: "1.0",
     sources: [sourcePath],
     outputDirectory,
-    maven: {
-      dependencies: [
-        "com.disneystreaming.alloy:alloy-core:0.3.40",
-        `com.disneystreaming.smithy:smithytranslate-traits:${SMITHY_TRANSLATE_VERSION}`,
-      ],
-    },
   };
 }
 
