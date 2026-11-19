@@ -8,16 +8,17 @@ Inttegro implementation to use.
   types, request- and response-direction models, discriminated operation
   results, named examples, business-invariant propositions, and a
   `SoundResponse` proof for request-dependent results from focused modules.
-  OpenAPI schema keywords, `$ref` objects, and JSON Pointer extension syntax
-  are not its public model.
+  Source-schema keywords, references, and extension syntax are not its public
+  model.
   Direct-field implications are also compiled into payload refinements, so
   incoherent lifecycle combinations fail ordinary TypeScript assignment.
 - `core.d.ts`, `models.d.ts`, `input.d.ts`, `output.d.ts`, `soundness.d.ts`,
   `operations.d.ts`, and `examples.d.ts` divide the public contract by
   responsibility. `operations/*.d.ts` divides operation definitions by their
-  public OpenAPI tag without changing the public import path.
+  public contract area without changing the public import path.
 - `contract-ir.d.ts` is an internal, lossless compiler projection used to prove
-  parity with OpenAPI. It is intentionally not the public TypeScript contract.
+  parity with the authored source document. It is intentionally not the public
+  TypeScript contract.
 - `proof-kernel.d.ts` defines the closed type algebra used to interpret schema
   nodes, resolve RFC 6901 paths, evaluate response expressions, and prove
   request-to-response scenarios.
@@ -29,11 +30,11 @@ Inttegro implementation to use.
 - `public-entrypoint.test.d.ts` proves that the barrel continues to expose
   representative models, inputs, operations, results, and soundness types.
 
-OpenAPI remains the authored HTTP authority while this representation is being
-evaluated. Both declaration outputs are deterministic, carry the exact OpenAPI
-digest, and are locked with the rest of the collection bundle. Keeping the
-internal projection separate prevents source-format machinery from leaking into
-the public domain types.
+The public declarations are a standalone HTTP contract and carry no dependency
+on the format used to generate them. The development-only internal projection
+remains deterministic and source-locked for repository parity checks. Keeping
+that projection separate prevents source-format machinery from leaking into the
+public domain types or Simile's TypeScript frontend.
 
 Regenerate and verify it with:
 
