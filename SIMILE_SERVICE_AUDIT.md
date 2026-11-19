@@ -3,7 +3,7 @@
 ## Resolved inputs
 
 - Service and CLI name: `inttegro`
-- OpenAPI authority: `commerce.yml` (OpenAPI 3.0.3, `0.1.0-beta82`)
+- OpenAPI authority: `commerce.yml` (OpenAPI 3.0.3, `0.1.0-beta86`)
 - Service configuration: `inttegro.simile.hcl`
 - Behavior overlay: `behaviors.hcl`
 - Listener: `127.0.0.1:4242`
@@ -74,8 +74,8 @@ SIMILE_HOME="$(mktemp -d)" simile register inttegro \
 Results:
 
 - Redocly: valid OpenAPI; five unused-component warnings. Two are the pre-existing balance-transaction bases; three retain the formerly shared search components so existing component consumers are not broken while operations use stricter route-specific schemas.
-- Simile compile: success with compiler 0.2.0, OpenAPI 3.0.3, service version `0.1.0-beta82`, 135 operations, zero abstract resources, and zero async operations.
-- Artifact inspection: format 11, 135 operations, 132 request bodies, 637 responses, 640 outcomes, 624 schema-synthesized outcomes, nine scenario selections, 126 operations without an exact named outcome, and `publicExportSafe: true`.
+- Simile compile: success with compiler 0.2.0, OpenAPI 3.0.3, service version `0.1.0-beta86`, 135 operations, zero abstract resources, and zero async operations.
+- Artifact inspection: format 13, 135 operations, 132 request bodies, 637 responses, 640 outcomes, 624 schema-synthesized outcomes, nine scenario selections, 126 operations without an exact named outcome, and `publicExportSafe: true`.
 - Request/response synthesis: 128 JSON operations synthesized without input, three bounded policy-version operations and one documented pagination-default workaround used valid request seeds, one Purchase Intent page finite-search gap is documented, and the two transport-only operations are explicitly allow-listed.
 - Request reachability: 111 operations carry 111 constructive success-payload relations; the remaining 24 operations match the exact reviewed exception inventory. All 111 relation maps are also preserved in both Smithy outputs.
 - Supplied requests: all request examples declared directly in OpenAPI replayed successfully, along with bank-account owner-source alternatives, a Dosh marker, bundle Buy links with catalog and special-offer prices, and a complete operating-policy capability snapshot; 16 valid supplied requests ran in total.
