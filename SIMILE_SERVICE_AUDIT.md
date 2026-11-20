@@ -3,9 +3,9 @@
 ## Resolved inputs
 
 - Service and CLI name: `inttegro`
-- OpenAPI authority: `commerce.yml` (OpenAPI 3.0.3, `0.1.0-beta86`)
-- Service configuration: `inttegro.simile.hcl`
-- Behavior overlay: `behaviors.hcl`
+- OpenAPI authority: `commerce.yml` (OpenAPI 3.0.3, `0.1.0-beta87`)
+- Service configuration: `simile/inttegro.simile.hcl`
+- Behavior overlays: `simile/behaviors.hcl`, `simile/errors.hcl`, `simile/state.hcl`, and `simile/faults.hcl`
 - Listener: `127.0.0.1:4242`
 - Primary public workflows: application and key management; catalog, product, price, and Buy-link management; checkout, orders, payments, refunds, balances, payouts, and financial accounts; customers, Chimes, OTP, files, upload requests, and policy management.
 
@@ -16,9 +16,10 @@
 - The checked-in Insomnia requests and generated Postman collections. `scripts/check-contract.mjs` proves one-to-one coverage and validates their request bodies against OpenAPI.
 - The global and per-operation error evidence in `scripts/operation-error-codes.mjs`, `scripts/check-error-contract.mjs`, and `scripts/check-operation-error-contract.mjs`.
 - The relationship evidence and fixtures in `SIMILE_SOUNDNESS.md` and `scripts/check-simile-soundness.mjs`.
-- Simile 0.2.0 compiler, runtime, HCL, and HTTP-adapter behavior from the published CLI.
+- Public operation descriptions and Upper tests for resource mutation, scheduled Chimes and payouts, asynchronous broadcasts and refunds, and file cleanup.
+- Simile 0.2.0 compiler, runtime, HCL, and HTTP-adapter behavior from the current workspace source.
 
-Implementation evidence was used only to confirm public wire behavior. Storage layout, provider decisions, production thresholds, dependency names, and private state transitions were not published.
+Implementation evidence was used to confirm public wire behavior.
 
 ## Contract audit
 
@@ -33,23 +34,30 @@ This pass corrected six contract defects:
 5. The generic search response could advertise financial-account search while returning product, order, payout, or customer projections. Five operation-specific response schemas now fix the advertised type, per-type totals, and result references; the shared sort object preserves the caller's concrete `field` and `direction` while enforcing relevance-descending semantics.
 6. Mobile-money tokenization reused a generic payment-method response and could synthesize another rail. Its response is now narrowed to the existing `mobile_money` shape while retaining the masked-number template and four-decimal-digit `last4` rule.
 
-No public route, method, field name, status, content type, request/response envelope, or side effect was changed. The HCL contains nine opaque scenario selectors for request-independent OpenAPI-owned examples. The product-created success remains a named OpenAPI example but is intentionally not an unconditional scenario because its `active` state depends on the request's `publish` value. HCL defines no body, route, resource, dependency, or private decision rule.
+No public route, method, field name, status, content type, or request/response envelope was changed. The expanded HCL publishes 28 deterministic outcome selections: nine select reviewed OpenAPI examples and 19 select provider-authored domain failures whose status and tuple are already part of the operation contract. Five additional scenarios inject opt-in transport faults without changing the selected domain result.
+
+The local setup declares four portable Simile backends: two logical state namespaces, one queue, and one scheduler. Twenty-nine explicitly authored effects record public resource snapshots or schedule only source-backed consequences. Three asynchronous units represent the operations documented as continuing after acceptance: Chime broadcast processing, refund processing, and file cleanup. Inttegro uses POST for reads, so the test gate requires zero convention-inferred effects; this prevents lookup operations from becoming false writes.
 
 ## Soundness ownership
 
 Ordinary OpenAPI continues to own field-local validation, closed objects, requiredness, discriminators, enum values, nullability, identifier patterns, request alternatives, and exact error tuple unions. Existing `x-simile-constraints` own the proven public cross-field invariants listed in `SIMILE_SOUNDNESS.md`: ordering, dynamic bounds, implications, equality, disjoint sets, equations, aggregates, lifecycle snapshots, and templates. Response-media `x-simile-from-request` blocks own the separately provable relationship between a submitted request and its successful response.
 
-This pass added no speculative relationships. Purchase Intent target/variant coherence, chronological expiry, and search-sort direction are attached to the narrowest owning objects. Operation-specific resource discriminators remain ordinary OpenAPI enums.
+This pass added no speculative payload relationships. Purchase Intent target/variant coherence, chronological expiry, and search-sort direction remain attached to the narrowest owning objects. Operation-specific resource discriminators remain ordinary OpenAPI enums. HCL effects project only public request or response fields and cannot weaken those schemas.
 
 ## Remaining gaps
 
 - Two successful operations are transport-only: `openFileLink` returns a redirect and `streamFileContents` returns `application/octet-stream`. Simile's JSON `run` command cannot synthesize those bodies, although the compiled HTTP service registers both routes.
+- Durable effects make mutation consequences inspectable, but a later lookup is not yet automatically served from the stored snapshot. The configuration therefore does not claim a complete CRUD replica.
+- Asynchronous units dispatch outside response latency, but the current dispatcher has no durable outbox, retry lease, or crash recovery. Their presence proves declared work, not production delivery guarantees.
+- Authentication behavior and multipart decoding are not yet emulated. File operations remain contract-valid for direct runs, but the HTTP server cannot yet reproduce their complete authenticated upload surface.
+- No public callback or webhook contract is currently declared. The configuration does not invent event names, payloads, or delivery destinations to approximate one.
+- Simile 0.2.0 currently repairs the four exact order-success examples back to the initial `preparing` lifecycle state when they are selected. They remain public OpenAPI examples but are deliberately not advertised as runnable HCL scenarios until exact lifecycle snapshots are preserved.
 - The 24 request-to-response exceptions remain explicit: authentication-scoped/static empty-request reads, multipart or transport bodies, payout and delivery lifecycle envelopes, the Purchase Intent target union, mobile-number masking, and conditional page normalization. They are schema-sound but are not claimed as request-reachable.
 - A `$ref` inside an OpenAPI Example Object is valid OpenAPI but is not imported as an exact outcome. The small provider-authored examples are therefore inline at their response media types so their outcomes compile.
 - Default protocol-error adaptation chooses an operation-declared status and schema-valid tuple, but it cannot infer which domain error caused an arbitrary invalid body. Exact causal errors are exposed as named outcomes and HTTP scenarios instead of publishing private decision logic.
 - The connect handler accepts an untyped `pull_configuration.mandate` value, while the existing public contract documents only `enabled`. No normative public shape or safe synthesis contract was found for that value, so it remains deliberately unpublished rather than exposing an arbitrary implementation payload.
 - The inexpressible relationships already catalogued in `SIMILE_SOUNDNESS.md` remain unresolved: heterogeneous order-total reconstruction, discriminator-crossing currency and aggregate rules, current-time-derived states, payout's private executing timestamp, filtered pagination state, pairwise uniqueness through referenced items, array-wildcard dynamic bounds, conditional disjunction, header/body equality, and error-URL lookup priority.
-- The current runtime records declared async plans but does not execute abstract resources. No async declaration was added because this audit found no source-backed public promise that should be simulated as a plan.
+- Most operations still retain schema-synthesized outcomes in addition to the reviewed exact catalog. Those are contract-valid approximations and are not represented as production-faithful fixtures.
 
 ## Validation report
 
@@ -62,25 +70,29 @@ npm run test:request-response-relations
 npm run postman:check
 npm test
 simile compile commerce.yml \
-  --behavior behaviors.hcl \
+  --behavior simile/behaviors.hcl \
+  --behavior simile/errors.hcl \
+  --behavior simile/state.hcl \
+  --behavior simile/faults.hcl \
   --artifact /tmp/inttegro.similec \
   --output json
 simile inspect /tmp/inttegro.similec --output json
 SIMILE_HOME="$(mktemp -d)" simile register inttegro \
-  --config ./inttegro.simile.hcl \
+  --config ./simile/inttegro.simile.hcl \
   --output json
 ```
 
 Results:
 
 - Redocly: valid OpenAPI; five unused-component warnings. Two are the pre-existing balance-transaction bases; three retain the formerly shared search components so existing component consumers are not broken while operations use stricter route-specific schemas.
-- Simile compile: success with compiler 0.2.0, OpenAPI 3.0.3, service version `0.1.0-beta86`, 135 operations, zero abstract resources, and zero async operations.
-- Artifact inspection: format 13, 135 operations, 132 request bodies, 637 responses, 640 outcomes, 624 schema-synthesized outcomes, nine scenario selections, 126 operations without an exact named outcome, and `publicExportSafe: true`.
+- Simile compile: success with compiler 0.2.0, OpenAPI 3.0.3, service version `0.1.0-beta87`, 135 operations, four abstract resources, and three async operations.
+- Artifact inspection: format 17, 135 operations, 637 responses, 659 outcomes, 624 schema-synthesized outcomes, 19 provider-authored outcomes, 28 outcome selections, five scenario faults, 29 provider-authored effects, zero convention-inferred effects, two faults, two fault profiles, and `publicExportSafe: true`.
 - Request/response synthesis: 128 JSON operations synthesized without input, three bounded policy-version operations and one documented pagination-default workaround used valid request seeds, one Purchase Intent page finite-search gap is documented, and the two transport-only operations are explicitly allow-listed.
 - Request reachability: 111 operations carry 111 constructive success-payload relations; the remaining 24 operations match the exact reviewed exception inventory. All 111 relation maps are also preserved in both Smithy outputs.
 - Supplied requests: all request examples declared directly in OpenAPI replayed successfully, along with bank-account owner-source alternatives, a Dosh marker, bundle Buy links with catalog and special-offer prices, and a complete operating-policy capability snapshot; 16 valid supplied requests ran in total.
 - Negative requests: missing financial-account subtype data, missing financial-account owner data, an unsupported mobile-money network, and a contradictory Purchase Intent target/quantity payload were rejected.
-- Exact outcomes: all nine unconditional HCL scenario selections returned the expected provider-authored payload shape and values. The request-dependent product success is verified through its relation rather than an unconditional scenario.
-- Local listener: isolated registration compiled the composition root at `127.0.0.1:4242`; `purchase_intent_created` returned the exact named 200 Buy-link payload and `purchase_intent_invalid_quantity_range` returned the exact named 400 error over HTTP.
+- Exact outcomes: all nine runnable contract selections and all 19 provider-authored domain outcomes returned their expected public payload shape and values. The request-dependent product success remains verified through its relation rather than an unconditional scenario; the four order lifecycle examples remain the documented Simile gap above.
+- Composition root: `simile describe service inttegro --config ./simile/inttegro.simile.hcl` resolved the relocated contract and all four modules, reporting 135 operations, 33 scenarios, four backends, three async units, and two fault profiles at `127.0.0.1:4242`.
+- Full package gate: `npm test` passed the modular OpenAPI bundle check, then stopped at `smithy:check` because `smithytranslate` is not installed on this PATH. The focused OpenAPI and Simile gates above passed; the missing external validator is an environment limitation rather than a contract result.
 
-The full contract gate also re-proves 118 typed-ID patterns, 327 global error tuples, all 498 operation/status error mappings, 181 allow-listed cross-field relationships with 362 sound/unsound fixture payloads, generated Postman parity, deterministic OpenAPI/Smithy artifacts, and the contract lock.
+With `smithytranslate` available, the full contract gate additionally re-proves 118 typed-ID patterns, 327 global error tuples, all 498 operation/status error mappings, 181 allow-listed cross-field relationships with 362 sound/unsound fixture payloads, generated Postman parity, deterministic OpenAPI/Smithy artifacts, and the contract lock.

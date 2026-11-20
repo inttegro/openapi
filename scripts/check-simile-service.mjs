@@ -9,9 +9,14 @@ import YAML from "yaml";
 const scriptDir = dirname(fileURLToPath(import.meta.url));
 const openapiDir = resolve(scriptDir, "..");
 const specificationPath = resolve(openapiDir, "commerce.yml");
-const behaviorPath = resolve(openapiDir, "behaviors.hcl");
+const configurationPath = resolve(openapiDir, "simile", "inttegro.simile.hcl");
+const stateBehaviorPath = resolve(openapiDir, "simile", "state.hcl");
+const behaviorPaths = ["behaviors.hcl", "errors.hcl", "state.hcl", "faults.hcl"]
+  .map((file) => resolve(openapiDir, "simile", file));
+const behaviorArguments = behaviorPaths.flatMap((path) => ["--behavior", path]);
 const simile = process.env.SIMILE_BIN ?? resolve(openapiDir, "../simile/target/debug/simile");
 const document = YAML.parse(readFileSync(specificationPath, "utf8"));
+const stateBehavior = readFileSync(stateBehaviorPath, "utf8");
 const methods = new Set(["delete", "get", "patch", "post", "put"]);
 const work = mkdtempSync(resolve(tmpdir(), "inttegro-simile-service-"));
 
@@ -58,17 +63,89 @@ const namedOutcomes = [
   ["createPurchaseIntent", ["invalid_quantity_range", "purchase_intent_invalid_quantity_range", { code: "invalid_purchase_intent_quantity_range" }]],
 ];
 
+const providerOutcomes = [
+  ["verifyOTP", "otp_transaction_expired", "otp_expired", { error: { code: "otp_transaction_expired" } }],
+  ["verifyOTP", "otp_max_verification_attempts_exceeded", "otp_attempts_exhausted", { error: { code: "otp_max_verification_attempts_exceeded" } }],
+  ["lookupCustomer", "customer_not_found", "customer_not_found", { code: "customer_not_found" }],
+  ["lookupOrder", "order_not_found", "order_not_found", { code: "order_not_found" }],
+  ["lookupProduct", "product_not_found", "product_not_found", { code: "product_not_found" }],
+  ["lookupPurchaseIntent", "purchase_intent_not_found", "purchase_intent_not_found", { code: "purchase_intent_not_found" }],
+  ["lookupPaymentMethod", "payment_method_not_found", "payment_method_not_found", { code: "payment_method_not_found" }],
+  ["createRefund", "refund_insufficient_merchant_balance", "refund_insufficient_balance", { error: { code: "refund_insufficient_merchant_balance" } }],
+  ["cancelRefund", "refund_not_found", "refund_not_found", { error: { code: "refund_not_found" } }],
+  ["cancelRefund", "refund_cannot_cancel", "refund_cannot_cancel", { error: { code: "refund_cannot_cancel" } }],
+  ["completeOrder", "order_payment_not_paid", "order_payment_not_paid", { code: "order_payment_not_paid" }],
+  ["confirmPayment", "confirmation_bad_token", "confirmation_bad_token", { error: { code: "confirmation_bad_token" } }],
+  ["confirmPayment", "payment_transition_conflict", "payment_transition_conflict", { error: { code: "payment_transition_conflict" } }],
+  ["lookupFile", "file_not_found", "file_not_found", { code: "file_not_found" }],
+  ["openFileLink", "file_link_expired", "file_link_expired", { code: "file_link_expired" }],
+  ["lookupUploadRequest", "upload_request_not_found", "upload_request_not_found", { code: "upload_request_not_found" }],
+  ["fulfillUploadRequest", "upload_request_expired", "upload_request_expired", { code: "upload_request_expired" }],
+  ["activatePrice", "price_archived", "price_archived", { code: "price_archived" }],
+  ["archiveProduct", "product_already_archived", "product_already_archived", { code: "product_already_archived" }],
+];
+
 if (!existsSync(simile)) {
   throw new Error(`Simile binary not found at ${simile}; set SIMILE_BIN to override it`);
 }
 
 try {
+  // Why: keep the state model aligned with the stable public resource vocabulary used by the API.
+  const publishedCollectionNames = [...stateBehavior.matchAll(
+    /^\s*collection\s*=\s*"([^"]+)"\s*$/gm,
+  )].map((match) => match[1]);
+  assert.deepEqual(
+    [...new Set(publishedCollectionNames)].sort(),
+    [
+      "applications",
+      "broadcasts",
+      "chimes",
+      "customers",
+      "file_links",
+      "files",
+      "financial_accounts",
+      "message_templates",
+      "operating_policies",
+      "orders",
+      "otp_transactions",
+      "payment_methods",
+      "payout_settings",
+      "payouts",
+      "prices",
+      "products",
+      "purchase_intents",
+      "refunds",
+      "scheduled_chimes",
+      "secret_keys",
+      "upload_requests",
+    ],
+    "state collection namespace inventory drifted",
+  );
+
+  // Why: direct module compilation does not prove that the published composition root resolves
+  // its relative contract and behavior paths from the new `simile/` directory.
+  const description = JSON.parse(runSimile([
+    "describe",
+    "service",
+    "inttegro",
+    "--config",
+    configurationPath,
+    "--output",
+    "json",
+  ]).stdout);
+  assert.equal(description.service, "inttegro", "published service name drifted");
+  assert.equal(description.listen, "127.0.0.1:4242", "published listener drifted");
+  assert.equal(description.operationCount, 135, "composition-root operation count drifted");
+  assert.equal(description.scenarios.length, 33, "published scenario catalogue drifted");
+  assert.equal(description.backends.length, 4, "published backend catalogue drifted");
+  assert.equal(description.asyncOperations.length, 3, "published async catalogue drifted");
+  assert.equal(description.faultProfiles.length, 2, "published fault-profile catalogue drifted");
+
   const artifactPath = resolve(work, "inttegro.similec");
   runSimile([
     "compile",
     specificationPath,
-    "--behavior",
-    behaviorPath,
+    ...behaviorArguments,
     "--artifact",
     artifactPath,
     "--output",
@@ -77,9 +154,18 @@ try {
   const inspection = JSON.parse(runSimile(["inspect", artifactPath, "--output", "json"]).stdout);
   assert.equal(inspection.operations, 135, "compiled public operation count drifted");
   assert.equal(inspection.publicExportSafe, true, "compiled artifact is not public-export safe");
-  // Why: request-dependent successes are exercised through relations, not unconditional scenarios
-  // that could return a response inconsistent with the submitted request.
-  assert.equal(inspection.scenarioSelections, 9, "exact-outcome scenario inventory drifted");
+  assert.equal(inspection.providerAuthoredOutcomes, 19, "provider-authored outcome inventory drifted");
+  assert.equal(inspection.scenarioSelections, 28, "exact-outcome scenario inventory drifted");
+  assert.equal(inspection.scenarioFaults, 5, "deterministic fault scenario inventory drifted");
+  assert.equal(inspection.resources, 4, "abstract test-backend inventory drifted");
+  assert.equal(inspection.asyncOperations, 3, "declared asynchronous-work inventory drifted");
+  assert.equal(inspection.effects, 29, "public effect inventory drifted");
+  assert.equal(inspection.providerAuthoredEffects, 29, "public effects must remain explicitly authored");
+  // Why: Inttegro uses POST for reads, so convention-inferred writes would turn lookup operations
+  // into false state mutations. Every durable consequence must remain explicitly reviewed.
+  assert.equal(inspection.conventionInferredEffects, 0, "unreviewed convention-inferred effects appeared");
+  assert.equal(inspection.faults, 2, "environmental fault inventory drifted");
+  assert.equal(inspection.faultProfiles, 2, "fault-profile inventory drifted");
 
   const operations = collectOperations();
   assert.equal(operations.length, 135, "OpenAPI public operation count drifted");
@@ -192,8 +278,35 @@ try {
     const scenarioActual = JSON.parse(runSimile([
       "run",
       specificationPath,
-      "--behavior",
-      behaviorPath,
+      ...behaviorArguments,
+      "--operation-id",
+      operationId,
+      "--scenario",
+      scenario,
+      "--output",
+      "json",
+    ]).stdout);
+    assertPartial(scenarioActual, expected, `${operationId}.${scenario}`);
+  }
+
+  for (const [operationId, outcome, scenario, expected] of providerOutcomes) {
+    const actual = JSON.parse(runSimile([
+      "run",
+      specificationPath,
+      ...behaviorArguments,
+      "--operation-id",
+      operationId,
+      "--outcome",
+      outcome,
+      "--output",
+      "json",
+    ]).stdout);
+    assertPartial(actual, expected, `${operationId}.${outcome}`);
+
+    const scenarioActual = JSON.parse(runSimile([
+      "run",
+      specificationPath,
+      ...behaviorArguments,
       "--operation-id",
       operationId,
       "--scenario",
@@ -241,7 +354,8 @@ try {
       `${synthesized} JSON operations synthesized, ${seeded} request seeds applied, ` +
       `${deferred} runtime synthesis gap documented, ` +
       `${supplied} supplied valid requests replayed, ` +
-      `${namedOutcomes.length} named outcomes selected, ${invalidRequests.length} invalid requests rejected, ` +
+      `${namedOutcomes.length} contract outcomes and ${providerOutcomes.length} provider outcomes selected, ` +
+      `${invalidRequests.length} invalid requests rejected, ` +
       `${nonJsonOperations.size} transport-only operations documented`,
   );
 } finally {
