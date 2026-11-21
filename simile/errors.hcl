@@ -209,6 +209,11 @@ behavior "lookupFile" {
 }
 
 behavior "openFileLink" {
+  outcome "redirect" {
+    description = "Redirect a valid public file-link capability to short-lived file delivery."
+    status      = 302
+  }
+
   outcome "file_link_expired" {
     description = "The public file-link capability has expired."
     status      = 410

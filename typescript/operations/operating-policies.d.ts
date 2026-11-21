@@ -1656,6 +1656,19 @@ export interface OperatingPoliciesResponseRelations {
               ];
             };
           },
+          {
+            readonly "to": "/operating_policy/active_version";
+            readonly "value": {
+              readonly "add": readonly [
+                {
+                  readonly "request": "/expected_version";
+                },
+                {
+                  readonly "literal": 1;
+                },
+              ];
+            };
+          },
         ];
         readonly "rules": readonly [
           {

@@ -300,6 +300,9 @@ paths:
                             schema:
                                 type: string
                                 format: uri
+                            # Why: redirect emulation needs a public, contract-valid destination rather than
+                            # an arbitrary synthesized URL that cannot be asserted by an integration test.
+                            example: https://files.example.test/download/file_example
                 '400':
                     description: Invalid request
                     headers:
@@ -926,6 +929,13 @@ paths:
                     headers:
                         X-Request-Id:
                             $ref: './common.yml#/components/headers/RequestId'
+                        Location:
+                            schema:
+                                type: string
+                                format: uri
+                            # Why: every HTTP redirect requires a destination; omitting this header made the
+                            # declared 302 response unusable even when the correct status was selected.
+                            example: https://files.example.test/download/file_link_example
                 '404':
                     description: File link not found or token invalid
                     headers:

@@ -16,8 +16,10 @@ assertPurchaseIntentTargetUnion();
 assertOrderDeliveryResponses();
 assertPayoutLifecycleResponses();
 assertBoundedSecretKeyPage();
+assertOperatingPolicyUpdateRelation();
+assertTokenizationRelation();
 
-console.log("Response fidelity verified for shipment, document delivery, payouts, Buy links, and key pages");
+console.log("Response fidelity verified for shipment, document delivery, payouts, Buy links, key pages, policies, and tokenization");
 
 function assertClosedShipmentUnion() {
   const shipment = schemas.ProductShipment;
@@ -173,6 +175,42 @@ function assertBoundedSecretKeyPage() {
   assert.equal(page.properties.keys.maxItems, 100);
   assert.ok(hasBound(page, "/count", "/size"));
   assert.ok(hasBound(page, "/count", "/total"));
+}
+
+function assertOperatingPolicyUpdateRelation() {
+  const relation = document.paths["/operating_policies/update"].post.responses["200"]
+    .content["application/json"]["x-simile-from-request"];
+  const expectedVersion = {
+    add: [{ request: "/expected_version" }, { literal: 1 }],
+  };
+  assert.deepEqual(
+    relation.bindings.find((binding) => binding.to === "/operating_policy/version")?.value,
+    expectedVersion,
+  );
+  assert.deepEqual(
+    relation.bindings.find((binding) => binding.to === "/operating_policy/active_version")?.value,
+    expectedVersion,
+  );
+}
+
+function assertTokenizationRelation() {
+  const relation = document.paths["/payment_methods/tokenize"].post.responses["200"]
+    .content["application/json"]["x-simile-from-request"];
+  assert.deepEqual(
+    relation.bindings,
+    [
+      { from: "/customer_id", to: "/payment_method/customer_id" },
+      { from: "/type", to: "/payment_method/type" },
+      { from: "/mobile_money/network", to: "/payment_method/mobile_money/network" },
+    ],
+  );
+  const mobileMoney = schemas.PaymentMethodObject.properties.mobile_money;
+  assert.ok(
+    mobileMoney["x-simile-constraints"].some((constraint) =>
+      constraint.template?.path === "/account_number" &&
+      constraint.template?.value === "****{/last4}"),
+    "tokenized mobile-money account must remain derived from its safe last-four display",
+  );
 }
 
 function operationResponseRefinement(path, status) {

@@ -993,4 +993,70 @@ export interface PurchaseIntentsOperations {
 
 /** Request-to-response construction rules in this contract area. */
 export interface PurchaseIntentsResponseRelations {
+  readonly "cancelPurchaseIntent": {
+    readonly "200": {
+      readonly "application/json": {
+        readonly "bindings": readonly [
+          {
+            readonly "to": "/purchase_intent/id";
+            readonly "value": {
+              readonly "coalesce": readonly [
+                {
+                  readonly "request": "/purchase_intent_id";
+                },
+                {
+                  readonly "request": "/id";
+                },
+              ];
+            };
+          },
+        ];
+      };
+    };
+  };
+  readonly "lookupPurchaseIntent": {
+    readonly "200": {
+      readonly "application/json": {
+        readonly "bindings": readonly [
+          {
+            readonly "from": "/id";
+            readonly "to": "/purchase_intent/id";
+          },
+        ];
+      };
+    };
+  };
+  readonly "pagePurchaseIntents": {
+    readonly "200": {
+      readonly "application/json": {
+        readonly "bindings": readonly [
+          {
+            readonly "from": "/page_number";
+            readonly "to": "/page/number";
+          },
+        ];
+      };
+    };
+  };
+  readonly "updatePurchaseIntent": {
+    readonly "200": {
+      readonly "application/json": {
+        readonly "bindings": readonly [
+          {
+            readonly "to": "/purchase_intent/id";
+            readonly "value": {
+              readonly "coalesce": readonly [
+                {
+                  readonly "request": "/purchase_intent_id";
+                },
+                {
+                  readonly "request": "/id";
+                },
+              ];
+            };
+          },
+        ];
+      };
+    };
+  };
 }

@@ -1640,6 +1640,18 @@ export interface PayoutsOperations {
 
 /** Request-to-response construction rules in this contract area. */
 export interface PayoutsResponseRelations {
+  readonly "cancelPayout": {
+    readonly "200": {
+      readonly "application/json": {
+        readonly "bindings": readonly [
+          {
+            readonly "from": "/payout_id";
+            readonly "to": "/payout/id";
+          },
+        ];
+      };
+    };
+  };
   readonly "disableAutomaticPayouts": {
     readonly "200": {
       readonly "application/json": {
@@ -1672,6 +1684,18 @@ export interface PayoutsResponseRelations {
       };
     };
   };
+  readonly "lookupPayout": {
+    readonly "200": {
+      readonly "application/json": {
+        readonly "bindings": readonly [
+          {
+            readonly "from": "/payout_id";
+            readonly "to": "/payout/id";
+          },
+        ];
+      };
+    };
+  };
   readonly "pagePayouts": {
     readonly "200": {
       readonly "application/json": {
@@ -1679,6 +1703,22 @@ export interface PayoutsResponseRelations {
           {
             readonly "from": "/page_number";
             readonly "to": "/page/number";
+          },
+        ];
+      };
+    };
+  };
+  readonly "schedulePayout": {
+    readonly "200": {
+      readonly "application/json": {
+        readonly "bindings": readonly [
+          {
+            readonly "from": "/destination_id";
+            readonly "to": "/payout/destination_id";
+          },
+          {
+            readonly "from": "/reference";
+            readonly "to": "/payout/reference";
           },
         ];
       };

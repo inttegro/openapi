@@ -202,6 +202,15 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/PurchaseIntentResponse'
+                            # Why: the updated Buy link must be the same public resource selected by either
+                            # accepted request alias, even though its product-or-bundle snapshot is synthesized.
+                            x-simile-from-request:
+                                bindings:
+                                    - to: /purchase_intent/id
+                                      value:
+                                          coalesce:
+                                              - { request: /purchase_intent_id }
+                                              - { request: /id }
                             examples:
                                 updated:
                                     summary: Active Buy link with revised quantity bounds
@@ -333,6 +342,15 @@ paths:
                                                     required: [inactive_at]
                                                     properties:
                                                         status: { type: string, enum: [inactive] }
+                            # Why: cancellation changes lifecycle state but never the identity selected by
+                            # either supported public request alias.
+                            x-simile-from-request:
+                                bindings:
+                                    - to: /purchase_intent/id
+                                      value:
+                                          coalesce:
+                                              - { request: /purchase_intent_id }
+                                              - { request: /id }
                             examples:
                                 canceled:
                                     summary: Buy link made inactive by an explicit cancellation
@@ -446,6 +464,10 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/PurchaseIntentResponse'
+                            # Why: a successful lookup must return the exact Buy link ID supplied by the caller.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /id, to: /purchase_intent/id }
                             examples:
                                 found:
                                     summary: Active reusable Buy link found by ID
@@ -538,6 +560,11 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/PagePurchaseIntentsResponse'
+                            # Why: the response page coordinate is public request state even when its item
+                            # union and exact returned size are constructed independently.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /page_number, to: /page/number }
                 '400':
                     description: Bad request - invalid pagination parameters
                     headers:

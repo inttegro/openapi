@@ -16927,7 +16927,7 @@
         },
         "com.inttegro.api#Inttegro": {
             "type": "service",
-            "version": "0.1.0-beta91",
+            "version": "0.1.0-beta95",
             "operations": [
                 {
                     "target": "com.inttegro.api#activatePaymentMethod"
@@ -17336,7 +17336,7 @@
                 }
             ],
             "traits": {
-                "com.inttegro.api#collectionVersion": "0.1.0-beta91",
+                "com.inttegro.api#collectionVersion": "0.1.0-beta95",
                 "smithy.api#auth": [
                     "smithy.api#httpBearerAuth"
                 ],
@@ -58355,6 +58355,18 @@
                 }
             ],
             "traits": {
+                "com.inttegro.api#responseRelations": {
+                    "200": {
+                        "application/json": {
+                            "bindings": [
+                                {
+                                    "from": "/payout_id",
+                                    "to": "/payout/id"
+                                }
+                            ]
+                        }
+                    }
+                },
                 "smithy.api#documentation": "Cancel a payout that is still scheduled for a future execution time. A payout\nthat has started processing, completed, was already canceled, or whose execution\ntime has passed cannot be canceled.\n",
                 "smithy.api#http": {
                     "method": "POST",
@@ -59589,6 +59601,27 @@
                 }
             ],
             "traits": {
+                "com.inttegro.api#responseRelations": {
+                    "200": {
+                        "application/json": {
+                            "bindings": [
+                                {
+                                    "to": "/purchase_intent/id",
+                                    "value": {
+                                        "coalesce": [
+                                            {
+                                                "request": "/purchase_intent_id"
+                                            },
+                                            {
+                                                "request": "/id"
+                                            }
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                },
                 "smithy.api#documentation": "Stops a Buy link from creating new orders immediately. Cancellation is an\nexplicit merchant action and is distinct from time-driven expiry. Repeating\ncancellation for an already inactive intent returns its current state, but a\nsingle-use intent that already created an order cannot be canceled.\n\nThis operation supports idempotency. Reuse the same `Idempotency-Key` and\nrequest body when retrying an uncertain request.\n",
                 "smithy.api#http": {
                     "method": "POST",
@@ -147251,6 +147284,18 @@
                 }
             ],
             "traits": {
+                "com.inttegro.api#responseRelations": {
+                    "200": {
+                        "application/json": {
+                            "bindings": [
+                                {
+                                    "from": "/payout_id",
+                                    "to": "/payout/id"
+                                }
+                            ]
+                        }
+                    }
+                },
                 "smithy.api#documentation": "Retrieve the current state of a payout by ID. Use this to monitor execution,\ninspect timestamps, review bundled balance transactions, and reconcile the\nfinal amount that moved to the destination account.\n",
                 "smithy.api#http": {
                     "method": "POST",
@@ -150928,6 +150973,18 @@
                 }
             ],
             "traits": {
+                "com.inttegro.api#responseRelations": {
+                    "200": {
+                        "application/json": {
+                            "bindings": [
+                                {
+                                    "from": "/id",
+                                    "to": "/purchase_intent/id"
+                                }
+                            ]
+                        }
+                    }
+                },
                 "smithy.api#documentation": "Resolves the offer behind a hosted Buy link using only its opaque ID. Public\nlookup requires no API key and returns active or expired intents; canceled\nand used single-use intents are returned as not found. When the owning\napplication authenticates the request, lookup is application-scoped, returns\nall lifecycle states.\n",
                 "smithy.api#http": {
                     "method": "POST",
@@ -158887,6 +158944,13 @@
                     "302": {
                         "description": "Redirect to short-lived file URL",
                         "headers": {
+                            "Location": {
+                                "example": "https://files.example.test/download/file_link_example",
+                                "schema": {
+                                    "format": "uri",
+                                    "type": "string"
+                                }
+                            },
                             "X-Request-Id": {
                                 "$ref": "#/components/headers/RequestId"
                             }
@@ -178566,6 +178630,7 @@
                         "application/json": {
                             "bindings": [
                                 {
+                                    "default": 1,
                                     "from": "/page_number",
                                     "to": "/page/number"
                                 }
@@ -179666,6 +179731,18 @@
                 }
             ],
             "traits": {
+                "com.inttegro.api#responseRelations": {
+                    "200": {
+                        "application/json": {
+                            "bindings": [
+                                {
+                                    "from": "/page_number",
+                                    "to": "/page/number"
+                                }
+                            ]
+                        }
+                    }
+                },
                 "smithy.api#documentation": "Lists purchase intents for the authenticated application, newest first.\nPagination is numbered. The response `page.size` is the number of records\nactually returned, not the requested limit, and no total count or next-page\ntoken is included.\n",
                 "smithy.api#http": {
                     "method": "POST",
@@ -207560,6 +207637,22 @@
                 }
             ],
             "traits": {
+                "com.inttegro.api#responseRelations": {
+                    "200": {
+                        "application/json": {
+                            "bindings": [
+                                {
+                                    "from": "/destination_id",
+                                    "to": "/payout/destination_id"
+                                },
+                                {
+                                    "from": "/reference",
+                                    "to": "/payout/reference"
+                                }
+                            ]
+                        }
+                    }
+                },
                 "smithy.api#documentation": "Create and schedule a payout to move funds from your available balance to a\nconnected financial account. The request chooses the destination, caps the\nmaximum amount that may leave your balance, and optionally delays execution\nuntil a future timestamp.\n",
                 "smithy.api#http": {
                     "method": "POST",
@@ -220287,6 +220380,28 @@
                 }
             ],
             "traits": {
+                "com.inttegro.api#responseRelations": {
+                    "200": {
+                        "application/json": {
+                            "bindings": [
+                                {
+                                    "from": "/order_id",
+                                    "to": "/order/id"
+                                }
+                            ]
+                        }
+                    },
+                    "207": {
+                        "application/json": {
+                            "bindings": [
+                                {
+                                    "from": "/order_id",
+                                    "to": "/order/id"
+                                }
+                            ]
+                        }
+                    }
+                },
                 "smithy.api#documentation": "Sends the hosted invoice link for an existing order through Chime. The request\nbody contains only `order_id`; delivery options are resolved from the order\ncustomer.\n\nIf the customer has both a phone number and an email address, Inttegro sends\nboth SMS and email Chimes. If only one contact method exists, Inttegro sends\nto that channel. The order must be finalized before Inttegro can send the\nhosted invoice link.\n\nThis is an idempotent endpoint. Send retry keys with the `Idempotency-Key`\nheader.\n",
                 "smithy.api#http": {
                     "method": "POST",
@@ -220427,6 +220542,14 @@
                                             "type": "object"
                                         }
                                     ]
+                                },
+                                "x-simile-from-request": {
+                                    "bindings": [
+                                        {
+                                            "from": "/order_id",
+                                            "to": "/order/id"
+                                        }
+                                    ]
                                 }
                             }
                         },
@@ -220530,6 +220653,14 @@
                                                 }
                                             },
                                             "type": "object"
+                                        }
+                                    ]
+                                },
+                                "x-simile-from-request": {
+                                    "bindings": [
+                                        {
+                                            "from": "/order_id",
+                                            "to": "/order/id"
                                         }
                                     ]
                                 }
@@ -222406,6 +222537,28 @@
                 }
             ],
             "traits": {
+                "com.inttegro.api#responseRelations": {
+                    "200": {
+                        "application/json": {
+                            "bindings": [
+                                {
+                                    "from": "/order_id",
+                                    "to": "/order/id"
+                                }
+                            ]
+                        }
+                    },
+                    "207": {
+                        "application/json": {
+                            "bindings": [
+                                {
+                                    "from": "/order_id",
+                                    "to": "/order/id"
+                                }
+                            ]
+                        }
+                    }
+                },
                 "smithy.api#documentation": "Sends the hosted receipt link for an existing paid order through Chime. The\nrequest body contains only `order_id`; receipt delivery never uses the invoice\nPDF path.\n\nIf the customer has both a phone number and an email address, Inttegro sends\nboth SMS and email Chimes. If only one contact method exists, Inttegro sends\nto that channel. The order must be paid before a receipt can be sent.\n\nThis is an idempotent endpoint. Send retry keys with the `Idempotency-Key`\nheader.\n",
                 "smithy.api#http": {
                     "method": "POST",
@@ -222544,6 +222697,14 @@
                                             "type": "object"
                                         }
                                     ]
+                                },
+                                "x-simile-from-request": {
+                                    "bindings": [
+                                        {
+                                            "from": "/order_id",
+                                            "to": "/order/id"
+                                        }
+                                    ]
                                 }
                             }
                         },
@@ -222645,6 +222806,14 @@
                                                 }
                                             },
                                             "type": "object"
+                                        }
+                                    ]
+                                },
+                                "x-simile-from-request": {
+                                    "bindings": [
+                                        {
+                                            "from": "/order_id",
+                                            "to": "/order/id"
                                         }
                                     ]
                                 }
@@ -225789,6 +225958,7 @@
                         "description": "Redirect to a purpose-authorized public asset URL or a short-lived signed delivery URL",
                         "headers": {
                             "Location": {
+                                "example": "https://files.example.test/download/file_example",
                                 "schema": {
                                     "format": "uri",
                                     "type": "string"
@@ -227965,6 +228135,26 @@
                 }
             ],
             "traits": {
+                "com.inttegro.api#responseRelations": {
+                    "200": {
+                        "application/json": {
+                            "bindings": [
+                                {
+                                    "from": "/customer_id",
+                                    "to": "/payment_method/customer_id"
+                                },
+                                {
+                                    "from": "/type",
+                                    "to": "/payment_method/type"
+                                },
+                                {
+                                    "from": "/mobile_money/network",
+                                    "to": "/payment_method/mobile_money/network"
+                                }
+                            ]
+                        }
+                    }
+                },
                 "smithy.api#documentation": "Save a mobile-money payment method for an existing customer without charging it.\nDirect tokenization currently supports `mobile_money`; send the wallet details\nand owner identity described by the request schema.\n\nThe returned payment method can be reused only while it is active, unarchived,\nand non-ephemeral. This operation supports idempotency.\n",
                 "smithy.api#http": {
                     "method": "POST",
@@ -238470,6 +238660,19 @@
                                             }
                                         ]
                                     }
+                                },
+                                {
+                                    "to": "/operating_policy/active_version",
+                                    "value": {
+                                        "add": [
+                                            {
+                                                "request": "/expected_version"
+                                            },
+                                            {
+                                                "literal": 1
+                                            }
+                                        ]
+                                    }
                                 }
                             ],
                             "rules": [
@@ -247398,6 +247601,27 @@
                 }
             ],
             "traits": {
+                "com.inttegro.api#responseRelations": {
+                    "200": {
+                        "application/json": {
+                            "bindings": [
+                                {
+                                    "to": "/purchase_intent/id",
+                                    "value": {
+                                        "coalesce": [
+                                            {
+                                                "request": "/purchase_intent_id"
+                                            },
+                                            {
+                                                "request": "/id"
+                                            }
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                },
                 "smithy.api#documentation": "Changes quantity bounds or expiry without changing what an already-shared\nBuy link sells. `reactivate: true` clears cancellation state and any existing\nelapsed expiry. Product, price, usage mode, and variant selection remain\nimmutable after creation.\n\nThis operation supports idempotency. Reuse the same `Idempotency-Key` and\nrequest body when retrying an uncertain request.\n",
                 "smithy.api#http": {
                     "method": "POST",

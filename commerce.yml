@@ -6,8 +6,8 @@ info:
     description: Machine-readable reference for the public Inttegro API
     # Why: contract and client artifacts are reviewed as one immutable bundle;
     # changing soundness rules or executable examples requires a new bundle identity.
-    version: 0.1.0-beta91
-    x-inttegro-collection-version: 0.1.0-beta91
+    version: 0.1.0-beta95
+    x-inttegro-collection-version: 0.1.0-beta95
     contact:
         name: Inttegro Engineering
         url: "https://inttegro.com"
@@ -4329,6 +4329,11 @@ paths:
                                                   - type: object
                                                     properties:
                                                         status: { type: string, enum: [requires_payment, paid, completed, canceled, expired] }
+                            # Why: delivery metadata may vary by channel, but the returned order must remain
+                            # the same public order whose invoice the caller requested.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /order_id, to: /order/id }
                             examples:
                                 invoice_sent:
                                     summary: Invoice accepted by the email delivery channel
@@ -4376,6 +4381,10 @@ paths:
                                                   - type: object
                                                     properties:
                                                         status: { type: string, enum: [requires_payment, paid, completed, canceled, expired] }
+                            # Why: partial channel failure does not change which public order the caller selected.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /order_id, to: /order/id }
                             examples:
                                 invoice_partially_sent:
                                     summary: Invoice accepted by email after SMS delivery failed
@@ -4535,6 +4544,11 @@ paths:
                                                   - type: object
                                                     properties:
                                                         status: { type: string, enum: [paid, completed] }
+                            # Why: receipt delivery is observable work for the caller-selected order, so a
+                            # schema-valid response for an unrelated order is not reachable.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /order_id, to: /order/id }
                             examples:
                                 receipt_sent:
                                     summary: Receipt accepted by the email delivery channel
@@ -4583,6 +4597,10 @@ paths:
                                                   - type: object
                                                     properties:
                                                         status: { type: string, enum: [paid, completed] }
+                            # Why: partial receipt delivery still belongs to the exact caller-selected order.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /order_id, to: /order/id }
                             examples:
                                 receipt_partially_sent:
                                     summary: Receipt accepted by email after SMS delivery failed
@@ -6302,6 +6320,13 @@ paths:
                                     - { from: /description, to: /operating_policy/description }
                                     - { from: /name, to: /operating_policy/name }
                                     - to: /operating_policy/version
+                                      value:
+                                          add:
+                                              - { request: /expected_version }
+                                              - { literal: 1 }
+                                    # Why: update creates and activates one immutable version atomically;
+                                    # allowing these counters to diverge describes an unreachable response.
+                                    - to: /operating_policy/active_version
                                       value:
                                           add:
                                               - { request: /expected_version }
@@ -8163,6 +8188,12 @@ paths:
                                                     required: [scheduled_at]
                                                     properties:
                                                         status: { type: string, enum: [scheduled] }
+                            # Why: scheduling chooses the durable destination and merchant reference; both
+                            # must survive into the scheduled payout snapshot returned to the caller.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /destination_id, to: /payout/destination_id }
+                                    - { from: /reference, to: /payout/reference }
                 '400':
                     description: Bad request - invalid schedule parameters
                     headers:
@@ -8247,6 +8278,10 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/PayoutResponse'
+                            # Why: a successful lookup must return the exact payout selected by its typed ID.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /payout_id, to: /payout/id }
                 '400':
                     description: Bad request - invalid payout identifier
                     headers:
@@ -8730,6 +8765,11 @@ paths:
                                                     required: [canceled_at, cancellation, scheduled_at]
                                                     properties:
                                                         status: { type: string, enum: [canceled] }
+                            # Why: cancellation changes the selected payout's lifecycle; it must not synthesize
+                            # a valid canceled snapshot for a different payout.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /payout_id, to: /payout/id }
                 '401':
                     description: Unauthorized - missing or invalid API key
                     headers:
@@ -9075,6 +9115,9 @@ paths:
                             schema:
                                 type: string
                                 format: uri
+                            # Why: redirect emulation needs a public, contract-valid destination rather than
+                            # an arbitrary synthesized URL that cannot be asserted by an integration test.
+                            example: https://files.example.test/download/file_example
                 '400':
                     description: Invalid request
                     headers:
@@ -9701,6 +9744,13 @@ paths:
                     headers:
                         X-Request-Id:
                             $ref: '#/components/headers/RequestId'
+                        Location:
+                            schema:
+                                type: string
+                                format: uri
+                            # Why: every HTTP redirect requires a destination; omitting this header made the
+                            # declared 302 response unusable even when the correct status was selected.
+                            example: https://files.example.test/download/file_link_example
                 '404':
                     description: File link not found or token invalid
                     headers:
@@ -10588,6 +10638,13 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/TokenizePaymentMethodResponse'
+                            # Why: tokenization cannot change the owning customer or selected rail.
+                            # The response schema separately proves that its account display is masked.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /customer_id, to: /payment_method/customer_id }
+                                    - { from: /type, to: /payment_method/type }
+                                    - { from: /mobile_money/network, to: /payment_method/mobile_money/network }
                             # Why: this exact outcome proves that a successful tokenization never
                             # exposes the raw wallet number and keeps its masked fields coherent.
                             examples:
@@ -12064,7 +12121,9 @@ paths:
                             # Why: this operation must return a result reachable from the caller-selected resource or page.
                             x-simile-from-request:
                                 bindings:
-                                    - { from: /page_number, to: /page/number }
+                                    # Why: an omitted page number has the same public meaning as page one, and
+                                    # response synthesis must preserve that documented default deterministically.
+                                    - { from: /page_number, to: /page/number, default: 1 }
                 '401':
                     description: Unauthorized - invalid or missing API key
                     headers:
@@ -12311,6 +12370,15 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/PurchaseIntentResponse'
+                            # Why: the updated Buy link must be the same public resource selected by either
+                            # accepted request alias, even though its product-or-bundle snapshot is synthesized.
+                            x-simile-from-request:
+                                bindings:
+                                    - to: /purchase_intent/id
+                                      value:
+                                          coalesce:
+                                              - { request: /purchase_intent_id }
+                                              - { request: /id }
                             examples:
                                 updated:
                                     summary: Active Buy link with revised quantity bounds
@@ -12442,6 +12510,15 @@ paths:
                                                     required: [inactive_at]
                                                     properties:
                                                         status: { type: string, enum: [inactive] }
+                            # Why: cancellation changes lifecycle state but never the identity selected by
+                            # either supported public request alias.
+                            x-simile-from-request:
+                                bindings:
+                                    - to: /purchase_intent/id
+                                      value:
+                                          coalesce:
+                                              - { request: /purchase_intent_id }
+                                              - { request: /id }
                             examples:
                                 canceled:
                                     summary: Buy link made inactive by an explicit cancellation
@@ -12555,6 +12632,10 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/PurchaseIntentResponse'
+                            # Why: a successful lookup must return the exact Buy link ID supplied by the caller.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /id, to: /purchase_intent/id }
                             examples:
                                 found:
                                     summary: Active reusable Buy link found by ID
@@ -12647,6 +12728,11 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/PagePurchaseIntentsResponse'
+                            # Why: the response page coordinate is public request state even when its item
+                            # union and exact returned size are constructed independently.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /page_number, to: /page/number }
                 '400':
                     description: Bad request - invalid pagination parameters
                     headers:

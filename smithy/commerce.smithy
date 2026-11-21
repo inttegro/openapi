@@ -33,14 +33,14 @@ structure untagged {}
 
 
 @collectionVersion(
-"0.1.0-beta91"
+"0.1.0-beta95"
 )
 @auth([
     httpBearerAuth
 ])
 @httpBearerAuth
 service Inttegro {
-    version: "0.1.0-beta91"
+    version: "0.1.0-beta95"
     operations: [
         activatePaymentMethod
         activatePrice
@@ -628,6 +628,20 @@ operation cancelOrder {
 @tags([
     "Payouts"
 ])
+@responseRelations(
+{
+        "200": {
+            "application/json": {
+                "bindings": [
+                    {
+                        "from": "/payout_id",
+                        "to": "/payout/id"
+                    }
+                ]
+            }
+        }
+    }
+)
 operation cancelPayout {
     input: cancelPayoutInput
     output: cancelPayout200
@@ -654,6 +668,29 @@ operation cancelPayout {
 @tags([
     "Purchase Intents"
 ])
+@responseRelations(
+{
+        "200": {
+            "application/json": {
+                "bindings": [
+                    {
+                        "to": "/purchase_intent/id",
+                        "value": {
+                            "coalesce": [
+                                {
+                                    "request": "/purchase_intent_id"
+                                },
+                                {
+                                    "request": "/id"
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        }
+    }
+)
 operation cancelPurchaseIntent {
     input: cancelPurchaseIntentInput
     output: cancelPurchaseIntent200
@@ -3189,6 +3226,20 @@ operation lookupPaymentMethod {
 @tags([
     "Payouts"
 ])
+@responseRelations(
+{
+        "200": {
+            "application/json": {
+                "bindings": [
+                    {
+                        "from": "/payout_id",
+                        "to": "/payout/id"
+                    }
+                ]
+            }
+        }
+    }
+)
 operation lookupPayout {
     input: lookupPayoutInput
     output: lookupPayout200
@@ -3284,6 +3335,20 @@ operation lookupProduct {
     "Purchase Intents"
 ])
 @optionalAuth
+@responseRelations(
+{
+        "200": {
+            "application/json": {
+                "bindings": [
+                    {
+                        "from": "/id",
+                        "to": "/purchase_intent/id"
+                    }
+                ]
+            }
+        }
+    }
+)
 operation lookupPurchaseIntent {
     input: lookupPurchaseIntentInput
     output: lookupPurchaseIntent200
@@ -4012,6 +4077,7 @@ operation pagePrices {
             "application/json": {
                 "bindings": [
                     {
+                        "default": 1,
                         "from": "/page_number",
                         "to": "/page/number"
                     }
@@ -4043,6 +4109,20 @@ operation pageProducts {
 @tags([
     "Purchase Intents"
 ])
+@responseRelations(
+{
+        "200": {
+            "application/json": {
+                "bindings": [
+                    {
+                        "from": "/page_number",
+                        "to": "/page/number"
+                    }
+                ]
+            }
+        }
+    }
+)
 operation pagePurchaseIntents {
     input: pagePurchaseIntentsInput
     output: pagePurchaseIntents200
@@ -4638,6 +4718,24 @@ operation scheduleChime {
 @tags([
     "Payouts"
 ])
+@responseRelations(
+{
+        "200": {
+            "application/json": {
+                "bindings": [
+                    {
+                        "from": "/destination_id",
+                        "to": "/payout/destination_id"
+                    },
+                    {
+                        "from": "/reference",
+                        "to": "/payout/reference"
+                    }
+                ]
+            }
+        }
+    }
+)
 operation schedulePayout {
     input: schedulePayoutInput
     output: schedulePayout200
@@ -4997,6 +5095,30 @@ operation sendChime {
 @tags([
     "Orders"
 ])
+@responseRelations(
+{
+        "200": {
+            "application/json": {
+                "bindings": [
+                    {
+                        "from": "/order_id",
+                        "to": "/order/id"
+                    }
+                ]
+            }
+        },
+        "207": {
+            "application/json": {
+                "bindings": [
+                    {
+                        "from": "/order_id",
+                        "to": "/order/id"
+                    }
+                ]
+            }
+        }
+    }
+)
 operation sendOrderInvoice {
     input: sendOrderInvoiceInput
     output: sendOrderInvoice200
@@ -5027,6 +5149,30 @@ operation sendOrderInvoice {
 @tags([
     "Orders"
 ])
+@responseRelations(
+{
+        "200": {
+            "application/json": {
+                "bindings": [
+                    {
+                        "from": "/order_id",
+                        "to": "/order/id"
+                    }
+                ]
+            }
+        },
+        "207": {
+            "application/json": {
+                "bindings": [
+                    {
+                        "from": "/order_id",
+                        "to": "/order/id"
+                    }
+                ]
+            }
+        }
+    }
+)
 operation sendOrderReceipt {
     input: sendOrderReceiptInput
     output: sendOrderReceipt200
@@ -5112,6 +5258,28 @@ operation streamFileContents {
 @tags([
     "Payment Methods"
 ])
+@responseRelations(
+{
+        "200": {
+            "application/json": {
+                "bindings": [
+                    {
+                        "from": "/customer_id",
+                        "to": "/payment_method/customer_id"
+                    },
+                    {
+                        "from": "/type",
+                        "to": "/payment_method/type"
+                    },
+                    {
+                        "from": "/mobile_money/network",
+                        "to": "/payment_method/mobile_money/network"
+                    }
+                ]
+            }
+        }
+    }
+)
 operation tokenizePaymentMethod {
     input: tokenizePaymentMethodInput
     output: tokenizePaymentMethod200
@@ -5490,6 +5658,19 @@ operation updateMessageTemplate {
                     },
                     {
                         "to": "/operating_policy/version",
+                        "value": {
+                            "add": [
+                                {
+                                    "request": "/expected_version"
+                                },
+                                {
+                                    "literal": 1
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "to": "/operating_policy/active_version",
                         "value": {
                             "add": [
                                 {
@@ -5892,6 +6073,29 @@ operation updateProduct {
 @tags([
     "Purchase Intents"
 ])
+@responseRelations(
+{
+        "200": {
+            "application/json": {
+                "bindings": [
+                    {
+                        "to": "/purchase_intent/id",
+                        "value": {
+                            "coalesce": [
+                                {
+                                    "request": "/purchase_intent_id"
+                                },
+                                {
+                                    "request": "/id"
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        }
+    }
+)
 operation updatePurchaseIntent {
     input: updatePurchaseIntentInput
     output: updatePurchaseIntent200
@@ -47424,6 +47628,13 @@ structure lookupUploadRequestInput {
         "302": {
             "description": "Redirect to short-lived file URL",
             "headers": {
+                "Location": {
+                    "example": "https://files.example.test/download/file_link_example",
+                    "schema": {
+                        "format": "uri",
+                        "type": "string"
+                    }
+                },
                 "X-Request-Id": {
                     "$ref": "#/components/headers/RequestId"
                 }
@@ -57995,6 +58206,14 @@ structure sendChimeInput {
                                 "type": "object"
                             }
                         ]
+                    },
+                    "x-simile-from-request": {
+                        "bindings": [
+                            {
+                                "from": "/order_id",
+                                "to": "/order/id"
+                            }
+                        ]
                     }
                 }
             },
@@ -58098,6 +58317,14 @@ structure sendChimeInput {
                                     }
                                 },
                                 "type": "object"
+                            }
+                        ]
+                    },
+                    "x-simile-from-request": {
+                        "bindings": [
+                            {
+                                "from": "/order_id",
+                                "to": "/order/id"
                             }
                         ]
                     }
@@ -58509,6 +58736,14 @@ structure sendOrderInvoiceInput {
                                 "type": "object"
                             }
                         ]
+                    },
+                    "x-simile-from-request": {
+                        "bindings": [
+                            {
+                                "from": "/order_id",
+                                "to": "/order/id"
+                            }
+                        ]
                     }
                 }
             },
@@ -58610,6 +58845,14 @@ structure sendOrderInvoiceInput {
                                     }
                                 },
                                 "type": "object"
+                            }
+                        ]
+                    },
+                    "x-simile-from-request": {
+                        "bindings": [
+                            {
+                                "from": "/order_id",
+                                "to": "/order/id"
                             }
                         ]
                     }
@@ -59141,6 +59384,7 @@ structure setPayoutDestinationsInput {
             "description": "Redirect to a purpose-authorized public asset URL or a short-lived signed delivery URL",
             "headers": {
                 "Location": {
+                    "example": "https://files.example.test/download/file_example",
                     "schema": {
                         "format": "uri",
                         "type": "string"

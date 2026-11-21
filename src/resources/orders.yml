@@ -1225,6 +1225,11 @@ paths:
                                                   - type: object
                                                     properties:
                                                         status: { type: string, enum: [requires_payment, paid, completed, canceled, expired] }
+                            # Why: delivery metadata may vary by channel, but the returned order must remain
+                            # the same public order whose invoice the caller requested.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /order_id, to: /order/id }
                             examples:
                                 invoice_sent:
                                     summary: Invoice accepted by the email delivery channel
@@ -1272,6 +1277,10 @@ paths:
                                                   - type: object
                                                     properties:
                                                         status: { type: string, enum: [requires_payment, paid, completed, canceled, expired] }
+                            # Why: partial channel failure does not change which public order the caller selected.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /order_id, to: /order/id }
                             examples:
                                 invoice_partially_sent:
                                     summary: Invoice accepted by email after SMS delivery failed
@@ -1431,6 +1440,11 @@ paths:
                                                   - type: object
                                                     properties:
                                                         status: { type: string, enum: [paid, completed] }
+                            # Why: receipt delivery is observable work for the caller-selected order, so a
+                            # schema-valid response for an unrelated order is not reachable.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /order_id, to: /order/id }
                             examples:
                                 receipt_sent:
                                     summary: Receipt accepted by the email delivery channel
@@ -1479,6 +1493,10 @@ paths:
                                                   - type: object
                                                     properties:
                                                         status: { type: string, enum: [paid, completed] }
+                            # Why: partial receipt delivery still belongs to the exact caller-selected order.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /order_id, to: /order/id }
                             examples:
                                 receipt_partially_sent:
                                     summary: Receipt accepted by email after SMS delivery failed

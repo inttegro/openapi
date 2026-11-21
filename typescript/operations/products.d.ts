@@ -1936,6 +1936,7 @@ export interface ProductsResponseRelations {
           {
             readonly "from": "/page_number";
             readonly "to": "/page/number";
+            readonly "default": 1;
           },
         ];
       };

@@ -476,6 +476,7 @@ export interface FileLinksOperations {
       readonly "302": {
         readonly headers: {
           readonly "X-Request-Id"?: string;
+          readonly "Location"?: Uri;
         };
         readonly content: {
         };

@@ -507,6 +507,25 @@ type SumEach<
       : never
   : Result;
 
+type CoalesceValue<Value, Fallback> = [
+  Exclude<Value, Missing | null | undefined>,
+] extends [never]
+  ? Fallback
+  : Extract<Value, Missing | null | undefined> extends never
+    ? Exclude<Value, Missing | null | undefined>
+    : Exclude<Value, Missing | null | undefined> | Fallback;
+
+type CoalesceExpressionValues<
+  Expressions extends readonly unknown[],
+  Root,
+  Context,
+> = Expressions extends readonly [infer Head, ...infer Tail]
+  ? CoalesceValue<
+      EvaluateExpression<Head, Root, Context>,
+      CoalesceExpressionValues<Tail, Root, Context>
+    >
+  : never;
+
 /** Evaluate the closed arithmetic and collection algebra used by response relations. */
 export type EvaluateExpression<Expression, Root, Context = Root> =
   Expression extends { readonly request: infer Pointer extends string }
@@ -532,15 +551,19 @@ export type EvaluateExpression<Expression, Root, Context = Root> =
               }
             ? MultiplyExpressionValues<Expressions, Root, Context>
             : Expression extends {
+                  readonly coalesce: infer Expressions extends readonly unknown[];
+                }
+              ? CoalesceExpressionValues<Expressions, Root, Context>
+              : Expression extends {
                   readonly sum: {
                     readonly each: infer Pointer extends string;
                     readonly value: infer ValueExpression;
                   };
                 }
-              ? CollectPath<Root, Pointer> extends infer Items extends readonly unknown[]
-                ? SumEach<Items, ValueExpression, Root>
-                : never
-              : never;
+                ? CollectPath<Root, Pointer> extends infer Items extends readonly unknown[]
+                  ? SumEach<Items, ValueExpression, Root>
+                  : never
+                : never;
 
 type BindingWellFormed<Request, Response, Binding> = Binding extends {
   readonly to: infer Target extends string;
@@ -570,23 +593,27 @@ type RelationExpressionWellFormed<Request, Expression> = Expression extends {
               readonly subtract: infer Operands extends readonly unknown[];
             }
           ? RelationExpressionsWellFormed<Request, Operands>
-          : Expression extends {
-                readonly multiply: infer Operands extends readonly unknown[];
-              }
-            ? RelationExpressionsWellFormed<Request, Operands>
             : Expression extends {
+                  readonly multiply: infer Operands extends readonly unknown[];
+                }
+              ? RelationExpressionsWellFormed<Request, Operands>
+              : Expression extends {
+                    readonly coalesce: infer Operands extends readonly unknown[];
+                  }
+                ? RelationExpressionsWellFormed<Request, Operands>
+                : Expression extends {
                   readonly sum: {
                     readonly each: infer Pointer extends string;
                     readonly value: infer ValueExpression;
                   };
                 }
-              ? PathExists<Request, Pointer> extends true
-                ? RelationExpressionWellFormed<
-                    Existing<PathValue<Request, Pointer>>,
-                    ValueExpression
-                  >
-                : false
-              : false;
+                  ? PathExists<Request, Pointer> extends true
+                    ? RelationExpressionWellFormed<
+                        Existing<PathValue<Request, Pointer>>,
+                        ValueExpression
+                      >
+                    : false
+                  : false;
 
 type RelationExpressionsWellFormed<
   Request,

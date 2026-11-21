@@ -21,58 +21,34 @@ const stateBehavior = readFileSync(stateBehaviorPath, "utf8");
 const methods = new Set(["delete", "get", "patch", "post", "put"]);
 const work = mkdtempSync(resolve(tmpdir(), "inttegro-simile-service-"));
 
-// Why: these operations intentionally return transport-level content instead of a JSON body,
-// so `simile run` cannot exercise them through its JSON request/response runner.
-const nonJsonOperations = new Map([
-  ["openFileLink", "302 redirect with a Location header"],
-  ["streamFileContents", "application/octet-stream file body"],
-]);
-
-// Why: these historical lookups accept any positive version, while the response independently
-// requires `version <= active_version`. Current Simile can prove a supplied finite version but its
-// unconstrained request generator can choose a value beyond the response search horizon.
-const synthesisSeeds = new Map([
-  ["lookupChildrenPolicy", { version: 1 }],
-  ["lookupOperatingPolicy", { operating_policy_id: "op_example", version: 1 }],
-  // Why: current Simile intermittently omits the optional page number and then
-  // fails to preserve its declared default in the synthesized response. The
-  // explicit public default keeps this contract gate deterministic while the
-  // simulator implementation is corrected independently.
-  ["pagePaymentMethods", { page_number: 1 }],
-  ["pagePrices", { page_number: 1 }],
-  ["updateOperatingPolicy", {
-    operating_policy_id: "op_example",
-    expected_version: 1,
-    name: "Updated operating policy",
-  }],
-]);
-
-// Why: this page is valid and compiles, but current Simile finite search sometimes chooses a
-// non-empty array and cannot complete an item through PurchaseIntent's product-or-bundle union.
-const runtimeSynthesisGaps = new Map([
-  ["pagePurchaseIntents", "array-item synthesis through the purchase-intent target union"],
-  // Why: the public schedule and unsealed-cancel snapshots correctly omit `amount`. Current
-  // Simile treats the optional target of Payout's bounded clause as required while synthesizing
-  // these operation refinements; making it required would contradict the API.
-  ["schedulePayout", "optional bounded payout amount in the scheduled snapshot"],
-  ["cancelPayout", "optional bounded payout amount in the unsealed canceled snapshot"],
-  ["lookupPayout", "optional bounded payout amount across lifecycle snapshots"],
-]);
-
-// Why: these document responses deliberately carry a realistic nested order snapshot. Selecting
-// the reviewed success example avoids reducing that public shape merely to fit finite search.
-const synthesisOutcomes = new Map([
-  ["createPurchaseIntent", "created"],
-  ["updatePurchaseIntent", "updated"],
-  ["cancelPurchaseIntent", "canceled"],
-  ["lookupPurchaseIntent", "found"],
-  ["updateOperatingPolicy", "updated"],
-  ["sendOrderInvoice", "invoice_sent"],
-  ["sendOrderReceipt", "receipt_sent"],
-]);
+// Why: these inputs cover relation normalization, request-owned dynamic bounds, and composed
+// response schemas that previously required test-only seeds or named-outcome fallbacks.
+const synthesisRegressions = [
+  ["pagePaymentMethods", { page_number: 0 }],
+  ["pagePrices", { page_number: 0 }],
+  ["lookupChildrenPolicy", { version: 100 }],
+  ["lookupOperatingPolicy", { operating_policy_id: "op_example", version: 100 }],
+];
 
 const namedOutcomes = [
-  ["tokenizePaymentMethod", ["tokenized", "payment_method_tokenized", { payment_method: { id: "pm_example", mobile_money: { account_number: "****7831" } } }]],
+  ["tokenizePaymentMethod", [
+    "tokenized",
+    "payment_method_tokenized",
+    {
+      payment_method: {
+        id: "pm_example",
+        customer_id: "cu_example",
+        type: "mobile_money",
+        mobile_money: { account_number: "****7831", last4: "7831", network: "mtn" },
+      },
+    },
+    {
+      customer_id: "cu_example",
+      type: "mobile_money",
+      mobile_money: { account_number: "+233242057831", network: "mtn" },
+      owner: { name: "Jane Mensah", address: { country: "GH" } },
+    },
+  ]],
   ["createPurchaseIntent", ["created", "purchase_intent_created", { purchase_intent: { id: "sale_example", status: "active", price: { nominal: { currency: "ghs", value: 15000 } } } }]],
   ["sendChime", ["cooldown_active", "chime_cooldown_active", { error: { code: "chime_cooldown_active" } }]],
   ["createOrder", ["payment_method_invalid", "order_payment_method_invalid", { code: "payment_method_invalid" }]],
@@ -81,13 +57,13 @@ const namedOutcomes = [
   ["tokenizePaymentMethod", ["malformed_body", "payment_method_invalid_body", { code: "invalid_request_body" }]],
   ["createProduct", ["gallery_too_large", "product_gallery_too_large", { code: "product_media_gallery_too_large" }]],
   ["createPurchaseIntent", ["invalid_quantity_range", "purchase_intent_invalid_quantity_range", { code: "invalid_purchase_intent_quantity_range" }]],
-  ["sendOrderInvoice", ["invoice_sent", "order_invoice_sent", { delivery: { document_kind: "invoice", sent_channels: ["email"] }, order: { id: "or_invoice_example", status: "requires_payment" } }]],
-  ["sendOrderInvoice", ["invoice_partially_sent", "order_invoice_partially_sent", { delivery: { document_kind: "invoice", sent_channels: ["email"], failed_channels: ["sms"] } }]],
-  ["sendOrderReceipt", ["receipt_sent", "order_receipt_sent", { delivery: { document_kind: "receipt", sent_channels: ["email"] }, order: { id: "or_receipt_example", status: "paid" } }]],
-  ["sendOrderReceipt", ["receipt_partially_sent", "order_receipt_partially_sent", { delivery: { document_kind: "receipt", sent_channels: ["email"], failed_channels: ["sms"] } }]],
-  ["cancelPurchaseIntent", ["canceled", "purchase_intent_canceled", { purchase_intent: { id: "sale_canceled_example", status: "inactive", inactive_at: "2026-11-20T10:00:00Z" } }]],
-  ["updatePurchaseIntent", ["updated", "purchase_intent_updated", { purchase_intent: { id: "sale_updated_example", status: "active", quantity: { min: 2, max: 10 } } }]],
-  ["lookupPurchaseIntent", ["found", "purchase_intent_found", { purchase_intent: { id: "sale_found_example", status: "active" } }]],
+  ["sendOrderInvoice", ["invoice_sent", "order_invoice_sent", { delivery: { document_kind: "invoice", sent_channels: ["email"] }, order: { id: "or_invoice_example", status: "requires_payment" } }, { order_id: "or_invoice_example" }]],
+  ["sendOrderInvoice", ["invoice_partially_sent", "order_invoice_partially_sent", { delivery: { document_kind: "invoice", sent_channels: ["email"], failed_channels: ["sms"] } }, { order_id: "or_invoice_example" }]],
+  ["sendOrderReceipt", ["receipt_sent", "order_receipt_sent", { delivery: { document_kind: "receipt", sent_channels: ["email"] }, order: { id: "or_receipt_example", status: "paid" } }, { order_id: "or_receipt_example" }]],
+  ["sendOrderReceipt", ["receipt_partially_sent", "order_receipt_partially_sent", { delivery: { document_kind: "receipt", sent_channels: ["email"], failed_channels: ["sms"] } }, { order_id: "or_receipt_example" }]],
+  ["cancelPurchaseIntent", ["canceled", "purchase_intent_canceled", { purchase_intent: { id: "sale_canceled_example", status: "inactive", inactive_at: "2026-11-20T10:00:00Z" } }, { purchase_intent_id: "sale_canceled_example" }]],
+  ["updatePurchaseIntent", ["updated", "purchase_intent_updated", { purchase_intent: { id: "sale_updated_example", status: "active", quantity: { min: 2, max: 10 } } }, { id: "sale_updated_example" }]],
+  ["lookupPurchaseIntent", ["found", "purchase_intent_found", { purchase_intent: { id: "sale_found_example", status: "active" } }, { id: "sale_found_example" }]],
   ["updateOperatingPolicy", [
     "updated",
     "operating_policy_updated",
@@ -169,7 +145,7 @@ try {
   assert.equal(description.service, "inttegro", "published service name drifted");
   assert.equal(description.listen, "127.0.0.1:4242", "published listener drifted");
   assert.equal(description.operationCount, 135, "composition-root operation count drifted");
-  assert.equal(description.scenarios.length, 41, "published scenario catalogue drifted");
+  assert.equal(description.scenarios.length, 42, "published scenario catalogue drifted");
   assert.equal(description.backends.length, 4, "published backend catalogue drifted");
   assert.equal(description.asyncOperations.length, 3, "published async catalogue drifted");
   assert.equal(description.faultProfiles.length, 2, "published fault-profile catalogue drifted");
@@ -190,8 +166,8 @@ try {
   const inspection = JSON.parse(runSimile(["inspect", artifactPath, "--output", "json"]).stdout);
   assert.equal(inspection.operations, 135, "compiled public operation count drifted");
   assert.equal(inspection.publicExportSafe, true, "compiled artifact is not public-export safe");
-  assert.equal(inspection.providerAuthoredOutcomes, 19, "provider-authored outcome inventory drifted");
-  assert.equal(inspection.scenarioSelections, 36, "exact-outcome scenario inventory drifted");
+  assert.equal(inspection.providerAuthoredOutcomes, 21, "provider-authored outcome inventory drifted");
+  assert.equal(inspection.scenarioSelections, 37, "exact-outcome scenario inventory drifted");
   assert.equal(inspection.scenarioFaults, 5, "deterministic fault scenario inventory drifted");
   assert.equal(inspection.resources, 4, "abstract test-backend inventory drifted");
   assert.equal(inspection.asyncOperations, 3, "declared asynchronous-work inventory drifted");
@@ -267,46 +243,23 @@ try {
   // Why: profile compilation and setup are insufficient unless the running HTTP service actually
   // preserves public routes while enforcing active, revoked, expired, and missing credentials.
   const authenticationChecks = await verifyAuthentication(registryEnvironment, issuedCredential);
+  const transportChecks = await verifyFileDeliveryTransport(registryEnvironment, issuedCredential);
 
   const operations = collectOperations();
   assert.equal(operations.length, 135, "OpenAPI public operation count drifted");
   let synthesized = 0;
-  let seeded = 0;
-  let deferred = 0;
   for (const { operationId } of operations) {
-    if (nonJsonOperations.has(operationId)) continue;
-    if (runtimeSynthesisGaps.has(operationId)) {
-      deferred += 1;
-      continue;
-    }
-    if (synthesisSeeds.has(operationId)) {
-      // Why: request-bound exact outcomes need their public construction sources before Simile can
-      // prove the response. Prefer that complete operation exercise over response-only synthesis.
-      runOperation(operationId, synthesisSeeds.get(operationId));
-      seeded += 1;
-      continue;
-    }
-    if (synthesisOutcomes.has(operationId)) {
-      runSimile([
-        "run",
-        specificationPath,
-        "--operation-id",
-        operationId,
-        "--outcome",
-        synthesisOutcomes.get(operationId),
-        "--output",
-        "json",
-      ]);
-      synthesized += 1;
-      continue;
-    }
     runSimile(["run", specificationPath, "--operation-id", operationId, "--output", "json"]);
     synthesized += 1;
   }
 
+  for (const [operationId, body] of synthesisRegressions) {
+    runOperation(operationId, body);
+  }
+
   let supplied = 0;
   for (const { operationId, requestExample } of operations) {
-    if (requestExample === undefined || nonJsonOperations.has(operationId)) continue;
+    if (requestExample === undefined) continue;
     runOperation(operationId, requestExample);
     supplied += 1;
   }
@@ -473,14 +426,15 @@ try {
 
   console.log(
     `Inttegro Simile service verified: ${operations.length} operations, ` +
-      `${synthesized} JSON operations synthesized, ${seeded} request seeds applied, ` +
-      `${deferred} runtime synthesis gap documented, ` +
+      `${synthesized} operations synthesized without fallbacks, ` +
+      `${synthesisRegressions.length} synthesis regressions exercised, ` +
       `${supplied} supplied valid requests replayed, ` +
       `${namedOutcomes.length} contract outcomes and ${providerOutcomes.length} provider outcomes selected, ` +
       `${invalidRequests.length} invalid requests rejected, ` +
       `${authenticationChecks} authentication cases verified, ` +
+      `${transportChecks} transport responses verified, ` +
       `${audit.warnings} reviewed fidelity warnings, ` +
-      `${nonJsonOperations.size} transport-only operations documented`,
+      `0 runtime synthesis gaps`,
   );
 } finally {
   rmSync(work, { recursive: true, force: true });
@@ -512,11 +466,6 @@ function runOperation(operationId, body, shouldSucceed = true) {
     "--request",
     JSON.stringify({ body }),
   ];
-  if (synthesisOutcomes.has(operationId)) {
-    // Why: exact provider examples keep complex response unions deterministic while the supplied
-    // request is still independently parsed and validated by the same compiled operation.
-    args.push("--outcome", synthesisOutcomes.get(operationId));
-  }
   args.push("--output", "json");
   return runSimile(args, shouldSucceed);
 }
@@ -566,6 +515,92 @@ async function verifyAuthentication(environment, issuedCredential) {
   } finally {
     await stopService(service);
   }
+}
+
+async function verifyFileDeliveryTransport(environment, issuedCredential) {
+  const port = await availablePort();
+  const baseUrl = `http://127.0.0.1:${port}`;
+  const service = spawn(simile, ["start", "inttegro", "--port", String(port)], {
+    cwd: openapiDir,
+    env: { ...process.env, SIMILE_COLOR: "never", ...environment },
+    stdio: ["ignore", "pipe", "pipe"],
+  });
+  let output = "";
+  service.stdout.on("data", (chunk) => { output += chunk; });
+  service.stderr.on("data", (chunk) => { output += chunk; });
+
+  try {
+    await waitForService(service, `${baseUrl}/spec/countries`, () => output);
+    const headers = {
+      authorization: `Bearer ${issuedCredential}`,
+      "content-type": "application/json",
+    };
+    const streamed = await fetch(`${baseUrl}/files/contents`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify({ file_id: "file_example", delivery: "stream" }),
+      redirect: "manual",
+    });
+    assert.equal(streamed.status, 200, "stream delivery did not select its binary response");
+    assert.equal(
+      streamed.headers.get("content-type"),
+      "application/octet-stream",
+      "stream delivery returned the wrong media type",
+    );
+    assert.ok((await streamed.arrayBuffer()).byteLength > 0, "stream delivery returned no bytes");
+
+    const redirected = await fetch(`${baseUrl}/files/contents`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify({ file_id: "file_example", delivery: "redirect" }),
+      redirect: "manual",
+    });
+    assert.equal(redirected.status, 303, "redirect delivery did not select its declared response");
+    assert.equal(
+      redirected.headers.get("location"),
+      "https://files.example.test/download/file_example",
+      "redirect delivery did not return its declared Location header",
+    );
+  } finally {
+    await stopService(service);
+  }
+
+  const scenarioPort = await availablePort();
+  const scenarioBaseUrl = `http://127.0.0.1:${scenarioPort}`;
+  const scenarioService = spawn(
+    simile,
+    ["start", "inttegro", "--port", String(scenarioPort), "--scenario", "file_link_redirect"],
+    {
+      cwd: openapiDir,
+      env: { ...process.env, SIMILE_COLOR: "never", ...environment },
+      stdio: ["ignore", "pipe", "pipe"],
+    },
+  );
+  let scenarioOutput = "";
+  scenarioService.stdout.on("data", (chunk) => { scenarioOutput += chunk; });
+  scenarioService.stderr.on("data", (chunk) => { scenarioOutput += chunk; });
+
+  try {
+    await waitForService(
+      scenarioService,
+      `${scenarioBaseUrl}/spec/countries`,
+      () => scenarioOutput,
+    );
+    const response = await fetch(
+      `${scenarioBaseUrl}/file_links/open?id=link_example&token=token_example`,
+      { redirect: "manual" },
+    );
+    assert.equal(response.status, 302, "file-link redirect scenario selected the wrong status");
+    assert.equal(
+      response.headers.get("location"),
+      "https://files.example.test/download/file_link_example",
+      "file-link redirect scenario did not return its declared Location header",
+    );
+  } finally {
+    await stopService(scenarioService);
+  }
+
+  return 3;
 }
 
 function availablePort() {

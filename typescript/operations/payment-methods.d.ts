@@ -1692,6 +1692,26 @@ export interface PaymentMethodsResponseRelations {
       };
     };
   };
+  readonly "tokenizePaymentMethod": {
+    readonly "200": {
+      readonly "application/json": {
+        readonly "bindings": readonly [
+          {
+            readonly "from": "/customer_id";
+            readonly "to": "/payment_method/customer_id";
+          },
+          {
+            readonly "from": "/type";
+            readonly "to": "/payment_method/type";
+          },
+          {
+            readonly "from": "/mobile_money/network";
+            readonly "to": "/payment_method/mobile_money/network";
+          },
+        ];
+      };
+    };
+  };
   readonly "unarchivePaymentMethod": {
     readonly "200": {
       readonly "application/json": {

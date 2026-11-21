@@ -995,6 +995,13 @@ paths:
                                           add:
                                               - { request: /expected_version }
                                               - { literal: 1 }
+                                    # Why: update creates and activates one immutable version atomically;
+                                    # allowing these counters to diverge describes an unreachable response.
+                                    - to: /operating_policy/active_version
+                                      value:
+                                          add:
+                                              - { request: /expected_version }
+                                              - { literal: 1 }
                                 # Why: each public catalog ID has one canonical duration in the returned snapshot.
                                 rules:
                                     - when:

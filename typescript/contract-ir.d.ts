@@ -1,5 +1,5 @@
 // Internal compiler IR generated from commerce.yml; DO NOT EDIT OR PUBLISH AS THE TYPESCRIPT CONTRACT.
-// OpenAPI SHA-256: 4085a787c27246361fe2740441cef8caec48b06da25ab03593fee8a46e40adf3
+// OpenAPI SHA-256: 56f340ee622551cc02c6ca78b3b40070be5e356cca1509b664d5b0abc113969f
 // This file contains declarations only and emits no JavaScript.
 
 import type {
@@ -10,12 +10,12 @@ import type {
   RelationWellFormed,
 } from "./proof-kernel";
 
-export type CollectionVersion = "0.1.0-beta91";
-export type SourceOpenApiSha256 = "4085a787c27246361fe2740441cef8caec48b06da25ab03593fee8a46e40adf3";
+export type CollectionVersion = "0.1.0-beta95";
+export type SourceOpenApiSha256 = "56f340ee622551cc02c6ca78b3b40070be5e356cca1509b664d5b0abc113969f";
 export type OperationCount = 135;
 export type SchemaCount = 604;
 export type ConstraintCount = 244;
-export type ResponseRelationCount = 111;
+export type ResponseRelationCount = 123;
 
 /** Closed OpenAPI schema algebra. InferSchema turns a node into its payload type. */
 export interface SchemaDefinitions {
@@ -35530,6 +35530,14 @@ export interface OperationDefinitions {
                 },
               ];
             };
+            readonly "relation": {
+              readonly "bindings": readonly [
+                {
+                  readonly "from": "/payout_id";
+                  readonly "to": "/payout/id";
+                },
+              ];
+            };
           };
         };
       };
@@ -36057,6 +36065,23 @@ export interface OperationDefinitions {
                         },
                       ];
                     };
+                  };
+                },
+              ];
+            };
+            readonly "relation": {
+              readonly "bindings": readonly [
+                {
+                  readonly "to": "/purchase_intent/id";
+                  readonly "value": {
+                    readonly "coalesce": readonly [
+                      {
+                        readonly "request": "/purchase_intent_id";
+                      },
+                      {
+                        readonly "request": "/id";
+                      },
+                    ];
                   };
                 },
               ];
@@ -72073,6 +72098,14 @@ export interface OperationDefinitions {
             readonly "schema": {
               readonly "$ref": "#/components/schemas/PayoutResponse";
             };
+            readonly "relation": {
+              readonly "bindings": readonly [
+                {
+                  readonly "from": "/payout_id";
+                  readonly "to": "/payout/id";
+                },
+              ];
+            };
           };
         };
       };
@@ -73574,6 +73607,14 @@ export interface OperationDefinitions {
           readonly "application/json": {
             readonly "schema": {
               readonly "$ref": "#/components/schemas/PurchaseIntentResponse";
+            };
+            readonly "relation": {
+              readonly "bindings": readonly [
+                {
+                  readonly "from": "/id";
+                  readonly "to": "/purchase_intent/id";
+                },
+              ];
             };
           };
         };
@@ -76813,6 +76854,12 @@ export interface OperationDefinitions {
           readonly "X-Request-Id": {
             readonly "schema": {
               readonly "type": "string";
+            };
+          };
+          readonly "Location": {
+            readonly "schema": {
+              readonly "type": "string";
+              readonly "format": "uri";
             };
           };
         };
@@ -84826,6 +84873,7 @@ export interface OperationDefinitions {
                 {
                   readonly "from": "/page_number";
                   readonly "to": "/page/number";
+                  readonly "default": 1;
                 },
               ];
             };
@@ -85281,6 +85329,14 @@ export interface OperationDefinitions {
           readonly "application/json": {
             readonly "schema": {
               readonly "$ref": "#/components/schemas/PagePurchaseIntentsResponse";
+            };
+            readonly "relation": {
+              readonly "bindings": readonly [
+                {
+                  readonly "from": "/page_number";
+                  readonly "to": "/page/number";
+                },
+              ];
             };
           };
         };
@@ -96731,6 +96787,18 @@ export interface OperationDefinitions {
                 },
               ];
             };
+            readonly "relation": {
+              readonly "bindings": readonly [
+                {
+                  readonly "from": "/destination_id";
+                  readonly "to": "/payout/destination_id";
+                },
+                {
+                  readonly "from": "/reference";
+                  readonly "to": "/payout/reference";
+                },
+              ];
+            };
           };
         };
       };
@@ -102050,6 +102118,14 @@ export interface OperationDefinitions {
                 },
               ];
             };
+            readonly "relation": {
+              readonly "bindings": readonly [
+                {
+                  readonly "from": "/order_id";
+                  readonly "to": "/order/id";
+                },
+              ];
+            };
           };
         };
       };
@@ -102112,6 +102188,14 @@ export interface OperationDefinitions {
                       ];
                     };
                   };
+                },
+              ];
+            };
+            readonly "relation": {
+              readonly "bindings": readonly [
+                {
+                  readonly "from": "/order_id";
+                  readonly "to": "/order/id";
                 },
               ];
             };
@@ -102901,6 +102985,14 @@ export interface OperationDefinitions {
                 },
               ];
             };
+            readonly "relation": {
+              readonly "bindings": readonly [
+                {
+                  readonly "from": "/order_id";
+                  readonly "to": "/order/id";
+                },
+              ];
+            };
           };
         };
       };
@@ -102960,6 +103052,14 @@ export interface OperationDefinitions {
                       ];
                     };
                   };
+                },
+              ];
+            };
+            readonly "relation": {
+              readonly "bindings": readonly [
+                {
+                  readonly "from": "/order_id";
+                  readonly "to": "/order/id";
                 },
               ];
             };
@@ -105040,6 +105140,22 @@ export interface OperationDefinitions {
           readonly "application/json": {
             readonly "schema": {
               readonly "$ref": "#/components/schemas/TokenizePaymentMethodResponse";
+            };
+            readonly "relation": {
+              readonly "bindings": readonly [
+                {
+                  readonly "from": "/customer_id";
+                  readonly "to": "/payment_method/customer_id";
+                },
+                {
+                  readonly "from": "/type";
+                  readonly "to": "/payment_method/type";
+                },
+                {
+                  readonly "from": "/mobile_money/network";
+                  readonly "to": "/payment_method/mobile_money/network";
+                },
+              ];
             };
           };
         };
@@ -109438,6 +109554,19 @@ export interface OperationDefinitions {
                     ];
                   };
                 },
+                {
+                  readonly "to": "/operating_policy/active_version";
+                  readonly "value": {
+                    readonly "add": readonly [
+                      {
+                        readonly "request": "/expected_version";
+                      },
+                      {
+                        readonly "literal": 1;
+                      },
+                    ];
+                  };
+                },
               ];
               readonly "rules": readonly [
                 {
@@ -113134,6 +113263,23 @@ export interface OperationDefinitions {
             readonly "schema": {
               readonly "$ref": "#/components/schemas/PurchaseIntentResponse";
             };
+            readonly "relation": {
+              readonly "bindings": readonly [
+                {
+                  readonly "to": "/purchase_intent/id";
+                  readonly "value": {
+                    readonly "coalesce": readonly [
+                      {
+                        readonly "request": "/purchase_intent_id";
+                      },
+                      {
+                        readonly "request": "/id";
+                      },
+                    ];
+                  };
+                },
+              ];
+            };
           };
         };
       };
@@ -116624,705 +116770,789 @@ type _RelationProof009 = Assert<
 >;
 type _RelationProof010 = Assert<
   RelationWellFormed<
+    RequestBody<"cancelPayout", "application/json">,
+    ResponseBody<"cancelPayout", "200", "application/json">,
+    ResponseRelation<"cancelPayout", "200", "application/json">
+  >
+>;
+type _RelationProof011 = Assert<
+  RelationWellFormed<
+    RequestBody<"cancelPurchaseIntent", "application/json">,
+    ResponseBody<"cancelPurchaseIntent", "200", "application/json">,
+    ResponseRelation<"cancelPurchaseIntent", "200", "application/json">
+  >
+>;
+type _RelationProof012 = Assert<
+  RelationWellFormed<
     RequestBody<"cancelRefund", "application/json">,
     ResponseBody<"cancelRefund", "200", "application/json">,
     ResponseRelation<"cancelRefund", "200", "application/json">
   >
 >;
-type _RelationProof011 = Assert<
+type _RelationProof013 = Assert<
   RelationWellFormed<
     RequestBody<"cancelSchedule", "application/json">,
     ResponseBody<"cancelSchedule", "200", "application/json">,
     ResponseRelation<"cancelSchedule", "200", "application/json">
   >
 >;
-type _RelationProof012 = Assert<
+type _RelationProof014 = Assert<
   RelationWellFormed<
     RequestBody<"cancelUploadRequest", "application/json">,
     ResponseBody<"cancelUploadRequest", "200", "application/json">,
     ResponseRelation<"cancelUploadRequest", "200", "application/json">
   >
 >;
-type _RelationProof013 = Assert<
+type _RelationProof015 = Assert<
   RelationWellFormed<
     RequestBody<"completeOrder", "application/json">,
     ResponseBody<"completeOrder", "200", "application/json">,
     ResponseRelation<"completeOrder", "200", "application/json">
   >
 >;
-type _RelationProof014 = Assert<
+type _RelationProof016 = Assert<
   RelationWellFormed<
     RequestBody<"confirmCheckoutPayment", "application/json">,
     ResponseBody<"confirmCheckoutPayment", "200", "application/json">,
     ResponseRelation<"confirmCheckoutPayment", "200", "application/json">
   >
 >;
-type _RelationProof015 = Assert<
+type _RelationProof017 = Assert<
   RelationWellFormed<
     RequestBody<"confirmPayment", "application/json">,
     ResponseBody<"confirmPayment", "200", "application/json">,
     ResponseRelation<"confirmPayment", "200", "application/json">
   >
 >;
-type _RelationProof016 = Assert<
+type _RelationProof018 = Assert<
   RelationWellFormed<
     RequestBody<"connectFinancialAccount", "application/json">,
     ResponseBody<"connectFinancialAccount", "200", "application/json">,
     ResponseRelation<"connectFinancialAccount", "200", "application/json">
   >
 >;
-type _RelationProof017 = Assert<
+type _RelationProof019 = Assert<
   RelationWellFormed<
     RequestBody<"createApplication", "application/json">,
     ResponseBody<"createApplication", "200", "application/json">,
     ResponseRelation<"createApplication", "200", "application/json">
   >
 >;
-type _RelationProof018 = Assert<
+type _RelationProof020 = Assert<
   RelationWellFormed<
     RequestBody<"createCustomer", "application/json">,
     ResponseBody<"createCustomer", "200", "application/json">,
     ResponseRelation<"createCustomer", "200", "application/json">
   >
 >;
-type _RelationProof019 = Assert<
+type _RelationProof021 = Assert<
   RelationWellFormed<
     RequestBody<"createFileLink", "application/json">,
     ResponseBody<"createFileLink", "200", "application/json">,
     ResponseRelation<"createFileLink", "200", "application/json">
   >
 >;
-type _RelationProof020 = Assert<
+type _RelationProof022 = Assert<
   RelationWellFormed<
     RequestBody<"createFinancialAccount", "application/json">,
     ResponseBody<"createFinancialAccount", "200", "application/json">,
     ResponseRelation<"createFinancialAccount", "200", "application/json">
   >
 >;
-type _RelationProof021 = Assert<
+type _RelationProof023 = Assert<
   RelationWellFormed<
     RequestBody<"createMessageTemplate", "application/json">,
     ResponseBody<"createMessageTemplate", "200", "application/json">,
     ResponseRelation<"createMessageTemplate", "200", "application/json">
   >
 >;
-type _RelationProof022 = Assert<
+type _RelationProof024 = Assert<
   RelationWellFormed<
     RequestBody<"createOperatingPolicy", "application/json">,
     ResponseBody<"createOperatingPolicy", "200", "application/json">,
     ResponseRelation<"createOperatingPolicy", "200", "application/json">
   >
 >;
-type _RelationProof023 = Assert<
+type _RelationProof025 = Assert<
   RelationWellFormed<
     RequestBody<"createOrder", "application/json">,
     ResponseBody<"createOrder", "200", "application/json">,
     ResponseRelation<"createOrder", "200", "application/json">
   >
 >;
-type _RelationProof024 = Assert<
+type _RelationProof026 = Assert<
   RelationWellFormed<
     RequestBody<"createPrice", "application/json">,
     ResponseBody<"createPrice", "200", "application/json">,
     ResponseRelation<"createPrice", "200", "application/json">
   >
 >;
-type _RelationProof025 = Assert<
+type _RelationProof027 = Assert<
   RelationWellFormed<
     RequestBody<"createProduct", "application/json">,
     ResponseBody<"createProduct", "200", "application/json">,
     ResponseRelation<"createProduct", "200", "application/json">
   >
 >;
-type _RelationProof026 = Assert<
+type _RelationProof028 = Assert<
   RelationWellFormed<
     RequestBody<"createRefund", "application/json">,
     ResponseBody<"createRefund", "200", "application/json">,
     ResponseRelation<"createRefund", "200", "application/json">
   >
 >;
-type _RelationProof027 = Assert<
+type _RelationProof029 = Assert<
   RelationWellFormed<
     RequestBody<"createUploadRequest", "application/json">,
     ResponseBody<"createUploadRequest", "200", "application/json">,
     ResponseRelation<"createUploadRequest", "200", "application/json">
   >
 >;
-type _RelationProof028 = Assert<
+type _RelationProof030 = Assert<
   RelationWellFormed<
     RequestBody<"deactivatePrice", "application/json">,
     ResponseBody<"deactivatePrice", "200", "application/json">,
     ResponseRelation<"deactivatePrice", "200", "application/json">
   >
 >;
-type _RelationProof029 = Assert<
+type _RelationProof031 = Assert<
   RelationWellFormed<
     RequestBody<"deleteFile", "application/json">,
     ResponseBody<"deleteFile", "200", "application/json">,
     ResponseRelation<"deleteFile", "200", "application/json">
   >
 >;
-type _RelationProof030 = Assert<
+type _RelationProof032 = Assert<
   RelationWellFormed<
     RequestBody<"destroySecretKey", "application/json">,
     ResponseBody<"destroySecretKey", "200", "application/json">,
     ResponseRelation<"destroySecretKey", "200", "application/json">
   >
 >;
-type _RelationProof031 = Assert<
+type _RelationProof033 = Assert<
   RelationWellFormed<
     RequestBody<"disableAutomaticPayouts", "application/json">,
     ResponseBody<"disableAutomaticPayouts", "200", "application/json">,
     ResponseRelation<"disableAutomaticPayouts", "200", "application/json">
   >
 >;
-type _RelationProof032 = Assert<
+type _RelationProof034 = Assert<
   RelationWellFormed<
     RequestBody<"disableFinancialAccountPull", "application/json">,
     ResponseBody<"disableFinancialAccountPull", "200", "application/json">,
     ResponseRelation<"disableFinancialAccountPull", "200", "application/json">
   >
 >;
-type _RelationProof033 = Assert<
+type _RelationProof035 = Assert<
   RelationWellFormed<
     RequestBody<"disableFinancialAccountPush", "application/json">,
     ResponseBody<"disableFinancialAccountPush", "200", "application/json">,
     ResponseRelation<"disableFinancialAccountPush", "200", "application/json">
   >
 >;
-type _RelationProof034 = Assert<
+type _RelationProof036 = Assert<
   RelationWellFormed<
     RequestBody<"disactivatePaymentMethod", "application/json">,
     ResponseBody<"disactivatePaymentMethod", "200", "application/json">,
     ResponseRelation<"disactivatePaymentMethod", "200", "application/json">
   >
 >;
-type _RelationProof035 = Assert<
+type _RelationProof037 = Assert<
   RelationWellFormed<
     RequestBody<"disconnectFinancialAccount", "application/json">,
     ResponseBody<"disconnectFinancialAccount", "200", "application/json">,
     ResponseRelation<"disconnectFinancialAccount", "200", "application/json">
   >
 >;
-type _RelationProof036 = Assert<
+type _RelationProof038 = Assert<
   RelationWellFormed<
     RequestBody<"enableFinancialAccountPull", "application/json">,
     ResponseBody<"enableFinancialAccountPull", "200", "application/json">,
     ResponseRelation<"enableFinancialAccountPull", "200", "application/json">
   >
 >;
-type _RelationProof037 = Assert<
+type _RelationProof039 = Assert<
   RelationWellFormed<
     RequestBody<"enableFinancialAccountPush", "application/json">,
     ResponseBody<"enableFinancialAccountPush", "200", "application/json">,
     ResponseRelation<"enableFinancialAccountPush", "200", "application/json">
   >
 >;
-type _RelationProof038 = Assert<
+type _RelationProof040 = Assert<
   RelationWellFormed<
     RequestBody<"finalizeOrder", "application/json">,
     ResponseBody<"finalizeOrder", "200", "application/json">,
     ResponseRelation<"finalizeOrder", "200", "application/json">
   >
 >;
-type _RelationProof039 = Assert<
+type _RelationProof041 = Assert<
   RelationWellFormed<
     RequestBody<"generateSecretKey", "application/json">,
     ResponseBody<"generateSecretKey", "200", "application/json">,
     ResponseRelation<"generateSecretKey", "200", "application/json">
   >
 >;
-type _RelationProof040 = Assert<
+type _RelationProof042 = Assert<
   RelationWellFormed<
     RequestBody<"initiateOTP", "application/json">,
     ResponseBody<"initiateOTP", "200", "application/json">,
     ResponseRelation<"initiateOTP", "200", "application/json">
   >
 >;
-type _RelationProof041 = Assert<
+type _RelationProof043 = Assert<
   RelationWellFormed<
     RequestBody<"lookupBalanceTransaction", "application/json">,
     ResponseBody<"lookupBalanceTransaction", "200", "application/json">,
     ResponseRelation<"lookupBalanceTransaction", "200", "application/json">
   >
 >;
-type _RelationProof042 = Assert<
+type _RelationProof044 = Assert<
   RelationWellFormed<
     RequestBody<"lookupBroadcast", "application/json">,
     ResponseBody<"lookupBroadcast", "200", "application/json">,
     ResponseRelation<"lookupBroadcast", "200", "application/json">
   >
 >;
-type _RelationProof043 = Assert<
+type _RelationProof045 = Assert<
   RelationWellFormed<
     RequestBody<"lookupCheckoutResource", "application/json">,
     ResponseBody<"lookupCheckoutResource", "200", "application/json">,
     ResponseRelation<"lookupCheckoutResource", "200", "application/json">
   >
 >;
-type _RelationProof044 = Assert<
+type _RelationProof046 = Assert<
   RelationWellFormed<
     RequestBody<"lookupChildrenPolicy", "application/json">,
     ResponseBody<"lookupChildrenPolicy", "200", "application/json">,
     ResponseRelation<"lookupChildrenPolicy", "200", "application/json">
   >
 >;
-type _RelationProof045 = Assert<
+type _RelationProof047 = Assert<
   RelationWellFormed<
     RequestBody<"lookupChime", "application/json">,
     ResponseBody<"lookupChime", "200", "application/json">,
     ResponseRelation<"lookupChime", "200", "application/json">
   >
 >;
-type _RelationProof046 = Assert<
+type _RelationProof048 = Assert<
   RelationWellFormed<
     RequestBody<"lookupCustomer", "application/json">,
     ResponseBody<"lookupCustomer", "200", "application/json">,
     ResponseRelation<"lookupCustomer", "200", "application/json">
   >
 >;
-type _RelationProof047 = Assert<
+type _RelationProof049 = Assert<
   RelationWellFormed<
     RequestBody<"lookupFile", "application/json">,
     ResponseBody<"lookupFile", "200", "application/json">,
     ResponseRelation<"lookupFile", "200", "application/json">
   >
 >;
-type _RelationProof048 = Assert<
+type _RelationProof050 = Assert<
   RelationWellFormed<
     RequestBody<"lookupFileLink", "application/json">,
     ResponseBody<"lookupFileLink", "200", "application/json">,
     ResponseRelation<"lookupFileLink", "200", "application/json">
   >
 >;
-type _RelationProof049 = Assert<
+type _RelationProof051 = Assert<
   RelationWellFormed<
     RequestBody<"lookupFinancialAccount", "application/json">,
     ResponseBody<"lookupFinancialAccount", "200", "application/json">,
     ResponseRelation<"lookupFinancialAccount", "200", "application/json">
   >
 >;
-type _RelationProof050 = Assert<
+type _RelationProof052 = Assert<
   RelationWellFormed<
     RequestBody<"lookupMessageTemplate", "application/json">,
     ResponseBody<"lookupMessageTemplate", "200", "application/json">,
     ResponseRelation<"lookupMessageTemplate", "200", "application/json">
   >
 >;
-type _RelationProof051 = Assert<
+type _RelationProof053 = Assert<
   RelationWellFormed<
     RequestBody<"lookupOperatingPolicy", "application/json">,
     ResponseBody<"lookupOperatingPolicy", "200", "application/json">,
     ResponseRelation<"lookupOperatingPolicy", "200", "application/json">
   >
 >;
-type _RelationProof052 = Assert<
+type _RelationProof054 = Assert<
   RelationWellFormed<
     RequestBody<"lookupOrder", "application/json">,
     ResponseBody<"lookupOrder", "200", "application/json">,
     ResponseRelation<"lookupOrder", "200", "application/json">
   >
 >;
-type _RelationProof053 = Assert<
+type _RelationProof055 = Assert<
   RelationWellFormed<
     RequestBody<"lookupOTP", "application/json">,
     ResponseBody<"lookupOTP", "200", "application/json">,
     ResponseRelation<"lookupOTP", "200", "application/json">
   >
 >;
-type _RelationProof054 = Assert<
+type _RelationProof056 = Assert<
   RelationWellFormed<
     RequestBody<"lookupPaymentMethod", "application/json">,
     ResponseBody<"lookupPaymentMethod", "200", "application/json">,
     ResponseRelation<"lookupPaymentMethod", "200", "application/json">
   >
 >;
-type _RelationProof055 = Assert<
+type _RelationProof057 = Assert<
+  RelationWellFormed<
+    RequestBody<"lookupPayout", "application/json">,
+    ResponseBody<"lookupPayout", "200", "application/json">,
+    ResponseRelation<"lookupPayout", "200", "application/json">
+  >
+>;
+type _RelationProof058 = Assert<
   RelationWellFormed<
     RequestBody<"lookupPrice", "application/json">,
     ResponseBody<"lookupPrice", "200", "application/json">,
     ResponseRelation<"lookupPrice", "200", "application/json">
   >
 >;
-type _RelationProof056 = Assert<
+type _RelationProof059 = Assert<
   RelationWellFormed<
     RequestBody<"lookupProduct", "application/json">,
     ResponseBody<"lookupProduct", "200", "application/json">,
     ResponseRelation<"lookupProduct", "200", "application/json">
   >
 >;
-type _RelationProof057 = Assert<
+type _RelationProof060 = Assert<
+  RelationWellFormed<
+    RequestBody<"lookupPurchaseIntent", "application/json">,
+    ResponseBody<"lookupPurchaseIntent", "200", "application/json">,
+    ResponseRelation<"lookupPurchaseIntent", "200", "application/json">
+  >
+>;
+type _RelationProof061 = Assert<
   RelationWellFormed<
     RequestBody<"lookupRefund", "application/json">,
     ResponseBody<"lookupRefund", "200", "application/json">,
     ResponseRelation<"lookupRefund", "200", "application/json">
   >
 >;
-type _RelationProof058 = Assert<
+type _RelationProof062 = Assert<
   RelationWellFormed<
     RequestBody<"lookupSchedule", "application/json">,
     ResponseBody<"lookupSchedule", "200", "application/json">,
     ResponseRelation<"lookupSchedule", "200", "application/json">
   >
 >;
-type _RelationProof059 = Assert<
+type _RelationProof063 = Assert<
   RelationWellFormed<
     RequestBody<"lookupSecretKey", "application/json">,
     ResponseBody<"lookupSecretKey", "200", "application/json">,
     ResponseRelation<"lookupSecretKey", "200", "application/json">
   >
 >;
-type _RelationProof060 = Assert<
+type _RelationProof064 = Assert<
   RelationWellFormed<
     RequestBody<"lookupSecretKeyUsage", "application/json">,
     ResponseBody<"lookupSecretKeyUsage", "200", "application/json">,
     ResponseRelation<"lookupSecretKeyUsage", "200", "application/json">
   >
 >;
-type _RelationProof061 = Assert<
+type _RelationProof065 = Assert<
   RelationWellFormed<
     RequestBody<"lookupUploadRequest", "application/json">,
     ResponseBody<"lookupUploadRequest", "200", "application/json">,
     ResponseRelation<"lookupUploadRequest", "200", "application/json">
   >
 >;
-type _RelationProof062 = Assert<
+type _RelationProof066 = Assert<
   RelationWellFormed<
     RequestBody<"pageBalanceTransactions", "application/json">,
     ResponseBody<"pageBalanceTransactions", "200", "application/json">,
     ResponseRelation<"pageBalanceTransactions", "200", "application/json">
   >
 >;
-type _RelationProof063 = Assert<
+type _RelationProof067 = Assert<
   RelationWellFormed<
     RequestBody<"pageChildrenPolicyVersions", "application/json">,
     ResponseBody<"pageChildrenPolicyVersions", "200", "application/json">,
     ResponseRelation<"pageChildrenPolicyVersions", "200", "application/json">
   >
 >;
-type _RelationProof064 = Assert<
+type _RelationProof068 = Assert<
   RelationWellFormed<
     RequestBody<"pageChimes", "application/json">,
     ResponseBody<"pageChimes", "200", "application/json">,
     ResponseRelation<"pageChimes", "200", "application/json">
   >
 >;
-type _RelationProof065 = Assert<
+type _RelationProof069 = Assert<
   RelationWellFormed<
     RequestBody<"pageCustomers", "application/json">,
     ResponseBody<"pageCustomers", "200", "application/json">,
     ResponseRelation<"pageCustomers", "200", "application/json">
   >
 >;
-type _RelationProof066 = Assert<
+type _RelationProof070 = Assert<
   RelationWellFormed<
     RequestBody<"pageFileLinks", "application/json">,
     ResponseBody<"pageFileLinks", "200", "application/json">,
     ResponseRelation<"pageFileLinks", "200", "application/json">
   >
 >;
-type _RelationProof067 = Assert<
+type _RelationProof071 = Assert<
   RelationWellFormed<
     RequestBody<"pageFiles", "application/json">,
     ResponseBody<"pageFiles", "200", "application/json">,
     ResponseRelation<"pageFiles", "200", "application/json">
   >
 >;
-type _RelationProof068 = Assert<
+type _RelationProof072 = Assert<
   RelationWellFormed<
     RequestBody<"pageFinancialAccounts", "application/json">,
     ResponseBody<"pageFinancialAccounts", "200", "application/json">,
     ResponseRelation<"pageFinancialAccounts", "200", "application/json">
   >
 >;
-type _RelationProof069 = Assert<
+type _RelationProof073 = Assert<
   RelationWellFormed<
     RequestBody<"pageMessageTemplates", "application/json">,
     ResponseBody<"pageMessageTemplates", "200", "application/json">,
     ResponseRelation<"pageMessageTemplates", "200", "application/json">
   >
 >;
-type _RelationProof070 = Assert<
+type _RelationProof074 = Assert<
   RelationWellFormed<
     RequestBody<"pageOperatingPolicyVersions", "application/json">,
     ResponseBody<"pageOperatingPolicyVersions", "200", "application/json">,
     ResponseRelation<"pageOperatingPolicyVersions", "200", "application/json">
   >
 >;
-type _RelationProof071 = Assert<
+type _RelationProof075 = Assert<
   RelationWellFormed<
     RequestBody<"pageOrders", "application/json">,
     ResponseBody<"pageOrders", "200", "application/json">,
     ResponseRelation<"pageOrders", "200", "application/json">
   >
 >;
-type _RelationProof072 = Assert<
+type _RelationProof076 = Assert<
   RelationWellFormed<
     RequestBody<"pagePaymentMethods", "application/json">,
     ResponseBody<"pagePaymentMethods", "200", "application/json">,
     ResponseRelation<"pagePaymentMethods", "200", "application/json">
   >
 >;
-type _RelationProof073 = Assert<
+type _RelationProof077 = Assert<
   RelationWellFormed<
     RequestBody<"pagePayouts", "application/json">,
     ResponseBody<"pagePayouts", "200", "application/json">,
     ResponseRelation<"pagePayouts", "200", "application/json">
   >
 >;
-type _RelationProof074 = Assert<
+type _RelationProof078 = Assert<
   RelationWellFormed<
     RequestBody<"pagePrices", "application/json">,
     ResponseBody<"pagePrices", "200", "application/json">,
     ResponseRelation<"pagePrices", "200", "application/json">
   >
 >;
-type _RelationProof075 = Assert<
+type _RelationProof079 = Assert<
   RelationWellFormed<
     RequestBody<"pageProducts", "application/json">,
     ResponseBody<"pageProducts", "200", "application/json">,
     ResponseRelation<"pageProducts", "200", "application/json">
   >
 >;
-type _RelationProof076 = Assert<
+type _RelationProof080 = Assert<
+  RelationWellFormed<
+    RequestBody<"pagePurchaseIntents", "application/json">,
+    ResponseBody<"pagePurchaseIntents", "200", "application/json">,
+    ResponseRelation<"pagePurchaseIntents", "200", "application/json">
+  >
+>;
+type _RelationProof081 = Assert<
   RelationWellFormed<
     RequestBody<"pageRefunds", "application/json">,
     ResponseBody<"pageRefunds", "200", "application/json">,
     ResponseRelation<"pageRefunds", "200", "application/json">
   >
 >;
-type _RelationProof077 = Assert<
+type _RelationProof082 = Assert<
   RelationWellFormed<
     RequestBody<"pageUploadRequests", "application/json">,
     ResponseBody<"pageUploadRequests", "200", "application/json">,
     ResponseRelation<"pageUploadRequests", "200", "application/json">
   >
 >;
-type _RelationProof078 = Assert<
+type _RelationProof083 = Assert<
   RelationWellFormed<
     RequestBody<"payCheckout", "application/json">,
     ResponseBody<"payCheckout", "200", "application/json">,
     ResponseRelation<"payCheckout", "200", "application/json">
   >
 >;
-type _RelationProof079 = Assert<
+type _RelationProof084 = Assert<
   RelationWellFormed<
     RequestBody<"payOrder", "application/json">,
     ResponseBody<"payOrder", "200", "application/json">,
     ResponseRelation<"payOrder", "200", "application/json">
   >
 >;
-type _RelationProof080 = Assert<
+type _RelationProof085 = Assert<
   RelationWellFormed<
     RequestBody<"publishMessageTemplate", "application/json">,
     ResponseBody<"publishMessageTemplate", "200", "application/json">,
     ResponseRelation<"publishMessageTemplate", "200", "application/json">
   >
 >;
-type _RelationProof081 = Assert<
+type _RelationProof086 = Assert<
   RelationWellFormed<
     RequestBody<"publishProduct", "application/json">,
     ResponseBody<"publishProduct", "200", "application/json">,
     ResponseRelation<"publishProduct", "200", "application/json">
   >
 >;
-type _RelationProof082 = Assert<
+type _RelationProof087 = Assert<
   RelationWellFormed<
     RequestBody<"reconcileFileReferences", "application/json">,
     ResponseBody<"reconcileFileReferences", "200", "application/json">,
     ResponseRelation<"reconcileFileReferences", "200", "application/json">
   >
 >;
-type _RelationProof083 = Assert<
+type _RelationProof088 = Assert<
   RelationWellFormed<
     RequestBody<"reconnectFinancialAccount", "application/json">,
     ResponseBody<"reconnectFinancialAccount", "200", "application/json">,
     ResponseRelation<"reconnectFinancialAccount", "200", "application/json">
   >
 >;
-type _RelationProof084 = Assert<
+type _RelationProof089 = Assert<
   RelationWellFormed<
     RequestBody<"renderMessageTemplatePreview", "application/json">,
     ResponseBody<"renderMessageTemplatePreview", "200", "application/json">,
     ResponseRelation<"renderMessageTemplatePreview", "200", "application/json">
   >
 >;
-type _RelationProof085 = Assert<
+type _RelationProof090 = Assert<
   RelationWellFormed<
     RequestBody<"requestCheckoutConfirmation", "application/json">,
     ResponseBody<"requestCheckoutConfirmation", "200", "application/json">,
     ResponseRelation<"requestCheckoutConfirmation", "200", "application/json">
   >
 >;
-type _RelationProof086 = Assert<
+type _RelationProof091 = Assert<
   RelationWellFormed<
     RequestBody<"requestConfirmation", "application/json">,
     ResponseBody<"requestConfirmation", "200", "application/json">,
     ResponseRelation<"requestConfirmation", "200", "application/json">
   >
 >;
-type _RelationProof087 = Assert<
+type _RelationProof092 = Assert<
   RelationWellFormed<
     RequestBody<"reviewUploadRequestAttempt", "application/json">,
     ResponseBody<"reviewUploadRequestAttempt", "200", "application/json">,
     ResponseRelation<"reviewUploadRequestAttempt", "200", "application/json">
   >
 >;
-type _RelationProof088 = Assert<
+type _RelationProof093 = Assert<
   RelationWellFormed<
     RequestBody<"revokeFileLink", "application/json">,
     ResponseBody<"revokeFileLink", "200", "application/json">,
     ResponseRelation<"revokeFileLink", "200", "application/json">
   >
 >;
-type _RelationProof089 = Assert<
+type _RelationProof094 = Assert<
   RelationWellFormed<
     RequestBody<"scheduleChime", "application/json">,
     ResponseBody<"scheduleChime", "200", "application/json">,
     ResponseRelation<"scheduleChime", "200", "application/json">
   >
 >;
-type _RelationProof090 = Assert<
+type _RelationProof095 = Assert<
+  RelationWellFormed<
+    RequestBody<"schedulePayout", "application/json">,
+    ResponseBody<"schedulePayout", "200", "application/json">,
+    ResponseRelation<"schedulePayout", "200", "application/json">
+  >
+>;
+type _RelationProof096 = Assert<
   RelationWellFormed<
     RequestBody<"searchCustomers", "application/json">,
     ResponseBody<"searchCustomers", "200", "application/json">,
     ResponseRelation<"searchCustomers", "200", "application/json">
   >
 >;
-type _RelationProof091 = Assert<
+type _RelationProof097 = Assert<
   RelationWellFormed<
     RequestBody<"searchFinancialAccounts", "application/json">,
     ResponseBody<"searchFinancialAccounts", "200", "application/json">,
     ResponseRelation<"searchFinancialAccounts", "200", "application/json">
   >
 >;
-type _RelationProof092 = Assert<
+type _RelationProof098 = Assert<
   RelationWellFormed<
     RequestBody<"searchOrders", "application/json">,
     ResponseBody<"searchOrders", "200", "application/json">,
     ResponseRelation<"searchOrders", "200", "application/json">
   >
 >;
-type _RelationProof093 = Assert<
+type _RelationProof099 = Assert<
   RelationWellFormed<
     RequestBody<"searchPayouts", "application/json">,
     ResponseBody<"searchPayouts", "200", "application/json">,
     ResponseRelation<"searchPayouts", "200", "application/json">
   >
 >;
-type _RelationProof094 = Assert<
+type _RelationProof100 = Assert<
   RelationWellFormed<
     RequestBody<"searchProducts", "application/json">,
     ResponseBody<"searchProducts", "200", "application/json">,
     ResponseRelation<"searchProducts", "200", "application/json">
   >
 >;
-type _RelationProof095 = Assert<
+type _RelationProof101 = Assert<
   RelationWellFormed<
     RequestBody<"selectCheckoutAmount", "application/json">,
     ResponseBody<"selectCheckoutAmount", "200", "application/json">,
     ResponseRelation<"selectCheckoutAmount", "200", "application/json">
   >
 >;
-type _RelationProof096 = Assert<
+type _RelationProof102 = Assert<
   RelationWellFormed<
     RequestBody<"sendChime", "application/json">,
     ResponseBody<"sendChime", "200", "application/json">,
     ResponseRelation<"sendChime", "200", "application/json">
   >
 >;
-type _RelationProof097 = Assert<
+type _RelationProof103 = Assert<
+  RelationWellFormed<
+    RequestBody<"sendOrderInvoice", "application/json">,
+    ResponseBody<"sendOrderInvoice", "200", "application/json">,
+    ResponseRelation<"sendOrderInvoice", "200", "application/json">
+  >
+>;
+type _RelationProof104 = Assert<
+  RelationWellFormed<
+    RequestBody<"sendOrderInvoice", "application/json">,
+    ResponseBody<"sendOrderInvoice", "207", "application/json">,
+    ResponseRelation<"sendOrderInvoice", "207", "application/json">
+  >
+>;
+type _RelationProof105 = Assert<
+  RelationWellFormed<
+    RequestBody<"sendOrderReceipt", "application/json">,
+    ResponseBody<"sendOrderReceipt", "200", "application/json">,
+    ResponseRelation<"sendOrderReceipt", "200", "application/json">
+  >
+>;
+type _RelationProof106 = Assert<
+  RelationWellFormed<
+    RequestBody<"sendOrderReceipt", "application/json">,
+    ResponseBody<"sendOrderReceipt", "207", "application/json">,
+    ResponseRelation<"sendOrderReceipt", "207", "application/json">
+  >
+>;
+type _RelationProof107 = Assert<
   RelationWellFormed<
     RequestBody<"setPayoutDestinations", "application/json">,
     ResponseBody<"setPayoutDestinations", "200", "application/json">,
     ResponseRelation<"setPayoutDestinations", "200", "application/json">
   >
 >;
-type _RelationProof098 = Assert<
+type _RelationProof108 = Assert<
+  RelationWellFormed<
+    RequestBody<"tokenizePaymentMethod", "application/json">,
+    ResponseBody<"tokenizePaymentMethod", "200", "application/json">,
+    ResponseRelation<"tokenizePaymentMethod", "200", "application/json">
+  >
+>;
+type _RelationProof109 = Assert<
   RelationWellFormed<
     RequestBody<"unarchivePaymentMethod", "application/json">,
     ResponseBody<"unarchivePaymentMethod", "200", "application/json">,
     ResponseRelation<"unarchivePaymentMethod", "200", "application/json">
   >
 >;
-type _RelationProof099 = Assert<
+type _RelationProof110 = Assert<
   RelationWellFormed<
     RequestBody<"unpublishProduct", "application/json">,
     ResponseBody<"unpublishProduct", "200", "application/json">,
     ResponseRelation<"unpublishProduct", "200", "application/json">
   >
 >;
-type _RelationProof100 = Assert<
+type _RelationProof111 = Assert<
   RelationWellFormed<
     RequestBody<"updateApplication", "application/json">,
     ResponseBody<"updateApplication", "200", "application/json">,
     ResponseRelation<"updateApplication", "200", "application/json">
   >
 >;
-type _RelationProof101 = Assert<
+type _RelationProof112 = Assert<
   RelationWellFormed<
     RequestBody<"updateCustomer", "application/json">,
     ResponseBody<"updateCustomer", "200", "application/json">,
     ResponseRelation<"updateCustomer", "200", "application/json">
   >
 >;
-type _RelationProof102 = Assert<
+type _RelationProof113 = Assert<
   RelationWellFormed<
     RequestBody<"updateFinancialAccount", "application/json">,
     ResponseBody<"updateFinancialAccount", "200", "application/json">,
     ResponseRelation<"updateFinancialAccount", "200", "application/json">
   >
 >;
-type _RelationProof103 = Assert<
+type _RelationProof114 = Assert<
   RelationWellFormed<
     RequestBody<"updateMessageTemplate", "application/json">,
     ResponseBody<"updateMessageTemplate", "200", "application/json">,
     ResponseRelation<"updateMessageTemplate", "200", "application/json">
   >
 >;
-type _RelationProof104 = Assert<
+type _RelationProof115 = Assert<
   RelationWellFormed<
     RequestBody<"updateOperatingPolicy", "application/json">,
     ResponseBody<"updateOperatingPolicy", "200", "application/json">,
     ResponseRelation<"updateOperatingPolicy", "200", "application/json">
   >
 >;
-type _RelationProof105 = Assert<
+type _RelationProof116 = Assert<
   RelationWellFormed<
     RequestBody<"updateOrder", "application/json">,
     ResponseBody<"updateOrder", "200", "application/json">,
     ResponseRelation<"updateOrder", "200", "application/json">
   >
 >;
-type _RelationProof106 = Assert<
+type _RelationProof117 = Assert<
   RelationWellFormed<
     RequestBody<"updatePaymentMethod", "application/json">,
     ResponseBody<"updatePaymentMethod", "200", "application/json">,
     ResponseRelation<"updatePaymentMethod", "200", "application/json">
   >
 >;
-type _RelationProof107 = Assert<
+type _RelationProof118 = Assert<
   RelationWellFormed<
     RequestBody<"updatePrice", "application/json">,
     ResponseBody<"updatePrice", "200", "application/json">,
     ResponseRelation<"updatePrice", "200", "application/json">
   >
 >;
-type _RelationProof108 = Assert<
+type _RelationProof119 = Assert<
   RelationWellFormed<
     RequestBody<"updateProduct", "application/json">,
     ResponseBody<"updateProduct", "200", "application/json">,
     ResponseRelation<"updateProduct", "200", "application/json">
   >
 >;
-type _RelationProof109 = Assert<
+type _RelationProof120 = Assert<
+  RelationWellFormed<
+    RequestBody<"updatePurchaseIntent", "application/json">,
+    ResponseBody<"updatePurchaseIntent", "200", "application/json">,
+    ResponseRelation<"updatePurchaseIntent", "200", "application/json">
+  >
+>;
+type _RelationProof121 = Assert<
   RelationWellFormed<
     RequestBody<"updateSecretKey", "application/json">,
     ResponseBody<"updateSecretKey", "200", "application/json">,
     ResponseRelation<"updateSecretKey", "200", "application/json">
   >
 >;
-type _RelationProof110 = Assert<
+type _RelationProof122 = Assert<
   RelationWellFormed<
     RequestBody<"verifyOTP", "application/json">,
     ResponseBody<"verifyOTP", "200", "application/json">,

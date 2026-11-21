@@ -49,6 +49,13 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/TokenizePaymentMethodResponse'
+                            # Why: tokenization cannot change the owning customer or selected rail.
+                            # The response schema separately proves that its account display is masked.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /customer_id, to: /payment_method/customer_id }
+                                    - { from: /type, to: /payment_method/type }
+                                    - { from: /mobile_money/network, to: /payment_method/mobile_money/network }
                             # Why: this exact outcome proves that a successful tokenization never
                             # exposes the raw wallet number and keeps its masked fields coherent.
                             examples:

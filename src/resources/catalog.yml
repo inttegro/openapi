@@ -697,7 +697,9 @@ paths:
                             # Why: this operation must return a result reachable from the caller-selected resource or page.
                             x-simile-from-request:
                                 bindings:
-                                    - { from: /page_number, to: /page/number }
+                                    # Why: an omitted page number has the same public meaning as page one, and
+                                    # response synthesis must preserve that documented default deterministically.
+                                    - { from: /page_number, to: /page/number, default: 1 }
                 '401':
                     description: Unauthorized - invalid or missing API key
                     headers:

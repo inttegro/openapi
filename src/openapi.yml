@@ -5,8 +5,8 @@ info:
     description: Machine-readable reference for the public Inttegro API
     # Why: contract and client artifacts are reviewed as one immutable bundle;
     # changing soundness rules or executable examples requires a new bundle identity.
-    version: 0.1.0-beta91
-    x-inttegro-collection-version: 0.1.0-beta91
+    version: 0.1.0-beta95
+    x-inttegro-collection-version: 0.1.0-beta95
     contact:
         name: Inttegro Engineering
         url: "https://inttegro.com"

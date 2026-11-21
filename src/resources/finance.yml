@@ -1209,6 +1209,12 @@ paths:
                                                     required: [scheduled_at]
                                                     properties:
                                                         status: { type: string, enum: [scheduled] }
+                            # Why: scheduling chooses the durable destination and merchant reference; both
+                            # must survive into the scheduled payout snapshot returned to the caller.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /destination_id, to: /payout/destination_id }
+                                    - { from: /reference, to: /payout/reference }
                 '400':
                     description: Bad request - invalid schedule parameters
                     headers:
@@ -1293,6 +1299,10 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/PayoutResponse'
+                            # Why: a successful lookup must return the exact payout selected by its typed ID.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /payout_id, to: /payout/id }
                 '400':
                     description: Bad request - invalid payout identifier
                     headers:
@@ -1776,6 +1786,11 @@ paths:
                                                     required: [canceled_at, cancellation, scheduled_at]
                                                     properties:
                                                         status: { type: string, enum: [canceled] }
+                            # Why: cancellation changes the selected payout's lifecycle; it must not synthesize
+                            # a valid canceled snapshot for a different payout.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /payout_id, to: /payout/id }
                 '401':
                     description: Unauthorized - missing or invalid API key
                     headers:

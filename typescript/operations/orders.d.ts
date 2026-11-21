@@ -3377,6 +3377,50 @@ export interface OrdersResponseRelations {
       };
     };
   };
+  readonly "sendOrderInvoice": {
+    readonly "200": {
+      readonly "application/json": {
+        readonly "bindings": readonly [
+          {
+            readonly "from": "/order_id";
+            readonly "to": "/order/id";
+          },
+        ];
+      };
+    };
+    readonly "207": {
+      readonly "application/json": {
+        readonly "bindings": readonly [
+          {
+            readonly "from": "/order_id";
+            readonly "to": "/order/id";
+          },
+        ];
+      };
+    };
+  };
+  readonly "sendOrderReceipt": {
+    readonly "200": {
+      readonly "application/json": {
+        readonly "bindings": readonly [
+          {
+            readonly "from": "/order_id";
+            readonly "to": "/order/id";
+          },
+        ];
+      };
+    };
+    readonly "207": {
+      readonly "application/json": {
+        readonly "bindings": readonly [
+          {
+            readonly "from": "/order_id";
+            readonly "to": "/order/id";
+          },
+        ];
+      };
+    };
+  };
   readonly "updateOrder": {
     readonly "200": {
       readonly "application/json": {

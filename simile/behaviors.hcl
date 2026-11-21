@@ -136,3 +136,27 @@ scenario "order_receipt_partially_sent" {
     outcome = "receipt_partially_sent"
   }
 }
+
+# Why: redirect delivery is a caller-controlled public mode, so the emulator can select the
+# declared bodyless response deterministically without reproducing storage-provider policy.
+behavior "streamFileContents" {
+  outcome "redirect" {
+    description = "Redirect to the file's public or short-lived delivery URL."
+    status      = 303
+
+    when {
+      path   = "/delivery"
+      equals = "redirect"
+    }
+  }
+}
+
+# Why: public-link delivery policy is intentionally opaque; this scenario exposes the observable
+# redirect branch without publishing private provider or storage decisions.
+scenario "file_link_redirect" {
+  description = "Return the declared public file-link redirect."
+
+  select "openFileLink" {
+    outcome = "redirect"
+  }
+}
