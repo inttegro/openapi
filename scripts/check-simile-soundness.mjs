@@ -37,6 +37,7 @@ const constrainedObjects = [
   ["components", "schemas", "CustomerSelectedAmount"],
   ["components", "schemas", "MessageTemplatesPage"],
   ["components", "schemas", "OrderDocumentDelivery"],
+  ["components", "schemas", "OrderDocumentPartialDelivery"],
   ["components", "schemas", "PaymentMethodPageResponse", "properties", "page"],
   ["components", "schemas", "CheckoutOrder"],
   ["components", "schemas", "CheckoutOrder", "properties", "payment"],
@@ -156,6 +157,34 @@ function schemaSynthesisSeed(location) {
   if (locationLabel === "PurchaseIntent") {
     return document.paths["/purchase_intents/create"].post.responses["200"]
       .content["application/json"].examples.created.value.purchase_intent;
+  }
+  if (locationLabel === "OrderDocumentPartialDelivery") {
+    return {
+      deliveries: [{ channel: "email", chime_id: "ch_soundness_email" }],
+      document_kind: "invoice",
+      document_url: "https://pages.inttegro.com/invoices/or_soundness",
+      failed_channels: ["sms"],
+      failures: [{ channel: "sms", error: "Delivery was not accepted" }],
+      sent_channels: ["email"],
+    };
+  }
+  if (locationLabel === "Payout") {
+    return {
+      amount: { currency: "ghs", value: 10_000 },
+      balance_transactions: [{
+        allocated_amount: { currency: "ghs", value: 10_000 },
+        amount: { currency: "ghs", value: 20_000 },
+        id: "bt_soundness_contribution",
+        status: "reserved",
+      }],
+      destination_id: "fa_soundness_destination",
+      execute_after: "2026-11-21T10:00:00Z",
+      id: "po_soundness",
+      initiated_at: "2026-11-20T10:00:00Z",
+      max_amount: { currency: "ghs", value: 20_000 },
+      scheduled_at: "2026-11-20T10:01:00Z",
+      status: "scheduled",
+    };
   }
   return undefined;
 }

@@ -147,6 +147,8 @@ try {
       contractPath,
       "--operation-id",
       syntheticOperationId,
+      "--outcome",
+      "witness",
       "--heuristics",
       "off",
       "--output",
@@ -166,6 +168,8 @@ try {
       syntheticOperationId,
       "--request",
       soundPath,
+      "--outcome",
+      "witness",
       "--output",
       "json",
     ], `${operationId} ${status} rejected its synthesized sound payload`);
@@ -179,6 +183,8 @@ try {
       syntheticOperationId,
       "--request",
       unsoundPath,
+      "--outcome",
+      "witness",
       "--output",
       "json",
     ], `${operationId} ${status} accepted an operation-inapplicable error`, false);
@@ -203,6 +209,7 @@ function projectedContract() {
     const schema = reference === "#/components/schemas/UploadRequestValidationErrorResponse"
       ? uploadValidationErrorProjection(sourceSchema)
       : structuredClone(sourceSchema);
+    const witness = operationErrorWitness(operationId, status, reference);
     paths[`/__simile_operation_error/${index}`] = {
       post: {
         operationId: `simileOperationError${index}`,
@@ -213,7 +220,14 @@ function projectedContract() {
         responses: {
           "200": {
             description: "Synthetic operation-specific error response",
-            content: { "application/json": { schema } },
+            content: {
+              "application/json": {
+                schema,
+                // Why: exact coherent tuples exercise each wrapper without relying on finite
+                // search through the global Error union, which is orthogonal to this projection.
+                examples: { witness: { value: witness } },
+              },
+            },
           },
         },
       },
@@ -225,6 +239,22 @@ function projectedContract() {
     paths,
     components: document.components,
   };
+}
+
+function operationErrorWitness(operationId, status, reference) {
+  const allowed = operationErrorCodes[operationId][status];
+  if (reference === "#/components/schemas/UploadRequestValidationErrorResponse") {
+    return { error: { code: allowed[0], message: "The upload request is invalid.", retryable: false } };
+  }
+  const variant = selectTupleVariants(operationId, status, allowed)[0];
+  const error = {
+    cause: variant.properties.cause.enum[0],
+    code: variant.properties.code.enum[0],
+    fix_code: variant.properties.fix_code.enum[0],
+    type: variant.properties.type.enum[0],
+    url: variant.properties.url.enum[0],
+  };
+  return directErrorSchemas.has(reference) ? error : { error };
 }
 
 function uploadValidationErrorProjection(sourceSchema) {

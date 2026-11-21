@@ -1196,7 +1196,19 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/PayoutResponse'
+                                # Why: scheduling persists the payout before returning; a successful
+                                # response is the scheduled snapshot, never an arbitrary terminal state.
+                                allOf:
+                                    - $ref: '#/components/schemas/PayoutResponse'
+                                    - type: object
+                                      properties:
+                                          payout:
+                                              allOf:
+                                                  - $ref: '#/components/schemas/Payout'
+                                                  - type: object
+                                                    required: [scheduled_at]
+                                                    properties:
+                                                        status: { type: string, enum: [scheduled] }
                 '400':
                     description: Bad request - invalid schedule parameters
                     headers:
@@ -1751,7 +1763,19 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/PayoutResponse'
+                                # Why: cancellation commits its terminal timestamp and public reason
+                                # before returning the same payout selected by the caller.
+                                allOf:
+                                    - $ref: '#/components/schemas/PayoutResponse'
+                                    - type: object
+                                      properties:
+                                          payout:
+                                              allOf:
+                                                  - $ref: '#/components/schemas/Payout'
+                                                  - type: object
+                                                    required: [canceled_at, cancellation, scheduled_at]
+                                                    properties:
+                                                        status: { type: string, enum: [canceled] }
                 '401':
                     description: Unauthorized - missing or invalid API key
                     headers:

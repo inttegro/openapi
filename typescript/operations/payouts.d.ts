@@ -29,7 +29,14 @@ export interface PayoutsOperations {
           readonly "X-Request-Id"?: string;
         };
         readonly content: {
-          readonly "application/json": Output.PayoutResponse;
+          readonly "application/json": Output.PayoutResponse & {
+            readonly "payout"?: Output.Payout & {
+              readonly "status"?: "canceled";
+              readonly "canceled_at": unknown;
+              readonly "cancellation": unknown;
+              readonly "scheduled_at": unknown;
+            };
+          };
         };
       };
       readonly "400": {
@@ -117,7 +124,14 @@ export interface PayoutsOperations {
         };
       };
     };
-    readonly result: { readonly status: 200; readonly content_type: "application/json"; readonly body: Output.PayoutResponse } | { readonly status: 400; readonly content_type: "application/json"; readonly body: Output.Error & (((({
+    readonly result: { readonly status: 200; readonly content_type: "application/json"; readonly body: Output.PayoutResponse & {
+  readonly "payout"?: Output.Payout & {
+    readonly "status"?: "canceled";
+    readonly "canceled_at": unknown;
+    readonly "cancellation": unknown;
+    readonly "scheduled_at": unknown;
+  };
+} } | { readonly status: 400; readonly content_type: "application/json"; readonly body: Output.Error & (((({
   readonly "cause": "invalid_request_parameter";
   readonly "code": ("idempotency_key_invalid" | "idempotency_key_mismatch" | "idempotency_key_unsupported");
   readonly "fix_code": "change_request_parameters";
@@ -1061,7 +1075,12 @@ export interface PayoutsOperations {
           readonly "X-Request-Id"?: string;
         };
         readonly content: {
-          readonly "application/json": Output.PayoutResponse;
+          readonly "application/json": Output.PayoutResponse & {
+            readonly "payout"?: Output.Payout & {
+              readonly "status"?: "scheduled";
+              readonly "scheduled_at": unknown;
+            };
+          };
         };
       };
       readonly "400": {
@@ -1155,7 +1174,12 @@ export interface PayoutsOperations {
         };
       };
     };
-    readonly result: { readonly status: 200; readonly content_type: "application/json"; readonly body: Output.PayoutResponse } | { readonly status: 400; readonly content_type: "application/json"; readonly body: Output.Error & (({
+    readonly result: { readonly status: 200; readonly content_type: "application/json"; readonly body: Output.PayoutResponse & {
+  readonly "payout"?: Output.Payout & {
+    readonly "status"?: "scheduled";
+    readonly "scheduled_at": unknown;
+  };
+} } | { readonly status: 400; readonly content_type: "application/json"; readonly body: Output.Error & (({
   readonly "cause": "precondition_unmet";
   readonly "code": "payout_restricted";
   readonly "fix_code": "satisfy_precondition";

@@ -45,13 +45,16 @@ paths:
                                     - { from: /about, to: /product/about }
                                     - { from: /attributes, to: /product/attributes }
                                     - { from: /category, to: /product/category }
-                                    - { from: /custom_data, to: /product/custom_data }
+                                    # Why: empty request custom data is valid but omitted from the response;
+                                    # the current relation language cannot conditionally echo only nonempty maps.
                                     - { from: /description, to: /product/description }
                                     - { from: /dimensions, to: /product/dimensions }
                                     - { from: /media, to: /product/media }
                                     - { from: /name, to: /product/name }
                                     - { from: /reference, to: /product/reference }
-                                    - { from: /shipment, to: /product/shipment }
+                                    # Why: an absent shipment must remain absent, while a present response may add
+                                    # its type-specific marker. The relation language cannot express both branches
+                                    # without falsely requiring or copying the whole response-owned object.
                                     - { from: /tax_code, to: /product/tax_code }
                                     - { from: /type, to: /product/type }
                                     - { from: /unit_dimension, to: /product/unit_dim }
@@ -350,7 +353,8 @@ paths:
                                     - { from: /product_id, to: /product/id }
                                     - { from: /about, to: /product/about }
                                     - { from: /category, to: /product/category }
-                                    - { from: /custom_data, to: /product/custom_data }
+                                    # Why: clearing custom data removes the response field, so an unconditional
+                                    # request-to-response copy would make the public update contract false.
                                     - { from: /description, to: /product/description }
                                     - { from: /dimensions, to: /product/dimensions }
                                     - { from: /name, to: /product/name }
@@ -1586,23 +1590,45 @@ components:
                     type: string
                     enum: [delivery, download, render, stream]
         ProductShipment:
-            type: object
-            additionalProperties: false
-            required: [type]
-            properties:
-                type:
-                    type: string
-                    enum: [delivery, download, render, service, stream]
-                delivery:
-                    $ref: '#/components/schemas/ProductDelivery'
-                download:
-                    $ref: '#/components/schemas/ProductDownload'
-                render:
-                    $ref: '#/components/schemas/ProductRender'
-                service:
-                    $ref: '#/components/schemas/ProductService'
-                stream:
-                    $ref: '#/components/schemas/ProductStream'
+            description: Product fulfillment mode. Only the marker matching `type` may be returned; older records may omit that otherwise empty marker.
+            # Why: the serializer emits only the selected fulfillment branch. A closed union prevents
+            # clients and synthesizers from treating every empty marker object as simultaneously relevant.
+            oneOf:
+                - type: object
+                  additionalProperties: false
+                  required: [type]
+                  properties:
+                      type: { type: string, enum: [delivery] }
+                      delivery:
+                          $ref: '#/components/schemas/ProductDelivery'
+                - type: object
+                  additionalProperties: false
+                  required: [type]
+                  properties:
+                      type: { type: string, enum: [download] }
+                      download:
+                          $ref: '#/components/schemas/ProductDownload'
+                - type: object
+                  additionalProperties: false
+                  required: [type]
+                  properties:
+                      type: { type: string, enum: [render] }
+                      render:
+                          $ref: '#/components/schemas/ProductRender'
+                - type: object
+                  additionalProperties: false
+                  required: [type]
+                  properties:
+                      type: { type: string, enum: [service] }
+                      service:
+                          $ref: '#/components/schemas/ProductService'
+                - type: object
+                  additionalProperties: false
+                  required: [type]
+                  properties:
+                      type: { type: string, enum: [stream] }
+                      stream:
+                          $ref: '#/components/schemas/ProductStream'
         ProductDelivery:
             type: object
             additionalProperties: false
@@ -2009,7 +2035,8 @@ components:
                 dimensions:
                     $ref: '#/components/schemas/ProductDimensions'
                 custom_data:
-                    $ref: './common.yml#/components/schemas/CustomData'
+                    # Why: the product serializer omits maps with no public custom-data entries.
+                    $ref: './common.yml#/components/schemas/NonEmptyCustomData'
                 active:
                     type: boolean
                     description: Whether product is published and available

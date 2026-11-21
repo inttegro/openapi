@@ -2360,7 +2360,16 @@ export interface OrdersOperations {
           readonly "X-Request-Id"?: string;
         };
         readonly content: {
-          readonly "application/json": Output.OrderDocumentDeliveryResponse;
+          readonly "application/json": Output.OrderDocumentDeliveryResponse & (({
+            readonly "delivery"?: Output.OrderDocumentDelivery & {
+              readonly "document_kind"?: "invoice";
+              readonly "deliveries": readonly (unknown)[];
+              readonly "sent_channels"?: readonly (unknown)[];
+            };
+            readonly "order"?: Output.Order & (({
+              readonly "status"?: ("requires_payment" | "paid" | "completed" | "canceled" | "expired");
+            }));
+          }));
         };
       };
       readonly "207": {
@@ -2368,7 +2377,14 @@ export interface OrdersOperations {
           readonly "X-Request-Id"?: string;
         };
         readonly content: {
-          readonly "application/json": Output.OrderDocumentDeliveryResponse;
+          readonly "application/json": Output.OrderDocumentDeliveryResponse & (({
+            readonly "delivery"?: Output.OrderDocumentPartialDelivery & {
+              readonly "document_kind"?: "invoice";
+            };
+            readonly "order"?: Output.Order & (({
+              readonly "status"?: ("requires_payment" | "paid" | "completed" | "canceled" | "expired");
+            }));
+          }));
         };
       };
       readonly "400": {
@@ -2499,7 +2515,23 @@ export interface OrdersOperations {
         };
       };
     };
-    readonly result: { readonly status: 200; readonly content_type: "application/json"; readonly body: Output.OrderDocumentDeliveryResponse } | { readonly status: 207; readonly content_type: "application/json"; readonly body: Output.OrderDocumentDeliveryResponse } | { readonly status: 400; readonly content_type: "application/json"; readonly body: Output.OrderDocumentDeliveryErrorResponse & (({
+    readonly result: { readonly status: 200; readonly content_type: "application/json"; readonly body: Output.OrderDocumentDeliveryResponse & (({
+  readonly "delivery"?: Output.OrderDocumentDelivery & {
+    readonly "document_kind"?: "invoice";
+    readonly "deliveries": readonly (unknown)[];
+    readonly "sent_channels"?: readonly (unknown)[];
+  };
+  readonly "order"?: Output.Order & (({
+    readonly "status"?: ("requires_payment" | "paid" | "completed" | "canceled" | "expired");
+  }));
+})) } | { readonly status: 207; readonly content_type: "application/json"; readonly body: Output.OrderDocumentDeliveryResponse & (({
+  readonly "delivery"?: Output.OrderDocumentPartialDelivery & {
+    readonly "document_kind"?: "invoice";
+  };
+  readonly "order"?: Output.Order & (({
+    readonly "status"?: ("requires_payment" | "paid" | "completed" | "canceled" | "expired");
+  }));
+})) } | { readonly status: 400; readonly content_type: "application/json"; readonly body: Output.OrderDocumentDeliveryErrorResponse & (({
   readonly "error"?: ((({
     readonly "cause": "precondition_unmet";
     readonly "code": ("draft_mode_order_has_no_invoice" | "order_delivery_contact_missing");
@@ -2617,7 +2649,16 @@ export interface OrdersOperations {
           readonly "X-Request-Id"?: string;
         };
         readonly content: {
-          readonly "application/json": Output.OrderDocumentDeliveryResponse;
+          readonly "application/json": Output.OrderDocumentDeliveryResponse & (({
+            readonly "delivery"?: Output.OrderDocumentDelivery & {
+              readonly "document_kind"?: "receipt";
+              readonly "deliveries": readonly (unknown)[];
+              readonly "sent_channels"?: readonly (unknown)[];
+            };
+            readonly "order"?: Output.Order & (({
+              readonly "status"?: ("paid" | "completed");
+            }));
+          }));
         };
       };
       readonly "207": {
@@ -2625,7 +2666,14 @@ export interface OrdersOperations {
           readonly "X-Request-Id"?: string;
         };
         readonly content: {
-          readonly "application/json": Output.OrderDocumentDeliveryResponse;
+          readonly "application/json": Output.OrderDocumentDeliveryResponse & (({
+            readonly "delivery"?: Output.OrderDocumentPartialDelivery & {
+              readonly "document_kind"?: "receipt";
+            };
+            readonly "order"?: Output.Order & (({
+              readonly "status"?: ("paid" | "completed");
+            }));
+          }));
         };
       };
       readonly "400": {
@@ -2756,7 +2804,23 @@ export interface OrdersOperations {
         };
       };
     };
-    readonly result: { readonly status: 200; readonly content_type: "application/json"; readonly body: Output.OrderDocumentDeliveryResponse } | { readonly status: 207; readonly content_type: "application/json"; readonly body: Output.OrderDocumentDeliveryResponse } | { readonly status: 400; readonly content_type: "application/json"; readonly body: Output.OrderDocumentDeliveryErrorResponse & (({
+    readonly result: { readonly status: 200; readonly content_type: "application/json"; readonly body: Output.OrderDocumentDeliveryResponse & (({
+  readonly "delivery"?: Output.OrderDocumentDelivery & {
+    readonly "document_kind"?: "receipt";
+    readonly "deliveries": readonly (unknown)[];
+    readonly "sent_channels"?: readonly (unknown)[];
+  };
+  readonly "order"?: Output.Order & (({
+    readonly "status"?: ("paid" | "completed");
+  }));
+})) } | { readonly status: 207; readonly content_type: "application/json"; readonly body: Output.OrderDocumentDeliveryResponse & (({
+  readonly "delivery"?: Output.OrderDocumentPartialDelivery & {
+    readonly "document_kind"?: "receipt";
+  };
+  readonly "order"?: Output.Order & (({
+    readonly "status"?: ("paid" | "completed");
+  }));
+})) } | { readonly status: 400; readonly content_type: "application/json"; readonly body: Output.OrderDocumentDeliveryErrorResponse & (({
   readonly "error"?: ((({
     readonly "cause": "precondition_unmet";
     readonly "code": ("order_delivery_contact_missing" | "order_receipt_missing");

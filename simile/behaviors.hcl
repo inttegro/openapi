@@ -17,6 +17,38 @@ scenario "purchase_intent_created" {
   }
 }
 
+scenario "purchase_intent_canceled" {
+  description = "Return the reviewed inactive Buy-link snapshot."
+
+  select "cancelPurchaseIntent" {
+    outcome = "canceled"
+  }
+}
+
+scenario "purchase_intent_updated" {
+  description = "Return the reviewed updated Buy-link snapshot."
+
+  select "updatePurchaseIntent" {
+    outcome = "updated"
+  }
+}
+
+scenario "purchase_intent_found" {
+  description = "Return the reviewed active Buy-link lookup result."
+
+  select "lookupPurchaseIntent" {
+    outcome = "found"
+  }
+}
+
+scenario "operating_policy_updated" {
+  description = "Return the reviewed activated operating-policy version."
+
+  select "updateOperatingPolicy" {
+    outcome = "updated"
+  }
+}
+
 scenario "chime_cooldown_active" {
   description = "Return the public Chime cooldown response."
 
@@ -70,5 +102,37 @@ scenario "purchase_intent_invalid_quantity_range" {
 
   select "createPurchaseIntent" {
     outcome = "invalid_quantity_range"
+  }
+}
+
+scenario "order_invoice_sent" {
+  description = "Return the reviewed successful invoice delivery."
+
+  select "sendOrderInvoice" {
+    outcome = "invoice_sent"
+  }
+}
+
+scenario "order_invoice_partially_sent" {
+  description = "Return the reviewed partial invoice delivery."
+
+  select "sendOrderInvoice" {
+    outcome = "invoice_partially_sent"
+  }
+}
+
+scenario "order_receipt_sent" {
+  description = "Return the reviewed successful receipt delivery."
+
+  select "sendOrderReceipt" {
+    outcome = "receipt_sent"
+  }
+}
+
+scenario "order_receipt_partially_sent" {
+  description = "Return the reviewed partial receipt delivery."
+
+  select "sendOrderReceipt" {
+    outcome = "receipt_partially_sent"
   }
 }

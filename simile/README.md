@@ -7,6 +7,7 @@ observable integration behavior that OpenAPI cannot express by itself.
 ## Modules
 
 - `inttegro.simile.hcl` composes the listener, OpenAPI contract, and behavior modules.
+- `principals.hcl` declares the application caller and active, revoked, and expired test profiles.
 - `behaviors.hcl` selects reviewed named OpenAPI outcomes through opaque scenarios.
 - `errors.hcl` supplies exact, operation-valid domain failures and scenarios.
 - `state.hcl` declares emulator-owned state, scheduled work, and source-backed async effects.
@@ -16,8 +17,14 @@ Register and run the service from the OpenAPI repository root:
 
 ```bash
 simile register inttegro --config ./simile/inttegro.simile.hcl
+simile setup inttegro --profile checkout --set name="Checkout development"
 simile start inttegro
 ```
+
+Setup writes the generated application identifier and bearer credential to the profile environment
+file reported by the command. The checked-in fixture credentials are `simile_test_active`,
+`simile_test_revoked`, and `simile_test_expired`; they exercise the three public authentication
+lifecycle states without setup.
 
 Select deterministic public behavior when a test needs one exact result:
 
@@ -50,8 +57,10 @@ data supplied by the test.
 The modules use public operation IDs, response fields, error tuples, lifecycle outcomes, and
 portable Simile capabilities.
 
-State effects make consequences inspectable; they do not yet make later lookups read those stored
-snapshots. Async declarations prove what work a successful operation dispatches, not durable
-production delivery. Authentication, multipart decoding, and network webhook delivery remain
-explicit simulator boundaries. See `../SIMILE_SERVICE_AUDIT.md` for the evidence and validation
-record.
+State effects make consequences inspectable; they do not yet make custom POST lookups read those
+stored snapshots. Registered services checkpoint state, profiles, and deferred work locally.
+Multipart decoding is supported by Simile, while multipart request-to-response projection remains
+an explicit contract limitation. The fidelity gate also keeps schema-synthesized outcomes and
+POST operations without an effect in reviewed inventories; it does not hide those gaps by
+inventing outcomes or private state. See `../SIMILE_SERVICE_AUDIT.md` for the evidence and
+validation record.

@@ -2,7 +2,7 @@
 // This is a semantic, declarations-only contract. It emits no JavaScript.
 
 import type { Add, Aggregate, Bounded, CompareAt, ContainsAt, DistinctValues, EqualFields, EqualsAt, Equation, Field, Implies, Lifecycle, Literal, Multiply, Ordered, Select, SetRelationship, StateAt, Subtract, Template } from "./core";
-import type { BalanceTransactionAllocationBase, BalanceTransactionPayoutAllocation, BalanceTransactionRefundAllocation, BroadcastDetail, CheckoutInvoiceView, CheckoutOrder, ChildrenPolicy, ChildrenPolicyVersionsPage, ChimeSMSSettings, ChimeTransmission, CreatePurchaseIntentRequest, CustomerPage, CustomerSelectedAmount, CustomerSelectedAmountParams, CustomerSelectedCatalogPriceFields, FileLinkAccess, FileLinkObject, FileLinkPage, FilePage, FinancialAccountPage, FinancialAccountVerification, FixedCatalogPrice, MessageTemplate, MessageTemplatesPage, OTPTransaction, OperatingPolicy, OperatingPolicyVersionsPage, Order, OrderDocumentDelivery, OrderPaymentAttempt, OrderPaymentMethod, PageChimesResponse, PageFilesRequest, PageOrdersResponse, PageProductsResponse, PagePurchaseIntentsResponse, PaymentBalanceTransaction, PaymentMethodObject, PaymentMethodPageResponse, Payout, PayoutAmountLimits, PayoutBalanceTransaction, PolicyAmountRange, PriceEmbeddedProduct, PricePageResponse, Product, PurchaseIntent, Refund, RefundLineItem, RefundPage, ResourceSearchPage, ResourceSearchSort, ScheduleCreationDetail, ScheduleDetail, SecretKey, SecretKeyPage, SecretKeyUsagePage, UpdatePurchaseIntentRequestFields, UploadRequestAttempt, UploadRequestAttempts, UploadRequestConstraints, UploadRequestObject, UploadRequestPage, UploadRequestReview } from "./models";
+import type { BalanceTransactionAllocationBase, BalanceTransactionPayoutAllocation, BalanceTransactionRefundAllocation, BroadcastDetail, CheckoutInvoiceView, CheckoutOrder, ChildrenPolicy, ChildrenPolicyVersionsPage, ChimeSMSSettings, ChimeTransmission, CreatePurchaseIntentRequest, CustomerPage, CustomerSelectedAmount, CustomerSelectedAmountParams, CustomerSelectedCatalogPriceFields, FileLinkAccess, FileLinkObject, FileLinkPage, FilePage, FinancialAccountPage, FinancialAccountVerification, FixedCatalogPrice, MessageTemplate, MessageTemplatesPage, OTPTransaction, OperatingPolicy, OperatingPolicyVersionsPage, Order, OrderDocumentDelivery, OrderDocumentPartialDelivery, OrderPaymentAttempt, OrderPaymentMethod, PageChimesResponse, PageFilesRequest, PageOrdersResponse, PageProductsResponse, PagePurchaseIntentsResponse, PaymentBalanceTransaction, PaymentMethodObject, PaymentMethodPageResponse, Payout, PayoutAmountLimits, PayoutBalanceTransaction, PolicyAmountRange, PriceEmbeddedProduct, PricePageResponse, Product, PurchaseIntent, Refund, RefundLineItem, RefundPage, ResourceSearchPage, ResourceSearchSort, ScheduleCreationDetail, ScheduleDetail, SecretKey, SecretKeyPage, SecretKeyUsagePage, UpdatePurchaseIntentRequestFields, UploadRequestAttempt, UploadRequestAttempts, UploadRequestConstraints, UploadRequestObject, UploadRequestPage, UploadRequestReview } from "./models";
 
 /** Cross-field business invariants stated over the public payload types. */
 export interface SchemaSoundness {
@@ -177,7 +177,13 @@ export interface SchemaSoundness {
     Implies<StateAt<Select<Order, readonly ["payment", "latest_attempt"]>, readonly ["succeeded_at"], "non-null">, readonly [EqualsAt<Select<Order, readonly ["payment", "latest_attempt"]>, readonly ["status"], "succeeded">]>,
   ];
   readonly "OrderDocumentDelivery": readonly [
-    SetRelationship<OrderDocumentDelivery, readonly ["failed_channels"], "disjoint", readonly ["sent_channels"]>,
+    DistinctValues<OrderDocumentDelivery, readonly ["deliveries", "*", "channel"]>,
+    DistinctValues<OrderDocumentDelivery, readonly ["failures", "*", "channel"]>,
+  ];
+  readonly "OrderDocumentPartialDelivery": readonly [
+    SetRelationship<OrderDocumentPartialDelivery, readonly ["failed_channels"], "disjoint", readonly ["sent_channels"]>,
+    DistinctValues<OrderDocumentPartialDelivery, readonly ["deliveries", "*", "channel"]>,
+    DistinctValues<OrderDocumentPartialDelivery, readonly ["failures", "*", "channel"]>,
   ];
   readonly "OrderPaymentAttempt": readonly [
     Ordered<OrderPaymentAttempt, readonly [readonly ["initiated_at"], readonly ["succeeded_at"]]>,
@@ -336,6 +342,8 @@ export interface SchemaSoundness {
   ];
   readonly "SecretKeyPage": readonly [
     Aggregate<SecretKeyPage, readonly ["count"], "count", readonly ["keys", "*"], never>,
+    Bounded<SecretKeyPage, readonly ["count"], { readonly "maximum": Field<SecretKeyPage, readonly ["size"]> }>,
+    Bounded<SecretKeyPage, readonly ["count"], { readonly "maximum": Field<SecretKeyPage, readonly ["total"]> }>,
   ];
   readonly "SecretKeyUsagePage": readonly [
     Aggregate<SecretKeyUsagePage, readonly ["count"], "count", readonly ["rows", "*"], never>,

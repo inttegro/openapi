@@ -285,6 +285,10 @@ function projectSmithy(input, openApi) {
   idl = mergeAlternateSuccessResponses(idl, openApi);
   idl = appendStatusCodeEnums(idl);
   idl = projectNativeTraits(idl);
+  // Why: smithytranslate can emit object members inside data examples in a
+  // different order across identical runs. Canonicalizing the trait nodes keeps
+  // the standalone contract reproducible without changing example semantics.
+  idl = canonicalizeDocumentTrait(idl, "dataExamples");
   idl = insertNativeTraitDefinitions(idl);
 
   const header = [
@@ -580,6 +584,29 @@ function projectNativeTraits(idl) {
     const tokens = tokenizeSmithyNode(idl.slice(bodyStart, end));
     const entries = parseSmithyNodeEntries(tokens);
     result += nativeTraits(entries);
+    cursor = end + 1;
+  }
+}
+
+function canonicalizeDocumentTrait(idl, traitName) {
+  const marker = `@${traitName}(`;
+  let cursor = 0;
+  let result = "";
+  while (true) {
+    const start = idl.indexOf(marker, cursor);
+    if (start === -1) {
+      return `${result}${idl.slice(cursor)}`;
+    }
+    result += idl.slice(cursor, start);
+    const bodyStart = start + marker.length;
+    const end = findBalancedParenthesis(idl, bodyStart);
+    const tokens = [
+      { type: "atom", value: "value" },
+      { type: ":", value: ":" },
+      ...tokenizeSmithyNode(idl.slice(bodyStart, end)),
+    ];
+    const value = parseSmithyNodeEntries(tokens).value;
+    result += `${marker}${formatSmithyNode(value, 0)})`;
     cursor = end + 1;
   }
 }

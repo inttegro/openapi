@@ -33,14 +33,14 @@ structure untagged {}
 
 
 @collectionVersion(
-"0.1.0-beta87"
+"0.1.0-beta91"
 )
 @auth([
     httpBearerAuth
 ])
 @httpBearerAuth
 service Inttegro {
-    version: "0.1.0-beta87"
+    version: "0.1.0-beta91"
     operations: [
         activatePaymentMethod
         activatePrice
@@ -1709,10 +1709,6 @@ operation createPrice {
                         "to": "/product/category"
                     },
                     {
-                        "from": "/custom_data",
-                        "to": "/product/custom_data"
-                    },
-                    {
                         "from": "/description",
                         "to": "/product/description"
                     },
@@ -1731,10 +1727,6 @@ operation createPrice {
                     {
                         "from": "/reference",
                         "to": "/product/reference"
-                    },
-                    {
-                        "from": "/shipment",
-                        "to": "/product/shipment"
                     },
                     {
                         "from": "/tax_code",
@@ -5846,10 +5838,6 @@ operation updatePrice {
                         "to": "/product/category"
                     },
                     {
-                        "from": "/custom_data",
-                        "to": "/product/custom_data"
-                    },
-                    {
                         "from": "/description",
                         "to": "/product/description"
                     },
@@ -6004,10 +5992,10 @@ structure activatePaymentMethod200 {
     @contentType("application/json")
     body: ActivatePaymentMethodResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -6020,10 +6008,10 @@ structure activatePaymentMethod400 {
     @contentType("application/json")
     body: activatePaymentMethod400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -6142,10 +6130,10 @@ structure activatePaymentMethod401 {
     @contentType("application/json")
     body: activatePaymentMethod401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -6186,10 +6174,10 @@ structure activatePaymentMethod404 {
     @contentType("application/json")
     body: activatePaymentMethod404body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -6212,10 +6200,10 @@ structure activatePrice200 {
     @contentType("application/json")
     body: PriceResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -6228,10 +6216,10 @@ structure activatePrice400 {
     @contentType("application/json")
     body: activatePrice400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -6337,10 +6325,10 @@ structure activatePrice401 {
     @contentType("application/json")
     body: activatePrice401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -6381,10 +6369,10 @@ structure activatePrice422 {
     @contentType("application/json")
     body: activatePrice422body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -6459,10 +6447,10 @@ structure addProductPrice200 {
     @contentType("application/json")
     body: AddProductPriceResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -6475,10 +6463,10 @@ structure addProductPrice400 {
     @contentType("application/json")
     body: addProductPrice400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -6584,10 +6572,10 @@ structure addProductPrice401 {
     @contentType("application/json")
     body: addProductPrice401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -6628,10 +6616,10 @@ structure addProductPrice422 {
     @contentType("application/json")
     body: addProductPrice422body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -6719,10 +6707,10 @@ structure archiveMessageTemplate200 {
     @contentType("application/json")
     body: MessageTemplateEnvelope
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -6735,10 +6723,10 @@ structure archiveMessageTemplate400 {
     @contentType("application/json")
     body: archiveMessageTemplate400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -6844,10 +6832,10 @@ structure archiveMessageTemplate401 {
     @contentType("application/json")
     body: archiveMessageTemplate401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -6888,10 +6876,10 @@ structure archiveMessageTemplate404 {
     @contentType("application/json")
     body: archiveMessageTemplate404body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -6919,17 +6907,17 @@ structure archiveMessageTemplate503 {
     @contentType("application/json")
     body: archiveMessageTemplate503body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
     @dataExamples([
-        {
-            json: "30"
-        }
-    ])
+    {
+        "json": "30"
+    }
+])
     @httpHeader("Retry-After")
     Retry_After: String
 }
@@ -7004,10 +6992,10 @@ structure archivePaymentMethod200 {
     @contentType("application/json")
     body: ArchivePaymentMethodResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -7020,10 +7008,10 @@ structure archivePaymentMethod400 {
     @contentType("application/json")
     body: archivePaymentMethod400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -7142,10 +7130,10 @@ structure archivePaymentMethod401 {
     @contentType("application/json")
     body: archivePaymentMethod401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -7186,10 +7174,10 @@ structure archivePaymentMethod404 {
     @contentType("application/json")
     body: archivePaymentMethod404body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -7212,10 +7200,10 @@ structure archivePrice200 {
     @contentType("application/json")
     body: PriceResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -7228,10 +7216,10 @@ structure archivePrice400 {
     @contentType("application/json")
     body: archivePrice400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -7337,10 +7325,10 @@ structure archivePrice401 {
     @contentType("application/json")
     body: archivePrice401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -7381,10 +7369,10 @@ structure archivePrice422 {
     @contentType("application/json")
     body: archivePrice422body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -7459,10 +7447,10 @@ structure archiveProduct200 {
     @contentType("application/json")
     body: ProductResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -7475,10 +7463,10 @@ structure archiveProduct400 {
     @contentType("application/json")
     body: archiveProduct400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -7584,10 +7572,10 @@ structure archiveProduct401 {
     @contentType("application/json")
     body: archiveProduct401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -7628,10 +7616,10 @@ structure archiveProduct422 {
     @contentType("application/json")
     body: archiveProduct422body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -7706,10 +7694,10 @@ structure broadcastChime202 {
     @contentType("application/json")
     body: BroadcastResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -7722,10 +7710,10 @@ structure broadcastChime400 {
     @contentType("application/json")
     body: broadcastChime400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -7844,10 +7832,10 @@ structure broadcastChime401 {
     @contentType("application/json")
     body: broadcastChime401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -7888,10 +7876,10 @@ structure broadcastChime404 {
     @contentType("application/json")
     body: broadcastChime404body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -7919,10 +7907,10 @@ structure broadcastChime409 {
     @contentType("application/json")
     body: broadcastChime409body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -7963,10 +7951,10 @@ structure broadcastChime422 {
     @contentType("application/json")
     body: broadcastChime422body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -7994,10 +7982,10 @@ structure broadcastChime500 {
     @contentType("application/json")
     body: broadcastChime500body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -8025,17 +8013,17 @@ structure broadcastChime503 {
     @contentType("application/json")
     body: broadcastChime503body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
     @dataExamples([
-        {
-            json: "30"
-        }
-    ])
+    {
+        "json": "30"
+    }
+])
     @httpHeader("Retry-After")
     Retry_After: String
 }
@@ -8110,10 +8098,10 @@ structure cancelBroadcast200 {
     @contentType("application/json")
     body: BroadcastCancelResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -8126,10 +8114,10 @@ structure cancelBroadcast400 {
     @contentType("application/json")
     body: cancelBroadcast400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -8235,10 +8223,10 @@ structure cancelBroadcast401 {
     @contentType("application/json")
     body: cancelBroadcast401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -8279,10 +8267,10 @@ structure cancelBroadcast422 {
     @contentType("application/json")
     body: cancelBroadcast422body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -8370,10 +8358,10 @@ structure cancelOrder200 {
     @contentType("application/json")
     body: OrderResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -8386,10 +8374,10 @@ structure cancelOrder400 {
     @contentType("application/json")
     body: cancelOrder400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -8508,10 +8496,10 @@ structure cancelOrder401 {
     @contentType("application/json")
     body: cancelOrder401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -8552,10 +8540,10 @@ structure cancelOrder500 {
     @contentType("application/json")
     body: cancelOrder500body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -8576,15 +8564,19 @@ structure cancelPayout200 {
     @httpPayload
     @required
     @contentType("application/json")
-    body: PayoutResponse
+    body: cancelPayout200body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
+
+structure cancelPayout200body with [PayoutResponseMixin] {}
+
+structure cancelPayout200bodyallOf1payout with [PayoutMixin] {}
 
 @error("client")
 @httpError(400)
@@ -8594,10 +8586,10 @@ structure cancelPayout400 {
     @contentType("application/json")
     body: cancelPayout400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -8703,10 +8695,10 @@ structure cancelPayout401 {
     @contentType("application/json")
     body: cancelPayout401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -8747,10 +8739,10 @@ structure cancelPayout500 {
     @contentType("application/json")
     body: cancelPayout500body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -8771,15 +8763,19 @@ structure cancelPurchaseIntent200 {
     @httpPayload
     @required
     @contentType("application/json")
-    body: PurchaseIntentResponse
+    body: cancelPurchaseIntent200body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
+
+structure cancelPurchaseIntent200body with [PurchaseIntentResponseMixin] {}
+
+structure cancelPurchaseIntent200bodyallOf1purchaseIntent with [PurchaseIntentMixin] {}
 
 @error("client")
 @httpError(400)
@@ -8789,10 +8785,10 @@ structure cancelPurchaseIntent400 {
     @contentType("application/json")
     body: cancelPurchaseIntent400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -8911,10 +8907,10 @@ structure cancelPurchaseIntent401 {
     @contentType("application/json")
     body: cancelPurchaseIntent401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -8955,10 +8951,10 @@ structure cancelPurchaseIntent404 {
     @contentType("application/json")
     body: cancelPurchaseIntent404body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -8973,10 +8969,10 @@ structure cancelPurchaseIntent500 {
     @contentType("application/json")
     body: cancelPurchaseIntent500body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -8999,10 +8995,10 @@ structure cancelRefund200 {
     @contentType("application/json")
     body: RefundResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -9015,10 +9011,10 @@ structure cancelRefund400 {
     @contentType("application/json")
     body: cancelRefund400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -9124,10 +9120,10 @@ structure cancelRefund401 {
     @contentType("application/json")
     body: cancelRefund401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -9168,10 +9164,10 @@ structure cancelRefund404 {
     @contentType("application/json")
     body: cancelRefund404body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -9199,10 +9195,10 @@ structure cancelRefund409 {
     @contentType("application/json")
     body: cancelRefund409body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -9243,10 +9239,10 @@ structure cancelRefund422 {
     @contentType("application/json")
     body: cancelRefund422body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -9274,10 +9270,10 @@ structure cancelRefund500 {
     @contentType("application/json")
     body: cancelRefund500body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -9305,17 +9301,17 @@ structure cancelRefund503 {
     @contentType("application/json")
     body: cancelRefund503body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
     @dataExamples([
-        {
-            json: "30"
-        }
-    ])
+    {
+        "json": "30"
+    }
+])
     @httpHeader("Retry-After")
     Retry_After: String
 }
@@ -9390,10 +9386,10 @@ structure cancelSchedule200 {
     @contentType("application/json")
     body: ScheduleCancelResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -9406,10 +9402,10 @@ structure cancelSchedule400 {
     @contentType("application/json")
     body: cancelSchedule400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -9515,10 +9511,10 @@ structure cancelSchedule401 {
     @contentType("application/json")
     body: cancelSchedule401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -9559,10 +9555,10 @@ structure cancelSchedule422 {
     @contentType("application/json")
     body: cancelSchedule422body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -9650,10 +9646,10 @@ structure cancelUploadRequest200 {
     @contentType("application/json")
     body: UploadRequestResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -9666,10 +9662,10 @@ structure cancelUploadRequest400 {
     @contentType("application/json")
     body: cancelUploadRequest400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -9681,19 +9677,19 @@ structure cancelUploadRequest400body with [
 
 apply cancelUploadRequest400body$message {
     @dataExamples([
-        {
-            json: "payment method could not be used for this order"
-        }
-    ])
+    {
+        "json": "payment method could not be used for this order"
+    }
+])
     @documentation("Concise, caller-safe explanation of why the request was rejected or could not finish.")
 }
 
 apply cancelUploadRequest400body$detail {
     @dataExamples([
-        {
-            json: "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
-        }
-    ])
+    {
+        "json": "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
+    }
+])
     @documentation("Explanation of the relevant rule and next safe action. It never contains raw dependency, storage, or implementation errors.")
 }
 
@@ -9802,10 +9798,10 @@ structure cancelUploadRequest401 {
     @contentType("application/json")
     body: cancelUploadRequest401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -9817,19 +9813,19 @@ structure cancelUploadRequest401body with [
 
 apply cancelUploadRequest401body$message {
     @dataExamples([
-        {
-            json: "payment method could not be used for this order"
-        }
-    ])
+    {
+        "json": "payment method could not be used for this order"
+    }
+])
     @documentation("Concise, caller-safe explanation of why the request was rejected or could not finish.")
 }
 
 apply cancelUploadRequest401body$detail {
     @dataExamples([
-        {
-            json: "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
-        }
-    ])
+    {
+        "json": "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
+    }
+])
     @documentation("Explanation of the relevant rule and next safe action. It never contains raw dependency, storage, or implementation errors.")
 }
 
@@ -9873,10 +9869,10 @@ structure cancelUploadRequest404 {
     @contentType("application/json")
     body: cancelUploadRequest404body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -9888,19 +9884,19 @@ structure cancelUploadRequest404body with [
 
 apply cancelUploadRequest404body$message {
     @dataExamples([
-        {
-            json: "payment method could not be used for this order"
-        }
-    ])
+    {
+        "json": "payment method could not be used for this order"
+    }
+])
     @documentation("Concise, caller-safe explanation of why the request was rejected or could not finish.")
 }
 
 apply cancelUploadRequest404body$detail {
     @dataExamples([
-        {
-            json: "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
-        }
-    ])
+    {
+        "json": "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
+    }
+])
     @documentation("Explanation of the relevant rule and next safe action. It never contains raw dependency, storage, or implementation errors.")
 }
 
@@ -9918,10 +9914,10 @@ structure cancelUploadRequest409 {
     @contentType("application/json")
     body: cancelUploadRequest409body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -9933,19 +9929,19 @@ structure cancelUploadRequest409body with [
 
 apply cancelUploadRequest409body$message {
     @dataExamples([
-        {
-            json: "payment method could not be used for this order"
-        }
-    ])
+    {
+        "json": "payment method could not be used for this order"
+    }
+])
     @documentation("Concise, caller-safe explanation of why the request was rejected or could not finish.")
 }
 
 apply cancelUploadRequest409body$detail {
     @dataExamples([
-        {
-            json: "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
-        }
-    ])
+    {
+        "json": "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
+    }
+])
     @documentation("Explanation of the relevant rule and next safe action. It never contains raw dependency, storage, or implementation errors.")
 }
 
@@ -9989,17 +9985,17 @@ structure cancelUploadRequest503 {
     @contentType("application/json")
     body: cancelUploadRequest503body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
     @dataExamples([
-        {
-            json: "30"
-        }
-    ])
+    {
+        "json": "30"
+    }
+])
     @httpHeader("Retry-After")
     Retry_After: String
 }
@@ -10011,19 +10007,19 @@ structure cancelUploadRequest503body with [
 
 apply cancelUploadRequest503body$message {
     @dataExamples([
-        {
-            json: "payment method could not be used for this order"
-        }
-    ])
+    {
+        "json": "payment method could not be used for this order"
+    }
+])
     @documentation("Concise, caller-safe explanation of why the request was rejected or could not finish.")
 }
 
 apply cancelUploadRequest503body$detail {
     @dataExamples([
-        {
-            json: "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
-        }
-    ])
+    {
+        "json": "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
+    }
+])
     @documentation("Explanation of the relevant rule and next safe action. It never contains raw dependency, storage, or implementation errors.")
 }
 
@@ -10114,10 +10110,10 @@ structure completeOrder200 {
     @contentType("application/json")
     body: CompleteOrderResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -10130,10 +10126,10 @@ structure completeOrder400 {
     @contentType("application/json")
     body: completeOrder400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -10252,10 +10248,10 @@ structure completeOrder401 {
     @contentType("application/json")
     body: completeOrder401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -10296,10 +10292,10 @@ structure completeOrder409 {
     @contentType("application/json")
     body: completeOrder409body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -10340,10 +10336,10 @@ structure completeOrder500 {
     @contentType("application/json")
     body: completeOrder500body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -10363,10 +10359,10 @@ structure completeOrderInput {
 structure ActivatePaymentMethodRequest {
     /// ID of the payment method to activate
     @dataExamples([
-        {
-            json: "pm_xyz789"
-        }
-    ])
+    {
+        "json": "pm_xyz789"
+    }
+])
     @pattern("^pm_")
     @required
     payment_method_id: String
@@ -10380,29 +10376,29 @@ structure ActivatePaymentMethodResponse {
 structure AddCustomerSelectedProductPriceRequest {
     /// Product ID to attach the new price to
     @dataExamples([
-        {
-            json: "prod_abc123"
-        }
-    ])
+    {
+        "json": "prod_abc123"
+    }
+])
     @pattern("^prod_")
     @required
     product_id: String
     /// Optional short label for the new price
     @dataExamples([
-        {
-            json: "Wholesale"
-        }
-    ])
+    {
+        "json": "Wholesale"
+    }
+])
     @length(
         max: 100
     )
     label: String
     /// Optional internal description for the new price
     @dataExamples([
-        {
-            json: "Preferred rate for repeat buyers"
-        }
-    ])
+    {
+        "json": "Preferred rate for repeat buyers"
+    }
+])
     @length(
         max: 500
     )
@@ -10417,29 +10413,29 @@ structure AddCustomerSelectedProductPriceRequestcustomerSelectedAmount with [Cus
 structure AddFixedProductPriceRequest {
     /// Product ID to attach the new price to
     @dataExamples([
-        {
-            json: "prod_abc123"
-        }
-    ])
+    {
+        "json": "prod_abc123"
+    }
+])
     @pattern("^prod_")
     @required
     product_id: String
     /// Optional short label for the new price
     @dataExamples([
-        {
-            json: "Wholesale"
-        }
-    ])
+    {
+        "json": "Wholesale"
+    }
+])
     @length(
         max: 100
     )
     label: String
     /// Optional internal description for the new price
     @dataExamples([
-        {
-            json: "Preferred rate for repeat buyers"
-        }
-    ])
+    {
+        "json": "Preferred rate for repeat buyers"
+    }
+])
     @length(
         max: 500
     )
@@ -10456,60 +10452,60 @@ structure AddProductPriceResponse {
 structure Address {
     /// Recipient name
     @dataExamples([
-        {
-            json: "Customer Name"
-        }
-    ])
+    {
+        "json": "Customer Name"
+    }
+])
     name: String
     /// Contact phone number
     @dataExamples([
-        {
-            json: "+233242058841"
-        }
-    ])
+    {
+        "json": "+233242058841"
+    }
+])
     phone_number: String
     /// Street address line 1
     @dataExamples([
-        {
-            json: "23 Adenta High Street"
-        }
-    ])
+    {
+        "json": "23 Adenta High Street"
+    }
+])
     line1: String
     /// Street address line 2 (optional)
     @dataExamples([
-        {
-            json: "Behind Pantang"
-        }
-    ])
+    {
+        "json": "Behind Pantang"
+    }
+])
     line2: String
     /// City or town
     @dataExamples([
-        {
-            json: "Accra"
-        }
-    ])
+    {
+        "json": "Accra"
+    }
+])
     city: String
     /// State, province, or region
     @dataExamples([
-        {
-            json: "Greater Accra"
-        }
-    ])
+    {
+        "json": "Greater Accra"
+    }
+])
     region: String
     /// Country value recorded for the address.
     @dataExamples([
-        {
-            json: "GH"
-        }
-    ])
+    {
+        "json": "GH"
+    }
+])
     @required
     country: String
     /// Postal/ZIP code
     @dataExamples([
-        {
-            json: "GHA-123-9822"
-        }
-    ])
+    {
+        "json": "GHA-123-9822"
+    }
+])
     post_code: String
 }
 
@@ -10521,10 +10517,10 @@ structure AmountMixin {
     currency: Currency
     /// Amount in the currency's smallest unit.
     @dataExamples([
-        {
-            json: 20000
-        }
-    ])
+    {
+        "json": 20000
+    }
+])
     @required
     value: Integer
 }
@@ -10537,10 +10533,10 @@ structure AmountParamsMixin {
     currency: Currency
     /// Amount in smallest currency unit (e.g., pesewas for GHS)
     @dataExamples([
-        {
-            json: 20000
-        }
-    ])
+    {
+        "json": 20000
+    }
+])
     @range(
         min: 0
     )
@@ -10621,10 +10617,10 @@ structure ApplicationOperatingPolicy {
 structure ArchivePaymentMethodRequest {
     /// ID of the payment method to archive
     @dataExamples([
-        {
-            json: "pm_xyz789"
-        }
-    ])
+    {
+        "json": "pm_xyz789"
+    }
+])
     @pattern("^pm_")
     @required
     payment_method_id: String
@@ -10743,10 +10739,10 @@ structure BalanceTransactionAllocationBase {
     created_at: Timestamp
     /// Stable public allocation identifier for reconciliation and support.
     @dataExamples([
-        {
-            json: "bta_0123456789abcdefghijklmnopqrstuvwxyzABCD"
-        }
-    ])
+    {
+        "json": "bta_0123456789abcdefghijklmnopqrstuvwxyzABCD"
+    }
+])
     @pattern("^bta_")
     @required
     id: String
@@ -10766,18 +10762,18 @@ structure BalanceTransactionAmount with [BalanceTransactionAmountMixin] {}
 structure BalanceTransactionAmountMixin {
     /// Currency code as stored on the transaction
     @dataExamples([
-        {
-            json: "GHS"
-        }
-    ])
+    {
+        "json": "GHS"
+    }
+])
     @required
     currency: String
     /// Unsigned amount in the currency's smallest unit
     @dataExamples([
-        {
-            json: 20000
-        }
-    ])
+    {
+        "json": 20000
+    }
+])
     @range(
         min: 0
     )
@@ -10792,10 +10788,10 @@ structure BalanceTransactionBase {
     @timestampFormat("date-time")
     created_at: Timestamp
     @dataExamples([
-        {
-            json: "bt_0123456789abcdefghijklmnopqrstuvwxyzABCD"
-        }
-    ])
+    {
+        "json": "bt_0123456789abcdefghijklmnopqrstuvwxyzABCD"
+    }
+])
     @pattern("^bt_")
     @required
     id: String
@@ -10898,10 +10894,10 @@ structure BalanceTransactionPayoutAllocation {
     created_at: Timestamp
     /// Stable public allocation identifier for reconciliation and support.
     @dataExamples([
-        {
-            json: "bta_0123456789abcdefghijklmnopqrstuvwxyzABCD"
-        }
-    ])
+    {
+        "json": "bta_0123456789abcdefghijklmnopqrstuvwxyzABCD"
+    }
+])
     @pattern("^bta_")
     @required
     id: String
@@ -10919,10 +10915,10 @@ structure BalanceTransactionPayoutAllocationpayout {
     @required
     amount: BalanceTransactionAmount
     @dataExamples([
-        {
-            json: "po_zyxwvutsrqponmlkjihgfedcbaABCDEFGHIJKLMN"
-        }
-    ])
+    {
+        "json": "po_zyxwvutsrqponmlkjihgfedcbaABCDEFGHIJKLMN"
+    }
+])
     @pattern("^po_")
     @required
     id: String
@@ -11007,10 +11003,10 @@ structure BalanceTransactionRefundAllocation {
     created_at: Timestamp
     /// Stable public allocation identifier for reconciliation and support.
     @dataExamples([
-        {
-            json: "bta_0123456789abcdefghijklmnopqrstuvwxyzABCD"
-        }
-    ])
+    {
+        "json": "bta_0123456789abcdefghijklmnopqrstuvwxyzABCD"
+    }
+])
     @pattern("^bta_")
     @required
     id: String
@@ -11028,10 +11024,10 @@ structure BalanceTransactionRefundAllocationrefund {
     @required
     amount: BalanceTransactionAmount
     @dataExamples([
-        {
-            json: "rf_1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcd"
-        }
-    ])
+    {
+        "json": "rf_1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcd"
+    }
+])
     @pattern("^rf_")
     @required
     id: String
@@ -11048,10 +11044,10 @@ structure BalanceValue with [BalanceValueMixin] {}
 structure BalanceValueMixin {
     /// Amount in the currency's smallest unit
     @dataExamples([
-        {
-            json: 145000
-        }
-    ])
+    {
+        "json": 145000
+    }
+])
     @range(
         min: 0
     )
@@ -11159,24 +11155,24 @@ structure BroadcastDetailMixin {
 structure BroadcastError {
     /// Recipient address that caused the error
     @dataExamples([
-        {
-            json: "+233invalid"
-        }
-    ])
+    {
+        "json": "+233invalid"
+    }
+])
     recipient: String
     /// Code indicating how to fix this error
     @dataExamples([
-        {
-            json: "check_recipient"
-        }
-    ])
+    {
+        "json": "check_recipient"
+    }
+])
     fix_code: String
     /// Error type classification
     @dataExamples([
-        {
-            json: "invalid_recipient"
-        }
-    ])
+    {
+        "json": "invalid_recipient"
+    }
+])
     type: String
 }
 
@@ -11186,19 +11182,19 @@ structure BroadcastRequest {
     email: ChimeEmailMessageInput
     /// Category or intent for this broadcast.
     @dataExamples([
-        {
-            json: "order_notification"
-        }
-    ])
+    {
+        "json": "order_notification"
+    }
+])
     purpose: String
     @required
     recipients: BroadcastRequestrecipients
     /// Sender identifier displayed to recipients.
     @dataExamples([
-        {
-            json: "YourBrand"
-        }
-    ])
+    {
+        "json": "YourBrand"
+    }
+])
     sender: String
 }
 
@@ -11236,10 +11232,10 @@ structure CancelOrderRequest {
 structure CancelPayoutRequest {
     /// Scheduled payout identifier.
     @dataExamples([
-        {
-            json: "po_yQ2wXm5Dc7Pk9Ls1Vn0RgHaB"
-        }
-    ])
+    {
+        "json": "po_yQ2wXm5Dc7Pk9Ls1Vn0RgHaB"
+    }
+])
     @pattern("^po_")
     @required
     payout_id: String
@@ -11282,10 +11278,10 @@ structure CancelPayoutRequest {
 structure CancelPurchaseIntentRequest {
     /// Purchase intent ID to cancel. Send this or purchase_intent_id.
     @dataExamples([
-        {
-            json: "sale_ABCXYZ"
-        }
-    ])
+    {
+        "json": "sale_ABCXYZ"
+    }
+])
     @length(
         min: 1
     )
@@ -11293,10 +11289,10 @@ structure CancelPurchaseIntentRequest {
     id: String
     /// Alias for id. If both are present, this value takes precedence.
     @dataExamples([
-        {
-            json: "sale_ABCXYZ"
-        }
-    ])
+    {
+        "json": "sale_ABCXYZ"
+    }
+])
     @length(
         min: 1
     )
@@ -11307,10 +11303,10 @@ structure CancelPurchaseIntentRequest {
 structure CancelRefundRequest {
     /// Refund to cancel before processing begins.
     @dataExamples([
-        {
-            json: "rf_1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcd"
-        }
-    ])
+    {
+        "json": "rf_1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcd"
+    }
+])
     @pattern("^rf_")
     @required
     refund_id: String
@@ -11341,18 +11337,18 @@ structure CatalogProductWithCustomerSelectedPrice {
     customer_selected_price: CustomerSelectedPriceInput
     /// Existing catalog product ID to snapshot onto the order line item
     @dataExamples([
-        {
-            json: "prod_devcongress_donation"
-        }
-    ])
+    {
+        "json": "prod_devcongress_donation"
+    }
+])
     @required
     product_id: String
     /// How many units of the catalog product the customer is purchasing
     @dataExamples([
-        {
-            json: 1
-        }
-    ])
+    {
+        "json": 1
+    }
+])
     @range(
         min: 1
     )
@@ -11365,18 +11361,18 @@ structure CatalogProductWithPriceData {
     price: PriceParams
     /// Existing catalog product ID to snapshot onto the order line item
     @dataExamples([
-        {
-            json: "prod_abc123xyz"
-        }
-    ])
+    {
+        "json": "prod_abc123xyz"
+    }
+])
     @required
     product_id: String
     /// How many units of the catalog product the customer is purchasing
     @dataExamples([
-        {
-            json: 1
-        }
-    ])
+    {
+        "json": 1
+    }
+])
     @range(
         min: 1
     )
@@ -11387,26 +11383,26 @@ structure CatalogProductWithPriceData {
 structure CatalogProductWithPriceReference {
     /// Existing product price to snapshot onto the order line item. It must belong to the same application and product.
     @dataExamples([
-        {
-            json: "pr_xyz789"
-        }
-    ])
+    {
+        "json": "pr_xyz789"
+    }
+])
     @required
     price_id: String
     /// Existing catalog product ID to snapshot onto the order line item
     @dataExamples([
-        {
-            json: "prod_abc123xyz"
-        }
-    ])
+    {
+        "json": "prod_abc123xyz"
+    }
+])
     @required
     product_id: String
     /// How many units of the catalog product the customer is purchasing
     @dataExamples([
-        {
-            json: 1
-        }
-    ])
+    {
+        "json": 1
+    }
+])
     @range(
         min: 1
     )
@@ -11427,10 +11423,10 @@ structure CheckoutBillingDetails {
 
 structure CheckoutConfirmPaymentRequest {
     @dataExamples([
-        {
-            json: "or_a1b2c3d4e5f6"
-        }
-    ])
+    {
+        "json": "or_a1b2c3d4e5f6"
+    }
+])
     @length(
         min: 1
     )
@@ -11444,10 +11440,10 @@ structure CheckoutConfirmPaymentRequest {
     confirmation_id: String
     /// Payer confirmation token.
     @dataExamples([
-        {
-            json: "123456"
-        }
-    ])
+    {
+        "json": "123456"
+    }
+])
     @length(
         min: 1
     )
@@ -11599,10 +11595,10 @@ structure CheckoutCustomerData {
 structure CheckoutExistingOrderPayRequest {
     /// The finalized Order to pay.
     @dataExamples([
-        {
-            json: "or_a1b2c3d4e5f6"
-        }
-    ])
+    {
+        "json": "or_a1b2c3d4e5f6"
+    }
+])
     @length(
         min: 1
     )
@@ -11966,10 +11962,10 @@ structure CheckoutMobileMoneyData {
 )
 structure CheckoutOrder {
     @dataExamples([
-        {
-            json: "or_a1b2c3d4e5f6"
-        }
-    ])
+    {
+        "json": "or_a1b2c3d4e5f6"
+    }
+])
     @pattern("^or_")
     @required
     id: String
@@ -12035,10 +12031,10 @@ structure CheckoutOrderErrorResponse {
 structure CheckoutOrderLineItemAmountSelection {
     /// Product line-item ID whose amount should be changed.
     @dataExamples([
-        {
-            json: "oli_a1b2c3d4e5f6"
-        }
-    ])
+    {
+        "json": "oli_a1b2c3d4e5f6"
+    }
+])
     @length(
         min: 1
     )
@@ -12433,10 +12429,10 @@ structure CheckoutOrderpayment {
 structure CheckoutOrderReferenceRequest {
     /// The finalized Order to inspect or pay.
     @dataExamples([
-        {
-            json: "or_a1b2c3d4e5f6"
-        }
-    ])
+    {
+        "json": "or_a1b2c3d4e5f6"
+    }
+])
     @length(
         min: 1
     )
@@ -12454,10 +12450,10 @@ structure CheckoutOrderResponse {
 structure CheckoutOrderSelectAmountRequest {
     /// Existing finalized Order whose amount should be changed before payment begins.
     @dataExamples([
-        {
-            json: "or_a1b2c3d4e5f6"
-        }
-    ])
+    {
+        "json": "or_a1b2c3d4e5f6"
+    }
+])
     @length(
         min: 1
     )
@@ -12478,10 +12474,10 @@ structure CheckoutPaymentAddress {
     post_code: String
     /// ISO 3166-1 alpha-2 country code.
     @dataExamples([
-        {
-            json: "GH"
-        }
-    ])
+    {
+        "json": "GH"
+    }
+])
     @required
     country: String
 }
@@ -12598,10 +12594,10 @@ structure CheckoutPurchaseIntentLookupResponse {
 structure CheckoutPurchaseIntentPayRequest {
     /// Purchase Intent to turn into an Order and pay in this request.
     @dataExamples([
-        {
-            json: "sale_a1b2c3d4e5f6"
-        }
-    ])
+    {
+        "json": "sale_a1b2c3d4e5f6"
+    }
+])
     @length(
         min: 1
     )
@@ -12637,10 +12633,10 @@ structure CheckoutPurchaseIntentPayRequestselectedAmount with [CheckoutSelectedA
 structure CheckoutPurchaseIntentSelectAmountRequest {
     /// Purchase Intent used to create a new Checkout Order.
     @dataExamples([
-        {
-            json: "sale_a1b2c3d4e5f6"
-        }
-    ])
+    {
+        "json": "sale_a1b2c3d4e5f6"
+    }
+])
     @length(
         min: 1
     )
@@ -12658,10 +12654,10 @@ structure CheckoutSelectedAmountMixin {
     currency: Currency
     /// Payer-selected amount in the currency's smallest unit.
     @dataExamples([
-        {
-            json: 5000
-        }
-    ])
+    {
+        "json": 5000
+    }
+])
     @range(
         min: 1
     )
@@ -12874,17 +12870,17 @@ structure ChimeEmailEvent {
 structure ChimeEmailMailbox {
     /// Optional display name
     @dataExamples([
-        {
-            json: "Acme"
-        }
-    ])
+    {
+        "json": "Acme"
+    }
+])
     name: String
     /// Email address
     @dataExamples([
-        {
-            json: "notifications@inttegro.com"
-        }
-    ])
+    {
+        "json": "notifications@inttegro.com"
+    }
+])
     address: String
 }
 
@@ -12933,17 +12929,17 @@ structure ChimeEmailMailbox {
 structure ChimeEmailMessage {
     /// Email subject
     @dataExamples([
-        {
-            json: "Your receipt"
-        }
-    ])
+    {
+        "json": "Your receipt"
+    }
+])
     subject: String
     /// Plain-text email body
     @dataExamples([
-        {
-            json: "Your receipt is ready."
-        }
-    ])
+    {
+        "json": "Your receipt is ready."
+    }
+])
     text: String
     /// Optional HTML email body before provider-specific rendering
     html: String
@@ -12958,18 +12954,18 @@ structure ChimeEmailMessage {
 structure ChimeEmailMessageInput {
     /// Email subject.
     @dataExamples([
-        {
-            json: "Your receipt"
-        }
-    ])
+    {
+        "json": "Your receipt"
+    }
+])
     @required
     subject: String
     /// Plain-text email body.
     @dataExamples([
-        {
-            json: "Your receipt is ready."
-        }
-    ])
+    {
+        "json": "Your receipt is ready."
+    }
+])
     @required
     text: String
     /// Optional HTML email body. Unsafe HTML is rejected or sanitized before delivery.
@@ -12978,10 +12974,10 @@ structure ChimeEmailMessageInput {
     from: ChimeEmailMailbox
     /// Optional reply-to email address.
     @dataExamples([
-        {
-            json: "support@example.com"
-        }
-    ])
+    {
+        "json": "support@example.com"
+    }
+])
     reply_to: String
     headers: MessageHeaders
 }
@@ -12996,10 +12992,10 @@ structure ChimeEmailRecipient {
 
 structure ChimeEmailRecipientemail {
     @dataExamples([
-        {
-            json: "user@example.com"
-        }
-    ])
+    {
+        "json": "user@example.com"
+    }
+])
     @required
     address: String
 }
@@ -13072,10 +13068,10 @@ structure ChimeEmailSafetyResult {
     links: ChimeEmailSafetyResultlinks
     /// Safety scanner identifier
     @dataExamples([
-        {
-            json: "content-safety"
-        }
-    ])
+    {
+        "json": "content-safety"
+    }
+])
     scanner: String
     /// Hash of the scanned email content
     content_hash: String
@@ -13114,10 +13110,10 @@ structure ChimePhoneRecipient {
 
 structure ChimePhoneRecipientphone {
     @dataExamples([
-        {
-            json: "+233544998605"
-        }
-    ])
+    {
+        "json": "+233544998605"
+    }
+])
     @required
     number: String
 }
@@ -13128,10 +13124,10 @@ structure ChimeRecipientResponse {
     type: ChimeRecipientResponsetype
     /// Recipient name
     @dataExamples([
-        {
-            json: "John Doe"
-        }
-    ])
+    {
+        "json": "John Doe"
+    }
+])
     name: String
     phone: ChimeRecipientResponsephone
     email: ChimeRecipientResponseemail
@@ -13139,20 +13135,20 @@ structure ChimeRecipientResponse {
 
 structure ChimeRecipientResponseemail {
     @dataExamples([
-        {
-            json: "user@example.com"
-        }
-    ])
+    {
+        "json": "user@example.com"
+    }
+])
     @required
     address: String
 }
 
 structure ChimeRecipientResponsephone {
     @dataExamples([
-        {
-            json: "+233544998605"
-        }
-    ])
+    {
+        "json": "+233544998605"
+    }
+])
     @required
     number: String
 }
@@ -13165,10 +13161,10 @@ structure ChimeResponse {
 
 structure ChimeSavedCustomerRecipient {
     @dataExamples([
-        {
-            json: "cu_abc123def456"
-        }
-    ])
+    {
+        "json": "cu_abc123def456"
+    }
+])
     @required
     customer_id: String
     @required
@@ -13367,10 +13363,10 @@ structure ChimeTransmission {
 structure CompleteOrderRequest {
     /// Unique identifier of the order to complete
     @dataExamples([
-        {
-            json: "or_48ZW7BGvYUBWc1i6WBkL2jr0iPQP5jUy76mmmHpt"
-        }
-    ])
+    {
+        "json": "or_48ZW7BGvYUBWc1i6WBkL2jr0iPQP5jUy76mmmHpt"
+    }
+])
     @pattern("^or_")
     @required
     order_id: String
@@ -13379,29 +13375,29 @@ structure CompleteOrderRequest {
     /// will be marked as paid offline before completing the order.
     ///
     @dataExamples([
-        {
-            json: false
-        }
-    ])
+    {
+        "json": false
+    }
+])
     paid_out_of_band: Boolean
 }
 
 @dataExamples([
     {
-        json: {
-            order: {
-                status: "completed"
-                sealed_at: "2025-01-25T10:30:00Z"
-                customer: {
-                    id: "cu_abc123def456"
-                    guest: false
-                    name: "Akua Mensah"
-                }
-                completed_at: "2025-01-25T11:00:00Z"
-                id: "or_48ZW7BGvYUBWc1i6WBkL2jr0iPQP5jUy76mmmHpt"
-                initiated_at: "2025-01-25T10:25:00Z"
-                expires_at: "2025-02-01T10:25:00Z"
-                number: "ORDER-12345"
+        "json": {
+            "order": {
+                "completed_at": "2025-01-25T11:00:00Z",
+                "customer": {
+                    "guest": false,
+                    "id": "cu_abc123def456",
+                    "name": "Akua Mensah"
+                },
+                "expires_at": "2025-02-01T10:25:00Z",
+                "id": "or_48ZW7BGvYUBWc1i6WBkL2jr0iPQP5jUy76mmmHpt",
+                "initiated_at": "2025-01-25T10:25:00Z",
+                "number": "ORDER-12345",
+                "sealed_at": "2025-01-25T10:30:00Z",
+                "status": "completed"
             }
         }
     }
@@ -13414,36 +13410,36 @@ structure CompleteOrderResponse {
 structure ConfirmPaymentRequest {
     /// Unique identifier of the order
     @dataExamples([
-        {
-            json: "or_JoPtqOmsjgZKwkPvqTrqGsopu07wfC7ttoWqmfwt"
-        }
-    ])
+    {
+        "json": "or_JoPtqOmsjgZKwkPvqTrqGsopu07wfC7ttoWqmfwt"
+    }
+])
     @pattern("^or_")
     @required
     order_id: String
     /// Unique identifier of the payment being confirmed
     @dataExamples([
-        {
-            json: "py_123"
-        }
-    ])
+    {
+        "json": "py_123"
+    }
+])
     @pattern("^py_")
     @required
     payment_id: String
     /// Unique identifier of the confirmation challenge
     @dataExamples([
-        {
-            json: "conf_123"
-        }
-    ])
+    {
+        "json": "conf_123"
+    }
+])
     @required
     confirmation_id: String
     /// Verification token (OTP) sent to customer
     @dataExamples([
-        {
-            json: "302673"
-        }
-    ])
+    {
+        "json": "302673"
+    }
+])
     @required
     token: String
 }
@@ -13457,33 +13453,33 @@ structure ConnectFinancialAccountResponse {
 structure CountryBank {
     /// Stable bank identifier
     @dataExamples([
-        {
-            json: "absa_gh_ltd"
-        }
-    ])
+    {
+        "json": "absa_gh_ltd"
+    }
+])
     @required
     id: String
     /// Bank display name
     @dataExamples([
-        {
-            json: "ABSA (GH) LTD"
-        }
-    ])
+    {
+        "json": "ABSA (GH) LTD"
+    }
+])
     @required
     name: String
     /// SWIFT/BIC code for the bank, when available
     @dataExamples([
-        {
-            json: "BARCGHAC"
-        }
-    ])
+    {
+        "json": "BARCGHAC"
+    }
+])
     swift_code: String
     /// Ghana sort code prefix for the bank
     @dataExamples([
-        {
-            json: "03"
-        }
-    ])
+    {
+        "json": "03"
+    }
+])
     sort_code_prefix: String
     @required
     branches: CountryBankbranches
@@ -13493,26 +13489,26 @@ structure CountryBank {
 structure CountryBankBranch {
     /// Stable branch identifier
     @dataExamples([
-        {
-            json: "absa_gh_ltd_kasoa_branch"
-        }
-    ])
+    {
+        "json": "absa_gh_ltd_kasoa_branch"
+    }
+])
     @required
     id: String
     /// Branch display name
     @dataExamples([
-        {
-            json: "ABSA (GH) LTD-KASOA BRANCH"
-        }
-    ])
+    {
+        "json": "ABSA (GH) LTD-KASOA BRANCH"
+    }
+])
     @required
     name: String
     /// Ghana bank branch sort code
     @dataExamples([
-        {
-            json: "030101"
-        }
-    ])
+    {
+        "json": "030101"
+    }
+])
     @required
     sort_code: String
 }
@@ -13521,18 +13517,18 @@ structure CountryBankBranch {
 structure CountryBankDirectory {
     /// Country-specific bank account subtype used by financial account APIs
     @dataExamples([
-        {
-            json: "ghana_bank_account"
-        }
-    ])
+    {
+        "json": "ghana_bank_account"
+    }
+])
     @required
     bank_account_type: String
     /// Identifier scheme used for bank branch codes
     @dataExamples([
-        {
-            json: "sort_code"
-        }
-    ])
+    {
+        "json": "sort_code"
+    }
+])
     @required
     code_scheme: String
     @required
@@ -13543,18 +13539,18 @@ structure CountryBankDirectory {
 structure CountrySpecification {
     /// ISO 3166-1 alpha-2 country code
     @dataExamples([
-        {
-            json: "gh"
-        }
-    ])
+    {
+        "json": "gh"
+    }
+])
     @required
     country_code: String
     /// Full country name
     @dataExamples([
-        {
-            json: "Ghana"
-        }
-    ])
+    {
+        "json": "Ghana"
+    }
+])
     @required
     country_name: String
     @required
@@ -13720,10 +13716,10 @@ structure CreateEmailMessageTemplateRequest {
 
 structure CreateFileLinkRequest {
     @dataExamples([
-        {
-            json: "file_2xC7k9gK5yQnZ4w8P1sT6vR3"
-        }
-    ])
+    {
+        "json": "file_2xC7k9gK5yQnZ4w8P1sT6vR3"
+    }
+])
     @pattern("^file_")
     @required
     file_id: String
@@ -13749,25 +13745,25 @@ structure CreateFileRequest {
     file: Blob
     /// File purpose policy to apply.
     @dataExamples([
-        {
-            json: "product_image"
-        }
-    ])
+    {
+        "json": "product_image"
+    }
+])
     @required
     purpose: String
     /// Optional display title for the file.
     @dataExamples([
-        {
-            json: "Hero product image"
-        }
-    ])
+    {
+        "json": "Hero product image"
+    }
+])
     title: String
     /// JSON object encoded as a string. Values must be strings.
     @dataExamples([
-        {
-            json: "{\"product_id\":\"prod_123\"}"
-        }
-    ])
+    {
+        "json": "{\"product_id\":\"prod_123\"}"
+    }
+])
     custom_data: String
 }
 
@@ -13956,20 +13952,20 @@ structure CreateOperatingPolicyRequest {
 structure CreateOrderExistingCustomer {
     /// ID of existing customer
     @dataExamples([
-        {
-            json: "cu_dZjC0hAsYi2dObveagp6pJLoXvgmicoBQj8KuNOZ"
-        }
-    ])
+    {
+        "json": "cu_dZjC0hAsYi2dObveagp6pJLoXvgmicoBQj8KuNOZ"
+    }
+])
     @pattern("^cu_")
     @required
     customer_id: String
     payment_method_types: CreateOrderExistingCustomerpaymentMethodTypes
     /// ID of saved payment method to use
     @dataExamples([
-        {
-            json: "OaNWqiOeYa5OJMcxUPZC1pLCW94Ne3toks4HIVPRa"
-        }
-    ])
+    {
+        "json": "OaNWqiOeYa5OJMcxUPZC1pLCW94Ne3toks4HIVPRa"
+    }
+])
     payment_method_id: String
     payment_method_data: CreateOrderExistingCustomerpaymentMethodData
     /// Optional payment due time.
@@ -13977,17 +13973,17 @@ structure CreateOrderExistingCustomer {
     payment_due_after: Timestamp
     /// Optional order number for reference. When omitted, Inttegro uses the generated order ID.
     @dataExamples([
-        {
-            json: "ORDER-NUMBER-2"
-        }
-    ])
+    {
+        "json": "ORDER-NUMBER-2"
+    }
+])
     number: String
     /// Optional receipt number for downstream reconciliation. Uses the same length rules as `number`.
     @dataExamples([
-        {
-            json: "RCPT-NUMBER-2"
-        }
-    ])
+    {
+        "json": "RCPT-NUMBER-2"
+    }
+])
     receipt_number: String
     /// Optional statement descriptor shown on the customer's bank statement
     @length(
@@ -13997,10 +13993,10 @@ structure CreateOrderExistingCustomer {
     statement_descriptor: String
     /// Optional static prefix used to build the statement descriptor as `prefix*order_id`. Mutually exclusive with `statement_descriptor`.
     @dataExamples([
-        {
-            json: "LINE"
-        }
-    ])
+    {
+        "json": "LINE"
+    }
+])
     @length(
         min: 2
         max: 10
@@ -14026,17 +14022,17 @@ structure CreateOrderExistingCustomer {
 structure CreateOrderExistingCustomercheckoutSettings {
     /// URL to redirect customer after payment completion
     @dataExamples([
-        {
-            json: "https://example.com/order/complete"
-        }
-    ])
+    {
+        "json": "https://example.com/order/complete"
+    }
+])
     redirect_url: String
     /// URL to redirect customer if they cancel payment
     @dataExamples([
-        {
-            json: "https://example.com/order/cancelled"
-        }
-    ])
+    {
+        "json": "https://example.com/order/cancelled"
+    }
+])
     cancel_url: String
 }
 
@@ -14206,24 +14202,24 @@ structure CreateOrderNewCustomer {
     payment_due_after: Timestamp
     /// Optional order number for reference. When omitted, Inttegro uses the generated order ID.
     @dataExamples([
-        {
-            json: "ORDER-NUMBER-2"
-        }
-    ])
+    {
+        "json": "ORDER-NUMBER-2"
+    }
+])
     number: String
     /// Optional receipt number for downstream reconciliation. Uses the same length rules as `number`.
     @dataExamples([
-        {
-            json: "RCPT-NUMBER-2"
-        }
-    ])
+    {
+        "json": "RCPT-NUMBER-2"
+    }
+])
     receipt_number: String
     /// Optional statement descriptor shown on the customer's bank statement
     @dataExamples([
-        {
-            json: "STMTDESC"
-        }
-    ])
+    {
+        "json": "STMTDESC"
+    }
+])
     @length(
         min: 3
         max: 22
@@ -14231,10 +14227,10 @@ structure CreateOrderNewCustomer {
     statement_descriptor: String
     /// Optional static prefix used to build the statement descriptor as `prefix*order_id`. Mutually exclusive with `statement_descriptor`.
     @dataExamples([
-        {
-            json: "LINE"
-        }
-    ])
+    {
+        "json": "LINE"
+    }
+])
     @length(
         min: 2
         max: 10
@@ -14260,17 +14256,17 @@ structure CreateOrderNewCustomer {
 structure CreateOrderNewCustomercheckoutSettings {
     /// URL to redirect customer after payment completion
     @dataExamples([
-        {
-            json: "https://example.com/order/complete"
-        }
-    ])
+    {
+        "json": "https://example.com/order/complete"
+    }
+])
     redirect_url: String
     /// URL to redirect customer if they cancel payment
     @dataExamples([
-        {
-            json: "https://example.com/order/cancelled"
-        }
-    ])
+    {
+        "json": "https://example.com/order/cancelled"
+    }
+])
     cancel_url: String
 }
 
@@ -14291,10 +14287,10 @@ structure CreateProductRequest {
     type: CreateProductRequesttype
     /// External reference or SKU from your system
     @dataExamples([
-        {
-            json: "SKU-12345"
-        }
-    ])
+    {
+        "json": "SKU-12345"
+    }
+])
     @length(
         min: 1
         max: 100
@@ -14302,10 +14298,10 @@ structure CreateProductRequest {
     reference: String
     /// Customer-facing product name
     @dataExamples([
-        {
-            json: "Premium Cotton T-Shirt"
-        }
-    ])
+    {
+        "json": "Premium Cotton T-Shirt"
+    }
+])
     @length(
         min: 1
         max: 100
@@ -14314,30 +14310,30 @@ structure CreateProductRequest {
     name: String
     /// Short product description or tagline
     @dataExamples([
-        {
-            json: "Comfortable everyday wear"
-        }
-    ])
+    {
+        "json": "Comfortable everyday wear"
+    }
+])
     @length(
         max: 200
     )
     description: String
     /// Full product description with details and features
     @dataExamples([
-        {
-            json: "Made from 100% organic cotton, this premium t-shirt..."
-        }
-    ])
+    {
+        "json": "Made from 100% organic cotton, this premium t-shirt..."
+    }
+])
     @length(
         max: 5000
     )
     about: String
     /// Tax classification code for tax calculations
     @dataExamples([
-        {
-            json: "TXCD001"
-        }
-    ])
+    {
+        "json": "TXCD001"
+    }
+])
     @length(
         max: 50
     )
@@ -14374,10 +14370,10 @@ structure CreatePurchaseIntentPresentationbuyPage {
 structure CreatePurchaseIntentPresentationbuyPagetext {
     /// Plain, single-line title shown above the Buy page form
     @dataExamples([
-        {
-            json: "Support this cause"
-        }
-    ])
+    {
+        "json": "Support this cause"
+    }
+])
     @length(
         min: 1
         max: 80
@@ -14385,10 +14381,10 @@ structure CreatePurchaseIntentPresentationbuyPagetext {
     checkout_section_title: String
     /// Plain, single-line label for a customer-selected amount field
     @dataExamples([
-        {
-            json: "Your contribution"
-        }
-    ])
+    {
+        "json": "Your contribution"
+    }
+])
     @length(
         min: 1
         max: 64
@@ -14396,10 +14392,10 @@ structure CreatePurchaseIntentPresentationbuyPagetext {
     amount_field_label: String
     /// Plain, single-line label used for the ready primary action. Validation and loading labels remain system-owned.
     @dataExamples([
-        {
-            json: "Continue to contribute"
-        }
-    ])
+    {
+        "json": "Continue to contribute"
+    }
+])
     @length(
         min: 1
         max: 48
@@ -15037,28 +15033,28 @@ structure CreatePurchaseIntentRequest {
     product: PurchaseIntentProductSelection
     /// App-owned product ID to sell through the Buy link when not using product
     @dataExamples([
-        {
-            json: "prod_abc123"
-        }
-    ])
+    {
+        "json": "prod_abc123"
+    }
+])
     @pattern("^prod_")
     product_id: String
     bundle: PurchaseIntentBundleSelection
     /// App-owned bundle ID to sell through the Buy link when not using bundle
     @dataExamples([
-        {
-            json: "pbd_abc123"
-        }
-    ])
+    {
+        "json": "pbd_abc123"
+    }
+])
     @pattern("^pbd_")
     bundle_id: String
     price: PurchaseIntentPriceSelection
     /// Active, unarchived app-owned price ID. It must belong to a selected product; for a bundle it must be fixed and use the bundle catalog currency.
     @dataExamples([
-        {
-            json: "pr_xyz789"
-        }
-    ])
+    {
+        "json": "pr_xyz789"
+    }
+])
     @pattern("^pr_")
     price_id: String
     @required
@@ -15066,10 +15062,10 @@ structure CreatePurchaseIntentRequest {
     usage: CreatePurchaseIntentRequestusage
     /// Future RFC3339 timestamp after which the Buy link stops accepting purchases
     @dataExamples([
-        {
-            json: "2030-12-01T09:00Z"
-        }
-    ])
+    {
+        "json": "2030-12-01T09:00Z"
+    }
+])
     @timestampFormat("date-time")
     expires_at: Timestamp
     presentation: CreatePurchaseIntentPresentation
@@ -15091,10 +15087,10 @@ structure CreatePurchaseIntentRequest {
 structure CreatePurchaseIntentRequestquantity {
     /// Minimum quantity the customer can buy
     @dataExamples([
-        {
-            json: 1
-        }
-    ])
+    {
+        "json": 1
+    }
+])
     @range(
         min: 1
     )
@@ -15102,10 +15098,10 @@ structure CreatePurchaseIntentRequestquantity {
     min: Integer
     /// Optional maximum quantity the customer can buy. It must be greater than or equal to min.
     @dataExamples([
-        {
-            json: 5
-        }
-    ])
+    {
+        "json": 5
+    }
+])
     @range(
         min: 1
     )
@@ -15116,17 +15112,17 @@ structure CreatePurchaseIntentRequestquantity {
 structure CreatePurchaseIntentRequestusage {
     /// Creating the first order consumes the Buy link
     @dataExamples([
-        {
-            json: true
-        }
-    ])
+    {
+        "json": true
+    }
+])
     single_use: Boolean
     /// The Buy link may create multiple orders
     @dataExamples([
-        {
-            json: true
-        }
-    ])
+    {
+        "json": true
+    }
+])
     multi_use: Boolean
 }
 
@@ -15225,10 +15221,10 @@ structure CreatePurchaseIntentRequestusage {
 structure CreateRefundLineItem {
     /// Strong identifier for the paid order line item being refunded.
     @dataExamples([
-        {
-            json: "oli_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMN"
-        }
-    ])
+    {
+        "json": "oli_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMN"
+    }
+])
     @pattern("^oli_")
     @required
     order_line_item_id: String
@@ -15248,10 +15244,10 @@ structure CreateRefundRequest {
     line_items: CreateRefundRequestlineItems
     /// Paid order to refund.
     @dataExamples([
-        {
-            json: "or_0123456789abcdefghijklmnopqrstuvwxyzABCD"
-        }
-    ])
+    {
+        "json": "or_0123456789abcdefghijklmnopqrstuvwxyzABCD"
+    }
+])
     @pattern("^or_")
     @required
     order_id: String
@@ -15284,10 +15280,10 @@ structure CreateSMSMessageTemplateRequest {
 
 structure CreateUploadRequestRequest {
     @dataExamples([
-        {
-            json: "support_document"
-        }
-    ])
+    {
+        "json": "support_document"
+    }
+])
     @required
     purpose: String
     constraints: UploadRequestConstraints
@@ -15427,24 +15423,24 @@ structure CustomerBalanceValue {
 structure CustomerData {
     /// Customer's full name
     @dataExamples([
-        {
-            json: "Customer Name"
-        }
-    ])
+    {
+        "json": "Customer Name"
+    }
+])
     name: String
     /// Customer's email address
     @dataExamples([
-        {
-            json: "customer@example.com"
-        }
-    ])
+    {
+        "json": "customer@example.com"
+    }
+])
     email_address: String
     /// Customer's phone number
     @dataExamples([
-        {
-            json: "0559714200"
-        }
-    ])
+    {
+        "json": "0559714200"
+    }
+])
     phone_number: String
     custom_data: CustomDataInput
 }
@@ -15532,10 +15528,10 @@ structure CustomerSelectedAmountParams {
     currency: CustomerSelectedAmountParamscurrency
     /// Minimum selectable amount in the currency's smallest unit
     @dataExamples([
-        {
-            json: 10000
-        }
-    ])
+    {
+        "json": 10000
+    }
+])
     @range(
         min: 1
     )
@@ -15543,10 +15539,10 @@ structure CustomerSelectedAmountParams {
     minimum: Integer
     /// Optional maximum selectable amount; it must be at least minimum
     @dataExamples([
-        {
-            json: 500000
-        }
-    ])
+    {
+        "json": 500000
+    }
+])
     @range(
         min: 1
     )
@@ -15754,33 +15750,33 @@ structure CustomerSelectedCatalogPrice with [CustomerSelectedCatalogPriceFields]
 structure CustomerSelectedCatalogPriceFields {
     /// Unique price identifier with pr_ prefix
     @dataExamples([
-        {
-            json: "pr_xyz789"
-        }
-    ])
+    {
+        "json": "pr_xyz789"
+    }
+])
     @pattern("^pr_")
     @required
     id: String
     /// Short label for this price
     @dataExamples([
-        {
-            json: "Standard pricing"
-        }
-    ])
+    {
+        "json": "Standard pricing"
+    }
+])
     label: String
     /// Longer description for this price
     @dataExamples([
-        {
-            json: "Standard pricing for individual customers"
-        }
-    ])
+    {
+        "json": "Standard pricing for individual customers"
+    }
+])
     about: String
     /// Whether this price is active and usable in new flows
     @dataExamples([
-        {
-            json: true
-        }
-    ])
+    {
+        "json": true
+    }
+])
     @required
     active: Boolean
     @required
@@ -15789,28 +15785,28 @@ structure CustomerSelectedCatalogPriceFields {
     customer_selected_amount: CustomerSelectedAmount
     /// Product ID when the operation returns the relationship by reference
     @dataExamples([
-        {
-            json: "prod_abc123"
-        }
-    ])
+    {
+        "json": "prod_abc123"
+    }
+])
     @pattern("^prod_")
     product_id: String
     product: CustomerSelectedCatalogPriceFieldsproduct
     /// Price creation timestamp
     @dataExamples([
-        {
-            json: "2024-01-15T10:30Z"
-        }
-    ])
+    {
+        "json": "2024-01-15T10:30Z"
+    }
+])
     @required
     @timestampFormat("date-time")
     created_at: Timestamp
     /// Last update timestamp
     @dataExamples([
-        {
-            json: "2024-01-20T14:45Z"
-        }
-    ])
+    {
+        "json": "2024-01-20T14:45Z"
+    }
+])
     @timestampFormat("date-time")
     updated_at: Timestamp
     /// Archive timestamp (if archived). A non-null value means `active` is false.
@@ -15824,29 +15820,29 @@ structure CustomerSelectedCatalogPriceFieldsproduct with [PriceEmbeddedProduct] 
 structure CustomerSelectedCatalogPriceParams {
     /// Product ID to associate this price with. It is immutable once set.
     @dataExamples([
-        {
-            json: "prod_abc123"
-        }
-    ])
+    {
+        "json": "prod_abc123"
+    }
+])
     @pattern("^prod_")
     @required
     product_id: String
     /// Short label for this price
     @dataExamples([
-        {
-            json: "Standard pricing"
-        }
-    ])
+    {
+        "json": "Standard pricing"
+    }
+])
     @length(
         max: 100
     )
     label: String
     /// Longer description of this price
     @dataExamples([
-        {
-            json: "Standard pricing for individual customers"
-        }
-    ])
+    {
+        "json": "Standard pricing for individual customers"
+    }
+])
     @length(
         max: 500
     )
@@ -15862,10 +15858,10 @@ structure CustomerSelectedCatalogPriceParamscustomerSelectedAmount with [Custome
 structure CustomerSelectedPriceInput {
     /// Existing customer_selected_amount price belonging to the catalog product
     @dataExamples([
-        {
-            json: "pr_donation"
-        }
-    ])
+    {
+        "json": "pr_donation"
+    }
+])
     @required
     price_id: String
     @required
@@ -15920,27 +15916,27 @@ structure CustomerSelectedPriceInputselectedAmount with [AmountParamsMixin] {}
 structure CustomerSelectedProductPriceSummary {
     /// Unique price identifier with pr_ prefix
     @dataExamples([
-        {
-            json: "pr_xyz789"
-        }
-    ])
+    {
+        "json": "pr_xyz789"
+    }
+])
     @pattern("^pr_")
     @required
     id: String
     /// Whether this price is active and usable in new flows
     @dataExamples([
-        {
-            json: true
-        }
-    ])
+    {
+        "json": true
+    }
+])
     @required
     active: Boolean
     /// Short label for this price
     @dataExamples([
-        {
-            json: "Wholesale"
-        }
-    ])
+    {
+        "json": "Wholesale"
+    }
+])
     label: String
     @required
     customer_selected_amount: CustomerSelectedAmount
@@ -15948,10 +15944,10 @@ structure CustomerSelectedProductPriceSummary {
 
 structure DeleteFileRequest {
     @dataExamples([
-        {
-            json: "file_2xC7k9gK5yQnZ4w8P1sT6vR3"
-        }
-    ])
+    {
+        "json": "file_2xC7k9gK5yQnZ4w8P1sT6vR3"
+    }
+])
     @pattern("^file_")
     @required
     file_id: String
@@ -15960,10 +15956,10 @@ structure DeleteFileRequest {
 structure DestroySecretKeyRequest {
     /// Secret key identifier to revoke.
     @dataExamples([
-        {
-            json: "sk_2xC7k9gK5yQnZ4w8P1sT6vR3"
-        }
-    ])
+    {
+        "json": "sk_2xC7k9gK5yQnZ4w8P1sT6vR3"
+    }
+])
     @pattern("^sk_")
     @required
     secret_key_id: String
@@ -15992,10 +15988,10 @@ structure DisableFinancialAccountPushResponse {
 structure DisactivatePaymentMethodRequest {
     /// ID of the payment method to mark inactive
     @dataExamples([
-        {
-            json: "pm_xyz789"
-        }
-    ])
+    {
+        "json": "pm_xyz789"
+    }
+])
     @pattern("^pm_")
     @required
     payment_method_id: String
@@ -16062,18 +16058,18 @@ structure ErrorfixCodeSchema {}
 structure ErrorMixin {
     /// Concise, caller-safe explanation of why the request was rejected or could not finish.
     @dataExamples([
-        {
-            json: "payment method could not be used for this order"
-        }
-    ])
+    {
+        "json": "payment method could not be used for this order"
+    }
+])
     message: String
     fix_code: ErrorfixCodeSchema
     /// Explanation of the relevant rule and next safe action. It never contains raw dependency, storage, or implementation errors.
     @dataExamples([
-        {
-            json: "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
-        }
-    ])
+    {
+        "json": "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
+    }
+])
     detail: String
     cause: ErrorcauseSchema
     @required
@@ -16111,10 +16107,10 @@ structure FeeLineItem {
 
 structure FileActor {
     @dataExamples([
-        {
-            json: "api_key"
-        }
-    ])
+    {
+        "json": "api_key"
+    }
+])
     @required
     type: String
     id: String
@@ -16135,10 +16131,10 @@ structure FileApiError with [ErrorMixin] {}
 
 structure FileContentsRequest {
     @dataExamples([
-        {
-            json: "file_2xC7k9gK5yQnZ4w8P1sT6vR3"
-        }
-    ])
+    {
+        "json": "file_2xC7k9gK5yQnZ4w8P1sT6vR3"
+    }
+])
     @required
     file_id: String
     disposition: FileContentsRequestdisposition
@@ -16149,22 +16145,22 @@ structure FileContentsRequest {
 structure FileDelivery {
     /// Unsigned CDN URL for public-safe assets such as product images.
     @dataExamples([
-        {
-            json: "https://assets.inttegro.com/public/assets/file_2xC7k9gK5yQnZ4w8P1sT6vR3/original"
-        }
-    ])
+    {
+        "json": "https://assets.inttegro.com/public/assets/file_2xC7k9gK5yQnZ4w8P1sT6vR3/original"
+    }
+])
     public_url: String
     @dataExamples([
-        {
-            json: "public, max-age=31536000, immutable"
-        }
-    ])
+    {
+        "json": "public, max-age=31536000, immutable"
+    }
+])
     cache_control: String
     @dataExamples([
-        {
-            json: "image/png"
-        }
-    ])
+    {
+        "json": "image/png"
+    }
+])
     content_type: String
 }
 
@@ -16389,10 +16385,10 @@ structure FileLinkResponse {
 
 structure FileMedia {
     @dataExamples([
-        {
-            json: "image"
-        }
-    ])
+    {
+        "json": "image"
+    }
+])
     kind: String
     width: Long
     height: Long
@@ -16408,18 +16404,18 @@ structure FileMedia {
 /// Public file metadata. Storage provider details, object keys, and idempotency internals are not exposed.
 structure FileObject {
     @dataExamples([
-        {
-            json: "file_2xC7k9gK5yQnZ4w8P1sT6vR3"
-        }
-    ])
+    {
+        "json": "file_2xC7k9gK5yQnZ4w8P1sT6vR3"
+    }
+])
     @pattern("^file_")
     @required
     id: String
     @dataExamples([
-        {
-            json: "product_image"
-        }
-    ])
+    {
+        "json": "product_image"
+    }
+])
     @required
     purpose: String
     @required
@@ -16427,37 +16423,37 @@ structure FileObject {
     @required
     scan_status: FileObjectscanStatus
     @dataExamples([
-        {
-            json: "Hero image"
-        }
-    ])
+    {
+        "json": "Hero image"
+    }
+])
     name: String
     @dataExamples([
-        {
-            json: "hero.png"
-        }
-    ])
+    {
+        "json": "hero.png"
+    }
+])
     filename: String
     @dataExamples([
-        {
-            json: "image/png"
-        }
-    ])
+    {
+        "json": "image/png"
+    }
+])
     @required
     content_type: String
     /// Original byte size.
     @dataExamples([
-        {
-            json: 384221
-        }
-    ])
+    {
+        "json": 384221
+    }
+])
     @required
     size: Long
     @dataExamples([
-        {
-            json: "02c26c6e49b2c332c8fb95d9f6a7c4f2d9e3f1f5a63f0b1a9d2a0ba"
-        }
-    ])
+    {
+        "json": "02c26c6e49b2c332c8fb95d9f6a7c4f2d9e3f1f5a63f0b1a9d2a0ba"
+    }
+])
     @required
     checksum_sha256: String
     @required
@@ -16496,17 +16492,17 @@ structure FileObject {
 )
 structure FilePage {
     @dataExamples([
-        {
-            json: 1
-        }
-    ])
+    {
+        "json": 1
+    }
+])
     @required
     number: Integer
     @dataExamples([
-        {
-            json: 1
-        }
-    ])
+    {
+        "json": 1
+    }
+])
     @required
     size: Integer
     @required
@@ -16534,10 +16530,10 @@ structure FileReferenceInput {
     file_id: String
     /// Non-blank resource field after trimming.
     @dataExamples([
-        {
-            json: "media.gallery[0]"
-        }
-    ])
+    {
+        "json": "media.gallery[0]"
+    }
+])
     @length(
         min: 1
     )
@@ -16553,10 +16549,10 @@ structure FileReferenceInput {
 structure FileReferenceReconcileRequest {
     /// Non-blank resource type after trimming.
     @dataExamples([
-        {
-            json: "product"
-        }
-    ])
+    {
+        "json": "product"
+    }
+])
     @length(
         min: 1
     )
@@ -16564,10 +16560,10 @@ structure FileReferenceReconcileRequest {
     resource_type: String
     /// Non-blank resource ID after trimming.
     @dataExamples([
-        {
-            json: "prod_123"
-        }
-    ])
+    {
+        "json": "prod_123"
+    }
+])
     @length(
         min: 1
     )
@@ -16583,10 +16579,10 @@ structure FileReferenceReconcileResponse {
 
 structure FileResource {
     @dataExamples([
-        {
-            json: "product"
-        }
-    ])
+    {
+        "json": "product"
+    }
+])
     type: String
     id: String
     name: String
@@ -16627,10 +16623,10 @@ structure FileUploadReceipt {
 structure FinalizeOrderRequest {
     /// Unique identifier of the order to finalize
     @dataExamples([
-        {
-            json: "or_48ZW7BGvYUBWc1i6WBkL2jr0iPQP5jUy76mmmHpt"
-        }
-    ])
+    {
+        "json": "or_48ZW7BGvYUBWc1i6WBkL2jr0iPQP5jUy76mmmHpt"
+    }
+])
     @pattern("^or_")
     @required
     order_id: String
@@ -16638,19 +16634,19 @@ structure FinalizeOrderRequest {
 
 @dataExamples([
     {
-        json: {
-            order: {
-                status: "requires_payment"
-                sealed_at: "2025-01-25T10:30:00Z"
-                customer: {
-                    id: "cu_abc123def456"
-                    guest: false
-                    name: "Akua Mensah"
-                }
-                id: "or_48ZW7BGvYUBWc1i6WBkL2jr0iPQP5jUy76mmmHpt"
-                initiated_at: "2025-01-25T10:25:00Z"
-                expires_at: "2025-02-01T10:25:00Z"
-                number: "ORDER-12345"
+        "json": {
+            "order": {
+                "customer": {
+                    "guest": false,
+                    "id": "cu_abc123def456",
+                    "name": "Akua Mensah"
+                },
+                "expires_at": "2025-02-01T10:25:00Z",
+                "id": "or_48ZW7BGvYUBWc1i6WBkL2jr0iPQP5jUy76mmmHpt",
+                "initiated_at": "2025-01-25T10:25:00Z",
+                "number": "ORDER-12345",
+                "sealed_at": "2025-01-25T10:30:00Z",
+                "status": "requires_payment"
             }
         }
     }
@@ -16974,10 +16970,10 @@ structure FinancialAccountCommonResponse {
     @required
     fingerprint: String
     @dataExamples([
-        {
-            json: "fa_1234567890abcdef"
-        }
-    ])
+    {
+        "json": "fa_1234567890abcdef"
+    }
+])
     @pattern("^fa_")
     @required
     id: String
@@ -17079,10 +17075,10 @@ structure FinancialAccountIDRequest with [FinancialAccountIDRequestMixin] {}
 @mixin
 structure FinancialAccountIDRequestMixin {
     @dataExamples([
-        {
-            json: "fa_1234567890abcdef"
-        }
-    ])
+    {
+        "json": "fa_1234567890abcdef"
+    }
+])
     @pattern("^fa_")
     @required
     account_id: String
@@ -17093,10 +17089,10 @@ structure FinancialAccountMandate {
     @timestampFormat("date-time")
     created_at: Timestamp
     @dataExamples([
-        {
-            json: "fm_abc123xyz789"
-        }
-    ])
+    {
+        "json": "fm_abc123xyz789"
+    }
+])
     @pattern("^fm_")
     @required
     id: String
@@ -17346,10 +17342,10 @@ structure FinancialAccountWalletResponse with [FinancialAccountWalletResponseMix
 @mixin
 structure FinancialAccountWalletResponseMixin {
     @dataExamples([
-        {
-            json: "wal_0987654321fedcba"
-        }
-    ])
+    {
+        "json": "wal_0987654321fedcba"
+    }
+])
     @required
     id: String
     @required
@@ -17566,61 +17562,61 @@ structure FinancialInstitutionmobileMoneyProvider {
 structure FixedCatalogPrice {
     /// Unique price identifier with pr_ prefix
     @dataExamples([
-        {
-            json: "pr_xyz789"
-        }
-    ])
+    {
+        "json": "pr_xyz789"
+    }
+])
     @pattern("^pr_")
     @required
     id: String
     /// Short label for this price
     @dataExamples([
-        {
-            json: "Standard pricing"
-        }
-    ])
+    {
+        "json": "Standard pricing"
+    }
+])
     label: String
     /// Longer description of this price
     @dataExamples([
-        {
-            json: "Standard pricing for individual customers"
-        }
-    ])
+    {
+        "json": "Standard pricing for individual customers"
+    }
+])
     about: String
     /// Whether this price is active and usable in new flows
     @dataExamples([
-        {
-            json: true
-        }
-    ])
+    {
+        "json": true
+    }
+])
     @required
     active: Boolean
     @required
     fixed_amount: Amount
     /// Product ID when the operation returns the relationship by reference
     @dataExamples([
-        {
-            json: "prod_abc123"
-        }
-    ])
+    {
+        "json": "prod_abc123"
+    }
+])
     @pattern("^prod_")
     product_id: String
     product: FixedCatalogPriceproduct
     /// Price creation timestamp
     @dataExamples([
-        {
-            json: "2024-01-15T10:30Z"
-        }
-    ])
+    {
+        "json": "2024-01-15T10:30Z"
+    }
+])
     @required
     @timestampFormat("date-time")
     created_at: Timestamp
     /// Last update timestamp
     @dataExamples([
-        {
-            json: "2024-01-20T14:45Z"
-        }
-    ])
+    {
+        "json": "2024-01-20T14:45Z"
+    }
+])
     @timestampFormat("date-time")
     updated_at: Timestamp
     /// Archive timestamp (if archived). A non-null value means `active` is false.
@@ -17631,28 +17627,28 @@ structure FixedCatalogPrice {
 structure FixedCatalogPriceParams {
     /// Product ID to associate this price with.
     @dataExamples([
-        {
-            json: "prod_abc123"
-        }
-    ])
+    {
+        "json": "prod_abc123"
+    }
+])
     @pattern("^prod_")
     product_id: String
     /// Short label for this price
     @dataExamples([
-        {
-            json: "Standard pricing"
-        }
-    ])
+    {
+        "json": "Standard pricing"
+    }
+])
     @length(
         max: 100
     )
     label: String
     /// Longer description of this price
     @dataExamples([
-        {
-            json: "Standard pricing for individual customers"
-        }
-    ])
+    {
+        "json": "Standard pricing for individual customers"
+    }
+])
     @length(
         max: 500
     )
@@ -17709,27 +17705,27 @@ structure FixedCatalogPriceproduct with [PriceEmbeddedProduct] {}
 structure FixedProductPriceSummary {
     /// Unique price identifier with pr_ prefix
     @dataExamples([
-        {
-            json: "pr_xyz789"
-        }
-    ])
+    {
+        "json": "pr_xyz789"
+    }
+])
     @pattern("^pr_")
     @required
     id: String
     /// Whether this price is active and usable in new flows
     @dataExamples([
-        {
-            json: true
-        }
-    ])
+    {
+        "json": true
+    }
+])
     @required
     active: Boolean
     /// Short label for this price
     @dataExamples([
-        {
-            json: "Wholesale"
-        }
-    ])
+    {
+        "json": "Wholesale"
+    }
+])
     label: String
     @required
     fixed_amount: Amount
@@ -17751,19 +17747,19 @@ structure FulfillUploadRequestResponse {
 structure GeneratedSecretKey {
     /// Secret key identifier.
     @dataExamples([
-        {
-            json: "sk_2xC7k9gK5yQnZ4w8P1sT6vR3"
-        }
-    ])
+    {
+        "json": "sk_2xC7k9gK5yQnZ4w8P1sT6vR3"
+    }
+])
     @pattern("^sk_")
     @required
     id: String
     /// Optional human-readable label for the secret key.
     @dataExamples([
-        {
-            json: "Production checkout"
-        }
-    ])
+    {
+        "json": "Production checkout"
+    }
+])
     label: String
     @required
     token_type: GeneratedSecretKeytokenType
@@ -17779,10 +17775,10 @@ structure GeneratedSecretKey {
 structure GenerateSecretKeyRequest {
     /// Optional human-readable label. Surrounding whitespace is trimmed; an empty value creates an unlabeled key.
     @dataExamples([
-        {
-            json: "Production checkout"
-        }
-    ])
+    {
+        "json": "Production checkout"
+    }
+])
     label: String
 }
 
@@ -17925,41 +17921,41 @@ structure InitiateOTPRequest {
     async_delivery: Boolean
     /// SMS body or email copy containing the required `{token}` placeholder and optional `{service}` placeholder. Email templates must contain `{token}` exactly once. A custom template replaces the purpose-specific default body, while `purpose` still controls the email subject and heading. Email sends this as the plain-text fallback and renders the copy around a prominent code in the HTML version. Defaults are transport-specific.
     @dataExamples([
-        {
-            json: "Your {service} code is {token}."
-        }
-    ])
+    {
+        "json": "Your {service} code is {token}."
+    }
+])
     message_template: String
     /// Optional SMS gateway; not valid for email OTP delivery. Email uses the configured default provider.
     @dataExamples([
-        {
-            json: "arkesel"
-        }
-    ])
+    {
+        "json": "arkesel"
+    }
+])
     preferred_gateway: String
     @required
     purpose: OTPPurpose
     /// Phone number in international format (E.164) or bare email address. Transport is inferred from the address unless specified.
     @dataExamples([
-        {
-            json: "+233241234567"
-        }
-    ])
+    {
+        "json": "+233241234567"
+    }
+])
     @required
     recipient: String
     /// Optional SMS sender identifier (3-12 characters). Email OTP always uses `{service_name} <noreply@inttegro.com>`; omit this field for email or supply exactly the bare `noreply@inttegro.com` address.
     @dataExamples([
-        {
-            json: "Acme"
-        }
-    ])
+    {
+        "json": "Acme"
+    }
+])
     sender: String
     /// Service name substituted for `{service}` (2-20 characters).
     @dataExamples([
-        {
-            json: "Acme Bank"
-        }
-    ])
+    {
+        "json": "Acme Bank"
+    }
+])
     @length(
         min: 2
         max: 20
@@ -17968,18 +17964,18 @@ structure InitiateOTPRequest {
     service_name: String
     /// Custom alphabet for token generation (mutually exclusive with token_alphabet_type)
     @dataExamples([
-        {
-            json: "0123456789ABCDEF"
-        }
-    ])
+    {
+        "json": "0123456789ABCDEF"
+    }
+])
     token_alphabet: String
     token_alphabet_type: InitiateOTPRequesttokenAlphabetType
     /// Length of generated token (5-10 characters)
     @dataExamples([
-        {
-            json: 6
-        }
-    ])
+    {
+        "json": 6
+    }
+])
     @range(
         min: 5
         max: 10
@@ -17989,10 +17985,10 @@ structure InitiateOTPRequest {
     transport: InitiateOTPRequesttransport
     /// How long the token remains valid (3-10080 minutes)
     @dataExamples([
-        {
-            json: 10
-        }
-    ])
+    {
+        "json": 10
+    }
+])
     @range(
         min: 3
         max: 10080
@@ -18018,20 +18014,20 @@ structure InlineProductDetails {
     custom_data: CustomData
     /// Product name shown to the customer
     @dataExamples([
-        {
-            json: "Premium Widget"
-        }
-    ])
+    {
+        "json": "Premium Widget"
+    }
+])
     @required
     name: String
     @required
     price: PriceParams
     /// How many units the customer is purchasing
     @dataExamples([
-        {
-            json: 1
-        }
-    ])
+    {
+        "json": 1
+    }
+])
     @range(
         min: 1
     )
@@ -18049,24 +18045,24 @@ structure InlineProductDetails {
 structure InvoiceSettings {
     /// Optional invoice number. When omitted, invoice delivery falls back to the order number and then the order ID for labels.
     @dataExamples([
-        {
-            json: "INV-1001"
-        }
-    ])
+    {
+        "json": "INV-1001"
+    }
+])
     number: String
     /// Optional invoice memo.
     @dataExamples([
-        {
-            json: "Thanks for your order."
-        }
-    ])
+    {
+        "json": "Thanks for your order."
+    }
+])
     memo: String
     /// Optional invoice footer.
     @dataExamples([
-        {
-            json: "Payment due within 7 days."
-        }
-    ])
+    {
+        "json": "Payment due within 7 days."
+    }
+])
     footer: String
     custom_data: CustomData
 }
@@ -18075,10 +18071,10 @@ structure InvoiceSettings {
 structure LegacyCheckoutPurchaseIntentLookupRequest {
     /// Purchase Intent whose customer-selected amount policy should be loaded.
     @dataExamples([
-        {
-            json: "sale_a1b2c3d4e5f6"
-        }
-    ])
+    {
+        "json": "sale_a1b2c3d4e5f6"
+    }
+])
     @length(
         min: 1
     )
@@ -18092,62 +18088,62 @@ structure ListCountrySpecsRequest {}
 
 @dataExamples([
     {
-        json: {
-            countries: {
-                gh: {
-                    banks: {
-                        code_scheme: "sort_code"
-                        items: [
+        "json": {
+            "countries": {
+                "gh": {
+                    "banks": {
+                        "bank_account_type": "ghana_bank_account",
+                        "code_scheme": "sort_code",
+                        "items": [
                             {
-                                sort_code_prefix: "03"
-                                branches: [
+                                "branches": [
                                     {
-                                        id: "absa_gh_ltd_kasoa_branch"
-                                        sort_code: "030101"
-                                        name: "ABSA (GH) LTD-KASOA BRANCH"
+                                        "id": "absa_gh_ltd_kasoa_branch",
+                                        "name": "ABSA (GH) LTD-KASOA BRANCH",
+                                        "sort_code": "030101"
                                     }
-                                ]
-                                id: "absa_gh_ltd"
-                                name: "ABSA (GH) LTD"
-                                swift_code: "BARCGHAC"
+                                ],
+                                "id": "absa_gh_ltd",
+                                "name": "ABSA (GH) LTD",
+                                "sort_code_prefix": "03",
+                                "swift_code": "BARCGHAC"
                             }
                         ]
-                        bank_account_type: "ghana_bank_account"
-                    }
-                    bt_aging_specs: [
-                        "bt_aging_spec_immediate"
-                        "bt_aging_spec_24_hourly"
-                        "bt_aging_spec_48_hourly"
+                    },
+                    "bt_aging_specs": [
+                        "bt_aging_spec_immediate",
+                        "bt_aging_spec_24_hourly",
+                        "bt_aging_spec_48_hourly",
                         "bt_aging_spec_168_hourly"
-                    ]
-                    financial_account_types: [
-                        "wallet"
-                        "bank_account"
-                    ]
-                    id_document_types: [
-                        "ghana_card"
-                        "passport"
-                    ]
-                    currencies: [
-                        "ghs"
+                    ],
+                    "country_code": "gh",
+                    "country_name": "Ghana",
+                    "currencies": [
+                        "ghs",
                         "usd"
-                    ]
-                    payment_methods: [
-                        "mobile_money"
+                    ],
+                    "financial_account_types": [
+                        "wallet",
                         "bank_account"
-                        "payment_card"
+                    ],
+                    "id_document_types": [
+                        "ghana_card",
+                        "passport"
+                    ],
+                    "legal_entity_types": [
+                        "individual",
+                        "business"
+                    ],
+                    "payment_methods": [
+                        "mobile_money",
+                        "bank_account",
+                        "payment_card",
                         "motito"
-                    ]
-                    country_name: "Ghana"
-                    payout_schedules: [
-                        "weekly"
+                    ],
+                    "payout_schedules": [
+                        "weekly",
                         "manual"
                     ]
-                    legal_entity_types: [
-                        "individual"
-                        "business"
-                    ]
-                    country_code: "gh"
                 }
             }
         }
@@ -18260,10 +18256,10 @@ structure LookupChildrenPolicyRequest {
 structure LookupChimeRequest {
     /// Unique identifier of the chime to look up
     @dataExamples([
-        {
-            json: "ch_1234567890abcdef1234567890abcdef12345678"
-        }
-    ])
+    {
+        "json": "ch_1234567890abcdef1234567890abcdef12345678"
+    }
+])
     @pattern("^ch_")
     @required
     chime_id: String
@@ -18272,10 +18268,10 @@ structure LookupChimeRequest {
 structure LookupCustomerRequest {
     /// The customer identifier (with or without cu_ prefix)
     @dataExamples([
-        {
-            json: "cu_abc123xyz"
-        }
-    ])
+    {
+        "json": "cu_abc123xyz"
+    }
+])
     @length(
         min: 1
         max: 100
@@ -18287,10 +18283,10 @@ structure LookupCustomerRequest {
 
 structure LookupFileLinkRequest {
     @dataExamples([
-        {
-            json: "flink_8pQz3LkY6mN2vT9sB4cD1eF0"
-        }
-    ])
+    {
+        "json": "flink_8pQz3LkY6mN2vT9sB4cD1eF0"
+    }
+])
     @pattern("^flink_")
     @required
     id: String
@@ -18298,10 +18294,10 @@ structure LookupFileLinkRequest {
 
 structure LookupFileRequest {
     @dataExamples([
-        {
-            json: "file_2xC7k9gK5yQnZ4w8P1sT6vR3"
-        }
-    ])
+    {
+        "json": "file_2xC7k9gK5yQnZ4w8P1sT6vR3"
+    }
+])
     @pattern("^file_")
     @required
     file_id: String
@@ -18326,10 +18322,10 @@ structure LookupOperatingPolicyRequest {
 structure LookupOrderRequest {
     /// Unique identifier of the order to lookup
     @dataExamples([
-        {
-            json: "or_JoPtqOmsjgZKwkPvqTrqGsopu07wfC7ttoWqmfwt"
-        }
-    ])
+    {
+        "json": "or_JoPtqOmsjgZKwkPvqTrqGsopu07wfC7ttoWqmfwt"
+    }
+])
     @pattern("^or_")
     @required
     order_id: String
@@ -18338,10 +18334,10 @@ structure LookupOrderRequest {
 structure LookupOTPRequest {
     /// ID of the OTP transaction to lookup (with ot_ prefix)
     @dataExamples([
-        {
-            json: "ot_3f8a9c7e2d1b4a6f"
-        }
-    ])
+    {
+        "json": "ot_3f8a9c7e2d1b4a6f"
+    }
+])
     @pattern("^ot_")
     @required
     transaction_id: String
@@ -18355,10 +18351,10 @@ structure LookupOTPResponse {
 structure LookupPaymentMethodRequest {
     /// ID of the payment method to fetch
     @dataExamples([
-        {
-            json: "pm_xyz789"
-        }
-    ])
+    {
+        "json": "pm_xyz789"
+    }
+])
     @pattern("^pm_")
     @required
     payment_method_id: String
@@ -18373,10 +18369,10 @@ structure LookupPaymentMethodResponse {
 structure LookupPayoutRequest {
     /// Payout identifier returned when the payout was created.
     @dataExamples([
-        {
-            json: "po_yQ2wXm5Dc7Pk9Ls1Vn0RgHaB"
-        }
-    ])
+    {
+        "json": "po_yQ2wXm5Dc7Pk9Ls1Vn0RgHaB"
+    }
+])
     @pattern("^po_")
     @required
     payout_id: String
@@ -18385,10 +18381,10 @@ structure LookupPayoutRequest {
 structure LookupPriceRequest {
     /// The unique identifier of the price to lookup
     @dataExamples([
-        {
-            json: "pr_xyz789"
-        }
-    ])
+    {
+        "json": "pr_xyz789"
+    }
+])
     @pattern("^pr_")
     @required
     price_id: String
@@ -18397,10 +18393,10 @@ structure LookupPriceRequest {
 structure LookupProductRequest {
     /// Product ID to lookup
     @dataExamples([
-        {
-            json: "prod_abc123"
-        }
-    ])
+    {
+        "json": "prod_abc123"
+    }
+])
     @pattern("^prod_")
     @required
     product_id: String
@@ -18409,10 +18405,10 @@ structure LookupProductRequest {
 structure LookupPurchaseIntentRequest {
     /// Purchase intent ID to look up
     @dataExamples([
-        {
-            json: "sale_ABCXYZ"
-        }
-    ])
+    {
+        "json": "sale_ABCXYZ"
+    }
+])
     @length(
         min: 1
     )
@@ -18424,10 +18420,10 @@ structure LookupPurchaseIntentRequest {
 structure LookupRefundRequest {
     /// Refund identifier to retrieve.
     @dataExamples([
-        {
-            json: "rf_1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcd"
-        }
-    ])
+    {
+        "json": "rf_1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcd"
+    }
+])
     @pattern("^rf_")
     @required
     refund_id: String
@@ -18442,10 +18438,10 @@ structure LookupScheduleRequest {
 structure LookupSecretKeyRequest {
     /// Secret key identifier. Typed `sk_...` IDs are accepted.
     @dataExamples([
-        {
-            json: "sk_2xC7k9gK5yQnZ4w8P1sT6vR3"
-        }
-    ])
+    {
+        "json": "sk_2xC7k9gK5yQnZ4w8P1sT6vR3"
+    }
+])
     @pattern("^sk_")
     @required
     secret_key_id: String
@@ -18458,10 +18454,10 @@ structure LookupSecretKeyResponse {
 
 structure LookupUploadRequestRequest {
     @dataExamples([
-        {
-            json: "uplreq_1gK9pQ4vL8mN2sT5wX7yZ0"
-        }
-    ])
+    {
+        "json": "uplreq_1gK9pQ4vL8mN2sT5wX7yZ0"
+    }
+])
     @pattern("^uplreq_")
     @required
     id: String
@@ -18540,62 +18536,62 @@ structure LookupUploadRequestRequest {
 structure MessageTemplate {
     /// API-generated unique template id.
     @dataExamples([
-        {
-            json: "mtpl_receipt"
-        }
-    ])
+    {
+        "json": "mtpl_receipt"
+    }
+])
     @pattern("^mtpl_")
     @required
     id: String
     @dataExamples([
-        {
-            json: "Receipt email"
-        }
-    ])
+    {
+        "json": "Receipt email"
+    }
+])
     @required
     name: String
     @dataExamples([
-        {
-            json: "Sent after successful payment."
-        }
-    ])
+    {
+        "json": "Sent after successful payment."
+    }
+])
     about: String
     @required
     channel: MessageTemplatechannel
     @dataExamples([
-        {
-            json: "receipt"
-        }
-    ])
+    {
+        "json": "receipt"
+    }
+])
     @required
     purpose: String
     @dataExamples([
-        {
-            json: "en"
-        }
-    ])
+    {
+        "json": "en"
+    }
+])
     @required
     locale: String
     @required
     status: MessageTemplatestatus
     @dataExamples([
-        {
-            json: 2
-        }
-    ])
+    {
+        "json": 2
+    }
+])
     @required
     version: Integer
     @dataExamples([
-        {
-            json: 1
-        }
-    ])
+    {
+        "json": 1
+    }
+])
     published_version: Integer
     @dataExamples([
-        {
-            json: 2
-        }
-    ])
+    {
+        "json": 2
+    }
+])
     @required
     draft_version: Integer
     @required
@@ -18619,18 +18615,18 @@ structure MessageTemplate {
 structure MessageTemplateEmailContent {
     /// Email subject template.
     @dataExamples([
-        {
-            json: "Your receipt"
-        }
-    ])
+    {
+        "json": "Your receipt"
+    }
+])
     @required
     subject: String
     /// HTML email body template.
     @dataExamples([
-        {
-            json: "<p>Thanks {{customer_name}}.</p>"
-        }
-    ])
+    {
+        "json": "<p>Thanks {{customer_name}}.</p>"
+    }
+])
     @required
     html: String
     from: MessageTemplateEmailContentfrom
@@ -18649,10 +18645,10 @@ structure MessageTemplateEnvelope {
 structure MessageTemplateIDRequest {
     /// API-generated message template id.
     @dataExamples([
-        {
-            json: "mtpl_receipt"
-        }
-    ])
+    {
+        "json": "mtpl_receipt"
+    }
+])
     @pattern("^mtpl_")
     @required
     id: String
@@ -18664,27 +18660,27 @@ structure MessageTemplateMailbox with [MessageTemplateMailboxMixin] {}
 structure MessageTemplateMailboxMixin {
     /// Literal or templated mailbox address, such as `{{recipient_email}}`.
     @dataExamples([
-        {
-            json: "{{recipient_email}}"
-        }
-    ])
+    {
+        "json": "{{recipient_email}}"
+    }
+])
     @required
     address: String
     @dataExamples([
-        {
-            json: "Acme"
-        }
-    ])
+    {
+        "json": "Acme"
+    }
+])
     name: String
 }
 
 structure MessageTemplateReference {
     /// API-generated message template id.
     @dataExamples([
-        {
-            json: "mtpl_receipt"
-        }
-    ])
+    {
+        "json": "mtpl_receipt"
+    }
+])
     @pattern("^mtpl_")
     @required
     template_id: String
@@ -18721,10 +18717,10 @@ structure MessageTemplateScannedLink {
 structure MessageTemplateSMSContent {
     /// SMS body template.
     @dataExamples([
-        {
-            json: "Your code is {{code}}."
-        }
-    ])
+    {
+        "json": "Your code is {{code}}."
+    }
+])
     @required
     message_template: String
 }
@@ -18742,18 +18738,18 @@ structure MessageTemplateSMSContent {
 )
 structure MessageTemplatesPage {
     @dataExamples([
-        {
-            json: 1
-        }
-    ])
+    {
+        "json": 1
+    }
+])
     @required
     number: Integer
     /// Number of templates returned in this page after filters are applied.
     @dataExamples([
-        {
-            json: 25
-        }
-    ])
+    {
+        "json": 25
+    }
+])
     @required
     size: Integer
     @required
@@ -18780,10 +18776,10 @@ structure MessageTemplateVariable {
 
 structure MessageTemplateVariableInput {
     @dataExamples([
-        {
-            json: "customer_name"
-        }
-    ])
+    {
+        "json": "customer_name"
+    }
+])
     @pattern("^[a-z][a-z0-9_]{0,63}$")
     @required
     name: String
@@ -19020,6 +19016,7 @@ structure OperatingPolicyVersionsPageResponse {
             "created_from": {
                 "additionalProperties": false,
                 "description": "Attribution for the public resource that created this order, when available.",
+                "minProperties": 1,
                 "properties": {
                     "resource_id": {
                         "type": "string"
@@ -19037,7 +19034,7 @@ structure OperatingPolicyVersionsPageResponse {
                 "type": "object"
             },
             "custom_data": {
-                "shape": "CustomData"
+                "shape": "NonEmptyCustomData"
             },
             "customer": {
                 "additionalProperties": false,
@@ -19121,7 +19118,7 @@ structure OperatingPolicyVersionsPageResponse {
                 "type": "object"
             },
             "invoice_settings": {
-                "shape": "InvoiceSettings"
+                "shape": "OrderInvoiceSettingsResponse"
             },
             "line_item_group": {
                 "additionalProperties": false,
@@ -20336,72 +20333,7 @@ structure OperatingPolicyVersionsPageResponse {
         }
     ]
 )
-structure Order {
-    /// When the order was canceled. Omitted otherwise.
-    @timestampFormat("date-time")
-    canceled_at: Timestamp
-    checkout_settings: OrdercheckoutSettings
-    /// When the order was completed. Omitted otherwise.
-    @timestampFormat("date-time")
-    completed_at: Timestamp
-    created_from: OrdercreatedFrom
-    custom_data: CustomData
-    @required
-    customer: Ordercustomer
-    /// When the order expires. Omitted when no expiry is set.
-    @timestampFormat("date-time")
-    expires_at: Timestamp
-    /// Unique identifier for this order
-    @dataExamples([
-        {
-            json: "or_48ZW7BGvYUBWc1i6WBkL2jr0iPQP5jUy76mmmHpt"
-        }
-    ])
-    @pattern("^or_")
-    @required
-    id: String
-    /// When order processing began
-    @required
-    @timestampFormat("date-time")
-    initiated_at: Timestamp
-    invoice: Orderinvoice
-    /// Human-readable order number
-    @dataExamples([
-        {
-            json: "ORDER-12345"
-        }
-    ])
-    number: String
-    /// Merchant-provided receipt number, when set
-    @dataExamples([
-        {
-            json: "RCPT-12345"
-        }
-    ])
-    receipt_number: String
-    refunds: Orderrefunds
-    invoice_settings: InvoiceSettings
-    @required
-    status: Orderstatus
-    /// When the order was finalized and became immutable—ready for payment or fulfillment
-    @dataExamples([
-        {
-            json: "2025-09-14T16:24:41.312701813Z"
-        }
-    ])
-    @timestampFormat("date-time")
-    sealed_at: Timestamp
-    line_item_group: OrderlineItemGroup
-    payment: Orderpayment
-    /// When the order became paid
-    @timestampFormat("date-time")
-    paid_at: Timestamp
-    /// When the order payment becomes overdue
-    @timestampFormat("date-time")
-    payment_due_at: Timestamp
-    /// External order reference when present
-    reference: String
-}
+structure Order with [OrderMixin] {}
 
 structure OrderAddress {
     name: String
@@ -20455,31 +20387,18 @@ structure OrderDiscountLineItem {
 @simileConstraints(
 [
         {
-            "set": {
-                "left": "/failed_channels",
-                "relation": "disjoint",
-                "right": "/sent_channels"
+            "distinct": {
+                "source": "/deliveries/*/channel"
+            }
+        },
+        {
+            "distinct": {
+                "source": "/failures/*/channel"
             }
         }
     ]
 )
-structure OrderDocumentDelivery {
-    deliveries: OrderDocumentDeliverydeliveries
-    @required
-    document_kind: OrderDocumentDeliverydocumentKind
-    /// Hosted invoice or receipt URL sent to the customer. Receipt URLs use the hosted receipt path, not the invoice PDF path.
-    @dataExamples([
-        {
-            json: "https://pages.inttegro.com/invoices/or_48ZW7BGvYUBWc1i6WBkL2jr0iPQP5jUy76mmmHpt"
-        }
-    ])
-    @required
-    document_url: String
-    failed_channels: OrderDocumentDeliveryfailedChannels
-    failures: OrderDocumentDeliveryfailures
-    @required
-    sent_channels: OrderDocumentDeliverysentChannels
-}
+structure OrderDocumentDelivery with [OrderDocumentDeliveryMixin] {}
 
 /// Chime delivery accepted for one channel.
 structure OrderDocumentDeliveryAttempt {
@@ -20490,10 +20409,10 @@ structure OrderDocumentDeliveryAttempt {
     channel: OrderDocumentDeliveryAttemptchannel
     /// Chime ID created for this delivery.
     @dataExamples([
-        {
-            json: "ch_7QYpB8c3V9kL2nM4"
-        }
-    ])
+    {
+        "json": "ch_7QYpB8c3V9kL2nM4"
+    }
+])
     @pattern("^ch_")
     chime_id: String
 }
@@ -20527,29 +20446,65 @@ structure OrderDocumentDeliveryFailure {
     channel: OrderDocumentDeliveryFailurechannel
     /// Provider or Chime error for this channel.
     @dataExamples([
-        {
-            json: "chime api returned status=503"
-        }
-    ])
+    {
+        "json": "chime api returned status=503"
+    }
+])
     error: String
+}
+
+/// Delivery result for one hosted order document link.
+@simileConstraints(
+[
+        {
+            "distinct": {
+                "source": "/deliveries/*/channel"
+            }
+        },
+        {
+            "distinct": {
+                "source": "/failures/*/channel"
+            }
+        }
+    ]
+)
+@mixin
+structure OrderDocumentDeliveryMixin {
+    deliveries: OrderDocumentDeliverydeliveries
+    @required
+    document_kind: OrderDocumentDeliverydocumentKind
+    /// Hosted invoice or receipt URL sent to the customer. Receipt URLs use the hosted receipt path, not the invoice PDF path.
+    @dataExamples([
+    {
+        "json": "https://pages.inttegro.com/invoices/or_48ZW7BGvYUBWc1i6WBkL2jr0iPQP5jUy76mmmHpt"
+    }
+])
+    @required
+    document_url: String
+    failed_channels: OrderDocumentDeliveryfailedChannels
+    failures: OrderDocumentDeliveryfailures
+    @required
+    sent_channels: OrderDocumentDeliverysentChannels
 }
 
 structure OrderDocumentDeliveryRequest {
     /// Order whose hosted invoice or receipt link should be delivered.
     @dataExamples([
-        {
-            json: "or_48ZW7BGvYUBWc1i6WBkL2jr0iPQP5jUy76mmmHpt"
-        }
-    ])
+    {
+        "json": "or_48ZW7BGvYUBWc1i6WBkL2jr0iPQP5jUy76mmmHpt"
+    }
+])
     @pattern("^or_")
     @required
     order_id: String
 }
 
 /// Successful or partially successful deliberate order document delivery.
+@mixin
 structure OrderDocumentDeliveryResponse {
     @required
     delivery: OrderDocumentDelivery
+    @required
     order: Order
 }
 
@@ -20578,6 +20533,44 @@ structure OrderDocumentDeliverySummarychannels {
 structure OrderDocumentFormat {
     @required
     url: String
+}
+
+/// Partial order-document delivery with at least one accepted and one failed channel.
+@simileConstraints(
+[
+        {
+            "set": {
+                "left": "/failed_channels",
+                "relation": "disjoint",
+                "right": "/sent_channels"
+            }
+        },
+        {
+            "distinct": {
+                "source": "/deliveries/*/channel"
+            }
+        },
+        {
+            "distinct": {
+                "source": "/failures/*/channel"
+            }
+        }
+    ]
+)
+@mixin
+structure OrderDocumentPartialDelivery {
+    @required
+    deliveries: OrderDocumentPartialDeliverydeliveries
+    @required
+    document_kind: OrderDocumentPartialDeliverydocumentKind
+    @required
+    document_url: String
+    @required
+    failed_channels: OrderDocumentPartialDeliveryfailedChannels
+    @required
+    failures: OrderDocumentPartialDeliveryfailures
+    @required
+    sent_channels: OrderDocumentPartialDeliverysentChannels
 }
 
 /// Order operation error. The latest Order snapshot is included when available.
@@ -20620,12 +20613,1459 @@ structure Orderinvoiceformat {
     pdf: OrderDocumentFormat
 }
 
+/// Persisted order-level invoice rendering data returned when at least one setting is present.
+structure OrderInvoiceSettingsResponse {
+    /// Optional invoice number.
+    @dataExamples([
+    {
+        "json": "INV-1001"
+    }
+])
+    number: String
+    /// Optional invoice memo.
+    @dataExamples([
+    {
+        "json": "Thanks for your order."
+    }
+])
+    memo: String
+    /// Optional invoice footer.
+    @dataExamples([
+    {
+        "json": "Payment due within 7 days."
+    }
+])
+    footer: String
+    custom_data: CustomData
+}
+
 /// Cart contents and totals
 structure OrderlineItemGroup {
     @required
     line_items: OrderlineItemGrouplineItems
     @required
     total: Amount
+}
+
+/// Complete order record with line items, customer details, payment state, and fulfillment information
+@simileSchema(
+{
+        "additionalProperties": false,
+        "description": "Complete order record with line items, customer details, payment state, and fulfillment information",
+        "properties": {
+            "canceled_at": {
+                "description": "When the order was canceled. Omitted otherwise.",
+                "format": "date-time",
+                "type": "string"
+            },
+            "checkout_settings": {
+                "additionalProperties": false,
+                "description": "Checkout and payment flow configuration for this order",
+                "properties": {
+                    "cancel_url": {
+                        "description": "URL to redirect the customer after canceling checkout",
+                        "format": "uri",
+                        "type": "string"
+                    },
+                    "redirect_url": {
+                        "description": "URL to redirect the customer after payment completion",
+                        "format": "uri",
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "completed_at": {
+                "description": "When the order was completed. Omitted otherwise.",
+                "format": "date-time",
+                "type": "string"
+            },
+            "created_from": {
+                "additionalProperties": false,
+                "description": "Attribution for the public resource that created this order, when available.",
+                "minProperties": 1,
+                "properties": {
+                    "resource_id": {
+                        "type": "string"
+                    },
+                    "resource_type": {
+                        "enum": [
+                            "purchase_intent"
+                        ],
+                        "type": "string"
+                    },
+                    "source": {
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "custom_data": {
+                "shape": "NonEmptyCustomData"
+            },
+            "customer": {
+                "additionalProperties": false,
+                "properties": {
+                    "billing_address": {
+                        "shape": "OrderAddress"
+                    },
+                    "email_address": {
+                        "format": "email",
+                        "type": "string"
+                    },
+                    "guest": {
+                        "type": "boolean"
+                    },
+                    "id": {
+                        "pattern": "^cu_",
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "phone_number": {
+                        "type": "string"
+                    },
+                    "shipping_address": {
+                        "shape": "OrderAddress"
+                    }
+                },
+                "required": [
+                    "guest",
+                    "id",
+                    "name"
+                ],
+                "type": "object"
+            },
+            "expires_at": {
+                "description": "When the order expires. Omitted when no expiry is set.",
+                "format": "date-time",
+                "type": "string"
+            },
+            "id": {
+                "description": "Unique identifier for this order",
+                "example": "or_48ZW7BGvYUBWc1i6WBkL2jr0iPQP5jUy76mmmHpt",
+                "pattern": "^or_",
+                "type": "string"
+            },
+            "initiated_at": {
+                "description": "When order processing began",
+                "format": "date-time",
+                "type": "string"
+            },
+            "invoice": {
+                "additionalProperties": false,
+                "properties": {
+                    "delivery_summary": {
+                        "shape": "OrderDocumentDeliverySummary"
+                    },
+                    "format": {
+                        "additionalProperties": false,
+                        "properties": {
+                            "pdf": {
+                                "shape": "OrderDocumentFormat"
+                            },
+                            "web": {
+                                "shape": "OrderDocumentFormat"
+                            }
+                        },
+                        "required": [
+                            "web",
+                            "pdf"
+                        ],
+                        "type": "object"
+                    },
+                    "number": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "format"
+                ],
+                "type": "object"
+            },
+            "invoice_settings": {
+                "shape": "OrderInvoiceSettingsResponse"
+            },
+            "line_item_group": {
+                "additionalProperties": false,
+                "description": "Cart contents and totals",
+                "properties": {
+                    "line_items": {
+                        "description": "Array of products, fees, and shipping charges",
+                        "items": {
+                            "shape": "OrderLineItem"
+                        },
+                        "minItems": 1,
+                        "type": "array"
+                    },
+                    "total": {
+                        "shape": "Amount"
+                    }
+                },
+                "required": [
+                    "line_items",
+                    "total"
+                ],
+                "type": "object"
+            },
+            "number": {
+                "description": "Human-readable order number",
+                "example": "ORDER-12345",
+                "type": "string"
+            },
+            "paid_at": {
+                "description": "When the order became paid",
+                "format": "date-time",
+                "type": "string"
+            },
+            "payment": {
+                "additionalProperties": false,
+                "description": "Payment intent tied to this order",
+                "properties": {
+                    "amount": {
+                        "shape": "Amount"
+                    },
+                    "balance_transaction": {
+                        "shape": "BalanceTransaction"
+                    },
+                    "billing_details": {
+                        "additionalProperties": false,
+                        "properties": {
+                            "owner": {
+                                "additionalProperties": false,
+                                "properties": {
+                                    "address": {
+                                        "shape": "OrderAddress"
+                                    },
+                                    "name": {
+                                        "type": "string"
+                                    }
+                                },
+                                "required": [
+                                    "name"
+                                ],
+                                "type": "object"
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "canceled_at": {
+                        "description": "When payment was canceled",
+                        "format": "date-time",
+                        "type": "string"
+                    },
+                    "customer": {
+                        "additionalProperties": false,
+                        "properties": {
+                            "billing_address": {
+                                "shape": "OrderAddress"
+                            },
+                            "email_address": {
+                                "format": "email",
+                                "type": "string"
+                            },
+                            "guest": {
+                                "type": "boolean"
+                            },
+                            "id": {
+                                "pattern": "^cu_",
+                                "type": "string"
+                            },
+                            "name": {
+                                "type": "string"
+                            },
+                            "phone_number": {
+                                "type": "string"
+                            },
+                            "shipping_address": {
+                                "shape": "OrderAddress"
+                            }
+                        },
+                        "required": [
+                            "id",
+                            "guest",
+                            "name"
+                        ],
+                        "type": "object"
+                    },
+                    "due_at": {
+                        "description": "When payment becomes overdue",
+                        "format": "date-time",
+                        "type": "string"
+                    },
+                    "executed_at": {
+                        "description": "When payment execution started",
+                        "format": "date-time",
+                        "type": "string"
+                    },
+                    "expired_at": {
+                        "description": "When payment expired",
+                        "format": "date-time",
+                        "type": "string"
+                    },
+                    "failed_at": {
+                        "description": "When payment failed",
+                        "format": "date-time",
+                        "type": "string"
+                    },
+                    "id": {
+                        "description": "Payment intent ID",
+                        "example": "py_OHFv6I3OZBvB1R46TQQGNxPPtgbPR6CXpQ8En9wl",
+                        "pattern": "^py_",
+                        "type": "string"
+                    },
+                    "initiated_at": {
+                        "description": "When we kicked off the payment intent",
+                        "format": "date-time",
+                        "type": "string"
+                    },
+                    "latest_attempt": {
+                        "additionalProperties": false,
+                        "description": "Most recent payment attempt details",
+                        "properties": {
+                            "error": {
+                                "additionalProperties": false,
+                                "properties": {
+                                    "message": {
+                                        "type": "string"
+                                    }
+                                },
+                                "required": [
+                                    "message"
+                                ],
+                                "type": "object"
+                            },
+                            "initiated_at": {
+                                "format": "date-time",
+                                "type": "string"
+                            },
+                            "payment_method_id": {
+                                "example": "pm_hg7D2A5qT6g6mVDSJu6zweKXwsiiNWf3Q85book6",
+                                "pattern": "^pm_",
+                                "type": "string"
+                            },
+                            "payment_method_type": {
+                                "example": "mobile_money",
+                                "type": "string"
+                            },
+                            "reference": {
+                                "description": "External payment reference",
+                                "example": "68c6ecbc3bf0a6548973b598",
+                                "type": "string"
+                            },
+                            "status": {
+                                "enum": [
+                                    "initiated",
+                                    "executed",
+                                    "succeeded",
+                                    "canceled",
+                                    "expired",
+                                    "failed",
+                                    "unknown"
+                                ],
+                                "example": "succeeded",
+                                "type": "string"
+                            },
+                            "succeeded_at": {
+                                "format": "date-time",
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "status",
+                            "initiated_at"
+                        ],
+                        "simileConstraints": [
+                            {
+                                "ordered": {
+                                    "paths": [
+                                        "/initiated_at",
+                                        "/succeeded_at"
+                                    ]
+                                }
+                            },
+                            {
+                                "implies": {
+                                    "then": {
+                                        "all": [
+                                            {
+                                                "path": "/succeeded_at",
+                                                "state": "non-null"
+                                            }
+                                        ]
+                                    },
+                                    "when": {
+                                        "equals": "succeeded",
+                                        "path": "/status"
+                                    }
+                                }
+                            },
+                            {
+                                "implies": {
+                                    "then": {
+                                        "all": [
+                                            {
+                                                "equals": "succeeded",
+                                                "path": "/status"
+                                            }
+                                        ]
+                                    },
+                                    "when": {
+                                        "path": "/succeeded_at",
+                                        "state": "non-null"
+                                    }
+                                }
+                            }
+                        ],
+                        "type": "object"
+                    },
+                    "latest_error": {
+                        "additionalProperties": false,
+                        "properties": {
+                            "code": {
+                                "type": "string"
+                            },
+                            "docs_url": {
+                                "format": "uri",
+                                "type": "string"
+                            },
+                            "message": {
+                                "type": "string"
+                            },
+                            "source": {
+                                "type": "string"
+                            },
+                            "type": {
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "message",
+                            "docs_url",
+                            "source",
+                            "type",
+                            "code"
+                        ],
+                        "type": "object"
+                    },
+                    "next_action": {
+                        "shape": "PaymentNextAction"
+                    },
+                    "paid_at": {
+                        "description": "When payment completed successfully",
+                        "format": "date-time",
+                        "type": "string"
+                    },
+                    "paid_offline": {
+                        "description": "Whether payment was recorded as received outside Inttegro",
+                        "type": "boolean"
+                    },
+                    "payment_method": {
+                        "shape": "OrderPaymentMethod"
+                    },
+                    "payment_method_types": {
+                        "items": {
+                            "type": "string"
+                        },
+                        "type": "array"
+                    },
+                    "payout_configuration": {
+                        "additionalProperties": false,
+                        "description": "Payout configuration for this payment",
+                        "properties": {
+                            "destination": {
+                                "additionalProperties": false,
+                                "description": "Where the funds will be paid out",
+                                "properties": {
+                                    "financial_account_id": {
+                                        "description": "ID of the financial account receiving the payout",
+                                        "example": "fa_1234567890abcdef",
+                                        "pattern": "^fa_",
+                                        "type": "string"
+                                    }
+                                },
+                                "required": [
+                                    "financial_account_id"
+                                ],
+                                "type": "object"
+                            },
+                            "enable_fx": {
+                                "description": "Compatibility flag. Cross-currency payout execution is not currently available.",
+                                "enum": [
+                                    false
+                                ],
+                                "example": false,
+                                "type": "boolean"
+                            }
+                        },
+                        "required": [
+                            "enable_fx",
+                            "destination"
+                        ],
+                        "type": [
+                            "object",
+                            "null"
+                        ]
+                    },
+                    "receipt": {
+                        "shape": "OrderReceipt"
+                    },
+                    "statement_descriptor": {
+                        "description": "Optional statement descriptor shown on the customer's bank statement",
+                        "example": "STATEMENT",
+                        "type": "string"
+                    },
+                    "status": {
+                        "description": "Payment state",
+                        "enum": [
+                            "initiated",
+                            "requires_action",
+                            "processing",
+                            "overdue",
+                            "executed",
+                            "paid",
+                            "canceled",
+                            "expired",
+                            "failed",
+                            "unknown"
+                        ],
+                        "example": "paid",
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "amount",
+                    "id",
+                    "initiated_at",
+                    "statement_descriptor",
+                    "status"
+                ],
+                "simileConstraints": [
+                    {
+                        "ordered": {
+                            "paths": [
+                                "/initiated_at",
+                                "/executed_at",
+                                "/paid_at"
+                            ]
+                        }
+                    },
+                    {
+                        "ordered": {
+                            "paths": [
+                                "/initiated_at",
+                                "/executed_at",
+                                "/failed_at"
+                            ]
+                        }
+                    },
+                    {
+                        "ordered": {
+                            "paths": [
+                                "/initiated_at",
+                                "/canceled_at"
+                            ]
+                        }
+                    },
+                    {
+                        "ordered": {
+                            "paths": [
+                                "/initiated_at",
+                                "/expired_at"
+                            ]
+                        }
+                    },
+                    {
+                        "implies": {
+                            "then": {
+                                "all": [
+                                    {
+                                        "path": "/executed_at",
+                                        "state": "absent"
+                                    },
+                                    {
+                                        "path": "/paid_at",
+                                        "state": "absent"
+                                    },
+                                    {
+                                        "path": "/failed_at",
+                                        "state": "absent"
+                                    },
+                                    {
+                                        "path": "/canceled_at",
+                                        "state": "absent"
+                                    },
+                                    {
+                                        "path": "/expired_at",
+                                        "state": "absent"
+                                    }
+                                ]
+                            },
+                            "when": {
+                                "equals": "initiated",
+                                "path": "/status"
+                            }
+                        }
+                    },
+                    {
+                        "implies": {
+                            "then": {
+                                "all": [
+                                    {
+                                        "path": "/next_action",
+                                        "state": "non-null"
+                                    },
+                                    {
+                                        "path": "/paid_at",
+                                        "state": "absent"
+                                    },
+                                    {
+                                        "path": "/failed_at",
+                                        "state": "absent"
+                                    },
+                                    {
+                                        "path": "/canceled_at",
+                                        "state": "absent"
+                                    },
+                                    {
+                                        "path": "/expired_at",
+                                        "state": "absent"
+                                    }
+                                ]
+                            },
+                            "when": {
+                                "equals": "requires_action",
+                                "path": "/status"
+                            }
+                        }
+                    },
+                    {
+                        "implies": {
+                            "then": {
+                                "all": [
+                                    {
+                                        "path": "/paid_at",
+                                        "state": "absent"
+                                    },
+                                    {
+                                        "path": "/failed_at",
+                                        "state": "absent"
+                                    },
+                                    {
+                                        "path": "/canceled_at",
+                                        "state": "absent"
+                                    },
+                                    {
+                                        "path": "/expired_at",
+                                        "state": "absent"
+                                    }
+                                ]
+                            },
+                            "when": {
+                                "equals": "processing",
+                                "path": "/status"
+                            }
+                        }
+                    },
+                    {
+                        "implies": {
+                            "then": {
+                                "all": [
+                                    {
+                                        "path": "/due_at",
+                                        "state": "non-null"
+                                    },
+                                    {
+                                        "path": "/paid_at",
+                                        "state": "absent"
+                                    },
+                                    {
+                                        "path": "/failed_at",
+                                        "state": "absent"
+                                    },
+                                    {
+                                        "path": "/canceled_at",
+                                        "state": "absent"
+                                    },
+                                    {
+                                        "path": "/expired_at",
+                                        "state": "absent"
+                                    }
+                                ]
+                            },
+                            "when": {
+                                "equals": "overdue",
+                                "path": "/status"
+                            }
+                        }
+                    },
+                    {
+                        "implies": {
+                            "then": {
+                                "all": [
+                                    {
+                                        "path": "/executed_at",
+                                        "state": "non-null"
+                                    },
+                                    {
+                                        "path": "/paid_at",
+                                        "state": "absent"
+                                    },
+                                    {
+                                        "path": "/failed_at",
+                                        "state": "absent"
+                                    },
+                                    {
+                                        "path": "/canceled_at",
+                                        "state": "absent"
+                                    },
+                                    {
+                                        "path": "/expired_at",
+                                        "state": "absent"
+                                    }
+                                ]
+                            },
+                            "when": {
+                                "equals": "executed",
+                                "path": "/status"
+                            }
+                        }
+                    },
+                    {
+                        "implies": {
+                            "then": {
+                                "all": [
+                                    {
+                                        "path": "/paid_at",
+                                        "state": "non-null"
+                                    },
+                                    {
+                                        "path": "/failed_at",
+                                        "state": "absent"
+                                    },
+                                    {
+                                        "path": "/canceled_at",
+                                        "state": "absent"
+                                    },
+                                    {
+                                        "path": "/expired_at",
+                                        "state": "absent"
+                                    }
+                                ]
+                            },
+                            "when": {
+                                "equals": "paid",
+                                "path": "/status"
+                            }
+                        }
+                    },
+                    {
+                        "implies": {
+                            "then": {
+                                "all": [
+                                    {
+                                        "path": "/paid_at",
+                                        "state": "absent"
+                                    },
+                                    {
+                                        "path": "/failed_at",
+                                        "state": "non-null"
+                                    },
+                                    {
+                                        "path": "/canceled_at",
+                                        "state": "absent"
+                                    },
+                                    {
+                                        "path": "/expired_at",
+                                        "state": "absent"
+                                    }
+                                ]
+                            },
+                            "when": {
+                                "equals": "failed",
+                                "path": "/status"
+                            }
+                        }
+                    },
+                    {
+                        "implies": {
+                            "then": {
+                                "all": [
+                                    {
+                                        "path": "/paid_at",
+                                        "state": "absent"
+                                    },
+                                    {
+                                        "path": "/failed_at",
+                                        "state": "absent"
+                                    },
+                                    {
+                                        "path": "/canceled_at",
+                                        "state": "non-null"
+                                    },
+                                    {
+                                        "path": "/expired_at",
+                                        "state": "absent"
+                                    }
+                                ]
+                            },
+                            "when": {
+                                "equals": "canceled",
+                                "path": "/status"
+                            }
+                        }
+                    },
+                    {
+                        "implies": {
+                            "then": {
+                                "all": [
+                                    {
+                                        "path": "/paid_at",
+                                        "state": "absent"
+                                    },
+                                    {
+                                        "path": "/failed_at",
+                                        "state": "absent"
+                                    },
+                                    {
+                                        "path": "/canceled_at",
+                                        "state": "absent"
+                                    },
+                                    {
+                                        "path": "/expired_at",
+                                        "state": "non-null"
+                                    }
+                                ]
+                            },
+                            "when": {
+                                "equals": "expired",
+                                "path": "/status"
+                            }
+                        }
+                    },
+                    {
+                        "implies": {
+                            "then": {
+                                "all": [
+                                    {
+                                        "path": "/executed_at",
+                                        "state": "absent"
+                                    },
+                                    {
+                                        "path": "/paid_at",
+                                        "state": "absent"
+                                    },
+                                    {
+                                        "path": "/failed_at",
+                                        "state": "absent"
+                                    },
+                                    {
+                                        "path": "/canceled_at",
+                                        "state": "absent"
+                                    },
+                                    {
+                                        "path": "/expired_at",
+                                        "state": "absent"
+                                    },
+                                    {
+                                        "path": "/next_action",
+                                        "state": "absent"
+                                    }
+                                ]
+                            },
+                            "when": {
+                                "equals": "unknown",
+                                "path": "/status"
+                            }
+                        }
+                    }
+                ],
+                "type": "object"
+            },
+            "payment_due_at": {
+                "description": "When the order payment becomes overdue",
+                "format": "date-time",
+                "type": "string"
+            },
+            "receipt_number": {
+                "description": "Merchant-provided receipt number, when set",
+                "example": "RCPT-12345",
+                "type": "string"
+            },
+            "reference": {
+                "description": "External order reference when present",
+                "type": "string"
+            },
+            "refunds": {
+                "description": "All refunds issued for this order, newest first. Omitted when no refunds exist.",
+                "items": {
+                    "shape": "Refund"
+                },
+                "type": "array"
+            },
+            "sealed_at": {
+                "description": "When the order was finalized and became immutable—ready for payment or fulfillment",
+                "example": "2025-09-14T16:24:41.312701813Z",
+                "format": "date-time",
+                "type": "string"
+            },
+            "status": {
+                "description": "Current lifecycle state of the order",
+                "enum": [
+                    "preparing",
+                    "requires_payment",
+                    "paid",
+                    "completed",
+                    "canceled",
+                    "expired",
+                    "unknown"
+                ],
+                "example": "completed",
+                "type": "string"
+            }
+        },
+        "required": [
+            "customer",
+            "id",
+            "initiated_at",
+            "status"
+        ],
+        "simileConstraints": [
+            {
+                "ordered": {
+                    "paths": [
+                        "/initiated_at",
+                        "/sealed_at",
+                        "/paid_at",
+                        "/completed_at"
+                    ]
+                }
+            },
+            {
+                "ordered": {
+                    "paths": [
+                        "/initiated_at",
+                        "/canceled_at"
+                    ]
+                }
+            },
+            {
+                "ordered": {
+                    "paths": [
+                        "/initiated_at",
+                        "/expires_at"
+                    ]
+                }
+            },
+            {
+                "implies": {
+                    "then": {
+                        "all": [
+                            {
+                                "path": "/sealed_at",
+                                "state": "absent"
+                            },
+                            {
+                                "path": "/paid_at",
+                                "state": "absent"
+                            },
+                            {
+                                "path": "/completed_at",
+                                "state": "absent"
+                            },
+                            {
+                                "path": "/canceled_at",
+                                "state": "absent"
+                            }
+                        ]
+                    },
+                    "when": {
+                        "equals": "preparing",
+                        "path": "/status"
+                    }
+                }
+            },
+            {
+                "implies": {
+                    "then": {
+                        "all": [
+                            {
+                                "path": "/sealed_at",
+                                "state": "non-null"
+                            },
+                            {
+                                "path": "/paid_at",
+                                "state": "absent"
+                            },
+                            {
+                                "path": "/completed_at",
+                                "state": "absent"
+                            },
+                            {
+                                "path": "/canceled_at",
+                                "state": "absent"
+                            }
+                        ]
+                    },
+                    "when": {
+                        "equals": "requires_payment",
+                        "path": "/status"
+                    }
+                }
+            },
+            {
+                "implies": {
+                    "then": {
+                        "all": [
+                            {
+                                "path": "/sealed_at",
+                                "state": "non-null"
+                            },
+                            {
+                                "path": "/paid_at",
+                                "state": "non-null"
+                            },
+                            {
+                                "path": "/completed_at",
+                                "state": "absent"
+                            },
+                            {
+                                "path": "/canceled_at",
+                                "state": "absent"
+                            }
+                        ]
+                    },
+                    "when": {
+                        "equals": "paid",
+                        "path": "/status"
+                    }
+                }
+            },
+            {
+                "implies": {
+                    "then": {
+                        "all": [
+                            {
+                                "path": "/sealed_at",
+                                "state": "non-null"
+                            },
+                            {
+                                "path": "/completed_at",
+                                "state": "non-null"
+                            },
+                            {
+                                "path": "/canceled_at",
+                                "state": "absent"
+                            }
+                        ]
+                    },
+                    "when": {
+                        "equals": "completed",
+                        "path": "/status"
+                    }
+                }
+            },
+            {
+                "implies": {
+                    "then": {
+                        "all": [
+                            {
+                                "path": "/paid_at",
+                                "state": "absent"
+                            },
+                            {
+                                "path": "/completed_at",
+                                "state": "absent"
+                            },
+                            {
+                                "path": "/canceled_at",
+                                "state": "non-null"
+                            }
+                        ]
+                    },
+                    "when": {
+                        "equals": "canceled",
+                        "path": "/status"
+                    }
+                }
+            },
+            {
+                "implies": {
+                    "then": {
+                        "all": [
+                            {
+                                "path": "/expires_at",
+                                "state": "non-null"
+                            },
+                            {
+                                "path": "/paid_at",
+                                "state": "absent"
+                            },
+                            {
+                                "path": "/completed_at",
+                                "state": "absent"
+                            },
+                            {
+                                "path": "/canceled_at",
+                                "state": "absent"
+                            }
+                        ]
+                    },
+                    "when": {
+                        "equals": "expired",
+                        "path": "/status"
+                    }
+                }
+            },
+            {
+                "implies": {
+                    "then": {
+                        "all": [
+                            {
+                                "path": "/sealed_at",
+                                "state": "absent"
+                            },
+                            {
+                                "path": "/paid_at",
+                                "state": "absent"
+                            },
+                            {
+                                "path": "/completed_at",
+                                "state": "absent"
+                            },
+                            {
+                                "path": "/canceled_at",
+                                "state": "absent"
+                            }
+                        ]
+                    },
+                    "when": {
+                        "equals": "unknown",
+                        "path": "/status"
+                    }
+                }
+            },
+            {
+                "equal": {
+                    "paths": [
+                        "/line_item_group/total/currency",
+                        "/payment/amount/currency"
+                    ]
+                }
+            },
+            {
+                "equal": {
+                    "paths": [
+                        "/line_item_group/total/value",
+                        "/payment/amount/value"
+                    ]
+                }
+            }
+        ],
+        "type": "object"
+    }
+)
+@simileConstraints(
+[
+        {
+            "ordered": {
+                "paths": [
+                    "/initiated_at",
+                    "/sealed_at",
+                    "/paid_at",
+                    "/completed_at"
+                ]
+            }
+        },
+        {
+            "ordered": {
+                "paths": [
+                    "/initiated_at",
+                    "/canceled_at"
+                ]
+            }
+        },
+        {
+            "ordered": {
+                "paths": [
+                    "/initiated_at",
+                    "/expires_at"
+                ]
+            }
+        },
+        {
+            "implies": {
+                "then": {
+                    "all": [
+                        {
+                            "path": "/sealed_at",
+                            "state": "absent"
+                        },
+                        {
+                            "path": "/paid_at",
+                            "state": "absent"
+                        },
+                        {
+                            "path": "/completed_at",
+                            "state": "absent"
+                        },
+                        {
+                            "path": "/canceled_at",
+                            "state": "absent"
+                        }
+                    ]
+                },
+                "when": {
+                    "equals": "preparing",
+                    "path": "/status"
+                }
+            }
+        },
+        {
+            "implies": {
+                "then": {
+                    "all": [
+                        {
+                            "path": "/sealed_at",
+                            "state": "non-null"
+                        },
+                        {
+                            "path": "/paid_at",
+                            "state": "absent"
+                        },
+                        {
+                            "path": "/completed_at",
+                            "state": "absent"
+                        },
+                        {
+                            "path": "/canceled_at",
+                            "state": "absent"
+                        }
+                    ]
+                },
+                "when": {
+                    "equals": "requires_payment",
+                    "path": "/status"
+                }
+            }
+        },
+        {
+            "implies": {
+                "then": {
+                    "all": [
+                        {
+                            "path": "/sealed_at",
+                            "state": "non-null"
+                        },
+                        {
+                            "path": "/paid_at",
+                            "state": "non-null"
+                        },
+                        {
+                            "path": "/completed_at",
+                            "state": "absent"
+                        },
+                        {
+                            "path": "/canceled_at",
+                            "state": "absent"
+                        }
+                    ]
+                },
+                "when": {
+                    "equals": "paid",
+                    "path": "/status"
+                }
+            }
+        },
+        {
+            "implies": {
+                "then": {
+                    "all": [
+                        {
+                            "path": "/sealed_at",
+                            "state": "non-null"
+                        },
+                        {
+                            "path": "/completed_at",
+                            "state": "non-null"
+                        },
+                        {
+                            "path": "/canceled_at",
+                            "state": "absent"
+                        }
+                    ]
+                },
+                "when": {
+                    "equals": "completed",
+                    "path": "/status"
+                }
+            }
+        },
+        {
+            "implies": {
+                "then": {
+                    "all": [
+                        {
+                            "path": "/paid_at",
+                            "state": "absent"
+                        },
+                        {
+                            "path": "/completed_at",
+                            "state": "absent"
+                        },
+                        {
+                            "path": "/canceled_at",
+                            "state": "non-null"
+                        }
+                    ]
+                },
+                "when": {
+                    "equals": "canceled",
+                    "path": "/status"
+                }
+            }
+        },
+        {
+            "implies": {
+                "then": {
+                    "all": [
+                        {
+                            "path": "/expires_at",
+                            "state": "non-null"
+                        },
+                        {
+                            "path": "/paid_at",
+                            "state": "absent"
+                        },
+                        {
+                            "path": "/completed_at",
+                            "state": "absent"
+                        },
+                        {
+                            "path": "/canceled_at",
+                            "state": "absent"
+                        }
+                    ]
+                },
+                "when": {
+                    "equals": "expired",
+                    "path": "/status"
+                }
+            }
+        },
+        {
+            "implies": {
+                "then": {
+                    "all": [
+                        {
+                            "path": "/sealed_at",
+                            "state": "absent"
+                        },
+                        {
+                            "path": "/paid_at",
+                            "state": "absent"
+                        },
+                        {
+                            "path": "/completed_at",
+                            "state": "absent"
+                        },
+                        {
+                            "path": "/canceled_at",
+                            "state": "absent"
+                        }
+                    ]
+                },
+                "when": {
+                    "equals": "unknown",
+                    "path": "/status"
+                }
+            }
+        },
+        {
+            "equal": {
+                "paths": [
+                    "/line_item_group/total/currency",
+                    "/payment/amount/currency"
+                ]
+            }
+        },
+        {
+            "equal": {
+                "paths": [
+                    "/line_item_group/total/value",
+                    "/payment/amount/value"
+                ]
+            }
+        }
+    ]
+)
+@mixin
+structure OrderMixin {
+    /// When the order was canceled. Omitted otherwise.
+    @timestampFormat("date-time")
+    canceled_at: Timestamp
+    checkout_settings: OrdercheckoutSettings
+    /// When the order was completed. Omitted otherwise.
+    @timestampFormat("date-time")
+    completed_at: Timestamp
+    created_from: OrdercreatedFrom
+    custom_data: NonEmptyCustomData
+    @required
+    customer: Ordercustomer
+    /// When the order expires. Omitted when no expiry is set.
+    @timestampFormat("date-time")
+    expires_at: Timestamp
+    /// Unique identifier for this order
+    @dataExamples([
+    {
+        "json": "or_48ZW7BGvYUBWc1i6WBkL2jr0iPQP5jUy76mmmHpt"
+    }
+])
+    @pattern("^or_")
+    @required
+    id: String
+    /// When order processing began
+    @required
+    @timestampFormat("date-time")
+    initiated_at: Timestamp
+    invoice: Orderinvoice
+    /// Human-readable order number
+    @dataExamples([
+    {
+        "json": "ORDER-12345"
+    }
+])
+    number: String
+    /// Merchant-provided receipt number, when set
+    @dataExamples([
+    {
+        "json": "RCPT-12345"
+    }
+])
+    receipt_number: String
+    refunds: Orderrefunds
+    invoice_settings: OrderInvoiceSettingsResponse
+    @required
+    status: Orderstatus
+    /// When the order was finalized and became immutable—ready for payment or fulfillment
+    @dataExamples([
+    {
+        "json": "2025-09-14T16:24:41.312701813Z"
+    }
+])
+    @timestampFormat("date-time")
+    sealed_at: Timestamp
+    line_item_group: OrderlineItemGroup
+    payment: Orderpayment
+    /// When the order became paid
+    @timestampFormat("date-time")
+    paid_at: Timestamp
+    /// When the order payment becomes overdue
+    @timestampFormat("date-time")
+    payment_due_at: Timestamp
+    /// External order reference when present
+    reference: String
 }
 
 /// Payment intent tied to this order
@@ -20974,10 +22414,10 @@ structure OrderlineItemGroup {
 structure Orderpayment {
     /// Payment intent ID
     @dataExamples([
-        {
-            json: "py_OHFv6I3OZBvB1R46TQQGNxPPtgbPR6CXpQ8En9wl"
-        }
-    ])
+    {
+        "json": "py_OHFv6I3OZBvB1R46TQQGNxPPtgbPR6CXpQ8En9wl"
+    }
+])
     @pattern("^py_")
     @required
     id: String
@@ -20985,10 +22425,10 @@ structure Orderpayment {
     status: Orderpaymentstatus
     /// Optional statement descriptor shown on the customer's bank statement
     @dataExamples([
-        {
-            json: "STATEMENT"
-        }
-    ])
+    {
+        "json": "STATEMENT"
+    }
+])
     @required
     statement_descriptor: String
     @required
@@ -21187,25 +22627,25 @@ structure OrderPaymentError {
 )
 structure OrderpaymentlatestAttempt {
     @dataExamples([
-        {
-            json: "mobile_money"
-        }
-    ])
+    {
+        "json": "mobile_money"
+    }
+])
     payment_method_type: String
     @dataExamples([
-        {
-            json: "pm_hg7D2A5qT6g6mVDSJu6zweKXwsiiNWf3Q85book6"
-        }
-    ])
+    {
+        "json": "pm_hg7D2A5qT6g6mVDSJu6zweKXwsiiNWf3Q85book6"
+    }
+])
     @pattern("^pm_")
     payment_method_id: String
     error: OrderpaymentlatestAttempterror
     /// External payment reference
     @dataExamples([
-        {
-            json: "68c6ecbc3bf0a6548973b598"
-        }
-    ])
+    {
+        "json": "68c6ecbc3bf0a6548973b598"
+    }
+])
     reference: String
     @required
     status: OrderpaymentlatestAttemptstatus
@@ -21439,10 +22879,10 @@ structure OrderPaymentMethodowner {
 structure OrderpaymentpayoutConfiguration {
     /// Compatibility flag. Cross-currency payout execution is not currently available.
     @dataExamples([
-        {
-            json: false
-        }
-    ])
+    {
+        "json": false
+    }
+])
     @required
     enable_fx: Boolean
     @required
@@ -21453,10 +22893,10 @@ structure OrderpaymentpayoutConfiguration {
 structure OrderpaymentpayoutConfigurationdestination {
     /// ID of the financial account receiving the payout
     @dataExamples([
-        {
-            json: "fa_1234567890abcdef"
-        }
-    ])
+    {
+        "json": "fa_1234567890abcdef"
+    }
+])
     @pattern("^fa_")
     @required
     financial_account_id: String
@@ -21482,10 +22922,10 @@ structure OrderProductLineItem {
 structure OrderProductLineItemproduct {
     /// Immutable order-line identifier with the `oli_` prefix.
     @dataExamples([
-        {
-            json: "oli_7QYpB8c3V9kL2nM4"
-        }
-    ])
+    {
+        "json": "oli_7QYpB8c3V9kL2nM4"
+    }
+])
     @pattern("^oli_")
     @required
     id: String
@@ -21753,18 +23193,18 @@ structure OTPTransaction {
     expires_at: Timestamp
     /// Message text with the `{token}` placeholder preserved; no generated token is returned.
     @dataExamples([
-        {
-            json: "Your Acme Bank code is {token}."
-        }
-    ])
+    {
+        "json": "Your Acme Bank code is {token}."
+    }
+])
     @required
     full_message: String
     /// Unique identifier with ot_ prefix
     @dataExamples([
-        {
-            json: "ot_3f8a9c7e2d1b4a6f"
-        }
-    ])
+    {
+        "json": "ot_3f8a9c7e2d1b4a6f"
+    }
+])
     @pattern("^ot_")
     @required
     id: String
@@ -21778,18 +23218,18 @@ structure OTPTransaction {
 
 structure OTPTransmission {
     @dataExamples([
-        {
-            json: "+233241234567"
-        }
-    ])
+    {
+        "json": "+233241234567"
+    }
+])
     @required
     recipient: String
     /// SMS sender identifier or approved email From address.
     @dataExamples([
-        {
-            json: "Acme"
-        }
-    ])
+    {
+        "json": "Acme"
+    }
+])
     @required
     sender_id: String
     @timestampFormat("date-time")
@@ -21804,10 +23244,10 @@ structure OTPVerificationAttempt {
     @timestampFormat("date-time")
     attempted_at: Timestamp
     @dataExamples([
-        {
-            json: "ov_9e8d7c6b5a4f3e2d"
-        }
-    ])
+    {
+        "json": "ov_9e8d7c6b5a4f3e2d"
+    }
+])
     @pattern("^ov_")
     @required
     id: String
@@ -21830,10 +23270,10 @@ structure OTPVerificationAttemptresult {
 structure PageBalanceTransactionsRequest {
     /// Page number to fetch. Use 1 for the first page; 0 is accepted but returns an empty page.
     @dataExamples([
-        {
-            json: 1
-        }
-    ])
+    {
+        "json": 1
+    }
+])
     @range(
         min: 0
         max: 10
@@ -21842,10 +23282,10 @@ structure PageBalanceTransactionsRequest {
     page_number: Integer
     /// Number of transactions per page (1-256)
     @dataExamples([
-        {
-            json: 20
-        }
-    ])
+    {
+        "json": 20
+    }
+])
     @range(
         min: 1
         max: 256
@@ -21870,17 +23310,17 @@ structure PageChildrenPolicyVersionsRequest {
 structure PageChimesRequest {
     /// Restrict the page to chimes associated with this customer
     @dataExamples([
-        {
-            json: "cu_abc123def456"
-        }
-    ])
+    {
+        "json": "cu_abc123def456"
+    }
+])
     customer_id: String
     /// 1-based page index to fetch
     @dataExamples([
-        {
-            json: 1
-        }
-    ])
+    {
+        "json": 1
+    }
+])
     @range(
         min: 1
         max: 10
@@ -21888,10 +23328,10 @@ structure PageChimesRequest {
     page_number: Integer
     /// Number of chimes to return
     @dataExamples([
-        {
-            json: 25
-        }
-    ])
+    {
+        "json": 25
+    }
+])
     @range(
         min: 1
         max: 256
@@ -21899,10 +23339,10 @@ structure PageChimesRequest {
     page_size: Integer
     /// Restrict the page to chimes whose recipient exactly matches this phone number or email address
     @dataExamples([
-        {
-            json: "+233544998605"
-        }
-    ])
+    {
+        "json": "+233544998605"
+    }
+])
     recipient: String
 }
 
@@ -21926,18 +23366,18 @@ structure PageChimesResponse {
 structure PageChimesResponsepage {
     /// Page number returned
     @dataExamples([
-        {
-            json: 1
-        }
-    ])
+    {
+        "json": 1
+    }
+])
     @required
     number: Integer
     /// Page size returned
     @dataExamples([
-        {
-            json: 25
-        }
-    ])
+    {
+        "json": 25
+    }
+])
     @required
     size: Integer
     @required
@@ -21990,26 +23430,26 @@ structure PageFileLinksRequest {
 )
 structure PageFilesRequest {
     @dataExamples([
-        {
-            json: "product_image"
-        }
-    ])
+    {
+        "json": "product_image"
+    }
+])
     purpose: String
     status: PageFilesRequeststatus
     @dataExamples([
-        {
-            json: 1
-        }
-    ])
+    {
+        "json": 1
+    }
+])
     @range(
         min: 1
     )
     page_number: Integer
     @dataExamples([
-        {
-            json: 25
-        }
-    ])
+    {
+        "json": 25
+    }
+])
     @range(
         min: 1
     )
@@ -22037,16 +23477,16 @@ structure PageMessageTemplatesRequest {
     status: PageMessageTemplatesRequeststatus
     channel: PageMessageTemplatesRequestchannel
     @dataExamples([
-        {
-            json: "receipt"
-        }
-    ])
+    {
+        "json": "receipt"
+    }
+])
     purpose: String
     @dataExamples([
-        {
-            json: "en"
-        }
-    ])
+    {
+        "json": "en"
+    }
+])
     locale: String
 }
 
@@ -22176,10 +23616,10 @@ structure PageProductsResponsepage {
 structure PagePurchaseIntentsRequest {
     /// One-based page number to retrieve
     @dataExamples([
-        {
-            json: 1
-        }
-    ])
+    {
+        "json": 1
+    }
+])
     @range(
         min: 1
         max: 10
@@ -22188,10 +23628,10 @@ structure PagePurchaseIntentsRequest {
     page_number: Integer
     /// Maximum number of purchase intents to return on this page
     @dataExamples([
-        {
-            json: 20
-        }
-    ])
+    {
+        "json": 20
+    }
+])
     @range(
         min: 1
         max: 256
@@ -22219,20 +23659,28 @@ structure PagePurchaseIntentsResponse {
 structure PagePurchaseIntentsResponsepage {
     /// One-based page number returned
     @dataExamples([
-        {
-            json: 1
-        }
-    ])
+    {
+        "json": 1
+    }
+])
+    @range(
+        min: 1
+        max: 10
+    )
     @required
     number: Integer
     @required
     purchase_intents: PagePurchaseIntentsResponsepagepurchaseIntents
     /// Number of purchase intents actually returned
     @dataExamples([
-        {
-            json: 2
-        }
-    ])
+    {
+        "json": 2
+    }
+])
+    @range(
+        min: 0
+        max: 256
+    )
     @required
     size: Integer
 }
@@ -22256,30 +23704,30 @@ structure PageRefundsRequest {
 structure PageSecretKeysRequest {
     /// Page number alias. Omitted or 0 is normalized to 1.
     @dataExamples([
-        {
-            json: 1
-        }
-    ])
+    {
+        "json": 1
+    }
+])
     @range(
         min: 0
     )
     page: Integer
     /// Page number. Omitted or 0 is normalized to 1.
     @dataExamples([
-        {
-            json: 1
-        }
-    ])
+    {
+        "json": 1
+    }
+])
     @range(
         min: 0
     )
     number: Integer
     /// Requested page size. Omitted or 0 becomes 50; values above 100 are capped at 100.
     @dataExamples([
-        {
-            json: 20
-        }
-    ])
+    {
+        "json": 20
+    }
+])
     @range(
         min: 0
     )
@@ -22353,18 +23801,18 @@ structure PaymentBalanceTransaction {
     @timestampFormat("date-time")
     created_at: Timestamp
     @dataExamples([
-        {
-            json: "bt_0123456789abcdefghijklmnopqrstuvwxyzABCD"
-        }
-    ])
+    {
+        "json": "bt_0123456789abcdefghijklmnopqrstuvwxyzABCD"
+    }
+])
     @pattern("^bt_")
     @required
     id: String
     @dataExamples([
-        {
-            json: "or_0123456789abcdefghijklmnopqrstuvwxyzABCD"
-        }
-    ])
+    {
+        "json": "or_0123456789abcdefghijklmnopqrstuvwxyzABCD"
+    }
+])
     @pattern("^or_")
     @required
     order_id: String
@@ -22372,19 +23820,19 @@ structure PaymentBalanceTransaction {
     @timestampFormat("date-time")
     paid_at: Timestamp
     @dataExamples([
-        {
-            json: "py_ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmn"
-        }
-    ])
+    {
+        "json": "py_ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmn"
+    }
+])
     @pattern("^py_")
     @required
     payment_id: String
     /// Legacy payout owning the whole transaction remainder. New integrations should inspect `allocations`.
     @dataExamples([
-        {
-            json: "po_zyxwvutsrqponmlkjihgfedcbaABCDEFGHIJKLMN"
-        }
-    ])
+    {
+        "json": "po_zyxwvutsrqponmlkjihgfedcbaABCDEFGHIJKLMN"
+    }
+])
     @pattern("^po_")
     payout_id: String
     payout_configuration: PaymentBalanceTransactionpayoutConfiguration
@@ -22455,10 +23903,10 @@ structure PaymentMethodMobileMoneyInput {
     network: PaymentMethodMobileMoneyInputnetwork
     /// Mobile-money account number in local or international form.
     @dataExamples([
-        {
-            json: "+233242057831"
-        }
-    ])
+    {
+        "json": "+233242057831"
+    }
+])
     @pattern("^(\\+?\\d{10,15})$")
     @required
     account_number: String
@@ -22719,39 +24167,39 @@ structure PaymentMethodObjectbankAccount {
 structure PaymentMethodObjectbankAccountghanaBankAccount {
     /// Branch name
     @dataExamples([
-        {
-            json: "Accra Main"
-        }
-    ])
+    {
+        "json": "Accra Main"
+    }
+])
     branch: String
     /// Account holder name
     @dataExamples([
-        {
-            json: "John Doe"
-        }
-    ])
+    {
+        "json": "John Doe"
+    }
+])
     name: String
     /// Account number
     @dataExamples([
-        {
-            json: "1234567890"
-        }
-    ])
+    {
+        "json": "1234567890"
+    }
+])
     @required
     account_number: String
     /// Bank sort code
     @dataExamples([
-        {
-            json: "030100"
-        }
-    ])
+    {
+        "json": "030100"
+    }
+])
     sort_code: String
     /// SWIFT/BIC code
     @dataExamples([
-        {
-            json: "GHBAGHAACCRA"
-        }
-    ])
+    {
+        "json": "GHBAGHAACCRA"
+    }
+])
     swift_code: String
 }
 
@@ -23001,10 +24449,10 @@ structure PaymentMethodObjectbankAccountghanaBankAccount {
 structure PaymentMethodObjectMixin {
     /// Whether this payment method is active and reusable in new payment flows
     @dataExamples([
-        {
-            json: true
-        }
-    ])
+    {
+        "json": true
+    }
+])
     @required
     active: Boolean
     /// Timestamp when the payment method was archived. Omitted while unarchived.
@@ -23014,29 +24462,29 @@ structure PaymentMethodObjectMixin {
     card: PaymentMethodCard
     /// When this payment method was tokenized
     @dataExamples([
-        {
-            json: "2025-11-23T13:00Z"
-        }
-    ])
+    {
+        "json": "2025-11-23T13:00Z"
+    }
+])
     @required
     @timestampFormat("date-time")
     created_at: Timestamp
     custom_data: CustomData
     /// Customer who owns this payment method
     @dataExamples([
-        {
-            json: "cu_a1b2c3d4e5"
-        }
-    ])
+    {
+        "json": "cu_a1b2c3d4e5"
+    }
+])
     @pattern("^cu_")
     @required
     customer_id: String
     /// Whether the method is limited to its originating flow and cannot be reused.
     @dataExamples([
-        {
-            json: false
-        }
-    ])
+    {
+        "json": false
+    }
+])
     ephemeral: Boolean
     /// When this payment method expires. Omitted when no expiry is available.
     @timestampFormat("date-time")
@@ -23046,10 +24494,10 @@ structure PaymentMethodObjectMixin {
     fingerprint: String
     /// Unique identifier for this payment method
     @dataExamples([
-        {
-            json: "pm_xyz789"
-        }
-    ])
+    {
+        "json": "pm_xyz789"
+    }
+])
     @pattern("^pm_")
     @required
     id: String
@@ -23061,10 +24509,10 @@ structure PaymentMethodObjectMixin {
     verification: PaymentMethodObjectverification
     /// When ownership verification was completed
     @dataExamples([
-        {
-            json: "2025-11-23T13:07Z"
-        }
-    ])
+    {
+        "json": "2025-11-23T13:07Z"
+    }
+])
     @timestampFormat("date-time")
     verified_at: Timestamp
 }
@@ -23083,10 +24531,10 @@ structure PaymentMethodObjectMixin {
 structure PaymentMethodObjectmobileMoney {
     /// Masked wallet number. The full account number is never returned.
     @dataExamples([
-        {
-            json: "****7831"
-        }
-    ])
+    {
+        "json": "****7831"
+    }
+])
     @length(
         min: 8
         max: 8
@@ -23095,10 +24543,10 @@ structure PaymentMethodObjectmobileMoney {
     account_number: String
     /// Last four numeric digits of the normalized wallet number.
     @dataExamples([
-        {
-            json: "7831"
-        }
-    ])
+    {
+        "json": "7831"
+    }
+])
     @length(
         min: 4
         max: 4
@@ -23115,10 +24563,10 @@ structure PaymentMethodObjectowner {
     address: PaymentMethodObjectowneraddress
     /// Owner full legal name
     @dataExamples([
-        {
-            json: "Yaw Boakye"
-        }
-    ])
+    {
+        "json": "Yaw Boakye"
+    }
+])
     @required
     name: String
 }
@@ -23127,60 +24575,60 @@ structure PaymentMethodObjectowner {
 structure PaymentMethodObjectowneraddress {
     /// City or locality
     @dataExamples([
-        {
-            json: "Accra"
-        }
-    ])
+    {
+        "json": "Accra"
+    }
+])
     city: String
     /// Two-letter ISO country code
     @dataExamples([
-        {
-            json: "GH"
-        }
-    ])
+    {
+        "json": "GH"
+    }
+])
     @required
     country: String
     /// First line of the street address
     @dataExamples([
-        {
-            json: "1 High Street"
-        }
-    ])
+    {
+        "json": "1 High Street"
+    }
+])
     line_1: String
     /// Second line of the street address
     @dataExamples([
-        {
-            json: "Osu"
-        }
-    ])
+    {
+        "json": "Osu"
+    }
+])
     line_2: String
     /// Recipient name at this address, if different from owner name
     @dataExamples([
-        {
-            json: "Jane Mensah"
-        }
-    ])
+    {
+        "json": "Jane Mensah"
+    }
+])
     name: String
     /// Phone number for this address
     @dataExamples([
-        {
-            json: "+233201234567"
-        }
-    ])
+    {
+        "json": "+233201234567"
+    }
+])
     phone_number: String
     /// Postal or ZIP code
     @dataExamples([
-        {
-            json: "GA-123-4567"
-        }
-    ])
+    {
+        "json": "GA-123-4567"
+    }
+])
     post_code: String
     /// Region, state, or province
     @dataExamples([
-        {
-            json: "Greater Accra"
-        }
-    ])
+    {
+        "json": "Greater Accra"
+    }
+])
     region: String
 }
 
@@ -23201,42 +24649,42 @@ structure PaymentMethodObjectsupplied {
 structure PaymentMethodObjectverification {
     /// When verification was completed
     @dataExamples([
-        {
-            json: "2025-11-23T13:07Z"
-        }
-    ])
+    {
+        "json": "2025-11-23T13:07Z"
+    }
+])
     @timestampFormat("date-time")
     completed_at: Timestamp
     /// When verification was initiated
     @dataExamples([
-        {
-            json: "2025-11-23T13:00Z"
-        }
-    ])
+    {
+        "json": "2025-11-23T13:00Z"
+    }
+])
     @required
     @timestampFormat("date-time")
     initiated_at: Timestamp
     /// Verification mechanism used
     @dataExamples([
-        {
-            json: "otp"
-        }
-    ])
+    {
+        "json": "otp"
+    }
+])
     mechanism: String
     /// ID of the verification request
     @dataExamples([
-        {
-            json: "req_abc123"
-        }
-    ])
+    {
+        "json": "req_abc123"
+    }
+])
     @required
     request_id: String
     /// Verification type
     @dataExamples([
-        {
-            json: "sms_otp"
-        }
-    ])
+    {
+        "json": "sms_otp"
+    }
+])
     @required
     type: String
 }
@@ -23246,10 +24694,10 @@ structure PaymentMethodOwnerInput {
     address: PaymentMethodOwnerInputaddress
     /// Payment method owner's name.
     @dataExamples([
-        {
-            json: "Jane Mensah"
-        }
-    ])
+    {
+        "json": "Jane Mensah"
+    }
+])
     @length(
         min: 1
     )
@@ -23261,10 +24709,10 @@ structure PaymentMethodOwnerInputaddress {
     city: String
     /// Country associated with the owner address.
     @dataExamples([
-        {
-            json: "GH"
-        }
-    ])
+    {
+        "json": "GH"
+    }
+])
     @length(
         min: 1
     )
@@ -23281,10 +24729,10 @@ structure PaymentMethodOwnerInputaddress {
 structure PaymentMethodPageRequest {
     /// Optional customer ID to scope the page to a single customer
     @dataExamples([
-        {
-            json: "cu_a1b2c3d4e5"
-        }
-    ])
+    {
+        "json": "cu_a1b2c3d4e5"
+    }
+])
     customer_id: String
     /// Page index to fetch. `0` is accepted and normalized to page 1; returned pages are numbered 1-10.
     @range(
@@ -23350,32 +24798,32 @@ structure PaymentMethodTypeSetting {
     type: PaymentMethodTypeSettingtype
     /// Human-readable name
     @dataExamples([
-        {
-            json: "Mobile Money"
-        }
-    ])
+    {
+        "json": "Mobile Money"
+    }
+])
     name: String
     /// Description of this payment method
     @dataExamples([
-        {
-            json: "Pay with supported mobile money wallets"
-        }
-    ])
+    {
+        "json": "Pay with supported mobile money wallets"
+    }
+])
     description: String
     /// Whether this payment type can be used
     @dataExamples([
-        {
-            json: true
-        }
-    ])
+    {
+        "json": true
+    }
+])
     @required
     enabled: Boolean
     /// Whether customers must explicitly agree before using
     @dataExamples([
-        {
-            json: true
-        }
-    ])
+    {
+        "json": true
+    }
+])
     @required
     confirms_use: Boolean
 }
@@ -23671,37 +25119,37 @@ structure PaymentNextActionauthorize {
 structure PaymentNextActionconfirmPayment {
     /// When the confirmation request expires
     @dataExamples([
-        {
-            json: "2025-10-24T21:16:11.917533316Z"
-        }
-    ])
+    {
+        "json": "2025-10-24T21:16:11.917533316Z"
+    }
+])
     @required
     @timestampFormat("date-time")
     expires_at: Timestamp
     /// Authentication scheme used
     @dataExamples([
-        {
-            json: "inttegro_defined_auth"
-        }
-    ])
+    {
+        "json": "inttegro_defined_auth"
+    }
+])
     @required
     scheme: String
     request: PaymentNextActionconfirmPaymentrequest
     attempt: PaymentNextActionconfirmPaymentattempt
     /// Whether the payment confirmation has completed
     @dataExamples([
-        {
-            json: false
-        }
-    ])
+    {
+        "json": false
+    }
+])
     @required
     confirmed: Boolean
     /// Confirmation status
     @dataExamples([
-        {
-            json: "pending"
-        }
-    ])
+    {
+        "json": "pending"
+    }
+])
     @required
     status: String
 }
@@ -23710,26 +25158,26 @@ structure PaymentNextActionconfirmPayment {
 structure PaymentNextActionconfirmPaymentattempt {
     /// Attempt status
     @dataExamples([
-        {
-            json: "pending"
-        }
-    ])
+    {
+        "json": "pending"
+    }
+])
     @required
     status: String
     /// Whether the confirmation has succeeded
     @dataExamples([
-        {
-            json: false
-        }
-    ])
+    {
+        "json": false
+    }
+])
     @required
     confirmed: Boolean
     /// Reason for the current attempt state
     @dataExamples([
-        {
-            json: "awaiting_customer_confirmation"
-        }
-    ])
+    {
+        "json": "awaiting_customer_confirmation"
+    }
+])
     @required
     reason: String
     /// When the attempt was executed
@@ -23745,36 +25193,36 @@ structure PaymentNextActionconfirmPaymentattempt {
 structure PaymentNextActionconfirmPaymentrequest {
     /// Unique identifier for the confirmation request
     @dataExamples([
-        {
-            json: "Jmjup0uRSVI2LvllHfdJ"
-        }
-    ])
+    {
+        "json": "Jmjup0uRSVI2LvllHfdJ"
+    }
+])
     @required
     id: String
     /// Recipient of the confirmation token
     @dataExamples([
-        {
-            json: "0242057831"
-        }
-    ])
+    {
+        "json": "0242057831"
+    }
+])
     @required
     recipient: String
     @required
     sent_via: PaymentNextActionconfirmPaymentrequestsentVia
     /// Number of digits in the token
     @dataExamples([
-        {
-            json: 6
-        }
-    ])
+    {
+        "json": 6
+    }
+])
     @required
     token_size: Integer
     /// Sender ID for the message
     @dataExamples([
-        {
-            json: "zverify"
-        }
-    ])
+    {
+        "json": "zverify"
+    }
+])
     @required
     sender_id: String
     /// Current request status
@@ -23785,10 +25233,10 @@ structure PaymentNextActionconfirmPaymentrequest {
 structure PaymentNextActionredirect {
     /// URL to redirect the customer to
     @dataExamples([
-        {
-            json: "https://pages.inttegro.com/authorize?order_id=3deNYydEjIGCqK1tGlAPwJYSCsZnQ4XGF"
-        }
-    ])
+    {
+        "json": "https://pages.inttegro.com/authorize?order_id=3deNYydEjIGCqK1tGlAPwJYSCsZnQ4XGF"
+    }
+])
     @required
     redirect_url: String
     /// When the redirect URL expires
@@ -23967,10 +25415,10 @@ structure PayOrderPaymentMethodData {
 structure PayOrderRequest {
     /// Unique identifier of the order to pay
     @dataExamples([
-        {
-            json: "or_GKj7A8lM5wEGRUvbqpI4bkDFsQvpqVyh5fqePNnb"
-        }
-    ])
+    {
+        "json": "or_GKj7A8lM5wEGRUvbqpI4bkDFsQvpqVyh5fqePNnb"
+    }
+])
     @pattern("^or_")
     @required
     order_id: String
@@ -23978,10 +25426,10 @@ structure PayOrderRequest {
     payment_method_data: PayOrderPaymentMethodData
     /// ID of a saved payment method to use for this payment
     @dataExamples([
-        {
-            json: "pm_xyz123abc456"
-        }
-    ])
+    {
+        "json": "pm_xyz123abc456"
+    }
+])
     @pattern("^pm_")
     payment_method_id: String
     /// Save a newly supplied payment method. When true and payment_method_data is present, billing_details is required.
@@ -23991,10 +25439,10 @@ structure PayOrderRequest {
     /// payment_method_data. Defaults to false.
     ///
     @dataExamples([
-        {
-            json: false
-        }
-    ])
+    {
+        "json": false
+    }
+])
     paid_out_of_band: Boolean
 }
 
@@ -24337,93 +25785,7 @@ structure PayOrderRequest {
         }
     ]
 )
-structure Payout {
-    amount: Payoutamount
-    balance_transactions: PayoutbalanceTransactions
-    /// Immutable debit balance transaction created when this payout succeeds.
-    @dataExamples([
-        {
-            json: "bt_1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcd"
-        }
-    ])
-    @pattern("^bt_")
-    balance_transaction_id: String
-    /// When the payout was canceled
-    @timestampFormat("date-time")
-    canceled_at: Timestamp
-    cancellation: PayoutcancellationSchema
-    custom_data: CustomData
-    /// Financial account receiving the funds
-    @dataExamples([
-        {
-            json: "fa_1234567890abcdef"
-        }
-    ])
-    @pattern("^fa_")
-    @required
-    destination_id: String
-    error: PayouterrorSchema
-    /// Earliest moment payout execution may begin
-    @dataExamples([
-        {
-            json: "2026-08-05T09:00Z"
-        }
-    ])
-    @required
-    @timestampFormat("date-time")
-    execute_after: Timestamp
-    /// Actor that executed the payout
-    executed_by: String
-    /// Expected completion time
-    @timestampFormat("date-time")
-    expected_at: Timestamp
-    /// When the payout entered the `failed` state.
-    @timestampFormat("date-time")
-    failed_at: Timestamp
-    failure: PayoutfailureSchema
-    /// Unique payout identifier
-    @dataExamples([
-        {
-            json: "po_yQ2wXm5Dc7Pk9Ls1Vn0RgHaB"
-        }
-    ])
-    @pattern("^po_")
-    @required
-    id: String
-    /// When the payout was created
-    @required
-    @timestampFormat("date-time")
-    initiated_at: Timestamp
-    /// Actor that initiated the payout
-    initiated_by: String
-    @required
-    max_amount: PayoutmaxAmount
-    /// Merchant reference carried on the payout
-    @dataExamples([
-        {
-            json: "PAYOUT-APR-15"
-        }
-    ])
-    reference: String
-    /// Schedule associated with the payout
-    @pattern("^posc_")
-    schedule_id: String
-    /// When the payout was scheduled
-    @timestampFormat("date-time")
-    scheduled_at: Timestamp
-    /// Actor that scheduled the payout
-    scheduled_by: String
-    /// When the transfer was sent
-    @timestampFormat("date-time")
-    sent_at: Timestamp
-    /// Source identifier associated with the payout
-    source_id: String
-    @required
-    status: Payoutstatus
-    /// When the payout succeeded
-    @timestampFormat("date-time")
-    succeeded_at: Timestamp
-}
+structure Payout with [PayoutMixin] {}
 
 structure Payoutamount with [AmountMixin] {}
 
@@ -24475,10 +25837,10 @@ structure PayoutBalanceTransaction {
     amount: PayoutBalanceTransactionamount
     /// Unique balance transaction identifier.
     @dataExamples([
-        {
-            json: "bt_1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcd"
-        }
-    ])
+    {
+        "json": "bt_1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcd"
+    }
+])
     @pattern("^bt_")
     @required
     id: String
@@ -24514,19 +25876,19 @@ structure PayoutDebitBalanceTransaction {
     @timestampFormat("date-time")
     created_at: Timestamp
     @dataExamples([
-        {
-            json: "bt_0123456789abcdefghijklmnopqrstuvwxyzABCD"
-        }
-    ])
+    {
+        "json": "bt_0123456789abcdefghijklmnopqrstuvwxyzABCD"
+    }
+])
     @pattern("^bt_")
     @required
     id: String
     /// Payout that created this finalized debit.
     @dataExamples([
-        {
-            json: "po_zyxwvutsrqponmlkjihgfedcbaABCDEFGHIJKLMN"
-        }
-    ])
+    {
+        "json": "po_zyxwvutsrqponmlkjihgfedcbaABCDEFGHIJKLMN"
+    }
+])
     @pattern("^po_")
     @required
     payout_id: String
@@ -24536,10 +25898,10 @@ structure PayoutDebitBalanceTransaction {
 structure PayoutDestinations {
     /// Financial account that receives Ghana cedi payouts. Send an empty string to remove the assignment.
     @dataExamples([
-        {
-            json: "fa_1234567890abcdef"
-        }
-    ])
+    {
+        "json": "fa_1234567890abcdef"
+    }
+])
     ghs: String
 }
 
@@ -24591,6 +25953,434 @@ structure PayoutLimitValue {
 
 structure PayoutmaxAmount with [AmountMixin] {}
 
+/// A payout scheduled from your Inttegro balance to a destination financial account
+@simileConstraints(
+[
+        {
+            "ordered": {
+                "paths": [
+                    "/initiated_at",
+                    "/scheduled_at",
+                    "/sent_at",
+                    "/succeeded_at"
+                ]
+            }
+        },
+        {
+            "ordered": {
+                "paths": [
+                    "/initiated_at",
+                    "/scheduled_at",
+                    "/sent_at",
+                    "/failed_at"
+                ]
+            }
+        },
+        {
+            "ordered": {
+                "paths": [
+                    "/initiated_at",
+                    "/scheduled_at",
+                    "/canceled_at"
+                ]
+            }
+        },
+        {
+            "implies": {
+                "then": {
+                    "all": [
+                        {
+                            "path": "/scheduled_at",
+                            "state": "absent"
+                        },
+                        {
+                            "path": "/sent_at",
+                            "state": "absent"
+                        },
+                        {
+                            "path": "/succeeded_at",
+                            "state": "absent"
+                        },
+                        {
+                            "path": "/failed_at",
+                            "state": "absent"
+                        },
+                        {
+                            "path": "/canceled_at",
+                            "state": "absent"
+                        },
+                        {
+                            "path": "/failure",
+                            "state": "absent"
+                        },
+                        {
+                            "path": "/cancellation",
+                            "state": "absent"
+                        },
+                        {
+                            "path": "/error",
+                            "state": "absent"
+                        }
+                    ]
+                },
+                "when": {
+                    "equals": "initialized",
+                    "path": "/status"
+                }
+            }
+        },
+        {
+            "implies": {
+                "then": {
+                    "all": [
+                        {
+                            "path": "/scheduled_at",
+                            "state": "non-null"
+                        },
+                        {
+                            "path": "/sent_at",
+                            "state": "absent"
+                        },
+                        {
+                            "path": "/succeeded_at",
+                            "state": "absent"
+                        },
+                        {
+                            "path": "/failed_at",
+                            "state": "absent"
+                        },
+                        {
+                            "path": "/canceled_at",
+                            "state": "absent"
+                        },
+                        {
+                            "path": "/failure",
+                            "state": "absent"
+                        },
+                        {
+                            "path": "/cancellation",
+                            "state": "absent"
+                        },
+                        {
+                            "path": "/error",
+                            "state": "absent"
+                        }
+                    ]
+                },
+                "when": {
+                    "equals": "scheduled",
+                    "path": "/status"
+                }
+            }
+        },
+        {
+            "implies": {
+                "then": {
+                    "all": [
+                        {
+                            "path": "/sent_at",
+                            "state": "absent"
+                        },
+                        {
+                            "path": "/succeeded_at",
+                            "state": "absent"
+                        },
+                        {
+                            "path": "/failed_at",
+                            "state": "absent"
+                        },
+                        {
+                            "path": "/canceled_at",
+                            "state": "absent"
+                        },
+                        {
+                            "path": "/failure",
+                            "state": "absent"
+                        },
+                        {
+                            "path": "/cancellation",
+                            "state": "absent"
+                        },
+                        {
+                            "path": "/error",
+                            "state": "absent"
+                        }
+                    ]
+                },
+                "when": {
+                    "equals": "executing",
+                    "path": "/status"
+                }
+            }
+        },
+        {
+            "implies": {
+                "then": {
+                    "all": [
+                        {
+                            "path": "/sent_at",
+                            "state": "non-null"
+                        },
+                        {
+                            "path": "/succeeded_at",
+                            "state": "absent"
+                        },
+                        {
+                            "path": "/failed_at",
+                            "state": "absent"
+                        },
+                        {
+                            "path": "/canceled_at",
+                            "state": "absent"
+                        },
+                        {
+                            "path": "/failure",
+                            "state": "absent"
+                        },
+                        {
+                            "path": "/cancellation",
+                            "state": "absent"
+                        },
+                        {
+                            "path": "/error",
+                            "state": "absent"
+                        }
+                    ]
+                },
+                "when": {
+                    "equals": "processing",
+                    "path": "/status"
+                }
+            }
+        },
+        {
+            "implies": {
+                "then": {
+                    "all": [
+                        {
+                            "path": "/succeeded_at",
+                            "state": "non-null"
+                        },
+                        {
+                            "path": "/failed_at",
+                            "state": "absent"
+                        },
+                        {
+                            "path": "/canceled_at",
+                            "state": "absent"
+                        },
+                        {
+                            "path": "/failure",
+                            "state": "absent"
+                        },
+                        {
+                            "path": "/cancellation",
+                            "state": "absent"
+                        },
+                        {
+                            "path": "/error",
+                            "state": "absent"
+                        }
+                    ]
+                },
+                "when": {
+                    "equals": "succeeded",
+                    "path": "/status"
+                }
+            }
+        },
+        {
+            "implies": {
+                "then": {
+                    "all": [
+                        {
+                            "path": "/succeeded_at",
+                            "state": "absent"
+                        },
+                        {
+                            "path": "/failed_at",
+                            "state": "non-null"
+                        },
+                        {
+                            "path": "/canceled_at",
+                            "state": "absent"
+                        },
+                        {
+                            "path": "/failure",
+                            "state": "non-null"
+                        },
+                        {
+                            "path": "/cancellation",
+                            "state": "absent"
+                        },
+                        {
+                            "path": "/error",
+                            "state": "non-null"
+                        }
+                    ]
+                },
+                "when": {
+                    "equals": "failed",
+                    "path": "/status"
+                }
+            }
+        },
+        {
+            "implies": {
+                "then": {
+                    "all": [
+                        {
+                            "path": "/succeeded_at",
+                            "state": "absent"
+                        },
+                        {
+                            "path": "/failed_at",
+                            "state": "absent"
+                        },
+                        {
+                            "path": "/canceled_at",
+                            "state": "non-null"
+                        },
+                        {
+                            "path": "/failure",
+                            "state": "absent"
+                        },
+                        {
+                            "path": "/cancellation",
+                            "state": "non-null"
+                        },
+                        {
+                            "path": "/error",
+                            "state": "absent"
+                        }
+                    ]
+                },
+                "when": {
+                    "equals": "canceled",
+                    "path": "/status"
+                }
+            }
+        },
+        {
+            "equal": {
+                "paths": [
+                    "/max_amount/currency",
+                    "/amount/currency",
+                    "/balance_transactions/*/amount/currency",
+                    "/balance_transactions/*/allocated_amount/currency"
+                ]
+            }
+        },
+        {
+            "bounded": {
+                "maximum": {
+                    "path": "/max_amount/value"
+                },
+                "path": "/amount/value"
+            }
+        },
+        {
+            "aggregate": {
+                "operation": "sum",
+                "source": "/balance_transactions/*/allocated_amount/value",
+                "target": "/amount/value",
+                "when": {
+                    "path": "/amount",
+                    "state": "non-null"
+                }
+            }
+        }
+    ]
+)
+@mixin
+structure PayoutMixin {
+    amount: Payoutamount
+    balance_transactions: PayoutbalanceTransactions
+    /// Immutable debit balance transaction created when this payout succeeds.
+    @dataExamples([
+    {
+        "json": "bt_1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcd"
+    }
+])
+    @pattern("^bt_")
+    balance_transaction_id: String
+    /// When the payout was canceled
+    @timestampFormat("date-time")
+    canceled_at: Timestamp
+    cancellation: PayoutcancellationSchema
+    custom_data: CustomData
+    /// Financial account receiving the funds
+    @dataExamples([
+    {
+        "json": "fa_1234567890abcdef"
+    }
+])
+    @pattern("^fa_")
+    @required
+    destination_id: String
+    error: PayouterrorSchema
+    /// Earliest moment payout execution may begin
+    @dataExamples([
+    {
+        "json": "2026-08-05T09:00Z"
+    }
+])
+    @required
+    @timestampFormat("date-time")
+    execute_after: Timestamp
+    /// Actor that executed the payout
+    executed_by: String
+    /// Expected completion time
+    @timestampFormat("date-time")
+    expected_at: Timestamp
+    /// When the payout entered the `failed` state.
+    @timestampFormat("date-time")
+    failed_at: Timestamp
+    failure: PayoutfailureSchema
+    /// Unique payout identifier
+    @dataExamples([
+    {
+        "json": "po_yQ2wXm5Dc7Pk9Ls1Vn0RgHaB"
+    }
+])
+    @pattern("^po_")
+    @required
+    id: String
+    /// When the payout was created
+    @required
+    @timestampFormat("date-time")
+    initiated_at: Timestamp
+    /// Actor that initiated the payout
+    initiated_by: String
+    @required
+    max_amount: PayoutmaxAmount
+    /// Merchant reference carried on the payout
+    @dataExamples([
+    {
+        "json": "PAYOUT-APR-15"
+    }
+])
+    reference: String
+    /// Schedule associated with the payout
+    @pattern("^posc_")
+    schedule_id: String
+    /// When the payout was scheduled
+    @timestampFormat("date-time")
+    scheduled_at: Timestamp
+    /// Actor that scheduled the payout
+    scheduled_by: String
+    /// When the transfer was sent
+    @timestampFormat("date-time")
+    sent_at: Timestamp
+    /// Source identifier associated with the payout
+    source_id: String
+    @required
+    status: Payoutstatus
+    /// When the payout succeeded
+    @timestampFormat("date-time")
+    succeeded_at: Timestamp
+}
+
 /// A page of payouts ordered from newest to oldest.
 structure PayoutPage {
     /// Page number returned.
@@ -24609,7 +26399,11 @@ structure PayoutPageResponse {
 }
 
 /// Response envelope containing a payout.
-structure PayoutResponse {
+structure PayoutResponse with [PayoutResponseMixin] {}
+
+/// Response envelope containing a payout.
+@mixin
+structure PayoutResponseMixin {
     @required
     payout: Payout
 }
@@ -24673,10 +26467,10 @@ structure PayoutSettingsLookupScheduleAgingSpec {
     abide: String
     /// Public identifier for the balance transaction aging specification.
     @dataExamples([
-        {
-            json: "bt_aging_spec_168_hourly"
-        }
-    ])
+    {
+        "json": "bt_aging_spec_168_hourly"
+    }
+])
     @pattern("^bt_aging_spec_")
     @required
     public_id: String
@@ -24685,10 +26479,10 @@ structure PayoutSettingsLookupScheduleAgingSpec {
     label: String
     /// Required transaction age.
     @dataExamples([
-        {
-            json: "168h"
-        }
-    ])
+    {
+        "json": "168h"
+    }
+])
     @required
     t_plus: String
 }
@@ -24739,20 +26533,20 @@ structure PayoutSettingsMutationScheduleSpec {
     abide: String
     /// Public identifier for the balance transaction aging specification.
     @dataExamples([
-        {
-            json: "bt_aging_spec_168_hourly"
-        }
-    ])
+    {
+        "json": "bt_aging_spec_168_hourly"
+    }
+])
     @pattern("^bt_aging_spec_")
     @required
     public_id: String
     @required
     label: String
     @dataExamples([
-        {
-            json: "168h"
-        }
-    ])
+    {
+        "json": "168h"
+    }
+])
     @required
     t_plus: String
 }
@@ -24819,10 +26613,10 @@ structure Price with [AmountMixin] {}
 structure PriceActionRequest {
     /// Price ID to perform the action on
     @dataExamples([
-        {
-            json: "pr_xyz789"
-        }
-    ])
+    {
+        "json": "pr_xyz789"
+    }
+])
     @pattern("^pr_")
     @required
     price_id: String
@@ -25057,26 +26851,26 @@ structure PriceActionRequest {
 structure PriceEmbeddedProduct {
     /// Unique product identifier with prod_ prefix
     @dataExamples([
-        {
-            json: "prod_abc123xyz"
-        }
-    ])
+    {
+        "json": "prod_abc123xyz"
+    }
+])
     @pattern("^prod_")
     @required
     id: String
     /// Full product description
     @dataExamples([
-        {
-            json: "Starter plan for solo businesses"
-        }
-    ])
+    {
+        "json": "Starter plan for solo businesses"
+    }
+])
     about: String
     /// Whether product is published and available
     @dataExamples([
-        {
-            json: true
-        }
-    ])
+    {
+        "json": true
+    }
+])
     @required
     active: Boolean
     /// Archive timestamp (if archived). A non-null value means `active` is false.
@@ -25085,69 +26879,69 @@ structure PriceEmbeddedProduct {
     attributes: PriceEmbeddedProductattributes
     /// Product category
     @dataExamples([
-        {
-            json: "software"
-        }
-    ])
+    {
+        "json": "software"
+    }
+])
     category: String
     /// Product creation timestamp
     @dataExamples([
-        {
-            json: "2024-01-15T10:30Z"
-        }
-    ])
+    {
+        "json": "2024-01-15T10:30Z"
+    }
+])
     @required
     @timestampFormat("date-time")
     created_at: Timestamp
     custom_data: CustomData
     /// Short description
     @dataExamples([
-        {
-            json: "Standard monthly subscription"
-        }
-    ])
+    {
+        "json": "Standard monthly subscription"
+    }
+])
     description: String
     dimensions: PriceEmbeddedProductdimensions
     media: PriceEmbeddedProductmedia
     /// Product name
     @dataExamples([
-        {
-            json: "Starter plan"
-        }
-    ])
+    {
+        "json": "Starter plan"
+    }
+])
     @required
     name: String
     /// When the product was published
     @dataExamples([
-        {
-            json: "2024-01-15T10:35Z"
-        }
-    ])
+    {
+        "json": "2024-01-15T10:35Z"
+    }
+])
     @timestampFormat("date-time")
     published_at: Timestamp
     /// External reference or SKU
     @dataExamples([
-        {
-            json: "plan-starter-monthly"
-        }
-    ])
+    {
+        "json": "plan-starter-monthly"
+    }
+])
     reference: String
     shipment: PriceEmbeddedProductshipment
     /// Tax classification code
     @dataExamples([
-        {
-            json: "txcd_software"
-        }
-    ])
+    {
+        "json": "txcd_software"
+    }
+])
     tax_code: String
     @required
     type: PriceEmbeddedProducttype
     /// Unit dimension label
     @dataExamples([
-        {
-            json: "license"
-        }
-    ])
+    {
+        "json": "license"
+    }
+])
     unit_dim: String
     /// Last update timestamp
     @timestampFormat("date-time")
@@ -25157,18 +26951,18 @@ structure PriceEmbeddedProduct {
 structure PriceEmbeddedProductattributesItem {
     /// Attribute name
     @dataExamples([
-        {
-            json: "tier"
-        }
-    ])
+    {
+        "json": "tier"
+    }
+])
     @required
     name: String
     /// Attribute value
     @dataExamples([
-        {
-            json: "starter"
-        }
-    ])
+    {
+        "json": "starter"
+    }
+])
     @required
     value: String
 }
@@ -25180,7 +26974,7 @@ structure PriceEmbeddedProductdimensions with [ProductDimensionsMixin] {}
 structure PriceEmbeddedProductmedia with [ProductMediaMixin] {}
 
 /// Shipment and fulfillment details
-structure PriceEmbeddedProductshipment with [ProductShipmentMixin] {}
+structure PriceEmbeddedProductshipment {}
 
 structure PricePageItem {}
 
@@ -25199,10 +26993,10 @@ structure PricePageRequest {
     page_size: Integer
     /// Optional product ID to scope the page to a single product
     @dataExamples([
-        {
-            json: "prod_abc123"
-        }
-    ])
+    {
+        "json": "prod_abc123"
+    }
+])
     product_id: String
 }
 
@@ -25243,10 +27037,10 @@ apply PriceParams$currency @required
 
 apply PriceParams$value {
     @dataExamples([
-        {
-            json: 20000
-        }
-    ])
+    {
+        "json": 20000
+    }
+])
     @documentation("Amount in smallest currency unit (e.g., pesewas for GHS)")
     @range(
         min: 0
@@ -25304,7 +27098,7 @@ structure PriceResponse {
                 "type": "string"
             },
             "custom_data": {
-                "shape": "CustomData"
+                "shape": "NonEmptyCustomData"
             },
             "description": {
                 "description": "Short description",
@@ -25501,10 +27295,10 @@ structure PriceResponse {
 structure Product {
     /// Unique product identifier with prod_ prefix
     @dataExamples([
-        {
-            json: "prod_abc123xyz"
-        }
-    ])
+    {
+        "json": "prod_abc123xyz"
+    }
+])
     @pattern("^prod_")
     @required
     id: String
@@ -25512,25 +27306,25 @@ structure Product {
     type: Producttype
     /// External reference or SKU
     @dataExamples([
-        {
-            json: "SKU-12345"
-        }
-    ])
+    {
+        "json": "SKU-12345"
+    }
+])
     reference: String
     /// Product name
     @dataExamples([
-        {
-            json: "Premium Cotton T-Shirt"
-        }
-    ])
+    {
+        "json": "Premium Cotton T-Shirt"
+    }
+])
     @required
     name: String
     /// Short description
     @dataExamples([
-        {
-            json: "Comfortable everyday wear"
-        }
-    ])
+    {
+        "json": "Comfortable everyday wear"
+    }
+])
     description: String
     /// Full product description
     about: String
@@ -25543,13 +27337,13 @@ structure Product {
     media: ProductMedia
     attributes: Productattributes
     dimensions: ProductDimensions
-    custom_data: CustomData
+    custom_data: NonEmptyCustomData
     /// Whether product is published and available
     @dataExamples([
-        {
-            json: true
-        }
-    ])
+    {
+        "json": true
+    }
+])
     @required
     active: Boolean
     /// Product creation timestamp
@@ -25572,10 +27366,10 @@ structure Product {
 structure ProductActionRequest {
     /// Product ID to perform action on
     @dataExamples([
-        {
-            json: "prod_abc123"
-        }
-    ])
+    {
+        "json": "prod_abc123"
+    }
+])
     @pattern("^prod_")
     @required
     product_id: String
@@ -25711,21 +27505,38 @@ structure ProductSearchResponsesearchallOf1resultsItemallOf1resource with [Resou
 /// Service fulfillment marker.
 structure ProductService {}
 
-structure ProductShipment with [ProductShipmentMixin] {}
-
 structure ProductShipmentInput {
     @required
     type: ProductShipmentInputtype
 }
 
-@mixin
-structure ProductShipmentMixin {
+structure ProductShipmentoneOfalt0 {
     @required
-    type: ProductShipmenttype
+    type: ProductShipmentoneOfalt0type
     delivery: ProductDelivery
+}
+
+structure ProductShipmentoneOfalt1 {
+    @required
+    type: ProductShipmentoneOfalt1type
     download: ProductDownload
+}
+
+structure ProductShipmentoneOfalt2 {
+    @required
+    type: ProductShipmentoneOfalt2type
     render: ProductRender
+}
+
+structure ProductShipmentoneOfalt3 {
+    @required
+    type: ProductShipmentoneOfalt3type
     service: ProductService
+}
+
+structure ProductShipmentoneOfalt4 {
+    @required
+    type: ProductShipmentoneOfalt4type
     stream: ProductStream
 }
 
@@ -25740,311 +27551,6 @@ structure PublicFileStorage {
     stored_size: Long
 }
 
-@simileSchema(
-{
-        "additionalProperties": false,
-        "anyOf": [
-            {
-                "required": [
-                    "product"
-                ]
-            },
-            {
-                "required": [
-                    "bundle"
-                ]
-            }
-        ],
-        "properties": {
-            "allow_variants": {
-                "description": "Whether the intent was configured with a variant set",
-                "example": false,
-                "type": "boolean"
-            },
-            "application_id": {
-                "description": "Application that owns the purchase intent. This is routing metadata, not merchant presentation.",
-                "example": "app_abc123",
-                "pattern": "^app_",
-                "type": "string"
-            },
-            "bundle": {
-                "shape": "PurchaseIntentBundle"
-            },
-            "created_at": {
-                "description": "Creation timestamp",
-                "format": "date-time",
-                "type": "string"
-            },
-            "expires_at": {
-                "description": "Timestamp at or after which the Buy link is expired",
-                "format": "date-time",
-                "type": "string"
-            },
-            "id": {
-                "description": "Unique purchase intent identifier with sale_ prefix. Append it to https://pages.inttegro.com/buy/ to build the hosted Buy link.",
-                "example": "sale_ABCXYZ",
-                "pattern": "^sale_",
-                "type": "string"
-            },
-            "inactive_at": {
-                "description": "When the Buy link was explicitly canceled",
-                "format": "date-time",
-                "type": "string"
-            },
-            "merchant": {
-                "shape": "PurchaseIntentMerchant"
-            },
-            "presentation": {
-                "shape": "PurchaseIntentPresentation"
-            },
-            "price": {
-                "allOf": [
-                    {
-                        "shape": "PurchaseIntentPrice"
-                    }
-                ],
-                "description": "Effective Buy-link offer price. For a bundle without an explicit override, this is the current catalog default."
-            },
-            "product": {
-                "shape": "PurchaseIntentProduct"
-            },
-            "quantity": {
-                "additionalProperties": false,
-                "description": "Quantity bounds enforced by the hosted checkout. max is omitted when the offer has no upper bound.",
-                "properties": {
-                    "max": {
-                        "description": "Optional maximum quantity the hosted checkout allows. It is always greater than or equal to min when present.",
-                        "example": 5,
-                        "minimum": 1,
-                        "type": "integer"
-                    },
-                    "min": {
-                        "description": "Minimum quantity the hosted checkout allows",
-                        "example": 1,
-                        "minimum": 1,
-                        "type": "integer"
-                    }
-                },
-                "required": [
-                    "min"
-                ],
-                "simileConstraints": [
-                    {
-                        "bounded": {
-                            "minimum": {
-                                "path": "/min"
-                            },
-                            "path": "/max"
-                        }
-                    }
-                ],
-                "type": "object"
-            },
-            "status": {
-                "description": "Effective lifecycle state derived from expiry, cancellation, and single-use order creation",
-                "enum": [
-                    "active",
-                    "expired",
-                    "inactive",
-                    "used"
-                ],
-                "example": "active",
-                "type": "string"
-            },
-            "updated_at": {
-                "description": "Last mutation timestamp",
-                "format": "date-time",
-                "type": "string"
-            },
-            "usage": {
-                "shape": "PurchaseIntentUsage"
-            },
-            "variant_set": {
-                "shape": "PurchaseIntentVariantSet"
-            }
-        },
-        "required": [
-            "allow_variants",
-            "application_id",
-            "created_at",
-            "id",
-            "quantity",
-            "status",
-            "usage"
-        ],
-        "simileConstraints": [
-            {
-                "ordered": {
-                    "paths": [
-                        "/created_at",
-                        "/updated_at"
-                    ]
-                }
-            },
-            {
-                "ordered": {
-                    "paths": [
-                        "/created_at",
-                        "/inactive_at"
-                    ]
-                }
-            },
-            {
-                "ordered": {
-                    "paths": [
-                        "/created_at",
-                        "/expires_at"
-                    ]
-                }
-            },
-            {
-                "implies": {
-                    "then": {
-                        "all": [
-                            {
-                                "path": "/inactive_at",
-                                "state": "absent"
-                            }
-                        ]
-                    },
-                    "when": {
-                        "equals": "active",
-                        "path": "/status"
-                    }
-                }
-            },
-            {
-                "implies": {
-                    "then": {
-                        "all": [
-                            {
-                                "path": "/inactive_at",
-                                "state": "non-null"
-                            }
-                        ]
-                    },
-                    "when": {
-                        "equals": "inactive",
-                        "path": "/status"
-                    }
-                }
-            },
-            {
-                "implies": {
-                    "then": {
-                        "all": [
-                            {
-                                "path": "/inactive_at",
-                                "state": "absent"
-                            }
-                        ]
-                    },
-                    "when": {
-                        "equals": "used",
-                        "path": "/status"
-                    }
-                }
-            },
-            {
-                "implies": {
-                    "then": {
-                        "all": [
-                            {
-                                "path": "/expires_at",
-                                "state": "non-null"
-                            },
-                            {
-                                "path": "/inactive_at",
-                                "state": "absent"
-                            }
-                        ]
-                    },
-                    "when": {
-                        "equals": "expired",
-                        "path": "/status"
-                    }
-                }
-            },
-            {
-                "implies": {
-                    "then": {
-                        "all": [
-                            {
-                                "equals": true,
-                                "path": "/allow_variants"
-                            },
-                            {
-                                "path": "/product",
-                                "state": "non-null"
-                            },
-                            {
-                                "path": "/bundle",
-                                "state": "absent"
-                            }
-                        ]
-                    },
-                    "when": {
-                        "path": "/variant_set",
-                        "state": "non-null"
-                    }
-                }
-            },
-            {
-                "implies": {
-                    "then": {
-                        "all": [
-                            {
-                                "equals": false,
-                                "path": "/allow_variants"
-                            }
-                        ]
-                    },
-                    "when": {
-                        "path": "/variant_set",
-                        "state": "absent"
-                    }
-                }
-            },
-            {
-                "implies": {
-                    "then": {
-                        "all": [
-                            {
-                                "path": "/product",
-                                "state": "absent"
-                            },
-                            {
-                                "path": "/variant_set",
-                                "state": "absent"
-                            }
-                        ]
-                    },
-                    "when": {
-                        "path": "/bundle",
-                        "state": "non-null"
-                    }
-                }
-            },
-            {
-                "implies": {
-                    "then": {
-                        "all": [
-                            {
-                                "path": "/bundle",
-                                "state": "absent"
-                            }
-                        ]
-                    },
-                    "when": {
-                        "path": "/product",
-                        "state": "non-null"
-                    }
-                }
-            }
-        ],
-        "type": "object"
-    }
-)
 @simileConstraints(
 [
         {
@@ -26217,69 +27723,17 @@ structure PublicFileStorage {
         }
     ]
 )
-structure PurchaseIntent {
-    /// Whether the intent was configured with a variant set
-    @dataExamples([
-        {
-            json: false
-        }
-    ])
-    @required
-    allow_variants: Boolean
-    /// Application that owns the purchase intent. This is routing metadata, not merchant presentation.
-    @dataExamples([
-        {
-            json: "app_abc123"
-        }
-    ])
-    @pattern("^app_")
-    @required
-    application_id: String
-    bundle: PurchaseIntentBundle
-    /// Creation timestamp
-    @required
-    @timestampFormat("date-time")
-    created_at: Timestamp
-    /// Timestamp at or after which the Buy link is expired
-    @timestampFormat("date-time")
-    expires_at: Timestamp
-    /// Unique purchase intent identifier with sale_ prefix. Append it to https://pages.inttegro.com/buy/ to build the hosted Buy link.
-    @dataExamples([
-        {
-            json: "sale_ABCXYZ"
-        }
-    ])
-    @pattern("^sale_")
-    @required
-    id: String
-    /// When the Buy link was explicitly canceled
-    @timestampFormat("date-time")
-    inactive_at: Timestamp
-    merchant: PurchaseIntentMerchant
-    price: PurchaseIntentpriceSchema
-    presentation: PurchaseIntentPresentation
-    product: PurchaseIntentProduct
-    @required
-    quantity: PurchaseIntentquantity
-    @required
-    status: PurchaseIntentstatus
-    /// Last mutation timestamp
-    @timestampFormat("date-time")
-    updated_at: Timestamp
-    @required
-    usage: PurchaseIntentUsage
-    variant_set: PurchaseIntentVariantSet
-}
+structure PurchaseIntent with [PurchaseIntentMixin] {}
 
 structure PurchaseIntentBundle {
     about: String
     components: PurchaseIntentBundlecomponents
     /// Current app-owned bundle referenced by the Buy link
     @dataExamples([
-        {
-            json: "pbd_abc123"
-        }
-    ])
+    {
+        "json": "pbd_abc123"
+    }
+])
     @pattern("^pbd_")
     @required
     id: String
@@ -26315,10 +27769,10 @@ structure PurchaseIntentBundleprice with [PurchaseIntentPriceMixin] {}
 structure PurchaseIntentBundleSelection {
     /// App-owned bundle ID to sell through the Buy link
     @dataExamples([
-        {
-            json: "pbd_abc123"
-        }
-    ])
+    {
+        "json": "pbd_abc123"
+    }
+])
     @pattern("^pbd_")
     @required
     id: String
@@ -26335,17 +27789,17 @@ structure PurchaseIntentMerchant {
 structure PurchaseIntentMerchantAsset {
     /// Accessible description of the merchant asset
     @dataExamples([
-        {
-            json: "Tea House"
-        }
-    ])
+    {
+        "json": "Tea House"
+    }
+])
     alt_text: String
     /// Public URL of the merchant asset
     @dataExamples([
-        {
-            json: "https://assets.example.com/tea-house.png"
-        }
-    ])
+    {
+        "json": "https://assets.example.com/tea-house.png"
+    }
+])
     @required
     url: String
 }
@@ -26353,10 +27807,10 @@ structure PurchaseIntentMerchantAsset {
 structure PurchaseIntentMerchantBranding {
     /// Merchant accent color as a normalized six-digit hexadecimal value
     @dataExamples([
-        {
-            json: "#16a34a"
-        }
-    ])
+    {
+        "json": "#16a34a"
+    }
+])
     @required
     accent_color: String
     @required
@@ -26367,59 +27821,59 @@ structure PurchaseIntentMerchantBranding {
 
 structure PurchaseIntentMerchantColorScheme {
     @dataExamples([
-        {
-            json: "#b9e3c8"
-        }
-    ])
+    {
+        "json": "#b9e3c8"
+    }
+])
     @required
     border: String
     @dataExamples([
-        {
-            json: "#128650"
-        }
-    ])
+    {
+        "json": "#128650"
+    }
+])
     @required
     link: String
     @dataExamples([
-        {
-            json: "#096d2f"
-        }
-    ])
+    {
+        "json": "#096d2f"
+    }
+])
     @required
     muted_text: String
     @dataExamples([
-        {
-            json: "#16a34a"
-        }
-    ])
+    {
+        "json": "#16a34a"
+    }
+])
     @required
     primary: String
     @dataExamples([
-        {
-            json: "#ffffff"
-        }
-    ])
+    {
+        "json": "#ffffff"
+    }
+])
     @required
     primary_foreground: String
     @dataExamples([
-        {
-            json: "#f1faf5"
-        }
-    ])
+    {
+        "json": "#f1faf5"
+    }
+])
     @required
     surface: String
     @dataExamples([
-        {
-            json: "#e3f4e9"
-        }
-    ])
+    {
+        "json": "#e3f4e9"
+    }
+])
     @required
     surface_muted: String
     @dataExamples([
-        {
-            json: "#041d0d"
-        }
-    ])
+    {
+        "json": "#041d0d"
+    }
+])
     @required
     text: String
 }
@@ -26427,37 +27881,264 @@ structure PurchaseIntentMerchantColorScheme {
 structure PurchaseIntentMerchantProfile {
     /// Current public application alias, falling back to its current application name
     @dataExamples([
-        {
-            json: "Tea House"
-        }
-    ])
+    {
+        "json": "Tea House"
+    }
+])
     @required
     name: String
     support: PurchaseIntentMerchantSupport
     /// Public merchant website URL
     @dataExamples([
-        {
-            json: "https://teahouse.example"
-        }
-    ])
+    {
+        "json": "https://teahouse.example"
+    }
+])
     website_url: String
 }
 
 structure PurchaseIntentMerchantSupport {
     /// Public merchant support email address
     @dataExamples([
-        {
-            json: "support@teahouse.example"
-        }
-    ])
+    {
+        "json": "support@teahouse.example"
+    }
+])
     email: String
     /// Public merchant support phone number
     @dataExamples([
-        {
-            json: "+233200000000"
-        }
-    ])
+    {
+        "json": "+233200000000"
+    }
+])
     phone: String
+}
+
+@simileConstraints(
+[
+        {
+            "ordered": {
+                "paths": [
+                    "/created_at",
+                    "/updated_at"
+                ]
+            }
+        },
+        {
+            "ordered": {
+                "paths": [
+                    "/created_at",
+                    "/inactive_at"
+                ]
+            }
+        },
+        {
+            "ordered": {
+                "paths": [
+                    "/created_at",
+                    "/expires_at"
+                ]
+            }
+        },
+        {
+            "implies": {
+                "then": {
+                    "all": [
+                        {
+                            "path": "/inactive_at",
+                            "state": "absent"
+                        }
+                    ]
+                },
+                "when": {
+                    "equals": "active",
+                    "path": "/status"
+                }
+            }
+        },
+        {
+            "implies": {
+                "then": {
+                    "all": [
+                        {
+                            "path": "/inactive_at",
+                            "state": "non-null"
+                        }
+                    ]
+                },
+                "when": {
+                    "equals": "inactive",
+                    "path": "/status"
+                }
+            }
+        },
+        {
+            "implies": {
+                "then": {
+                    "all": [
+                        {
+                            "path": "/inactive_at",
+                            "state": "absent"
+                        }
+                    ]
+                },
+                "when": {
+                    "equals": "used",
+                    "path": "/status"
+                }
+            }
+        },
+        {
+            "implies": {
+                "then": {
+                    "all": [
+                        {
+                            "path": "/expires_at",
+                            "state": "non-null"
+                        },
+                        {
+                            "path": "/inactive_at",
+                            "state": "absent"
+                        }
+                    ]
+                },
+                "when": {
+                    "equals": "expired",
+                    "path": "/status"
+                }
+            }
+        },
+        {
+            "implies": {
+                "then": {
+                    "all": [
+                        {
+                            "equals": true,
+                            "path": "/allow_variants"
+                        },
+                        {
+                            "path": "/product",
+                            "state": "non-null"
+                        },
+                        {
+                            "path": "/bundle",
+                            "state": "absent"
+                        }
+                    ]
+                },
+                "when": {
+                    "path": "/variant_set",
+                    "state": "non-null"
+                }
+            }
+        },
+        {
+            "implies": {
+                "then": {
+                    "all": [
+                        {
+                            "equals": false,
+                            "path": "/allow_variants"
+                        }
+                    ]
+                },
+                "when": {
+                    "path": "/variant_set",
+                    "state": "absent"
+                }
+            }
+        },
+        {
+            "implies": {
+                "then": {
+                    "all": [
+                        {
+                            "path": "/product",
+                            "state": "absent"
+                        },
+                        {
+                            "path": "/variant_set",
+                            "state": "absent"
+                        }
+                    ]
+                },
+                "when": {
+                    "path": "/bundle",
+                    "state": "non-null"
+                }
+            }
+        },
+        {
+            "implies": {
+                "then": {
+                    "all": [
+                        {
+                            "path": "/bundle",
+                            "state": "absent"
+                        }
+                    ]
+                },
+                "when": {
+                    "path": "/product",
+                    "state": "non-null"
+                }
+            }
+        }
+    ]
+)
+@mixin
+structure PurchaseIntentMixin {
+    /// Whether the intent was configured with a variant set
+    @dataExamples([
+    {
+        "json": false
+    }
+])
+    @required
+    allow_variants: Boolean
+    /// Application that owns the purchase intent. This is routing metadata, not merchant presentation.
+    @dataExamples([
+    {
+        "json": "app_abc123"
+    }
+])
+    @pattern("^app_")
+    @required
+    application_id: String
+    bundle: PurchaseIntentBundle
+    /// Creation timestamp
+    @required
+    @timestampFormat("date-time")
+    created_at: Timestamp
+    /// Timestamp at or after which the Buy link is expired
+    @timestampFormat("date-time")
+    expires_at: Timestamp
+    /// Unique purchase intent identifier with sale_ prefix. Append it to https://pages.inttegro.com/buy/ to build the hosted Buy link.
+    @dataExamples([
+    {
+        "json": "sale_ABCXYZ"
+    }
+])
+    @pattern("^sale_")
+    @required
+    id: String
+    /// When the Buy link was explicitly canceled
+    @timestampFormat("date-time")
+    inactive_at: Timestamp
+    merchant: PurchaseIntentMerchant
+    price: PurchaseIntentpriceSchema
+    presentation: PurchaseIntentPresentation
+    product: PurchaseIntentProduct
+    @required
+    quantity: PurchaseIntentquantity
+    @required
+    status: PurchaseIntentstatus
+    /// Last mutation timestamp
+    @timestampFormat("date-time")
+    updated_at: Timestamp
+    @required
+    usage: PurchaseIntentUsage
+    variant_set: PurchaseIntentVariantSet
 }
 
 structure PurchaseIntentMultiUseUsage {
@@ -26468,26 +28149,26 @@ structure PurchaseIntentMultiUseUsage {
 structure PurchaseIntentOriginalPrice {
     /// Whether the resolved comparison price is active
     @dataExamples([
-        {
-            json: true
-        }
-    ])
+    {
+        "json": true
+    }
+])
     @required
     active: Boolean
     /// Catalog price ID when the comparison price is not inline
     @dataExamples([
-        {
-            json: "pr_original123"
-        }
-    ])
+    {
+        "json": "pr_original123"
+    }
+])
     @pattern("^pr_")
     id: String
     /// Catalog price label when available
     @dataExamples([
-        {
-            json: "Regular price"
-        }
-    ])
+    {
+        "json": "Regular price"
+    }
+])
     label: String
     @required
     nominal: Amount
@@ -26516,26 +28197,26 @@ structure PurchaseIntentpriceSchema with [PurchaseIntentPriceMixin] {}
 structure PurchaseIntentPriceMixin {
     /// Whether the resolved price can be used
     @dataExamples([
-        {
-            json: true
-        }
-    ])
+    {
+        "json": true
+    }
+])
     @required
     active: Boolean
     /// Catalog price ID when the offer price is not inline
     @dataExamples([
-        {
-            json: "pr_xyz789"
-        }
-    ])
+    {
+        "json": "pr_xyz789"
+    }
+])
     @pattern("^pr_")
     id: String
     /// Catalog price label when available
     @dataExamples([
-        {
-            json: "Campaign price"
-        }
-    ])
+    {
+        "json": "Campaign price"
+    }
+])
     label: String
     @required
     nominal: Amount
@@ -26652,20 +28333,20 @@ structure PurchaseIntentPriceMixin {
 structure PurchaseIntentPriceSelection {
     /// Active, unarchived app-owned price ID. It must belong to a selected product; for a bundle it must be fixed and use the bundle catalog currency.
     @dataExamples([
-        {
-            json: "pr_xyz789"
-        }
-    ])
+    {
+        "json": "pr_xyz789"
+    }
+])
     @pattern("^pr_")
     id: String
     nominal: PurchaseIntentPriceSelectionnominal
     original: PurchaseIntentPriceSelectionoriginal
     /// App-owned comparison price ID when not using original.id
     @dataExamples([
-        {
-            json: "pr_original123"
-        }
-    ])
+    {
+        "json": "pr_original123"
+    }
+])
     @pattern("^pr_")
     original_id: String
 }
@@ -26680,10 +28361,10 @@ apply PurchaseIntentPriceSelectionnominal$currency @required
 
 apply PurchaseIntentPriceSelectionnominal$value {
     @dataExamples([
-        {
-            json: 20000
-        }
-    ])
+    {
+        "json": 20000
+    }
+])
     @documentation("Amount in smallest currency unit (e.g., pesewas for GHS)")
     @range(
         min: 0
@@ -26695,10 +28376,10 @@ apply PurchaseIntentPriceSelectionnominal$value {
 structure PurchaseIntentPriceSelectionoriginal {
     /// App-owned fixed comparison price ID. It must belong to a selected product; for a bundle it must use the bundle catalog currency.
     @dataExamples([
-        {
-            json: "pr_original123"
-        }
-    ])
+    {
+        "json": "pr_original123"
+    }
+])
     @pattern("^pr_")
     id: String
     nominal: PurchaseIntentPriceSelectionoriginalnominal
@@ -26714,10 +28395,10 @@ apply PurchaseIntentPriceSelectionoriginalnominal$currency @required
 
 apply PurchaseIntentPriceSelectionoriginalnominal$value {
     @dataExamples([
-        {
-            json: 20000
-        }
-    ])
+    {
+        "json": 20000
+    }
+])
     @documentation("Amount in smallest currency unit (e.g., pesewas for GHS)")
     @range(
         min: 0
@@ -26729,10 +28410,10 @@ structure PurchaseIntentProduct with [PriceEmbeddedProduct] {
     prices: PurchaseIntentProductallOf1prices
     /// Variant set configured for this Buy link
     @dataExamples([
-        {
-            json: "pg_variantset123"
-        }
-    ])
+    {
+        "json": "pg_variantset123"
+    }
+])
     @pattern("^pg_")
     variant_set_id: String
 }
@@ -26741,19 +28422,19 @@ structure PurchaseIntentProduct with [PriceEmbeddedProduct] {
 structure PurchaseIntentProductSelection {
     /// Product ID to sell through the Buy link
     @dataExamples([
-        {
-            json: "prod_abc123"
-        }
-    ])
+    {
+        "json": "prod_abc123"
+    }
+])
     @pattern("^prod_")
     @required
     id: String
     /// Optional variant set ID the hosted checkout may use for sibling product selection
     @dataExamples([
-        {
-            json: "pg_variantset123"
-        }
-    ])
+    {
+        "json": "pg_variantset123"
+    }
+])
     @pattern("^pg_")
     variant_set_id: String
 }
@@ -26774,10 +28455,10 @@ structure PurchaseIntentProductSelection {
 structure PurchaseIntentquantity {
     /// Minimum quantity the hosted checkout allows
     @dataExamples([
-        {
-            json: 1
-        }
-    ])
+    {
+        "json": 1
+    }
+])
     @range(
         min: 1
     )
@@ -26785,17 +28466,20 @@ structure PurchaseIntentquantity {
     min: Integer
     /// Optional maximum quantity the hosted checkout allows. It is always greater than or equal to min when present.
     @dataExamples([
-        {
-            json: 5
-        }
-    ])
+    {
+        "json": 5
+    }
+])
     @range(
         min: 1
     )
     max: Integer
 }
 
-structure PurchaseIntentResponse {
+structure PurchaseIntentResponse with [PurchaseIntentResponseMixin] {}
+
+@mixin
+structure PurchaseIntentResponseMixin {
     @required
     purchase_intent: PurchaseIntent
 }
@@ -26813,10 +28497,10 @@ structure PurchaseIntentUsageOrder {
     created_at: Timestamp
     /// Order that consumed the Buy link
     @dataExamples([
-        {
-            json: "or_abc123"
-        }
-    ])
+    {
+        "json": "or_abc123"
+    }
+])
     @pattern("^or_")
     @required
     id: String
@@ -26824,25 +28508,25 @@ structure PurchaseIntentUsageOrder {
 
 structure PurchaseIntentVariant {
     @dataExamples([
-        {
-            json: true
-        }
-    ])
+    {
+        "json": true
+    }
+])
     @required
     active: Boolean
     @dataExamples([
-        {
-            json: 0
-        }
-    ])
+    {
+        "json": 0
+    }
+])
     position: Integer
     price: PurchaseIntentPrice
     product: PurchaseIntentProduct
     @dataExamples([
-        {
-            json: "prod_variant123"
-        }
-    ])
+    {
+        "json": "prod_variant123"
+    }
+])
     @pattern("^prod_")
     @required
     product_id: String
@@ -26852,69 +28536,69 @@ structure PurchaseIntentVariant {
 
 structure PurchaseIntentVariantAxis {
     @dataExamples([
-        {
-            json: "size"
-        }
-    ])
+    {
+        "json": "size"
+    }
+])
     @required
     key: String
     @dataExamples([
-        {
-            json: "Size"
-        }
-    ])
+    {
+        "json": "Size"
+    }
+])
     @required
     label: String
     @dataExamples([
-        {
-            json: 0
-        }
-    ])
+    {
+        "json": 0
+    }
+])
     @required
     position: Integer
 }
 
 structure PurchaseIntentVariantSet {
     @dataExamples([
-        {
-            json: true
-        }
-    ])
+    {
+        "json": true
+    }
+])
     @required
     active: Boolean
     @dataExamples([
-        {
-            json: "prod_abc123"
-        }
-    ])
+    {
+        "json": "prod_abc123"
+    }
+])
     @pattern("^prod_")
     default_product_id: String
     @dataExamples([
-        {
-            json: "Choose a tin size"
-        }
-    ])
+    {
+        "json": "Choose a tin size"
+    }
+])
     description: String
     @dataExamples([
-        {
-            json: "pg_variantset123"
-        }
-    ])
+    {
+        "json": "pg_variantset123"
+    }
+])
     @pattern("^pg_")
     @required
     id: String
     @dataExamples([
-        {
-            json: "Tin size"
-        }
-    ])
+    {
+        "json": "Tin size"
+    }
+])
     @required
     name: String
     @dataExamples([
-        {
-            json: "matcha-tin-size"
-        }
-    ])
+    {
+        "json": "matcha-tin-size"
+    }
+])
     reference: String
     @required
     variant_axes: PurchaseIntentVariantSetvariantAxes
@@ -27134,26 +28818,26 @@ structure RefundBalanceTransaction {
     @timestampFormat("date-time")
     created_at: Timestamp
     @dataExamples([
-        {
-            json: "bt_0123456789abcdefghijklmnopqrstuvwxyzABCD"
-        }
-    ])
+    {
+        "json": "bt_0123456789abcdefghijklmnopqrstuvwxyzABCD"
+    }
+])
     @pattern("^bt_")
     @required
     id: String
     @dataExamples([
-        {
-            json: "or_0123456789abcdefghijklmnopqrstuvwxyzABCD"
-        }
-    ])
+    {
+        "json": "or_0123456789abcdefghijklmnopqrstuvwxyzABCD"
+    }
+])
     @pattern("^or_")
     @required
     order_id: String
     @dataExamples([
-        {
-            json: "rf_1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcd"
-        }
-    ])
+    {
+        "json": "rf_1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcd"
+    }
+])
     @pattern("^rf_")
     @required
     refund_id: String
@@ -27375,10 +29059,10 @@ structure RefundorderAmount with [AmountMixin] {}
 structure RefundOrderFeeLineItem {
     /// Immutable order-line identifier with the `oli_` prefix.
     @dataExamples([
-        {
-            json: "oli_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMN"
-        }
-    ])
+    {
+        "json": "oli_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMN"
+    }
+])
     @pattern("^oli_")
     @required
     id: String
@@ -27394,10 +29078,10 @@ structure RefundOrderFeeLineItemfee {
 structure RefundOrderProductLineItem {
     /// Immutable order-line identifier with the `oli_` prefix.
     @dataExamples([
-        {
-            json: "oli_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMN"
-        }
-    ])
+    {
+        "json": "oli_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMN"
+    }
+])
     @pattern("^oli_")
     @required
     id: String
@@ -27413,10 +29097,10 @@ structure RefundOrderProductLineItem {
 structure RefundOrderProductLineItemproduct {
     /// Source catalog product identifier. Omitted for inline products.
     @dataExamples([
-        {
-            json: "prod_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMN"
-        }
-    ])
+    {
+        "json": "prod_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMN"
+    }
+])
     @pattern("^prod_")
     id: String
     /// Product name captured on the order.
@@ -27427,10 +29111,10 @@ structure RefundOrderProductLineItemproduct {
 structure RefundOrderShippingLineItem {
     /// Immutable order-line identifier with the `oli_` prefix.
     @dataExamples([
-        {
-            json: "oli_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMN"
-        }
-    ])
+    {
+        "json": "oli_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMN"
+    }
+])
     @pattern("^oli_")
     @required
     id: String
@@ -27500,10 +29184,10 @@ structure RefundSettlementBankAccountPaymentMethod {
     bank_account: RefundSettlementBankAccountPaymentMethodbankAccount
     /// Public identifier of the original payment method.
     @dataExamples([
-        {
-            json: "pm_xyz789"
-        }
-    ])
+    {
+        "json": "pm_xyz789"
+    }
+])
     @pattern("^pm_")
     @required
     id: String
@@ -27519,19 +29203,19 @@ structure RefundSettlementBankAccountPaymentMethodbankAccount {
 structure RefundSettlementBankAccountPaymentMethodbankAccountghanaBankAccount {
     /// Masked bank-account number. The full number is never returned.
     @dataExamples([
-        {
-            json: "****7890"
-        }
-    ])
+    {
+        "json": "****7890"
+    }
+])
     @pattern("^\\*{4}[0-9]{4}$")
     @required
     account_number: String
     /// Last four numeric digits of the original bank-account number.
     @dataExamples([
-        {
-            json: "7890"
-        }
-    ])
+    {
+        "json": "7890"
+    }
+])
     @pattern("^[0-9]{4}$")
     @required
     last4: String
@@ -27540,10 +29224,10 @@ structure RefundSettlementBankAccountPaymentMethodbankAccountghanaBankAccount {
 structure RefundSettlementMobileMoneyPaymentMethod {
     /// Public identifier of the original payment method.
     @dataExamples([
-        {
-            json: "pm_xyz789"
-        }
-    ])
+    {
+        "json": "pm_xyz789"
+    }
+])
     @pattern("^pm_")
     @required
     id: String
@@ -27554,19 +29238,19 @@ structure RefundSettlementMobileMoneyPaymentMethod {
 structure RefundSettlementMobileMoneyPaymentMethodmobileMoney {
     /// Masked mobile-money account number. The full number is never returned.
     @dataExamples([
-        {
-            json: "****7831"
-        }
-    ])
+    {
+        "json": "****7831"
+    }
+])
     @pattern("^\\*{4}[0-9]{4}$")
     @required
     account_number: String
     /// Last four numeric digits of the original account number.
     @dataExamples([
-        {
-            json: "7831"
-        }
-    ])
+    {
+        "json": "7831"
+    }
+])
     @pattern("^[0-9]{4}$")
     @required
     last4: String
@@ -27578,24 +29262,24 @@ structure Refundtotal with [AmountMixin] {}
 
 structure RenderedEmailMessageTemplate {
     @dataExamples([
-        {
-            json: "Your receipt"
-        }
-    ])
+    {
+        "json": "Your receipt"
+    }
+])
     @required
     subject: String
     @dataExamples([
-        {
-            json: "Thanks Akua."
-        }
-    ])
+    {
+        "json": "Thanks Akua."
+    }
+])
     @required
     text: String
     @dataExamples([
-        {
-            json: "<p>Thanks Akua.</p>"
-        }
-    ])
+    {
+        "json": "<p>Thanks Akua.</p>"
+    }
+])
     html: String
     from: MessageTemplateMailbox
     reply_to: MessageTemplateMailbox
@@ -27613,10 +29297,10 @@ structure RenderedMessageTemplate {
 
 structure RenderedSMSMessageTemplate {
     @dataExamples([
-        {
-            json: "Your code is 123456."
-        }
-    ])
+    {
+        "json": "Your code is 123456."
+    }
+])
     @length(
         max: 120
     )
@@ -27639,10 +29323,10 @@ structure RenderMessageTemplatePreviewResponse {
 structure RequestConfirmationRequest {
     /// Unique identifier of the order
     @dataExamples([
-        {
-            json: "or_kAVwBsk6EhQVv2YBUhYAqMf0lktEoQ0S7ZR8y2xi"
-        }
-    ])
+    {
+        "json": "or_kAVwBsk6EhQVv2YBUhYAqMf0lktEoQ0S7ZR8y2xi"
+    }
+])
     @pattern("^or_")
     @required
     order_id: String
@@ -28066,35 +29750,35 @@ structure ScheduleChimeRequest {
     recipients: ScheduleChimeRequestrecipients
     /// ISO 8601 timestamp for when to send the chime (must be in the future)
     @dataExamples([
-        {
-            json: "2025-12-15T10:00Z"
-        }
-    ])
+    {
+        "json": "2025-12-15T10:00Z"
+    }
+])
     @required
     @timestampFormat("date-time")
     send_after: Timestamp
     /// Complete SMS message content. Use only with SMS recipients.
     @dataExamples([
-        {
-            json: "Reminder: Your appointment is tomorrow at 10 AM."
-        }
-    ])
+    {
+        "json": "Reminder: Your appointment is tomorrow at 10 AM."
+    }
+])
     full_message: String
     email: ChimeEmailMessageInput
     message_template: MessageTemplateReference
     /// Sender identifier displayed to recipients
     @dataExamples([
-        {
-            json: "YourBrand"
-        }
-    ])
+    {
+        "json": "YourBrand"
+    }
+])
     sender_id: String
     /// Optional purpose or category for this scheduled chime
     @dataExamples([
-        {
-            json: "appointment_reminder"
-        }
-    ])
+    {
+        "json": "appointment_reminder"
+    }
+])
     purpose: String
 }
 
@@ -28201,24 +29885,24 @@ structure ScheduleDetailMixin {
 structure ScheduleError {
     /// Recipient address that caused the error
     @dataExamples([
-        {
-            json: "+233invalid"
-        }
-    ])
+    {
+        "json": "+233invalid"
+    }
+])
     recipient: String
     /// Code indicating how to fix this error
     @dataExamples([
-        {
-            json: "check_recipient"
-        }
-    ])
+    {
+        "json": "check_recipient"
+    }
+])
     fix_code: String
     /// Error type classification
     @dataExamples([
-        {
-            json: "invalid_recipient"
-        }
-    ])
+    {
+        "json": "invalid_recipient"
+    }
+])
     type: String
 }
 
@@ -28231,37 +29915,37 @@ structure ScheduleLookupResponse {
 structure SchedulePayoutRequest {
     /// Financial account that should receive the payout.
     @dataExamples([
-        {
-            json: "fa_1234567890abcdef"
-        }
-    ])
+    {
+        "json": "fa_1234567890abcdef"
+    }
+])
     @pattern("^fa_")
     @required
     destination_id: String
     /// Optional future time after which execution may begin.
     @dataExamples([
-        {
-            json: "2026-08-05T09:00Z"
-        }
-    ])
+    {
+        "json": "2026-08-05T09:00Z"
+    }
+])
     @timestampFormat("date-time")
     execute_after: Timestamp
     /// Maximum amount, in the smallest currency unit, that this payout may transfer.
     @dataExamples([
-        {
-            json: 250000
-        }
-    ])
+    {
+        "json": 250000
+    }
+])
     @range(
         min: 25000
     )
     max_amount: Integer
     /// Merchant reference carried on the payout.
     @dataExamples([
-        {
-            json: "PAYOUT-APR-15"
-        }
-    ])
+    {
+        "json": "PAYOUT-APR-15"
+    }
+])
     @required
     reference: String
 }
@@ -28363,19 +30047,19 @@ structure ScheduleResponse {
 structure SecretKey {
     /// Application-scoped secret key identifier.
     @dataExamples([
-        {
-            json: "sk_2xC7k9gK5yQnZ4w8P1sT6vR3"
-        }
-    ])
+    {
+        "json": "sk_2xC7k9gK5yQnZ4w8P1sT6vR3"
+    }
+])
     @pattern("^sk_")
     @required
     id: String
     /// Optional human-readable label for the secret key.
     @dataExamples([
-        {
-            json: "Production checkout"
-        }
-    ])
+    {
+        "json": "Production checkout"
+    }
+])
     label: String
     @required
     token_type: SecretKeytokenType
@@ -28413,6 +30097,22 @@ structure SecretKey {
                 "source": "/keys/*",
                 "target": "/count"
             }
+        },
+        {
+            "bounded": {
+                "maximum": {
+                    "path": "/size"
+                },
+                "path": "/count"
+            }
+        },
+        {
+            "bounded": {
+                "maximum": {
+                    "path": "/total"
+                },
+                "path": "/count"
+            }
         }
     ]
 )
@@ -28423,12 +30123,14 @@ structure SecretKeyPage {
     @required
     number: Integer
     @range(
-        min: 0
+        min: 1
+        max: 100
     )
     @required
     size: Integer
     @range(
         min: 0
+        max: 100
     )
     @required
     count: Integer
@@ -28494,10 +30196,10 @@ structure SecretKeyUsageRequest {
     page: Integer
     /// Secret key identifier whose recent activity should be returned.
     @dataExamples([
-        {
-            json: "sk_2xC7k9gK5yQnZ4w8P1sT6vR3"
-        }
-    ])
+    {
+        "json": "sk_2xC7k9gK5yQnZ4w8P1sT6vR3"
+    }
+])
     @pattern("^sk_")
     @required
     secret_key_id: String
@@ -28518,10 +30220,10 @@ structure SecretKeyUsageResponse {
 /// Public authentication outcome associated with the selected key.
 structure SecretKeyUsageRow {
     @dataExamples([
-        {
-            json: "sk_2xC7k9gK5yQnZ4w8P1sT6vR3"
-        }
-    ])
+    {
+        "json": "sk_2xC7k9gK5yQnZ4w8P1sT6vR3"
+    }
+])
     @pattern("^sk_")
     @required
     secret_key_id: String
@@ -28541,26 +30243,26 @@ structure SendChimeRequest {
     recipient: ChimeRecipient
     /// Complete SMS message content. Use only with SMS recipients.
     @dataExamples([
-        {
-            json: "Your verification code is 123456. It expires in 10 minutes."
-        }
-    ])
+    {
+        "json": "Your verification code is 123456. It expires in 10 minutes."
+    }
+])
     full_message: String
     email: ChimeEmailMessageInput
     message_template: MessageTemplateReference
     /// Sender identifier shown to recipient. Uses default sender if not provided.
     @dataExamples([
-        {
-            json: "YourBrand"
-        }
-    ])
+    {
+        "json": "YourBrand"
+    }
+])
     sender_id: String
     /// Purpose of this chime for categorization and analytics
     @dataExamples([
-        {
-            json: "verification"
-        }
-    ])
+    {
+        "json": "verification"
+    }
+])
     purpose: String
     cooldown: SendChimeRequestcooldown
     custom_data: CustomData
@@ -28634,10 +30336,10 @@ structure SuggestedAmount {
 structure SuggestedAmountParams {
     /// Stable merchant-defined identifier for this suggestion
     @dataExamples([
-        {
-            json: "supporter"
-        }
-    ])
+    {
+        "json": "supporter"
+    }
+])
     @length(
         max: 100
     )
@@ -28645,10 +30347,10 @@ structure SuggestedAmountParams {
     id: String
     /// Suggested amount in the currency's smallest unit
     @dataExamples([
-        {
-            json: 50000
-        }
-    ])
+    {
+        "json": 50000
+    }
+])
     @range(
         min: 1
     )
@@ -28676,10 +30378,10 @@ structure TokenizedMobileMoneyPaymentMethodObject with [PaymentMethodObjectMixin
 structure TokenizeMobileMoneyPaymentMethodRequest {
     /// Existing customer in the authenticated application who will own the payment method.
     @dataExamples([
-        {
-            json: "cu_a1b2c3d4e5"
-        }
-    ])
+    {
+        "json": "cu_a1b2c3d4e5"
+    }
+])
     @length(
         min: 1
     )
@@ -28698,10 +30400,10 @@ structure TokenizeMobileMoneyPaymentMethodRequest {
 structure TokenizeMobileMoneyPaymentMethodRequestmobileMoney {
     /// Mobile-money number in a valid local or international phone-number format.
     @dataExamples([
-        {
-            json: "+233242057831"
-        }
-    ])
+    {
+        "json": "+233242057831"
+    }
+])
     @length(
         min: 1
     )
@@ -28719,10 +30421,10 @@ structure TokenizePaymentMethodResponse {
 structure UnarchivePaymentMethodRequest {
     /// ID of the payment method to unarchive
     @dataExamples([
-        {
-            json: "pm_xyz789"
-        }
-    ])
+    {
+        "json": "pm_xyz789"
+    }
+])
     @pattern("^pm_")
     @required
     payment_method_id: String
@@ -28927,40 +30629,40 @@ structure UpdateFinancialAccountResponse {
 structure UpdateMessageTemplateRequest {
     /// API-generated message template id.
     @dataExamples([
-        {
-            json: "mtpl_receipt"
-        }
-    ])
+    {
+        "json": "mtpl_receipt"
+    }
+])
     @pattern("^mtpl_")
     @required
     id: String
     /// Human-readable template name.
     @dataExamples([
-        {
-            json: "Receipt email"
-        }
-    ])
+    {
+        "json": "Receipt email"
+    }
+])
     name: String
     /// Optional description of when this template should be used.
     @dataExamples([
-        {
-            json: "Sent after a successful payment."
-        }
-    ])
+    {
+        "json": "Sent after a successful payment."
+    }
+])
     about: String
     channel: UpdateMessageTemplateRequestchannel
     /// Caller-defined purpose for filtering and analytics.
     @dataExamples([
-        {
-            json: "receipt"
-        }
-    ])
+    {
+        "json": "receipt"
+    }
+])
     purpose: String
     @dataExamples([
-        {
-            json: "en"
-        }
-    ])
+    {
+        "json": "en"
+    }
+])
     locale: String
     variables: UpdateMessageTemplateRequestvariables
     sms: MessageTemplateSMSContent
@@ -29172,26 +30874,26 @@ structure UpdateOrderRequest {
     line_items: UpdateOrderRequestlineItems
     /// Replacement order number.
     @dataExamples([
-        {
-            json: "ORDER-12345-REV2"
-        }
-    ])
+    {
+        "json": "ORDER-12345-REV2"
+    }
+])
     number: String
     /// Replacement receipt number. Once set, it cannot be unset; provide a
     /// different non-empty value to change it. No uniqueness is enforced.
     ///
     @dataExamples([
-        {
-            json: "RCPT-12345-REV2"
-        }
-    ])
+    {
+        "json": "RCPT-12345-REV2"
+    }
+])
     receipt_number: String
     /// Unique identifier of the order to update.
     @dataExamples([
-        {
-            json: "or_48ZW7BGvYUBWc1i6WBkL2jr0iPQP5jUy76mmmHpt"
-        }
-    ])
+    {
+        "json": "or_48ZW7BGvYUBWc1i6WBkL2jr0iPQP5jUy76mmmHpt"
+    }
+])
     @pattern("^or_")
     @required
     order_id: String
@@ -29200,18 +30902,18 @@ structure UpdateOrderRequest {
     /// with `payment_method_data` and `clear_payment_method`.
     ///
     @dataExamples([
-        {
-            json: "pm_xyz123abc456"
-        }
-    ])
+    {
+        "json": "pm_xyz123abc456"
+    }
+])
     @pattern("^pm_")
     payment_method_id: String
     /// Replacement payment statement descriptor for the order's payment.
     @dataExamples([
-        {
-            json: "ORDER 12345"
-        }
-    ])
+    {
+        "json": "ORDER 12345"
+    }
+])
     @length(
         min: 3
         max: 22
@@ -29219,10 +30921,10 @@ structure UpdateOrderRequest {
     statement_descriptor: String
     /// Static prefix used to build the replacement descriptor as `prefix*order_id`. Mutually exclusive with `statement_descriptor`.
     @dataExamples([
-        {
-            json: "LINE"
-        }
-    ])
+    {
+        "json": "LINE"
+    }
+])
     @length(
         min: 2
         max: 10
@@ -29241,27 +30943,27 @@ structure UpdateOrderRequestpaymentMethodData with [UpdateOrderPaymentMethodData
 structure UpdatePaymentMethodRequest {
     /// ID of the payment method to update
     @dataExamples([
-        {
-            json: "pm_xyz789"
-        }
-    ])
+    {
+        "json": "pm_xyz789"
+    }
+])
     @pattern("^pm_")
     @required
     payment_method_id: String
     custom_data: CustomDataPatch
     /// Set to `true` to activate the payment method or `false` to mark it inactive.
     @dataExamples([
-        {
-            json: true
-        }
-    ])
+    {
+        "json": true
+    }
+])
     active: Boolean
     /// Set to `true` to archive the payment method or `false` to unarchive it.
     @dataExamples([
-        {
-            json: false
-        }
-    ])
+    {
+        "json": false
+    }
+])
     archived: Boolean
     owner: UpdatePaymentMethodRequestowner
 }
@@ -29270,10 +30972,10 @@ structure UpdatePaymentMethodRequest {
 structure UpdatePaymentMethodRequestowner {
     /// Full legal name of the account holder.
     @dataExamples([
-        {
-            json: "Jane Mensah"
-        }
-    ])
+    {
+        "json": "Jane Mensah"
+    }
+])
     name: String
     address: UpdatePaymentMethodRequestowneraddress
 }
@@ -29282,59 +30984,59 @@ structure UpdatePaymentMethodRequestowner {
 structure UpdatePaymentMethodRequestowneraddress {
     /// City or locality.
     @dataExamples([
-        {
-            json: "Accra"
-        }
-    ])
+    {
+        "json": "Accra"
+    }
+])
     city: String
     /// Two-letter ISO country code. Required when adding a brand new owner address.
     @dataExamples([
-        {
-            json: "GH"
-        }
-    ])
+    {
+        "json": "GH"
+    }
+])
     country: String
     /// First address line.
     @dataExamples([
-        {
-            json: "1 High Street"
-        }
-    ])
+    {
+        "json": "1 High Street"
+    }
+])
     line1: String
     /// Second address line.
     @dataExamples([
-        {
-            json: "Osu"
-        }
-    ])
+    {
+        "json": "Osu"
+    }
+])
     line2: String
     /// Recipient name for the address, if different from owner name.
     @dataExamples([
-        {
-            json: "Jane Mensah"
-        }
-    ])
+    {
+        "json": "Jane Mensah"
+    }
+])
     name: String
     /// Phone number for the address.
     @dataExamples([
-        {
-            json: "+233201234567"
-        }
-    ])
+    {
+        "json": "+233201234567"
+    }
+])
     phone_number: String
     /// Postal or ZIP code.
     @dataExamples([
-        {
-            json: "GA-123-4567"
-        }
-    ])
+    {
+        "json": "GA-123-4567"
+    }
+])
     post_code: String
     /// Region, state, or province.
     @dataExamples([
-        {
-            json: "Greater Accra"
-        }
-    ])
+    {
+        "json": "Greater Accra"
+    }
+])
     region: String
 }
 
@@ -29346,26 +31048,26 @@ structure UpdatePaymentMethodResponse {
 structure UpdatePriceRequest {
     /// The unique identifier of the price to update
     @dataExamples([
-        {
-            json: "pr_xyz789"
-        }
-    ])
+    {
+        "json": "pr_xyz789"
+    }
+])
     @pattern("^pr_")
     @required
     price_id: String
     /// Short label for this price (max 100 characters)
     @dataExamples([
-        {
-            json: "Premium pricing"
-        }
-    ])
+    {
+        "json": "Premium pricing"
+    }
+])
     label: String
     /// Longer description of this price (max 500 characters)
     @dataExamples([
-        {
-            json: "Premium pricing tier for enterprise customers"
-        }
-    ])
+    {
+        "json": "Premium pricing tier for enterprise customers"
+    }
+])
     about: String
 }
 
@@ -29469,10 +31171,10 @@ structure UpdatePriceRequest {
 structure UpdateProductRequest {
     /// Product ID to update
     @dataExamples([
-        {
-            json: "prod_abc123"
-        }
-    ])
+    {
+        "json": "prod_abc123"
+    }
+])
     @pattern("^prod_")
     @required
     product_id: String
@@ -29700,10 +31402,10 @@ structure UpdatePurchaseIntentRequestFields {
     expires_at: Timestamp
     /// Purchase intent ID to update. Send this or purchase_intent_id.
     @dataExamples([
-        {
-            json: "sale_ABCXYZ"
-        }
-    ])
+    {
+        "json": "sale_ABCXYZ"
+    }
+])
     @length(
         min: 1
     )
@@ -29712,10 +31414,10 @@ structure UpdatePurchaseIntentRequestFields {
     quantity: UpdatePurchaseIntentRequestFieldsquantity
     /// Alias for id. If both are present, this value takes precedence.
     @dataExamples([
-        {
-            json: "sale_ABCXYZ"
-        }
-    ])
+    {
+        "json": "sale_ABCXYZ"
+    }
+])
     @length(
         min: 1
     )
@@ -29727,10 +31429,10 @@ structure UpdatePurchaseIntentRequestFields {
     /// the order claim from a used single-use intent.
     ///
     @dataExamples([
-        {
-            json: true
-        }
-    ])
+    {
+        "json": true
+    }
+])
     reactivate: Boolean
     presentation: UpdatePurchaseIntentPresentation
 }
@@ -29751,10 +31453,10 @@ structure UpdatePurchaseIntentRequestFields {
 structure UpdatePurchaseIntentRequestFieldsquantity {
     /// Minimum quantity the customer can buy
     @dataExamples([
-        {
-            json: 1
-        }
-    ])
+    {
+        "json": 1
+    }
+])
     @range(
         min: 1
     )
@@ -29762,10 +31464,10 @@ structure UpdatePurchaseIntentRequestFieldsquantity {
     min: Integer
     /// Optional maximum quantity the customer can buy. It must be greater than or equal to min.
     @dataExamples([
-        {
-            json: 3
-        }
-    ])
+    {
+        "json": 3
+    }
+])
     @range(
         min: 1
     )
@@ -29775,18 +31477,18 @@ structure UpdatePurchaseIntentRequestFieldsquantity {
 structure UpdateSecretKeyRequest {
     /// Human-readable label for the secret key. Send an empty string to clear the label.
     @dataExamples([
-        {
-            json: "Production checkout"
-        }
-    ])
+    {
+        "json": "Production checkout"
+    }
+])
     @required
     label: String
     /// Secret key identifier to update.
     @dataExamples([
-        {
-            json: "sk_2xC7k9gK5yQnZ4w8P1sT6vR3"
-        }
-    ])
+    {
+        "json": "sk_2xC7k9gK5yQnZ4w8P1sT6vR3"
+    }
+])
     @pattern("^sk_")
     @required
     secret_key_id: String
@@ -30545,27 +32247,27 @@ structure UploadRequestWithAttemptResponse {
 structure VerifyOTPRequest {
     /// ID of the OTP transaction to verify (with ot_ prefix)
     @dataExamples([
-        {
-            json: "ot_3f8a9c7e2d1b4a6f"
-        }
-    ])
+    {
+        "json": "ot_3f8a9c7e2d1b4a6f"
+    }
+])
     @pattern("^ot_")
     @required
     transaction_id: String
     /// Phone number or bare email address that received the OTP; must match the stored transaction transport.
     @dataExamples([
-        {
-            json: "+233241234567"
-        }
-    ])
+    {
+        "json": "+233241234567"
+    }
+])
     @required
     recipient: String
     /// OTP token submitted by the user
     @dataExamples([
-        {
-            json: "847293"
-        }
-    ])
+    {
+        "json": "847293"
+    }
+])
     @required
     token: String
 }
@@ -30583,10 +32285,10 @@ structure confirmCheckoutPayment200 {
     @contentType("application/json")
     body: CheckoutOrderResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -30599,10 +32301,10 @@ structure confirmCheckoutPayment400 {
     @contentType("application/json")
     body: confirmCheckoutPayment400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -30708,10 +32410,10 @@ structure confirmCheckoutPayment409 {
     @contentType("application/json")
     body: confirmCheckoutPayment409body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -30739,10 +32441,10 @@ structure confirmCheckoutPayment422 {
     @contentType("application/json")
     body: confirmCheckoutPayment422body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -30809,17 +32511,17 @@ structure confirmCheckoutPayment503 {
     @contentType("application/json")
     body: confirmCheckoutPayment503body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
     @dataExamples([
-        {
-            json: "30"
-        }
-    ])
+    {
+        "json": "30"
+    }
+])
     @httpHeader("Retry-After")
     Retry_After: String
 }
@@ -30873,10 +32575,10 @@ structure confirmCheckoutPayment504 {
     @contentType("application/json")
     body: confirmCheckoutPayment504body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -30912,10 +32614,10 @@ structure confirmPayment200 {
     @contentType("application/json")
     body: OrderResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -30928,10 +32630,10 @@ structure confirmPayment400 {
     @contentType("application/json")
     body: confirmPayment400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -31050,10 +32752,10 @@ structure confirmPayment401 {
     @contentType("application/json")
     body: confirmPayment401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -31094,10 +32796,10 @@ structure confirmPayment409 {
     @contentType("application/json")
     body: confirmPayment409body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -31138,10 +32840,10 @@ structure confirmPayment500 {
     @contentType("application/json")
     body: confirmPayment500body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -31169,17 +32871,17 @@ structure confirmPayment503 {
     @contentType("application/json")
     body: confirmPayment503body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
     @dataExamples([
-        {
-            json: "30"
-        }
-    ])
+    {
+        "json": "30"
+    }
+])
     @httpHeader("Retry-After")
     Retry_After: String
 }
@@ -31254,10 +32956,10 @@ structure connectFinancialAccount200 {
     @contentType("application/json")
     body: ConnectFinancialAccountResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -31270,10 +32972,10 @@ structure connectFinancialAccount400 {
     @contentType("application/json")
     body: connectFinancialAccount400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -31379,10 +33081,10 @@ structure connectFinancialAccount401 {
     @contentType("application/json")
     body: connectFinancialAccount401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -31423,10 +33125,10 @@ structure connectFinancialAccount500 {
     @contentType("application/json")
     body: connectFinancialAccount500body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -31441,10 +33143,10 @@ structure connectFinancialAccount503 {
     @contentType("application/json")
     body: connectFinancialAccount503body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -31506,10 +33208,10 @@ structure createApplication200 {
     @contentType("application/json")
     body: CreateApplicationResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -31522,10 +33224,10 @@ structure createApplication401 {
     @contentType("application/json")
     body: createApplication401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -31566,10 +33268,10 @@ structure createApplication422 {
     @contentType("application/json")
     body: createApplication422body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -31745,10 +33447,10 @@ structure createCustomer200 {
     @contentType("application/json")
     body: CustomerResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -31761,10 +33463,10 @@ structure createCustomer400 {
     @contentType("application/json")
     body: createCustomer400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -31870,10 +33572,10 @@ structure createCustomer401 {
     @contentType("application/json")
     body: createCustomer401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -31914,10 +33616,10 @@ structure createCustomer422 {
     @contentType("application/json")
     body: createCustomer422body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -31958,10 +33660,10 @@ structure createCustomer500 {
     @contentType("application/json")
     body: createCustomer500body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -31984,10 +33686,10 @@ structure createFile200 {
     @contentType("application/json")
     body: FileResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -32000,10 +33702,10 @@ structure createFile400 {
     @contentType("application/json")
     body: createFile400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -32015,19 +33717,19 @@ structure createFile400body with [
 
 apply createFile400body$message {
     @dataExamples([
-        {
-            json: "payment method could not be used for this order"
-        }
-    ])
+    {
+        "json": "payment method could not be used for this order"
+    }
+])
     @documentation("Concise, caller-safe explanation of why the request was rejected or could not finish.")
 }
 
 apply createFile400body$detail {
     @dataExamples([
-        {
-            json: "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
-        }
-    ])
+    {
+        "json": "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
+    }
+])
     @documentation("Explanation of the relevant rule and next safe action. It never contains raw dependency, storage, or implementation errors.")
 }
 
@@ -32123,10 +33825,10 @@ structure createFile401 {
     @contentType("application/json")
     body: createFile401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -32138,19 +33840,19 @@ structure createFile401body with [
 
 apply createFile401body$message {
     @dataExamples([
-        {
-            json: "payment method could not be used for this order"
-        }
-    ])
+    {
+        "json": "payment method could not be used for this order"
+    }
+])
     @documentation("Concise, caller-safe explanation of why the request was rejected or could not finish.")
 }
 
 apply createFile401body$detail {
     @dataExamples([
-        {
-            json: "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
-        }
-    ])
+    {
+        "json": "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
+    }
+])
     @documentation("Explanation of the relevant rule and next safe action. It never contains raw dependency, storage, or implementation errors.")
 }
 
@@ -32194,10 +33896,10 @@ structure createFile409 {
     @contentType("application/json")
     body: createFile409body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -32209,19 +33911,19 @@ structure createFile409body with [
 
 apply createFile409body$message {
     @dataExamples([
-        {
-            json: "payment method could not be used for this order"
-        }
-    ])
+    {
+        "json": "payment method could not be used for this order"
+    }
+])
     @documentation("Concise, caller-safe explanation of why the request was rejected or could not finish.")
 }
 
 apply createFile409body$detail {
     @dataExamples([
-        {
-            json: "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
-        }
-    ])
+    {
+        "json": "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
+    }
+])
     @documentation("Explanation of the relevant rule and next safe action. It never contains raw dependency, storage, or implementation errors.")
 }
 
@@ -32265,17 +33967,17 @@ structure createFile503 {
     @contentType("application/json")
     body: createFile503body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
     @dataExamples([
-        {
-            json: "30"
-        }
-    ])
+    {
+        "json": "30"
+    }
+])
     @httpHeader("Retry-After")
     Retry_After: String
 }
@@ -32287,19 +33989,19 @@ structure createFile503body with [
 
 apply createFile503body$message {
     @dataExamples([
-        {
-            json: "payment method could not be used for this order"
-        }
-    ])
+    {
+        "json": "payment method could not be used for this order"
+    }
+])
     @documentation("Concise, caller-safe explanation of why the request was rejected or could not finish.")
 }
 
 apply createFile503body$detail {
     @dataExamples([
-        {
-            json: "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
-        }
-    ])
+    {
+        "json": "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
+    }
+])
     @documentation("Explanation of the relevant rule and next safe action. It never contains raw dependency, storage, or implementation errors.")
 }
 
@@ -32364,10 +34066,10 @@ structure createFileLink200 {
     @contentType("application/json")
     body: CreateFileLinkResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -32380,10 +34082,10 @@ structure createFileLink400 {
     @contentType("application/json")
     body: createFileLink400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -32395,19 +34097,19 @@ structure createFileLink400body with [
 
 apply createFileLink400body$message {
     @dataExamples([
-        {
-            json: "payment method could not be used for this order"
-        }
-    ])
+    {
+        "json": "payment method could not be used for this order"
+    }
+])
     @documentation("Concise, caller-safe explanation of why the request was rejected or could not finish.")
 }
 
 apply createFileLink400body$detail {
     @dataExamples([
-        {
-            json: "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
-        }
-    ])
+    {
+        "json": "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
+    }
+])
     @documentation("Explanation of the relevant rule and next safe action. It never contains raw dependency, storage, or implementation errors.")
 }
 
@@ -32516,10 +34218,10 @@ structure createFileLink401 {
     @contentType("application/json")
     body: createFileLink401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -32531,19 +34233,19 @@ structure createFileLink401body with [
 
 apply createFileLink401body$message {
     @dataExamples([
-        {
-            json: "payment method could not be used for this order"
-        }
-    ])
+    {
+        "json": "payment method could not be used for this order"
+    }
+])
     @documentation("Concise, caller-safe explanation of why the request was rejected or could not finish.")
 }
 
 apply createFileLink401body$detail {
     @dataExamples([
-        {
-            json: "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
-        }
-    ])
+    {
+        "json": "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
+    }
+])
     @documentation("Explanation of the relevant rule and next safe action. It never contains raw dependency, storage, or implementation errors.")
 }
 
@@ -32587,10 +34289,10 @@ structure createFileLink404 {
     @contentType("application/json")
     body: createFileLink404body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -32602,19 +34304,19 @@ structure createFileLink404body with [
 
 apply createFileLink404body$message {
     @dataExamples([
-        {
-            json: "payment method could not be used for this order"
-        }
-    ])
+    {
+        "json": "payment method could not be used for this order"
+    }
+])
     @documentation("Concise, caller-safe explanation of why the request was rejected or could not finish.")
 }
 
 apply createFileLink404body$detail {
     @dataExamples([
-        {
-            json: "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
-        }
-    ])
+    {
+        "json": "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
+    }
+])
     @documentation("Explanation of the relevant rule and next safe action. It never contains raw dependency, storage, or implementation errors.")
 }
 
@@ -32632,17 +34334,17 @@ structure createFileLink503 {
     @contentType("application/json")
     body: createFileLink503body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
     @dataExamples([
-        {
-            json: "30"
-        }
-    ])
+    {
+        "json": "30"
+    }
+])
     @httpHeader("Retry-After")
     Retry_After: String
 }
@@ -32654,19 +34356,19 @@ structure createFileLink503body with [
 
 apply createFileLink503body$message {
     @dataExamples([
-        {
-            json: "payment method could not be used for this order"
-        }
-    ])
+    {
+        "json": "payment method could not be used for this order"
+    }
+])
     @documentation("Concise, caller-safe explanation of why the request was rejected or could not finish.")
 }
 
 apply createFileLink503body$detail {
     @dataExamples([
-        {
-            json: "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
-        }
-    ])
+    {
+        "json": "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
+    }
+])
     @documentation("Explanation of the relevant rule and next safe action. It never contains raw dependency, storage, or implementation errors.")
 }
 
@@ -32757,10 +34459,10 @@ structure createFinancialAccount200 {
     @contentType("application/json")
     body: CreateFinancialAccountResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -32773,10 +34475,10 @@ structure createFinancialAccount400 {
     @contentType("application/json")
     body: createFinancialAccount400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -32882,10 +34584,10 @@ structure createFinancialAccount401 {
     @contentType("application/json")
     body: createFinancialAccount401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -32926,10 +34628,10 @@ structure createFinancialAccount500 {
     @contentType("application/json")
     body: createFinancialAccount500body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -32944,10 +34646,10 @@ structure createFinancialAccount503 {
     @contentType("application/json")
     body: createFinancialAccount503body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -33009,10 +34711,10 @@ structure createMessageTemplate200 {
     @contentType("application/json")
     body: MessageTemplateEnvelope
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -33025,10 +34727,10 @@ structure createMessageTemplate400 {
     @contentType("application/json")
     body: createMessageTemplate400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -33134,10 +34836,10 @@ structure createMessageTemplate401 {
     @contentType("application/json")
     body: createMessageTemplate401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -33178,17 +34880,17 @@ structure createMessageTemplate503 {
     @contentType("application/json")
     body: createMessageTemplate503body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
     @dataExamples([
-        {
-            json: "30"
-        }
-    ])
+    {
+        "json": "30"
+    }
+])
     @httpHeader("Retry-After")
     Retry_After: String
 }
@@ -33263,10 +34965,10 @@ structure createOperatingPolicy200 {
     @contentType("application/json")
     body: OperatingPolicyResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -33688,10 +35390,10 @@ structure createOrder200 {
     @contentType("application/json")
     body: OrderResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -33704,10 +35406,10 @@ structure createOrder400 {
     @contentType("application/json")
     body: createOrder400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -33826,10 +35528,10 @@ structure createOrder401 {
     @contentType("application/json")
     body: createOrder401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -33870,10 +35572,10 @@ structure createOrder409 {
     @contentType("application/json")
     body: createOrder409body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -33927,10 +35629,10 @@ structure createOrder500 {
     @contentType("application/json")
     body: createOrder500body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -33945,17 +35647,17 @@ structure createOrder503 {
     @contentType("application/json")
     body: createOrder503body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
     @dataExamples([
-        {
-            json: "30"
-        }
-    ])
+    {
+        "json": "30"
+    }
+])
     @httpHeader("Retry-After")
     Retry_After: String
 }
@@ -34027,10 +35729,10 @@ structure createPrice200 {
     @contentType("application/json")
     body: PriceResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -34043,10 +35745,10 @@ structure createPrice400 {
     @contentType("application/json")
     body: createPrice400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -34152,10 +35854,10 @@ structure createPrice401 {
     @contentType("application/json")
     body: createPrice401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -34196,10 +35898,10 @@ structure createPrice422 {
     @contentType("application/json")
     body: createPrice422body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -34274,10 +35976,10 @@ structure createProduct200 {
     @contentType("application/json")
     body: ProductResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -34290,10 +35992,10 @@ structure createProduct400 {
     @contentType("application/json")
     body: createProduct400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -34399,10 +36101,10 @@ structure createProduct401 {
     @contentType("application/json")
     body: createProduct401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -34443,10 +36145,10 @@ structure createProduct422 {
     @contentType("application/json")
     body: createProduct422body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -34506,15 +36208,19 @@ structure createPurchaseIntent200 {
     @httpPayload
     @required
     @contentType("application/json")
-    body: PurchaseIntentResponse
+    body: createPurchaseIntent200body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
+
+structure createPurchaseIntent200body with [PurchaseIntentResponseMixin] {}
+
+structure createPurchaseIntent200bodyallOf1purchaseIntent with [PurchaseIntentMixin] {}
 
 @error("client")
 @httpError(400)
@@ -34524,10 +36230,10 @@ structure createPurchaseIntent400 {
     @contentType("application/json")
     body: createPurchaseIntent400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -34646,10 +36352,10 @@ structure createPurchaseIntent401 {
     @contentType("application/json")
     body: createPurchaseIntent401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -34690,10 +36396,10 @@ structure createPurchaseIntent404 {
     @contentType("application/json")
     body: createPurchaseIntent404body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -34708,10 +36414,10 @@ structure createPurchaseIntent500 {
     @contentType("application/json")
     body: createPurchaseIntent500body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -34734,10 +36440,10 @@ structure createRefund200 {
     @contentType("application/json")
     body: RefundResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -34750,10 +36456,10 @@ structure createRefund400 {
     @contentType("application/json")
     body: createRefund400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -34872,10 +36578,10 @@ structure createRefund401 {
     @contentType("application/json")
     body: createRefund401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -34916,10 +36622,10 @@ structure createRefund409 {
     @contentType("application/json")
     body: createRefund409body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -34960,10 +36666,10 @@ structure createRefund422 {
     @contentType("application/json")
     body: createRefund422body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -34991,10 +36697,10 @@ structure createRefund500 {
     @contentType("application/json")
     body: createRefund500body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -35022,17 +36728,17 @@ structure createRefund503 {
     @contentType("application/json")
     body: createRefund503body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
     @dataExamples([
-        {
-            json: "30"
-        }
-    ])
+    {
+        "json": "30"
+    }
+])
     @httpHeader("Retry-After")
     Retry_After: String
 }
@@ -35107,10 +36813,10 @@ structure createUploadRequest200 {
     @contentType("application/json")
     body: UploadRequestResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -35123,10 +36829,10 @@ structure createUploadRequest400 {
     @contentType("application/json")
     body: createUploadRequest400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -35138,19 +36844,19 @@ structure createUploadRequest400body with [
 
 apply createUploadRequest400body$message {
     @dataExamples([
-        {
-            json: "payment method could not be used for this order"
-        }
-    ])
+    {
+        "json": "payment method could not be used for this order"
+    }
+])
     @documentation("Concise, caller-safe explanation of why the request was rejected or could not finish.")
 }
 
 apply createUploadRequest400body$detail {
     @dataExamples([
-        {
-            json: "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
-        }
-    ])
+    {
+        "json": "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
+    }
+])
     @documentation("Explanation of the relevant rule and next safe action. It never contains raw dependency, storage, or implementation errors.")
 }
 
@@ -35259,10 +36965,10 @@ structure createUploadRequest401 {
     @contentType("application/json")
     body: createUploadRequest401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -35274,19 +36980,19 @@ structure createUploadRequest401body with [
 
 apply createUploadRequest401body$message {
     @dataExamples([
-        {
-            json: "payment method could not be used for this order"
-        }
-    ])
+    {
+        "json": "payment method could not be used for this order"
+    }
+])
     @documentation("Concise, caller-safe explanation of why the request was rejected or could not finish.")
 }
 
 apply createUploadRequest401body$detail {
     @dataExamples([
-        {
-            json: "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
-        }
-    ])
+    {
+        "json": "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
+    }
+])
     @documentation("Explanation of the relevant rule and next safe action. It never contains raw dependency, storage, or implementation errors.")
 }
 
@@ -35330,10 +37036,10 @@ structure createUploadRequest409 {
     @contentType("application/json")
     body: createUploadRequest409body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -35345,19 +37051,19 @@ structure createUploadRequest409body with [
 
 apply createUploadRequest409body$message {
     @dataExamples([
-        {
-            json: "payment method could not be used for this order"
-        }
-    ])
+    {
+        "json": "payment method could not be used for this order"
+    }
+])
     @documentation("Concise, caller-safe explanation of why the request was rejected or could not finish.")
 }
 
 apply createUploadRequest409body$detail {
     @dataExamples([
-        {
-            json: "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
-        }
-    ])
+    {
+        "json": "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
+    }
+])
     @documentation("Explanation of the relevant rule and next safe action. It never contains raw dependency, storage, or implementation errors.")
 }
 
@@ -35414,17 +37120,17 @@ structure createUploadRequest503 {
     @contentType("application/json")
     body: createUploadRequest503body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
     @dataExamples([
-        {
-            json: "30"
-        }
-    ])
+    {
+        "json": "30"
+    }
+])
     @httpHeader("Retry-After")
     Retry_After: String
 }
@@ -35436,19 +37142,19 @@ structure createUploadRequest503body with [
 
 apply createUploadRequest503body$message {
     @dataExamples([
-        {
-            json: "payment method could not be used for this order"
-        }
-    ])
+    {
+        "json": "payment method could not be used for this order"
+    }
+])
     @documentation("Concise, caller-safe explanation of why the request was rejected or could not finish.")
 }
 
 apply createUploadRequest503body$detail {
     @dataExamples([
-        {
-            json: "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
-        }
-    ])
+    {
+        "json": "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
+    }
+])
     @documentation("Explanation of the relevant rule and next safe action. It never contains raw dependency, storage, or implementation errors.")
 }
 
@@ -35539,10 +37245,10 @@ structure deactivatePrice200 {
     @contentType("application/json")
     body: PriceResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -35555,10 +37261,10 @@ structure deactivatePrice400 {
     @contentType("application/json")
     body: deactivatePrice400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -35664,10 +37370,10 @@ structure deactivatePrice401 {
     @contentType("application/json")
     body: deactivatePrice401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -35708,10 +37414,10 @@ structure deactivatePrice422 {
     @contentType("application/json")
     body: deactivatePrice422body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -35786,10 +37492,10 @@ structure deleteFile200 {
     @contentType("application/json")
     body: FileResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -35802,10 +37508,10 @@ structure deleteFile400 {
     @contentType("application/json")
     body: deleteFile400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -35817,19 +37523,19 @@ structure deleteFile400body with [
 
 apply deleteFile400body$message {
     @dataExamples([
-        {
-            json: "payment method could not be used for this order"
-        }
-    ])
+    {
+        "json": "payment method could not be used for this order"
+    }
+])
     @documentation("Concise, caller-safe explanation of why the request was rejected or could not finish.")
 }
 
 apply deleteFile400body$detail {
     @dataExamples([
-        {
-            json: "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
-        }
-    ])
+    {
+        "json": "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
+    }
+])
     @documentation("Explanation of the relevant rule and next safe action. It never contains raw dependency, storage, or implementation errors.")
 }
 
@@ -35938,10 +37644,10 @@ structure deleteFile401 {
     @contentType("application/json")
     body: deleteFile401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -35953,19 +37659,19 @@ structure deleteFile401body with [
 
 apply deleteFile401body$message {
     @dataExamples([
-        {
-            json: "payment method could not be used for this order"
-        }
-    ])
+    {
+        "json": "payment method could not be used for this order"
+    }
+])
     @documentation("Concise, caller-safe explanation of why the request was rejected or could not finish.")
 }
 
 apply deleteFile401body$detail {
     @dataExamples([
-        {
-            json: "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
-        }
-    ])
+    {
+        "json": "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
+    }
+])
     @documentation("Explanation of the relevant rule and next safe action. It never contains raw dependency, storage, or implementation errors.")
 }
 
@@ -36009,10 +37715,10 @@ structure deleteFile404 {
     @contentType("application/json")
     body: deleteFile404body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -36024,19 +37730,19 @@ structure deleteFile404body with [
 
 apply deleteFile404body$message {
     @dataExamples([
-        {
-            json: "payment method could not be used for this order"
-        }
-    ])
+    {
+        "json": "payment method could not be used for this order"
+    }
+])
     @documentation("Concise, caller-safe explanation of why the request was rejected or could not finish.")
 }
 
 apply deleteFile404body$detail {
     @dataExamples([
-        {
-            json: "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
-        }
-    ])
+    {
+        "json": "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
+    }
+])
     @documentation("Explanation of the relevant rule and next safe action. It never contains raw dependency, storage, or implementation errors.")
 }
 
@@ -36054,10 +37760,10 @@ structure deleteFile409 {
     @contentType("application/json")
     body: deleteFile409body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -36069,19 +37775,19 @@ structure deleteFile409body with [
 
 apply deleteFile409body$message {
     @dataExamples([
-        {
-            json: "payment method could not be used for this order"
-        }
-    ])
+    {
+        "json": "payment method could not be used for this order"
+    }
+])
     @documentation("Concise, caller-safe explanation of why the request was rejected or could not finish.")
 }
 
 apply deleteFile409body$detail {
     @dataExamples([
-        {
-            json: "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
-        }
-    ])
+    {
+        "json": "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
+    }
+])
     @documentation("Explanation of the relevant rule and next safe action. It never contains raw dependency, storage, or implementation errors.")
 }
 
@@ -36125,17 +37831,17 @@ structure deleteFile503 {
     @contentType("application/json")
     body: deleteFile503body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
     @dataExamples([
-        {
-            json: "30"
-        }
-    ])
+    {
+        "json": "30"
+    }
+])
     @httpHeader("Retry-After")
     Retry_After: String
 }
@@ -36147,19 +37853,19 @@ structure deleteFile503body with [
 
 apply deleteFile503body$message {
     @dataExamples([
-        {
-            json: "payment method could not be used for this order"
-        }
-    ])
+    {
+        "json": "payment method could not be used for this order"
+    }
+])
     @documentation("Concise, caller-safe explanation of why the request was rejected or could not finish.")
 }
 
 apply deleteFile503body$detail {
     @dataExamples([
-        {
-            json: "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
-        }
-    ])
+    {
+        "json": "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
+    }
+])
     @documentation("Explanation of the relevant rule and next safe action. It never contains raw dependency, storage, or implementation errors.")
 }
 
@@ -36250,10 +37956,10 @@ structure destroySecretKey200 {
     @contentType("application/json")
     body: DestroySecretKeyResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -36266,10 +37972,10 @@ structure destroySecretKey401 {
     @contentType("application/json")
     body: destroySecretKey401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -36310,10 +38016,10 @@ structure destroySecretKey404 {
     @contentType("application/json")
     body: destroySecretKey404body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -36328,10 +38034,10 @@ structure destroySecretKey409 {
     @contentType("application/json")
     body: destroySecretKey409body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -36346,10 +38052,10 @@ structure destroySecretKey422 {
     @contentType("application/json")
     body: destroySecretKey422body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -36481,17 +38187,17 @@ structure destroySecretKey503 {
     @contentType("application/json")
     body: destroySecretKey503body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
     @dataExamples([
-        {
-            json: "30"
-        }
-    ])
+    {
+        "json": "30"
+    }
+])
     @httpHeader("Retry-After")
     Retry_After: String
 }
@@ -36553,10 +38259,10 @@ structure disableAutomaticPayouts200 {
     @contentType("application/json")
     body: DisableAutomaticPayoutsResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -36569,10 +38275,10 @@ structure disableAutomaticPayouts400 {
     @contentType("application/json")
     body: disableAutomaticPayouts400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -36678,10 +38384,10 @@ structure disableAutomaticPayouts401 {
     @contentType("application/json")
     body: disableAutomaticPayouts401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -36722,10 +38428,10 @@ structure disableAutomaticPayouts500 {
     @contentType("application/json")
     body: disableAutomaticPayouts500body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -36748,10 +38454,10 @@ structure disableFinancialAccountPull200 {
     @contentType("application/json")
     body: DisableFinancialAccountPullResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -36764,10 +38470,10 @@ structure disableFinancialAccountPull400 {
     @contentType("application/json")
     body: disableFinancialAccountPull400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -36873,10 +38579,10 @@ structure disableFinancialAccountPull401 {
     @contentType("application/json")
     body: disableFinancialAccountPull401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -36917,10 +38623,10 @@ structure disableFinancialAccountPull500 {
     @contentType("application/json")
     body: disableFinancialAccountPull500body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -36943,10 +38649,10 @@ structure disableFinancialAccountPush200 {
     @contentType("application/json")
     body: DisableFinancialAccountPushResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -36959,10 +38665,10 @@ structure disableFinancialAccountPush400 {
     @contentType("application/json")
     body: disableFinancialAccountPush400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -37068,10 +38774,10 @@ structure disableFinancialAccountPush401 {
     @contentType("application/json")
     body: disableFinancialAccountPush401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -37112,10 +38818,10 @@ structure disableFinancialAccountPush500 {
     @contentType("application/json")
     body: disableFinancialAccountPush500body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -37138,10 +38844,10 @@ structure disactivatePaymentMethod200 {
     @contentType("application/json")
     body: DisactivatePaymentMethodResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -37154,10 +38860,10 @@ structure disactivatePaymentMethod400 {
     @contentType("application/json")
     body: disactivatePaymentMethod400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -37276,10 +38982,10 @@ structure disactivatePaymentMethod401 {
     @contentType("application/json")
     body: disactivatePaymentMethod401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -37320,10 +39026,10 @@ structure disactivatePaymentMethod404 {
     @contentType("application/json")
     body: disactivatePaymentMethod404body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -37346,10 +39052,10 @@ structure disconnectFinancialAccount200 {
     @contentType("application/json")
     body: DisconnectFinancialAccountResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -37362,10 +39068,10 @@ structure disconnectFinancialAccount400 {
     @contentType("application/json")
     body: disconnectFinancialAccount400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -37484,10 +39190,10 @@ structure disconnectFinancialAccount401 {
     @contentType("application/json")
     body: disconnectFinancialAccount401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -37528,10 +39234,10 @@ structure disconnectFinancialAccount500 {
     @contentType("application/json")
     body: disconnectFinancialAccount500body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -37554,10 +39260,10 @@ structure enableAutomaticPayouts200 {
     @contentType("application/json")
     body: PayoutSettingsMutationResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -37570,10 +39276,10 @@ structure enableAutomaticPayouts400 {
     @contentType("application/json")
     body: enableAutomaticPayouts400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -37679,10 +39385,10 @@ structure enableAutomaticPayouts401 {
     @contentType("application/json")
     body: enableAutomaticPayouts401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -37723,10 +39429,10 @@ structure enableAutomaticPayouts500 {
     @contentType("application/json")
     body: enableAutomaticPayouts500body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -37749,10 +39455,10 @@ structure enableFinancialAccountPull200 {
     @contentType("application/json")
     body: EnableFinancialAccountPullResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -37765,10 +39471,10 @@ structure enableFinancialAccountPull400 {
     @contentType("application/json")
     body: enableFinancialAccountPull400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -37874,10 +39580,10 @@ structure enableFinancialAccountPull401 {
     @contentType("application/json")
     body: enableFinancialAccountPull401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -37918,10 +39624,10 @@ structure enableFinancialAccountPull500 {
     @contentType("application/json")
     body: enableFinancialAccountPull500body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -37944,10 +39650,10 @@ structure enableFinancialAccountPush200 {
     @contentType("application/json")
     body: EnableFinancialAccountPushResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -37960,10 +39666,10 @@ structure enableFinancialAccountPush400 {
     @contentType("application/json")
     body: enableFinancialAccountPush400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -38069,10 +39775,10 @@ structure enableFinancialAccountPush401 {
     @contentType("application/json")
     body: enableFinancialAccountPush401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -38113,10 +39819,10 @@ structure enableFinancialAccountPush500 {
     @contentType("application/json")
     body: enableFinancialAccountPush500body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -38139,10 +39845,10 @@ structure finalizeOrder200 {
     @contentType("application/json")
     body: FinalizeOrderResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -38155,10 +39861,10 @@ structure finalizeOrder400 {
     @contentType("application/json")
     body: finalizeOrder400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -38264,10 +39970,10 @@ structure finalizeOrder401 {
     @contentType("application/json")
     body: finalizeOrder401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -38308,10 +40014,10 @@ structure finalizeOrder500 {
     @contentType("application/json")
     body: finalizeOrder500body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -38326,17 +40032,17 @@ structure finalizeOrder503 {
     @contentType("application/json")
     body: finalizeOrder503body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
     @dataExamples([
-        {
-            json: "30"
-        }
-    ])
+    {
+        "json": "30"
+    }
+])
     @httpHeader("Retry-After")
     Retry_After: String
 }
@@ -38398,10 +40104,10 @@ structure fulfillUploadRequest200 {
     @contentType("application/json")
     body: FulfillUploadRequestResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -38414,10 +40120,10 @@ structure fulfillUploadRequest400 {
     @contentType("application/json")
     body: fulfillUploadRequest400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -38436,10 +40142,10 @@ structure fulfillUploadRequest404 {
     @contentType("application/json")
     body: fulfillUploadRequest404body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -38451,19 +40157,19 @@ structure fulfillUploadRequest404body with [
 
 apply fulfillUploadRequest404body$message {
     @dataExamples([
-        {
-            json: "payment method could not be used for this order"
-        }
-    ])
+    {
+        "json": "payment method could not be used for this order"
+    }
+])
     @documentation("Concise, caller-safe explanation of why the request was rejected or could not finish.")
 }
 
 apply fulfillUploadRequest404body$detail {
     @dataExamples([
-        {
-            json: "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
-        }
-    ])
+    {
+        "json": "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
+    }
+])
     @documentation("Explanation of the relevant rule and next safe action. It never contains raw dependency, storage, or implementation errors.")
 }
 
@@ -38481,10 +40187,10 @@ structure fulfillUploadRequest409 {
     @contentType("application/json")
     body: fulfillUploadRequest409body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -38496,19 +40202,19 @@ structure fulfillUploadRequest409body with [
 
 apply fulfillUploadRequest409body$message {
     @dataExamples([
-        {
-            json: "payment method could not be used for this order"
-        }
-    ])
+    {
+        "json": "payment method could not be used for this order"
+    }
+])
     @documentation("Concise, caller-safe explanation of why the request was rejected or could not finish.")
 }
 
 apply fulfillUploadRequest409body$detail {
     @dataExamples([
-        {
-            json: "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
-        }
-    ])
+    {
+        "json": "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
+    }
+])
     @documentation("Explanation of the relevant rule and next safe action. It never contains raw dependency, storage, or implementation errors.")
 }
 
@@ -38526,10 +40232,10 @@ structure fulfillUploadRequest410 {
     @contentType("application/json")
     body: fulfillUploadRequest410body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -38541,19 +40247,19 @@ structure fulfillUploadRequest410body with [
 
 apply fulfillUploadRequest410body$message {
     @dataExamples([
-        {
-            json: "payment method could not be used for this order"
-        }
-    ])
+    {
+        "json": "payment method could not be used for this order"
+    }
+])
     @documentation("Concise, caller-safe explanation of why the request was rejected or could not finish.")
 }
 
 apply fulfillUploadRequest410body$detail {
     @dataExamples([
-        {
-            json: "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
-        }
-    ])
+    {
+        "json": "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
+    }
+])
     @documentation("Explanation of the relevant rule and next safe action. It never contains raw dependency, storage, or implementation errors.")
 }
 
@@ -38571,17 +40277,17 @@ structure fulfillUploadRequest503 {
     @contentType("application/json")
     body: fulfillUploadRequest503body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
     @dataExamples([
-        {
-            json: "30"
-        }
-    ])
+    {
+        "json": "30"
+    }
+])
     @httpHeader("Retry-After")
     Retry_After: String
 }
@@ -38593,19 +40299,19 @@ structure fulfillUploadRequest503body with [
 
 apply fulfillUploadRequest503body$message {
     @dataExamples([
-        {
-            json: "payment method could not be used for this order"
-        }
-    ])
+    {
+        "json": "payment method could not be used for this order"
+    }
+])
     @documentation("Concise, caller-safe explanation of why the request was rejected or could not finish.")
 }
 
 apply fulfillUploadRequest503body$detail {
     @dataExamples([
-        {
-            json: "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
-        }
-    ])
+    {
+        "json": "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
+    }
+])
     @documentation("Explanation of the relevant rule and next safe action. It never contains raw dependency, storage, or implementation errors.")
 }
 
@@ -38675,10 +40381,10 @@ structure generateSecretKey200 {
     @contentType("application/json")
     body: GenerateSecretKeyResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -38691,10 +40397,10 @@ structure generateSecretKey401 {
     @contentType("application/json")
     body: generateSecretKey401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -38735,10 +40441,10 @@ structure generateSecretKey422 {
     @contentType("application/json")
     body: generateSecretKey422body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -38849,10 +40555,10 @@ structure getPaymentMethodSettings200 {
     @contentType("application/json")
     body: GetPaymentMethodSettingsResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -38865,10 +40571,10 @@ structure getPaymentMethodSettings400 {
     @contentType("application/json")
     body: getPaymentMethodSettings400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -38961,10 +40667,10 @@ structure getPaymentMethodSettings401 {
     @contentType("application/json")
     body: getPaymentMethodSettings401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -39005,10 +40711,10 @@ structure getPaymentMethodSettings422 {
     @contentType("application/json")
     body: getPaymentMethodSettings422body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -39028,10 +40734,10 @@ structure getPayoutSettings200 {
     @contentType("application/json")
     body: PayoutSettingsLookupResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -39044,10 +40750,10 @@ structure getPayoutSettings400 {
     @contentType("application/json")
     body: getPayoutSettings400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -39153,10 +40859,10 @@ structure getPayoutSettings401 {
     @contentType("application/json")
     body: getPayoutSettings401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -39197,10 +40903,10 @@ structure getPayoutSettings500 {
     @contentType("application/json")
     body: getPayoutSettings500body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -39220,10 +40926,10 @@ structure initiateOTP200 {
     @contentType("application/json")
     body: InitiateOTPResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -39236,10 +40942,10 @@ structure initiateOTP400 {
     @contentType("application/json")
     body: initiateOTP400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -39345,10 +41051,10 @@ structure initiateOTP401 {
     @contentType("application/json")
     body: initiateOTP401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -39389,10 +41095,10 @@ structure initiateOTP422 {
     @contentType("application/json")
     body: initiateOTP422body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -39467,10 +41173,10 @@ structure listCountrySpecs200 {
     @contentType("application/json")
     body: ListCountrySpecsResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -39483,10 +41189,10 @@ structure listCountrySpecs400 {
     @contentType("application/json")
     body: listCountrySpecs400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -39584,10 +41290,10 @@ structure lookupApplication200 {
     @contentType("application/json")
     body: LookupApplicationResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -39600,10 +41306,10 @@ structure lookupApplication401 {
     @contentType("application/json")
     body: lookupApplication401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -39644,10 +41350,10 @@ structure lookupApplication422 {
     @contentType("application/json")
     body: lookupApplication422body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -39751,10 +41457,10 @@ structure lookupApplicationCapabilities200 {
     @contentType("application/json")
     body: ApplicationCapabilitiesResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -39767,10 +41473,10 @@ structure lookupApplicationCapabilities400 {
     @contentType("application/json")
     body: lookupApplicationCapabilities400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -39876,10 +41582,10 @@ structure lookupApplicationCapabilities401 {
     @contentType("application/json")
     body: lookupApplicationCapabilities401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -39920,10 +41626,10 @@ structure lookupApplicationCapabilities403 {
     @contentType("application/json")
     body: lookupApplicationCapabilities403body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -39951,10 +41657,10 @@ structure lookupApplicationCapabilities500 {
     @contentType("application/json")
     body: lookupApplicationCapabilities500body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -39995,17 +41701,17 @@ structure lookupApplicationCapabilities503 {
     @contentType("application/json")
     body: lookupApplicationCapabilities503body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
     @dataExamples([
-        {
-            json: "30"
-        }
-    ])
+    {
+        "json": "30"
+    }
+])
     @httpHeader("Retry-After")
     Retry_After: String
 }
@@ -40077,10 +41783,10 @@ structure lookupBalances200 {
     @contentType("application/json")
     body: BalanceSnapshotResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -40093,10 +41799,10 @@ structure lookupBalances400 {
     @contentType("application/json")
     body: lookupBalances400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -40189,10 +41895,10 @@ structure lookupBalances401 {
     @contentType("application/json")
     body: lookupBalances401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -40233,10 +41939,10 @@ structure lookupBalances422 {
     @contentType("application/json")
     body: lookupBalances422body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -40269,10 +41975,10 @@ structure lookupBalanceTransaction200 {
     @contentType("application/json")
     body: BalanceTransactionResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -40285,10 +41991,10 @@ structure lookupBalanceTransaction400 {
     @contentType("application/json")
     body: lookupBalanceTransaction400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -40381,10 +42087,10 @@ structure lookupBalanceTransaction401 {
     @contentType("application/json")
     body: lookupBalanceTransaction401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -40425,10 +42131,10 @@ structure lookupBalanceTransaction422 {
     @contentType("application/json")
     body: lookupBalanceTransaction422body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -40461,10 +42167,10 @@ structure lookupBroadcast200 {
     @contentType("application/json")
     body: LookupBroadcastResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -40477,10 +42183,10 @@ structure lookupBroadcast400 {
     @contentType("application/json")
     body: lookupBroadcast400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -40573,10 +42279,10 @@ structure lookupBroadcast401 {
     @contentType("application/json")
     body: lookupBroadcast401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -40617,10 +42323,10 @@ structure lookupBroadcast422 {
     @contentType("application/json")
     body: lookupBroadcast422body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -40666,10 +42372,10 @@ structure lookupCheckoutResource200 {
     @contentType("application/json")
     body: CheckoutLookupResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -40682,10 +42388,10 @@ structure lookupCheckoutResource400 {
     @contentType("application/json")
     body: lookupCheckoutResource400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -40778,10 +42484,10 @@ structure lookupCheckoutResource422 {
     @contentType("application/json")
     body: lookupCheckoutResource422body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -40840,10 +42546,10 @@ structure lookupChildrenPolicy200 {
     @contentType("application/json")
     body: ChildrenPolicyResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -41174,10 +42880,10 @@ structure lookupChime200 {
     @contentType("application/json")
     body: ChimeResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -41190,10 +42896,10 @@ structure lookupChime400 {
     @contentType("application/json")
     body: lookupChime400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -41286,10 +42992,10 @@ structure lookupChime401 {
     @contentType("application/json")
     body: lookupChime401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -41330,10 +43036,10 @@ structure lookupChime422 {
     @contentType("application/json")
     body: lookupChime422body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -41379,10 +43085,10 @@ structure lookupChimeSettings200 {
     @contentType("application/json")
     body: ChimeSettingsResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -41519,10 +43225,10 @@ structure lookupCustomer200 {
     @contentType("application/json")
     body: CustomerResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -41535,10 +43241,10 @@ structure lookupCustomer400 {
     @contentType("application/json")
     body: lookupCustomer400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -41631,10 +43337,10 @@ structure lookupCustomer401 {
     @contentType("application/json")
     body: lookupCustomer401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -41675,10 +43381,10 @@ structure lookupCustomer404 {
     @contentType("application/json")
     body: lookupCustomer404body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -41693,10 +43399,10 @@ structure lookupCustomer500 {
     @contentType("application/json")
     body: lookupCustomer500body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -41716,10 +43422,10 @@ structure lookupFile200 {
     @contentType("application/json")
     body: FileResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -41732,10 +43438,10 @@ structure lookupFile400 {
     @contentType("application/json")
     body: lookupFile400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -41747,19 +43453,19 @@ structure lookupFile400body with [
 
 apply lookupFile400body$message {
     @dataExamples([
-        {
-            json: "payment method could not be used for this order"
-        }
-    ])
+    {
+        "json": "payment method could not be used for this order"
+    }
+])
     @documentation("Concise, caller-safe explanation of why the request was rejected or could not finish.")
 }
 
 apply lookupFile400body$detail {
     @dataExamples([
-        {
-            json: "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
-        }
-    ])
+    {
+        "json": "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
+    }
+])
     @documentation("Explanation of the relevant rule and next safe action. It never contains raw dependency, storage, or implementation errors.")
 }
 
@@ -41855,10 +43561,10 @@ structure lookupFile401 {
     @contentType("application/json")
     body: lookupFile401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -41870,19 +43576,19 @@ structure lookupFile401body with [
 
 apply lookupFile401body$message {
     @dataExamples([
-        {
-            json: "payment method could not be used for this order"
-        }
-    ])
+    {
+        "json": "payment method could not be used for this order"
+    }
+])
     @documentation("Concise, caller-safe explanation of why the request was rejected or could not finish.")
 }
 
 apply lookupFile401body$detail {
     @dataExamples([
-        {
-            json: "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
-        }
-    ])
+    {
+        "json": "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
+    }
+])
     @documentation("Explanation of the relevant rule and next safe action. It never contains raw dependency, storage, or implementation errors.")
 }
 
@@ -41926,10 +43632,10 @@ structure lookupFile404 {
     @contentType("application/json")
     body: lookupFile404body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -41941,19 +43647,19 @@ structure lookupFile404body with [
 
 apply lookupFile404body$message {
     @dataExamples([
-        {
-            json: "payment method could not be used for this order"
-        }
-    ])
+    {
+        "json": "payment method could not be used for this order"
+    }
+])
     @documentation("Concise, caller-safe explanation of why the request was rejected or could not finish.")
 }
 
 apply lookupFile404body$detail {
     @dataExamples([
-        {
-            json: "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
-        }
-    ])
+    {
+        "json": "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
+    }
+])
     @documentation("Explanation of the relevant rule and next safe action. It never contains raw dependency, storage, or implementation errors.")
 }
 
@@ -41971,17 +43677,17 @@ structure lookupFile503 {
     @contentType("application/json")
     body: lookupFile503body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
     @dataExamples([
-        {
-            json: "30"
-        }
-    ])
+    {
+        "json": "30"
+    }
+])
     @httpHeader("Retry-After")
     Retry_After: String
 }
@@ -41993,19 +43699,19 @@ structure lookupFile503body with [
 
 apply lookupFile503body$message {
     @dataExamples([
-        {
-            json: "payment method could not be used for this order"
-        }
-    ])
+    {
+        "json": "payment method could not be used for this order"
+    }
+])
     @documentation("Concise, caller-safe explanation of why the request was rejected or could not finish.")
 }
 
 apply lookupFile503body$detail {
     @dataExamples([
-        {
-            json: "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
-        }
-    ])
+    {
+        "json": "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
+    }
+])
     @documentation("Explanation of the relevant rule and next safe action. It never contains raw dependency, storage, or implementation errors.")
 }
 
@@ -42067,10 +43773,10 @@ structure lookupFileLink200 {
     @contentType("application/json")
     body: FileLinkResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -42083,10 +43789,10 @@ structure lookupFileLink400 {
     @contentType("application/json")
     body: lookupFileLink400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -42098,19 +43804,19 @@ structure lookupFileLink400body with [
 
 apply lookupFileLink400body$message {
     @dataExamples([
-        {
-            json: "payment method could not be used for this order"
-        }
-    ])
+    {
+        "json": "payment method could not be used for this order"
+    }
+])
     @documentation("Concise, caller-safe explanation of why the request was rejected or could not finish.")
 }
 
 apply lookupFileLink400body$detail {
     @dataExamples([
-        {
-            json: "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
-        }
-    ])
+    {
+        "json": "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
+    }
+])
     @documentation("Explanation of the relevant rule and next safe action. It never contains raw dependency, storage, or implementation errors.")
 }
 
@@ -42206,10 +43912,10 @@ structure lookupFileLink401 {
     @contentType("application/json")
     body: lookupFileLink401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -42221,19 +43927,19 @@ structure lookupFileLink401body with [
 
 apply lookupFileLink401body$message {
     @dataExamples([
-        {
-            json: "payment method could not be used for this order"
-        }
-    ])
+    {
+        "json": "payment method could not be used for this order"
+    }
+])
     @documentation("Concise, caller-safe explanation of why the request was rejected or could not finish.")
 }
 
 apply lookupFileLink401body$detail {
     @dataExamples([
-        {
-            json: "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
-        }
-    ])
+    {
+        "json": "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
+    }
+])
     @documentation("Explanation of the relevant rule and next safe action. It never contains raw dependency, storage, or implementation errors.")
 }
 
@@ -42277,10 +43983,10 @@ structure lookupFileLink404 {
     @contentType("application/json")
     body: lookupFileLink404body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -42292,19 +43998,19 @@ structure lookupFileLink404body with [
 
 apply lookupFileLink404body$message {
     @dataExamples([
-        {
-            json: "payment method could not be used for this order"
-        }
-    ])
+    {
+        "json": "payment method could not be used for this order"
+    }
+])
     @documentation("Concise, caller-safe explanation of why the request was rejected or could not finish.")
 }
 
 apply lookupFileLink404body$detail {
     @dataExamples([
-        {
-            json: "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
-        }
-    ])
+    {
+        "json": "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
+    }
+])
     @documentation("Explanation of the relevant rule and next safe action. It never contains raw dependency, storage, or implementation errors.")
 }
 
@@ -42322,17 +44028,17 @@ structure lookupFileLink503 {
     @contentType("application/json")
     body: lookupFileLink503body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
     @dataExamples([
-        {
-            json: "30"
-        }
-    ])
+    {
+        "json": "30"
+    }
+])
     @httpHeader("Retry-After")
     Retry_After: String
 }
@@ -42344,19 +44050,19 @@ structure lookupFileLink503body with [
 
 apply lookupFileLink503body$message {
     @dataExamples([
-        {
-            json: "payment method could not be used for this order"
-        }
-    ])
+    {
+        "json": "payment method could not be used for this order"
+    }
+])
     @documentation("Concise, caller-safe explanation of why the request was rejected or could not finish.")
 }
 
 apply lookupFileLink503body$detail {
     @dataExamples([
-        {
-            json: "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
-        }
-    ])
+    {
+        "json": "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
+    }
+])
     @documentation("Explanation of the relevant rule and next safe action. It never contains raw dependency, storage, or implementation errors.")
 }
 
@@ -42418,10 +44124,10 @@ structure lookupFinancialAccount200 {
     @contentType("application/json")
     body: LookupFinancialAccountResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -42434,10 +44140,10 @@ structure lookupFinancialAccount400 {
     @contentType("application/json")
     body: lookupFinancialAccount400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -42543,10 +44249,10 @@ structure lookupFinancialAccount401 {
     @contentType("application/json")
     body: lookupFinancialAccount401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -42587,10 +44293,10 @@ structure lookupFinancialAccount500 {
     @contentType("application/json")
     body: lookupFinancialAccount500body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -42610,10 +44316,10 @@ structure lookupMessageTemplate200 {
     @contentType("application/json")
     body: MessageTemplateEnvelope
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -42626,10 +44332,10 @@ structure lookupMessageTemplate400 {
     @contentType("application/json")
     body: lookupMessageTemplate400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -42722,10 +44428,10 @@ structure lookupMessageTemplate401 {
     @contentType("application/json")
     body: lookupMessageTemplate401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -42766,10 +44472,10 @@ structure lookupMessageTemplate404 {
     @contentType("application/json")
     body: lookupMessageTemplate404body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -42802,10 +44508,10 @@ structure lookupOperatingPolicy200 {
     @contentType("application/json")
     body: OperatingPolicyResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -43162,10 +44868,10 @@ structure lookupOrder200 {
     @contentType("application/json")
     body: OrderResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -43178,10 +44884,10 @@ structure lookupOrder400 {
     @contentType("application/json")
     body: lookupOrder400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -43300,10 +45006,10 @@ structure lookupOrder401 {
     @contentType("application/json")
     body: lookupOrder401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -43349,10 +45055,10 @@ structure lookupOTP200 {
     @contentType("application/json")
     body: LookupOTPResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -43365,10 +45071,10 @@ structure lookupOTP400 {
     @contentType("application/json")
     body: lookupOTP400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -43461,10 +45167,10 @@ structure lookupOTP401 {
     @contentType("application/json")
     body: lookupOTP401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -43505,10 +45211,10 @@ structure lookupOTP422 {
     @contentType("application/json")
     body: lookupOTP422body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -43554,10 +45260,10 @@ structure lookupPaymentMethod200 {
     @contentType("application/json")
     body: LookupPaymentMethodResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -43570,10 +45276,10 @@ structure lookupPaymentMethod400 {
     @contentType("application/json")
     body: lookupPaymentMethod400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -43666,10 +45372,10 @@ structure lookupPaymentMethod401 {
     @contentType("application/json")
     body: lookupPaymentMethod401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -43710,10 +45416,10 @@ structure lookupPaymentMethod404 {
     @contentType("application/json")
     body: lookupPaymentMethod404body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -43733,10 +45439,10 @@ structure lookupPayout200 {
     @contentType("application/json")
     body: PayoutResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -43749,10 +45455,10 @@ structure lookupPayout400 {
     @contentType("application/json")
     body: lookupPayout400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -43858,10 +45564,10 @@ structure lookupPayout401 {
     @contentType("application/json")
     body: lookupPayout401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -43902,10 +45608,10 @@ structure lookupPayout500 {
     @contentType("application/json")
     body: lookupPayout500body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -43925,10 +45631,10 @@ structure lookupPrice200 {
     @contentType("application/json")
     body: PriceResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -43941,10 +45647,10 @@ structure lookupPrice400 {
     @contentType("application/json")
     body: lookupPrice400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -44037,10 +45743,10 @@ structure lookupPrice401 {
     @contentType("application/json")
     body: lookupPrice401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -44081,10 +45787,10 @@ structure lookupPrice422 {
     @contentType("application/json")
     body: lookupPrice422body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -44130,10 +45836,10 @@ structure lookupProduct200 {
     @contentType("application/json")
     body: ProductResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -44146,10 +45852,10 @@ structure lookupProduct400 {
     @contentType("application/json")
     body: lookupProduct400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -44242,10 +45948,10 @@ structure lookupProduct401 {
     @contentType("application/json")
     body: lookupProduct401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -44286,10 +45992,10 @@ structure lookupProduct422 {
     @contentType("application/json")
     body: lookupProduct422body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -44335,10 +46041,10 @@ structure lookupPurchaseIntent200 {
     @contentType("application/json")
     body: PurchaseIntentResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -44351,10 +46057,10 @@ structure lookupPurchaseIntent400 {
     @contentType("application/json")
     body: lookupPurchaseIntent400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -44460,10 +46166,10 @@ structure lookupPurchaseIntent404 {
     @contentType("application/json")
     body: lookupPurchaseIntent404body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -44478,10 +46184,10 @@ structure lookupPurchaseIntent500 {
     @contentType("application/json")
     body: lookupPurchaseIntent500body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -44501,10 +46207,10 @@ structure lookupRefund200 {
     @contentType("application/json")
     body: RefundResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -44517,10 +46223,10 @@ structure lookupRefund400 {
     @contentType("application/json")
     body: lookupRefund400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -44626,10 +46332,10 @@ structure lookupRefund401 {
     @contentType("application/json")
     body: lookupRefund401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -44670,10 +46376,10 @@ structure lookupRefund404 {
     @contentType("application/json")
     body: lookupRefund404body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -44701,10 +46407,10 @@ structure lookupRefund500 {
     @contentType("application/json")
     body: lookupRefund500body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -44737,10 +46443,10 @@ structure lookupSchedule200 {
     @contentType("application/json")
     body: ScheduleLookupResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -44753,10 +46459,10 @@ structure lookupSchedule400 {
     @contentType("application/json")
     body: lookupSchedule400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -44849,10 +46555,10 @@ structure lookupSchedule401 {
     @contentType("application/json")
     body: lookupSchedule401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -44893,10 +46599,10 @@ structure lookupSchedule422 {
     @contentType("application/json")
     body: lookupSchedule422body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -44942,10 +46648,10 @@ structure lookupSecretKey200 {
     @contentType("application/json")
     body: LookupSecretKeyResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -44958,10 +46664,10 @@ structure lookupSecretKey401 {
     @contentType("application/json")
     body: lookupSecretKey401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -45002,10 +46708,10 @@ structure lookupSecretKey404 {
     @contentType("application/json")
     body: lookupSecretKey404body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -45020,10 +46726,10 @@ structure lookupSecretKey422 {
     @contentType("application/json")
     body: lookupSecretKey422body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -45147,10 +46853,10 @@ structure lookupSecretKeyUsage200 {
     @contentType("application/json")
     body: SecretKeyUsageResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -45163,10 +46869,10 @@ structure lookupSecretKeyUsage401 {
     @contentType("application/json")
     body: lookupSecretKeyUsage401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -45207,10 +46913,10 @@ structure lookupSecretKeyUsage404 {
     @contentType("application/json")
     body: lookupSecretKeyUsage404body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -45225,10 +46931,10 @@ structure lookupSecretKeyUsage422 {
     @contentType("application/json")
     body: lookupSecretKeyUsage422body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -45352,10 +47058,10 @@ structure lookupUploadRequest200 {
     @contentType("application/json")
     body: UploadRequestWithAttemptResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -45368,10 +47074,10 @@ structure lookupUploadRequest400 {
     @contentType("application/json")
     body: lookupUploadRequest400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -45383,19 +47089,19 @@ structure lookupUploadRequest400body with [
 
 apply lookupUploadRequest400body$message {
     @dataExamples([
-        {
-            json: "payment method could not be used for this order"
-        }
-    ])
+    {
+        "json": "payment method could not be used for this order"
+    }
+])
     @documentation("Concise, caller-safe explanation of why the request was rejected or could not finish.")
 }
 
 apply lookupUploadRequest400body$detail {
     @dataExamples([
-        {
-            json: "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
-        }
-    ])
+    {
+        "json": "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
+    }
+])
     @documentation("Explanation of the relevant rule and next safe action. It never contains raw dependency, storage, or implementation errors.")
 }
 
@@ -45491,10 +47197,10 @@ structure lookupUploadRequest401 {
     @contentType("application/json")
     body: lookupUploadRequest401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -45506,19 +47212,19 @@ structure lookupUploadRequest401body with [
 
 apply lookupUploadRequest401body$message {
     @dataExamples([
-        {
-            json: "payment method could not be used for this order"
-        }
-    ])
+    {
+        "json": "payment method could not be used for this order"
+    }
+])
     @documentation("Concise, caller-safe explanation of why the request was rejected or could not finish.")
 }
 
 apply lookupUploadRequest401body$detail {
     @dataExamples([
-        {
-            json: "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
-        }
-    ])
+    {
+        "json": "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
+    }
+])
     @documentation("Explanation of the relevant rule and next safe action. It never contains raw dependency, storage, or implementation errors.")
 }
 
@@ -45562,10 +47268,10 @@ structure lookupUploadRequest404 {
     @contentType("application/json")
     body: lookupUploadRequest404body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -45577,19 +47283,19 @@ structure lookupUploadRequest404body with [
 
 apply lookupUploadRequest404body$message {
     @dataExamples([
-        {
-            json: "payment method could not be used for this order"
-        }
-    ])
+    {
+        "json": "payment method could not be used for this order"
+    }
+])
     @documentation("Concise, caller-safe explanation of why the request was rejected or could not finish.")
 }
 
 apply lookupUploadRequest404body$detail {
     @dataExamples([
-        {
-            json: "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
-        }
-    ])
+    {
+        "json": "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
+    }
+])
     @documentation("Explanation of the relevant rule and next safe action. It never contains raw dependency, storage, or implementation errors.")
 }
 
@@ -45607,17 +47313,17 @@ structure lookupUploadRequest503 {
     @contentType("application/json")
     body: lookupUploadRequest503body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
     @dataExamples([
-        {
-            json: "30"
-        }
-    ])
+    {
+        "json": "30"
+    }
+])
     @httpHeader("Retry-After")
     Retry_After: String
 }
@@ -45629,19 +47335,19 @@ structure lookupUploadRequest503body with [
 
 apply lookupUploadRequest503body$message {
     @dataExamples([
-        {
-            json: "payment method could not be used for this order"
-        }
-    ])
+    {
+        "json": "payment method could not be used for this order"
+    }
+])
     @documentation("Concise, caller-safe explanation of why the request was rejected or could not finish.")
 }
 
 apply lookupUploadRequest503body$detail {
     @dataExamples([
-        {
-            json: "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
-        }
-    ])
+    {
+        "json": "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
+    }
+])
     @documentation("Explanation of the relevant rule and next safe action. It never contains raw dependency, storage, or implementation errors.")
 }
 
@@ -45733,10 +47439,10 @@ structure openFileLink200 {
     @contentType("application/octet-stream")
     body: Blob
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -45749,10 +47455,10 @@ structure openFileLink403 {
     @contentType("application/json")
     body: openFileLink403body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -45764,19 +47470,19 @@ structure openFileLink403body with [
 
 apply openFileLink403body$message {
     @dataExamples([
-        {
-            json: "payment method could not be used for this order"
-        }
-    ])
+    {
+        "json": "payment method could not be used for this order"
+    }
+])
     @documentation("Concise, caller-safe explanation of why the request was rejected or could not finish.")
 }
 
 apply openFileLink403body$detail {
     @dataExamples([
-        {
-            json: "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
-        }
-    ])
+    {
+        "json": "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
+    }
+])
     @documentation("Explanation of the relevant rule and next safe action. It never contains raw dependency, storage, or implementation errors.")
 }
 
@@ -45820,10 +47526,10 @@ structure openFileLink404 {
     @contentType("application/json")
     body: openFileLink404body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -45835,19 +47541,19 @@ structure openFileLink404body with [
 
 apply openFileLink404body$message {
     @dataExamples([
-        {
-            json: "payment method could not be used for this order"
-        }
-    ])
+    {
+        "json": "payment method could not be used for this order"
+    }
+])
     @documentation("Concise, caller-safe explanation of why the request was rejected or could not finish.")
 }
 
 apply openFileLink404body$detail {
     @dataExamples([
-        {
-            json: "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
-        }
-    ])
+    {
+        "json": "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
+    }
+])
     @documentation("Explanation of the relevant rule and next safe action. It never contains raw dependency, storage, or implementation errors.")
 }
 
@@ -45865,10 +47571,10 @@ structure openFileLink410 {
     @contentType("application/json")
     body: openFileLink410body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -45880,19 +47586,19 @@ structure openFileLink410body with [
 
 apply openFileLink410body$message {
     @dataExamples([
-        {
-            json: "payment method could not be used for this order"
-        }
-    ])
+    {
+        "json": "payment method could not be used for this order"
+    }
+])
     @documentation("Concise, caller-safe explanation of why the request was rejected or could not finish.")
 }
 
 apply openFileLink410body$detail {
     @dataExamples([
-        {
-            json: "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
-        }
-    ])
+    {
+        "json": "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
+    }
+])
     @documentation("Explanation of the relevant rule and next safe action. It never contains raw dependency, storage, or implementation errors.")
 }
 
@@ -45910,10 +47616,10 @@ structure openFileLink422 {
     @contentType("application/json")
     body: openFileLink422body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -45925,19 +47631,19 @@ structure openFileLink422body with [
 
 apply openFileLink422body$message {
     @dataExamples([
-        {
-            json: "payment method could not be used for this order"
-        }
-    ])
+    {
+        "json": "payment method could not be used for this order"
+    }
+])
     @documentation("Concise, caller-safe explanation of why the request was rejected or could not finish.")
 }
 
 apply openFileLink422body$detail {
     @dataExamples([
-        {
-            json: "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
-        }
-    ])
+    {
+        "json": "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
+    }
+])
     @documentation("Explanation of the relevant rule and next safe action. It never contains raw dependency, storage, or implementation errors.")
 }
 
@@ -45994,10 +47700,10 @@ structure openFileLink424 {
     @contentType("application/json")
     body: openFileLink424body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -46009,19 +47715,19 @@ structure openFileLink424body with [
 
 apply openFileLink424body$message {
     @dataExamples([
-        {
-            json: "payment method could not be used for this order"
-        }
-    ])
+    {
+        "json": "payment method could not be used for this order"
+    }
+])
     @documentation("Concise, caller-safe explanation of why the request was rejected or could not finish.")
 }
 
 apply openFileLink424body$detail {
     @dataExamples([
-        {
-            json: "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
-        }
-    ])
+    {
+        "json": "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
+    }
+])
     @documentation("Explanation of the relevant rule and next safe action. It never contains raw dependency, storage, or implementation errors.")
 }
 
@@ -46039,17 +47745,17 @@ structure openFileLink503 {
     @contentType("application/json")
     body: openFileLink503body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
     @dataExamples([
-        {
-            json: "30"
-        }
-    ])
+    {
+        "json": "30"
+    }
+])
     @httpHeader("Retry-After")
     Retry_After: String
 }
@@ -46061,19 +47767,19 @@ structure openFileLink503body with [
 
 apply openFileLink503body$message {
     @dataExamples([
-        {
-            json: "payment method could not be used for this order"
-        }
-    ])
+    {
+        "json": "payment method could not be used for this order"
+    }
+])
     @documentation("Concise, caller-safe explanation of why the request was rejected or could not finish.")
 }
 
 apply openFileLink503body$detail {
     @dataExamples([
-        {
-            json: "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
-        }
-    ])
+    {
+        "json": "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
+    }
+])
     @documentation("Explanation of the relevant rule and next safe action. It never contains raw dependency, storage, or implementation errors.")
 }
 
@@ -46139,10 +47845,10 @@ structure pageBalanceTransactions200 {
     @contentType("application/json")
     body: BalanceTransactionPageResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -46155,10 +47861,10 @@ structure pageBalanceTransactions400 {
     @contentType("application/json")
     body: pageBalanceTransactions400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -46251,10 +47957,10 @@ structure pageBalanceTransactions401 {
     @contentType("application/json")
     body: pageBalanceTransactions401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -46295,10 +48001,10 @@ structure pageBalanceTransactions422 {
     @contentType("application/json")
     body: pageBalanceTransactions422body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -46331,10 +48037,10 @@ structure pageChildrenPolicyVersions200 {
     @contentType("application/json")
     body: ChildrenPolicyVersionsPageResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -46628,10 +48334,10 @@ structure pageChimes200 {
     @contentType("application/json")
     body: PageChimesResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -46644,10 +48350,10 @@ structure pageChimes400 {
     @contentType("application/json")
     body: pageChimes400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -46740,10 +48446,10 @@ structure pageChimes401 {
     @contentType("application/json")
     body: pageChimes401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -46784,10 +48490,10 @@ structure pageChimes422 {
     @contentType("application/json")
     body: pageChimes422body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -46815,10 +48521,10 @@ structure pageChimes503 {
     @contentType("application/json")
     body: pageChimes503body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -46864,10 +48570,10 @@ structure pageCustomers200 {
     @contentType("application/json")
     body: PageCustomersResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -46880,10 +48586,10 @@ structure pageCustomers400 {
     @contentType("application/json")
     body: pageCustomers400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -46976,10 +48682,10 @@ structure pageCustomers401 {
     @contentType("application/json")
     body: pageCustomers401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -47020,10 +48726,10 @@ structure pageCustomers422 {
     @contentType("application/json")
     body: pageCustomers422body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -47038,10 +48744,10 @@ structure pageCustomers500 {
     @contentType("application/json")
     body: pageCustomers500body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -47061,10 +48767,10 @@ structure pageFileLinks200 {
     @contentType("application/json")
     body: FileLinkPageResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -47077,10 +48783,10 @@ structure pageFileLinks400 {
     @contentType("application/json")
     body: pageFileLinks400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -47092,19 +48798,19 @@ structure pageFileLinks400body with [
 
 apply pageFileLinks400body$message {
     @dataExamples([
-        {
-            json: "payment method could not be used for this order"
-        }
-    ])
+    {
+        "json": "payment method could not be used for this order"
+    }
+])
     @documentation("Concise, caller-safe explanation of why the request was rejected or could not finish.")
 }
 
 apply pageFileLinks400body$detail {
     @dataExamples([
-        {
-            json: "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
-        }
-    ])
+    {
+        "json": "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
+    }
+])
     @documentation("Explanation of the relevant rule and next safe action. It never contains raw dependency, storage, or implementation errors.")
 }
 
@@ -47200,10 +48906,10 @@ structure pageFileLinks401 {
     @contentType("application/json")
     body: pageFileLinks401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -47215,19 +48921,19 @@ structure pageFileLinks401body with [
 
 apply pageFileLinks401body$message {
     @dataExamples([
-        {
-            json: "payment method could not be used for this order"
-        }
-    ])
+    {
+        "json": "payment method could not be used for this order"
+    }
+])
     @documentation("Concise, caller-safe explanation of why the request was rejected or could not finish.")
 }
 
 apply pageFileLinks401body$detail {
     @dataExamples([
-        {
-            json: "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
-        }
-    ])
+    {
+        "json": "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
+    }
+])
     @documentation("Explanation of the relevant rule and next safe action. It never contains raw dependency, storage, or implementation errors.")
 }
 
@@ -47271,17 +48977,17 @@ structure pageFileLinks503 {
     @contentType("application/json")
     body: pageFileLinks503body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
     @dataExamples([
-        {
-            json: "30"
-        }
-    ])
+    {
+        "json": "30"
+    }
+])
     @httpHeader("Retry-After")
     Retry_After: String
 }
@@ -47293,19 +48999,19 @@ structure pageFileLinks503body with [
 
 apply pageFileLinks503body$message {
     @dataExamples([
-        {
-            json: "payment method could not be used for this order"
-        }
-    ])
+    {
+        "json": "payment method could not be used for this order"
+    }
+])
     @documentation("Concise, caller-safe explanation of why the request was rejected or could not finish.")
 }
 
 apply pageFileLinks503body$detail {
     @dataExamples([
-        {
-            json: "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
-        }
-    ])
+    {
+        "json": "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
+    }
+])
     @documentation("Explanation of the relevant rule and next safe action. It never contains raw dependency, storage, or implementation errors.")
 }
 
@@ -47367,10 +49073,10 @@ structure pageFiles200 {
     @contentType("application/json")
     body: FilePageResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -47383,10 +49089,10 @@ structure pageFiles400 {
     @contentType("application/json")
     body: pageFiles400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -47398,19 +49104,19 @@ structure pageFiles400body with [
 
 apply pageFiles400body$message {
     @dataExamples([
-        {
-            json: "payment method could not be used for this order"
-        }
-    ])
+    {
+        "json": "payment method could not be used for this order"
+    }
+])
     @documentation("Concise, caller-safe explanation of why the request was rejected or could not finish.")
 }
 
 apply pageFiles400body$detail {
     @dataExamples([
-        {
-            json: "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
-        }
-    ])
+    {
+        "json": "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
+    }
+])
     @documentation("Explanation of the relevant rule and next safe action. It never contains raw dependency, storage, or implementation errors.")
 }
 
@@ -47506,10 +49212,10 @@ structure pageFiles401 {
     @contentType("application/json")
     body: pageFiles401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -47521,19 +49227,19 @@ structure pageFiles401body with [
 
 apply pageFiles401body$message {
     @dataExamples([
-        {
-            json: "payment method could not be used for this order"
-        }
-    ])
+    {
+        "json": "payment method could not be used for this order"
+    }
+])
     @documentation("Concise, caller-safe explanation of why the request was rejected or could not finish.")
 }
 
 apply pageFiles401body$detail {
     @dataExamples([
-        {
-            json: "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
-        }
-    ])
+    {
+        "json": "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
+    }
+])
     @documentation("Explanation of the relevant rule and next safe action. It never contains raw dependency, storage, or implementation errors.")
 }
 
@@ -47577,17 +49283,17 @@ structure pageFiles503 {
     @contentType("application/json")
     body: pageFiles503body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
     @dataExamples([
-        {
-            json: "30"
-        }
-    ])
+    {
+        "json": "30"
+    }
+])
     @httpHeader("Retry-After")
     Retry_After: String
 }
@@ -47599,19 +49305,19 @@ structure pageFiles503body with [
 
 apply pageFiles503body$message {
     @dataExamples([
-        {
-            json: "payment method could not be used for this order"
-        }
-    ])
+    {
+        "json": "payment method could not be used for this order"
+    }
+])
     @documentation("Concise, caller-safe explanation of why the request was rejected or could not finish.")
 }
 
 apply pageFiles503body$detail {
     @dataExamples([
-        {
-            json: "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
-        }
-    ])
+    {
+        "json": "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
+    }
+])
     @documentation("Explanation of the relevant rule and next safe action. It never contains raw dependency, storage, or implementation errors.")
 }
 
@@ -47673,10 +49379,10 @@ structure pageFinancialAccounts200 {
     @contentType("application/json")
     body: PageFinancialAccountsResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -47689,10 +49395,10 @@ structure pageFinancialAccounts400 {
     @contentType("application/json")
     body: pageFinancialAccounts400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -47798,10 +49504,10 @@ structure pageFinancialAccounts401 {
     @contentType("application/json")
     body: pageFinancialAccounts401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -47842,10 +49548,10 @@ structure pageFinancialAccounts500 {
     @contentType("application/json")
     body: pageFinancialAccounts500body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -47865,10 +49571,10 @@ structure pageMessageTemplates200 {
     @contentType("application/json")
     body: MessageTemplatesPageEnvelope
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -47881,10 +49587,10 @@ structure pageMessageTemplates400 {
     @contentType("application/json")
     body: pageMessageTemplates400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -47977,10 +49683,10 @@ structure pageMessageTemplates401 {
     @contentType("application/json")
     body: pageMessageTemplates401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -48021,10 +49727,10 @@ structure pageMessageTemplates404 {
     @contentType("application/json")
     body: pageMessageTemplates404body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -48057,10 +49763,10 @@ structure pageOperatingPolicyVersions200 {
     @contentType("application/json")
     body: OperatingPolicyVersionsPageResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -48354,10 +50060,10 @@ structure pageOrders200 {
     @contentType("application/json")
     body: PageOrdersResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -48370,10 +50076,10 @@ structure pageOrders400 {
     @contentType("application/json")
     body: pageOrders400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -48479,10 +50185,10 @@ structure pageOrders401 {
     @contentType("application/json")
     body: pageOrders401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -48523,10 +50229,10 @@ structure pageOrders500 {
     @contentType("application/json")
     body: pageOrders500body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -48541,17 +50247,17 @@ structure pageOrders503 {
     @contentType("application/json")
     body: pageOrders503body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
     @dataExamples([
-        {
-            json: "30"
-        }
-    ])
+    {
+        "json": "30"
+    }
+])
     @httpHeader("Retry-After")
     Retry_After: String
 }
@@ -48623,10 +50329,10 @@ structure pagePaymentMethods200 {
     @contentType("application/json")
     body: PaymentMethodPageResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -48639,10 +50345,10 @@ structure pagePaymentMethods400 {
     @contentType("application/json")
     body: pagePaymentMethods400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -48735,10 +50441,10 @@ structure pagePaymentMethods401 {
     @contentType("application/json")
     body: pagePaymentMethods401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -48779,10 +50485,10 @@ structure pagePaymentMethods422 {
     @contentType("application/json")
     body: pagePaymentMethods422body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -48802,10 +50508,10 @@ structure pagePayouts200 {
     @contentType("application/json")
     body: PayoutPageResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -48818,10 +50524,10 @@ structure pagePayouts400 {
     @contentType("application/json")
     body: pagePayouts400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -48927,10 +50633,10 @@ structure pagePayouts401 {
     @contentType("application/json")
     body: pagePayouts401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -48971,10 +50677,10 @@ structure pagePayouts500 {
     @contentType("application/json")
     body: pagePayouts500body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -48994,10 +50700,10 @@ structure pagePrices200 {
     @contentType("application/json")
     body: PricePageResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -49010,10 +50716,10 @@ structure pagePrices400 {
     @contentType("application/json")
     body: pagePrices400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -49106,10 +50812,10 @@ structure pagePrices401 {
     @contentType("application/json")
     body: pagePrices401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -49150,10 +50856,10 @@ structure pagePrices422 {
     @contentType("application/json")
     body: pagePrices422body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -49173,10 +50879,10 @@ structure pageProducts200 {
     @contentType("application/json")
     body: PageProductsResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -49189,10 +50895,10 @@ structure pageProducts400 {
     @contentType("application/json")
     body: pageProducts400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -49285,10 +50991,10 @@ structure pageProducts401 {
     @contentType("application/json")
     body: pageProducts401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -49329,10 +51035,10 @@ structure pageProducts422 {
     @contentType("application/json")
     body: pageProducts422body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -49352,10 +51058,10 @@ structure pagePurchaseIntents200 {
     @contentType("application/json")
     body: PagePurchaseIntentsResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -49368,10 +51074,10 @@ structure pagePurchaseIntents400 {
     @contentType("application/json")
     body: pagePurchaseIntents400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -49477,10 +51183,10 @@ structure pagePurchaseIntents401 {
     @contentType("application/json")
     body: pagePurchaseIntents401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -49521,10 +51227,10 @@ structure pagePurchaseIntents404 {
     @contentType("application/json")
     body: pagePurchaseIntents404body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -49539,10 +51245,10 @@ structure pagePurchaseIntents500 {
     @contentType("application/json")
     body: pagePurchaseIntents500body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -49562,10 +51268,10 @@ structure pageRefunds200 {
     @contentType("application/json")
     body: RefundPageResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -49578,10 +51284,10 @@ structure pageRefunds400 {
     @contentType("application/json")
     body: pageRefunds400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -49687,10 +51393,10 @@ structure pageRefunds401 {
     @contentType("application/json")
     body: pageRefunds401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -49731,10 +51437,10 @@ structure pageRefunds500 {
     @contentType("application/json")
     body: pageRefunds500body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -49762,17 +51468,17 @@ structure pageRefunds503 {
     @contentType("application/json")
     body: pageRefunds503body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
     @dataExamples([
-        {
-            json: "30"
-        }
-    ])
+    {
+        "json": "30"
+    }
+])
     @httpHeader("Retry-After")
     Retry_After: String
 }
@@ -49844,10 +51550,10 @@ structure pageSecretKeys200 {
     @contentType("application/json")
     body: PageSecretKeysResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -49860,10 +51566,10 @@ structure pageSecretKeys401 {
     @contentType("application/json")
     body: pageSecretKeys401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -49904,10 +51610,10 @@ structure pageSecretKeys422 {
     @contentType("application/json")
     body: pageSecretKeys422body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -50044,10 +51750,10 @@ structure pageUploadRequests200 {
     @contentType("application/json")
     body: UploadRequestPageResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -50060,10 +51766,10 @@ structure pageUploadRequests400 {
     @contentType("application/json")
     body: pageUploadRequests400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -50075,19 +51781,19 @@ structure pageUploadRequests400body with [
 
 apply pageUploadRequests400body$message {
     @dataExamples([
-        {
-            json: "payment method could not be used for this order"
-        }
-    ])
+    {
+        "json": "payment method could not be used for this order"
+    }
+])
     @documentation("Concise, caller-safe explanation of why the request was rejected or could not finish.")
 }
 
 apply pageUploadRequests400body$detail {
     @dataExamples([
-        {
-            json: "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
-        }
-    ])
+    {
+        "json": "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
+    }
+])
     @documentation("Explanation of the relevant rule and next safe action. It never contains raw dependency, storage, or implementation errors.")
 }
 
@@ -50183,10 +51889,10 @@ structure pageUploadRequests401 {
     @contentType("application/json")
     body: pageUploadRequests401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -50198,19 +51904,19 @@ structure pageUploadRequests401body with [
 
 apply pageUploadRequests401body$message {
     @dataExamples([
-        {
-            json: "payment method could not be used for this order"
-        }
-    ])
+    {
+        "json": "payment method could not be used for this order"
+    }
+])
     @documentation("Concise, caller-safe explanation of why the request was rejected or could not finish.")
 }
 
 apply pageUploadRequests401body$detail {
     @dataExamples([
-        {
-            json: "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
-        }
-    ])
+    {
+        "json": "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
+    }
+])
     @documentation("Explanation of the relevant rule and next safe action. It never contains raw dependency, storage, or implementation errors.")
 }
 
@@ -50254,17 +51960,17 @@ structure pageUploadRequests503 {
     @contentType("application/json")
     body: pageUploadRequests503body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
     @dataExamples([
-        {
-            json: "30"
-        }
-    ])
+    {
+        "json": "30"
+    }
+])
     @httpHeader("Retry-After")
     Retry_After: String
 }
@@ -50276,19 +51982,19 @@ structure pageUploadRequests503body with [
 
 apply pageUploadRequests503body$message {
     @dataExamples([
-        {
-            json: "payment method could not be used for this order"
-        }
-    ])
+    {
+        "json": "payment method could not be used for this order"
+    }
+])
     @documentation("Concise, caller-safe explanation of why the request was rejected or could not finish.")
 }
 
 apply pageUploadRequests503body$detail {
     @dataExamples([
-        {
-            json: "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
-        }
-    ])
+    {
+        "json": "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
+    }
+])
     @documentation("Explanation of the relevant rule and next safe action. It never contains raw dependency, storage, or implementation errors.")
 }
 
@@ -50350,10 +52056,10 @@ structure payCheckout200 {
     @contentType("application/json")
     body: CheckoutOrderResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -50366,10 +52072,10 @@ structure payCheckout400 {
     @contentType("application/json")
     body: payCheckout400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -50488,10 +52194,10 @@ structure payCheckout409 {
     @contentType("application/json")
     body: payCheckout409body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -50519,10 +52225,10 @@ structure payCheckout422 {
     @contentType("application/json")
     body: payCheckout422body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -50576,17 +52282,17 @@ structure payCheckout503 {
     @contentType("application/json")
     body: payCheckout503body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
     @dataExamples([
-        {
-            json: "30"
-        }
-    ])
+    {
+        "json": "30"
+    }
+])
     @httpHeader("Retry-After")
     Retry_After: String
 }
@@ -50653,10 +52359,10 @@ structure payCheckout504 {
     @contentType("application/json")
     body: payCheckout504body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -50692,10 +52398,10 @@ structure payOrder200 {
     @contentType("application/json")
     body: OrderResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -50708,10 +52414,10 @@ structure payOrder400 {
     @contentType("application/json")
     body: payOrder400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -50830,10 +52536,10 @@ structure payOrder401 {
     @contentType("application/json")
     body: payOrder401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -50874,10 +52580,10 @@ structure payOrder409 {
     @contentType("application/json")
     body: payOrder409body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -50918,10 +52624,10 @@ structure payOrder500 {
     @contentType("application/json")
     body: payOrder500body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -50936,17 +52642,17 @@ structure payOrder503 {
     @contentType("application/json")
     body: payOrder503body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
     @dataExamples([
-        {
-            json: "30"
-        }
-    ])
+    {
+        "json": "30"
+    }
+])
     @httpHeader("Retry-After")
     Retry_After: String
 }
@@ -51021,10 +52727,10 @@ structure publishMessageTemplate200 {
     @contentType("application/json")
     body: MessageTemplateEnvelope
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -51037,10 +52743,10 @@ structure publishMessageTemplate400 {
     @contentType("application/json")
     body: publishMessageTemplate400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -51146,10 +52852,10 @@ structure publishMessageTemplate401 {
     @contentType("application/json")
     body: publishMessageTemplate401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -51190,10 +52896,10 @@ structure publishMessageTemplate404 {
     @contentType("application/json")
     body: publishMessageTemplate404body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -51221,10 +52927,10 @@ structure publishMessageTemplate409 {
     @contentType("application/json")
     body: publishMessageTemplate409body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -51265,17 +52971,17 @@ structure publishMessageTemplate503 {
     @contentType("application/json")
     body: publishMessageTemplate503body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
     @dataExamples([
-        {
-            json: "30"
-        }
-    ])
+    {
+        "json": "30"
+    }
+])
     @httpHeader("Retry-After")
     Retry_After: String
 }
@@ -51350,10 +53056,10 @@ structure publishProduct200 {
     @contentType("application/json")
     body: ProductResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -51366,10 +53072,10 @@ structure publishProduct400 {
     @contentType("application/json")
     body: publishProduct400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -51475,10 +53181,10 @@ structure publishProduct401 {
     @contentType("application/json")
     body: publishProduct401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -51519,10 +53225,10 @@ structure publishProduct422 {
     @contentType("application/json")
     body: publishProduct422body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -51597,10 +53303,10 @@ structure reconcileFileReferences200 {
     @contentType("application/json")
     body: FileReferenceReconcileResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -51613,10 +53319,10 @@ structure reconcileFileReferences400 {
     @contentType("application/json")
     body: reconcileFileReferences400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -51722,10 +53428,10 @@ structure reconcileFileReferences401 {
     @contentType("application/json")
     body: reconcileFileReferences401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -51766,10 +53472,10 @@ structure reconcileFileReferences409 {
     @contentType("application/json")
     body: reconcileFileReferences409body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -51797,10 +53503,10 @@ structure reconcileFileReferences422 {
     @contentType("application/json")
     body: reconcileFileReferences422body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -51828,17 +53534,17 @@ structure reconcileFileReferences503 {
     @contentType("application/json")
     body: reconcileFileReferences503body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
     @dataExamples([
-        {
-            json: "30"
-        }
-    ])
+    {
+        "json": "30"
+    }
+])
     @httpHeader("Retry-After")
     Retry_After: String
 }
@@ -51913,10 +53619,10 @@ structure reconnectFinancialAccount200 {
     @contentType("application/json")
     body: ReconnectFinancialAccountResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -51929,10 +53635,10 @@ structure reconnectFinancialAccount400 {
     @contentType("application/json")
     body: reconnectFinancialAccount400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -52038,10 +53744,10 @@ structure reconnectFinancialAccount401 {
     @contentType("application/json")
     body: reconnectFinancialAccount401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -52082,10 +53788,10 @@ structure reconnectFinancialAccount500 {
     @contentType("application/json")
     body: reconnectFinancialAccount500body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -52108,10 +53814,10 @@ structure renderMessageTemplatePreview200 {
     @contentType("application/json")
     body: RenderMessageTemplatePreviewResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -52124,10 +53830,10 @@ structure renderMessageTemplatePreview400 {
     @contentType("application/json")
     body: renderMessageTemplatePreview400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -52233,10 +53939,10 @@ structure renderMessageTemplatePreview401 {
     @contentType("application/json")
     body: renderMessageTemplatePreview401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -52277,10 +53983,10 @@ structure renderMessageTemplatePreview404 {
     @contentType("application/json")
     body: renderMessageTemplatePreview404body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -52308,10 +54014,10 @@ structure renderMessageTemplatePreview409 {
     @contentType("application/json")
     body: renderMessageTemplatePreview409body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -52344,10 +54050,10 @@ structure requestCheckoutConfirmation200 {
     @contentType("application/json")
     body: CheckoutOrderResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -52360,10 +54066,10 @@ structure requestCheckoutConfirmation400 {
     @contentType("application/json")
     body: requestCheckoutConfirmation400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -52482,10 +54188,10 @@ structure requestCheckoutConfirmation409 {
     @contentType("application/json")
     body: requestCheckoutConfirmation409body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -52513,10 +54219,10 @@ structure requestCheckoutConfirmation422 {
     @contentType("application/json")
     body: requestCheckoutConfirmation422body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -52557,17 +54263,17 @@ structure requestCheckoutConfirmation503 {
     @contentType("application/json")
     body: requestCheckoutConfirmation503body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
     @dataExamples([
-        {
-            json: "30"
-        }
-    ])
+    {
+        "json": "30"
+    }
+])
     @httpHeader("Retry-After")
     Retry_After: String
 }
@@ -52634,10 +54340,10 @@ structure requestCheckoutConfirmation504 {
     @contentType("application/json")
     body: requestCheckoutConfirmation504body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -52673,10 +54379,10 @@ structure requestConfirmation200 {
     @contentType("application/json")
     body: OrderResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -52689,10 +54395,10 @@ structure requestConfirmation400 {
     @contentType("application/json")
     body: requestConfirmation400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -52811,10 +54517,10 @@ structure requestConfirmation401 {
     @contentType("application/json")
     body: requestConfirmation401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -52855,10 +54561,10 @@ structure requestConfirmation500 {
     @contentType("application/json")
     body: requestConfirmation500body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -52873,17 +54579,17 @@ structure requestConfirmation503 {
     @contentType("application/json")
     body: requestConfirmation503body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
     @dataExamples([
-        {
-            json: "30"
-        }
-    ])
+    {
+        "json": "30"
+    }
+])
     @httpHeader("Retry-After")
     Retry_After: String
 }
@@ -52958,10 +54664,10 @@ structure reviewUploadRequestAttempt200 {
     @contentType("application/json")
     body: UploadRequestWithAttemptResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -52974,10 +54680,10 @@ structure reviewUploadRequestAttempt400 {
     @contentType("application/json")
     body: reviewUploadRequestAttempt400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -52989,19 +54695,19 @@ structure reviewUploadRequestAttempt400body with [
 
 apply reviewUploadRequestAttempt400body$message {
     @dataExamples([
-        {
-            json: "payment method could not be used for this order"
-        }
-    ])
+    {
+        "json": "payment method could not be used for this order"
+    }
+])
     @documentation("Concise, caller-safe explanation of why the request was rejected or could not finish.")
 }
 
 apply reviewUploadRequestAttempt400body$detail {
     @dataExamples([
-        {
-            json: "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
-        }
-    ])
+    {
+        "json": "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
+    }
+])
     @documentation("Explanation of the relevant rule and next safe action. It never contains raw dependency, storage, or implementation errors.")
 }
 
@@ -53110,10 +54816,10 @@ structure reviewUploadRequestAttempt401 {
     @contentType("application/json")
     body: reviewUploadRequestAttempt401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -53125,19 +54831,19 @@ structure reviewUploadRequestAttempt401body with [
 
 apply reviewUploadRequestAttempt401body$message {
     @dataExamples([
-        {
-            json: "payment method could not be used for this order"
-        }
-    ])
+    {
+        "json": "payment method could not be used for this order"
+    }
+])
     @documentation("Concise, caller-safe explanation of why the request was rejected or could not finish.")
 }
 
 apply reviewUploadRequestAttempt401body$detail {
     @dataExamples([
-        {
-            json: "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
-        }
-    ])
+    {
+        "json": "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
+    }
+])
     @documentation("Explanation of the relevant rule and next safe action. It never contains raw dependency, storage, or implementation errors.")
 }
 
@@ -53181,10 +54887,10 @@ structure reviewUploadRequestAttempt404 {
     @contentType("application/json")
     body: reviewUploadRequestAttempt404body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -53196,19 +54902,19 @@ structure reviewUploadRequestAttempt404body with [
 
 apply reviewUploadRequestAttempt404body$message {
     @dataExamples([
-        {
-            json: "payment method could not be used for this order"
-        }
-    ])
+    {
+        "json": "payment method could not be used for this order"
+    }
+])
     @documentation("Concise, caller-safe explanation of why the request was rejected or could not finish.")
 }
 
 apply reviewUploadRequestAttempt404body$detail {
     @dataExamples([
-        {
-            json: "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
-        }
-    ])
+    {
+        "json": "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
+    }
+])
     @documentation("Explanation of the relevant rule and next safe action. It never contains raw dependency, storage, or implementation errors.")
 }
 
@@ -53226,10 +54932,10 @@ structure reviewUploadRequestAttempt409 {
     @contentType("application/json")
     body: reviewUploadRequestAttempt409body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -53241,19 +54947,19 @@ structure reviewUploadRequestAttempt409body with [
 
 apply reviewUploadRequestAttempt409body$message {
     @dataExamples([
-        {
-            json: "payment method could not be used for this order"
-        }
-    ])
+    {
+        "json": "payment method could not be used for this order"
+    }
+])
     @documentation("Concise, caller-safe explanation of why the request was rejected or could not finish.")
 }
 
 apply reviewUploadRequestAttempt409body$detail {
     @dataExamples([
-        {
-            json: "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
-        }
-    ])
+    {
+        "json": "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
+    }
+])
     @documentation("Explanation of the relevant rule and next safe action. It never contains raw dependency, storage, or implementation errors.")
 }
 
@@ -53297,17 +55003,17 @@ structure reviewUploadRequestAttempt503 {
     @contentType("application/json")
     body: reviewUploadRequestAttempt503body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
     @dataExamples([
-        {
-            json: "30"
-        }
-    ])
+    {
+        "json": "30"
+    }
+])
     @httpHeader("Retry-After")
     Retry_After: String
 }
@@ -53319,19 +55025,19 @@ structure reviewUploadRequestAttempt503body with [
 
 apply reviewUploadRequestAttempt503body$message {
     @dataExamples([
-        {
-            json: "payment method could not be used for this order"
-        }
-    ])
+    {
+        "json": "payment method could not be used for this order"
+    }
+])
     @documentation("Concise, caller-safe explanation of why the request was rejected or could not finish.")
 }
 
 apply reviewUploadRequestAttempt503body$detail {
     @dataExamples([
-        {
-            json: "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
-        }
-    ])
+    {
+        "json": "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
+    }
+])
     @documentation("Explanation of the relevant rule and next safe action. It never contains raw dependency, storage, or implementation errors.")
 }
 
@@ -53422,10 +55128,10 @@ structure revokeFileLink200 {
     @contentType("application/json")
     body: FileLinkResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -53438,10 +55144,10 @@ structure revokeFileLink400 {
     @contentType("application/json")
     body: revokeFileLink400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -53453,19 +55159,19 @@ structure revokeFileLink400body with [
 
 apply revokeFileLink400body$message {
     @dataExamples([
-        {
-            json: "payment method could not be used for this order"
-        }
-    ])
+    {
+        "json": "payment method could not be used for this order"
+    }
+])
     @documentation("Concise, caller-safe explanation of why the request was rejected or could not finish.")
 }
 
 apply revokeFileLink400body$detail {
     @dataExamples([
-        {
-            json: "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
-        }
-    ])
+    {
+        "json": "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
+    }
+])
     @documentation("Explanation of the relevant rule and next safe action. It never contains raw dependency, storage, or implementation errors.")
 }
 
@@ -53574,10 +55280,10 @@ structure revokeFileLink401 {
     @contentType("application/json")
     body: revokeFileLink401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -53589,19 +55295,19 @@ structure revokeFileLink401body with [
 
 apply revokeFileLink401body$message {
     @dataExamples([
-        {
-            json: "payment method could not be used for this order"
-        }
-    ])
+    {
+        "json": "payment method could not be used for this order"
+    }
+])
     @documentation("Concise, caller-safe explanation of why the request was rejected or could not finish.")
 }
 
 apply revokeFileLink401body$detail {
     @dataExamples([
-        {
-            json: "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
-        }
-    ])
+    {
+        "json": "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
+    }
+])
     @documentation("Explanation of the relevant rule and next safe action. It never contains raw dependency, storage, or implementation errors.")
 }
 
@@ -53645,10 +55351,10 @@ structure revokeFileLink404 {
     @contentType("application/json")
     body: revokeFileLink404body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -53660,19 +55366,19 @@ structure revokeFileLink404body with [
 
 apply revokeFileLink404body$message {
     @dataExamples([
-        {
-            json: "payment method could not be used for this order"
-        }
-    ])
+    {
+        "json": "payment method could not be used for this order"
+    }
+])
     @documentation("Concise, caller-safe explanation of why the request was rejected or could not finish.")
 }
 
 apply revokeFileLink404body$detail {
     @dataExamples([
-        {
-            json: "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
-        }
-    ])
+    {
+        "json": "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
+    }
+])
     @documentation("Explanation of the relevant rule and next safe action. It never contains raw dependency, storage, or implementation errors.")
 }
 
@@ -53690,17 +55396,17 @@ structure revokeFileLink503 {
     @contentType("application/json")
     body: revokeFileLink503body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
     @dataExamples([
-        {
-            json: "30"
-        }
-    ])
+    {
+        "json": "30"
+    }
+])
     @httpHeader("Retry-After")
     Retry_After: String
 }
@@ -53712,19 +55418,19 @@ structure revokeFileLink503body with [
 
 apply revokeFileLink503body$message {
     @dataExamples([
-        {
-            json: "payment method could not be used for this order"
-        }
-    ])
+    {
+        "json": "payment method could not be used for this order"
+    }
+])
     @documentation("Concise, caller-safe explanation of why the request was rejected or could not finish.")
 }
 
 apply revokeFileLink503body$detail {
     @dataExamples([
-        {
-            json: "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
-        }
-    ])
+    {
+        "json": "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
+    }
+])
     @documentation("Explanation of the relevant rule and next safe action. It never contains raw dependency, storage, or implementation errors.")
 }
 
@@ -53815,10 +55521,10 @@ structure scheduleChime200 {
     @contentType("application/json")
     body: ScheduleResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -53831,10 +55537,10 @@ structure scheduleChime400 {
     @contentType("application/json")
     body: scheduleChime400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -53953,10 +55659,10 @@ structure scheduleChime401 {
     @contentType("application/json")
     body: scheduleChime401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -53997,10 +55703,10 @@ structure scheduleChime404 {
     @contentType("application/json")
     body: scheduleChime404body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -54028,10 +55734,10 @@ structure scheduleChime409 {
     @contentType("application/json")
     body: scheduleChime409body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -54072,10 +55778,10 @@ structure scheduleChime422 {
     @contentType("application/json")
     body: scheduleChime422body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -54103,10 +55809,10 @@ structure scheduleChime500 {
     @contentType("application/json")
     body: scheduleChime500body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -54134,17 +55840,17 @@ structure scheduleChime503 {
     @contentType("application/json")
     body: scheduleChime503body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
     @dataExamples([
-        {
-            json: "30"
-        }
-    ])
+    {
+        "json": "30"
+    }
+])
     @httpHeader("Retry-After")
     Retry_After: String
 }
@@ -54217,15 +55923,19 @@ structure schedulePayout200 {
     @httpPayload
     @required
     @contentType("application/json")
-    body: PayoutResponse
+    body: schedulePayout200body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
+
+structure schedulePayout200body with [PayoutResponseMixin] {}
+
+structure schedulePayout200bodyallOf1payout with [PayoutMixin] {}
 
 @error("client")
 @httpError(400)
@@ -54235,10 +55945,10 @@ structure schedulePayout400 {
     @contentType("application/json")
     body: schedulePayout400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -54357,10 +56067,10 @@ structure schedulePayout401 {
     @contentType("application/json")
     body: schedulePayout401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -54401,10 +56111,10 @@ structure schedulePayout500 {
     @contentType("application/json")
     body: schedulePayout500body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -54427,10 +56137,10 @@ structure searchCustomers200 {
     @contentType("application/json")
     body: CustomerSearchResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -54611,10 +56321,10 @@ structure searchFinancialAccounts200 {
     @contentType("application/json")
     body: FinancialAccountSearchResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -54834,10 +56544,10 @@ structure searchOrders200 {
     @contentType("application/json")
     body: OrderSearchResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -55057,10 +56767,10 @@ structure searchPayouts200 {
     @contentType("application/json")
     body: PayoutSearchResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -55280,10 +56990,10 @@ structure searchProducts200 {
     @contentType("application/json")
     body: ProductSearchResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -55464,10 +57174,10 @@ structure selectCheckoutAmount200 {
     @contentType("application/json")
     body: CheckoutOrderResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -55480,10 +57190,10 @@ structure selectCheckoutAmount400 {
     @contentType("application/json")
     body: selectCheckoutAmount400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -55589,10 +57299,10 @@ structure selectCheckoutAmount409 {
     @contentType("application/json")
     body: selectCheckoutAmount409body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -55620,10 +57330,10 @@ structure selectCheckoutAmount422 {
     @contentType("application/json")
     body: selectCheckoutAmount422body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -55677,17 +57387,17 @@ structure selectCheckoutAmount503 {
     @contentType("application/json")
     body: selectCheckoutAmount503body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
     @dataExamples([
-        {
-            json: "30"
-        }
-    ])
+    {
+        "json": "30"
+    }
+])
     @httpHeader("Retry-After")
     Retry_After: String
 }
@@ -55762,10 +57472,10 @@ structure sendChime200 {
     @contentType("application/json")
     body: ChimeResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -55778,10 +57488,10 @@ structure sendChime400 {
     @contentType("application/json")
     body: sendChime400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -55900,10 +57610,10 @@ structure sendChime401 {
     @contentType("application/json")
     body: sendChime401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -55944,10 +57654,10 @@ structure sendChime404 {
     @contentType("application/json")
     body: sendChime404body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -55975,10 +57685,10 @@ structure sendChime409 {
     @contentType("application/json")
     body: sendChime409body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -56019,10 +57729,10 @@ structure sendChime422 {
     @contentType("application/json")
     body: sendChime422body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -56076,10 +57786,10 @@ structure sendChime500 {
     @contentType("application/json")
     body: sendChime500body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -56107,17 +57817,17 @@ structure sendChime503 {
     @contentType("application/json")
     body: sendChime503body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
     @dataExamples([
-        {
-            json: "30"
-        }
-    ])
+    {
+        "json": "30"
+    }
+])
     @httpHeader("Retry-After")
     Retry_After: String
 }
@@ -56191,8 +57901,100 @@ structure sendChimeInput {
         "200": {
             "content": {
                 "application/json": {
+                    "examples": {
+                        "invoice_sent": {
+                            "summary": "Invoice accepted by the email delivery channel",
+                            "value": {
+                                "delivery": {
+                                    "deliveries": [
+                                        {
+                                            "accepted_at": "2026-11-20T10:01:00Z",
+                                            "channel": "email",
+                                            "chime_id": "ch_invoice_email"
+                                        }
+                                    ],
+                                    "document_kind": "invoice",
+                                    "document_url": "https://pages.inttegro.com/invoices/or_invoice_example",
+                                    "sent_channels": [
+                                        "email"
+                                    ]
+                                },
+                                "order": {
+                                    "customer": {
+                                        "guest": false,
+                                        "id": "cu_invoice_customer",
+                                        "name": "Ama Mensah"
+                                    },
+                                    "id": "or_invoice_example",
+                                    "initiated_at": "2026-11-20T10:00:00Z",
+                                    "sealed_at": "2026-11-20T10:00:30Z",
+                                    "status": "requires_payment"
+                                }
+                            }
+                        }
+                    },
                     "schema": {
-                        "$ref": "#/components/schemas/OrderDocumentDeliveryResponse"
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/OrderDocumentDeliveryResponse"
+                            },
+                            {
+                                "properties": {
+                                    "delivery": {
+                                        "allOf": [
+                                            {
+                                                "$ref": "#/components/schemas/OrderDocumentDelivery"
+                                            },
+                                            {
+                                                "properties": {
+                                                    "deliveries": {
+                                                        "minItems": 1,
+                                                        "type": "array"
+                                                    },
+                                                    "document_kind": {
+                                                        "enum": [
+                                                            "invoice"
+                                                        ],
+                                                        "type": "string"
+                                                    },
+                                                    "sent_channels": {
+                                                        "minItems": 1,
+                                                        "type": "array"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "deliveries"
+                                                ],
+                                                "type": "object"
+                                            }
+                                        ]
+                                    },
+                                    "order": {
+                                        "allOf": [
+                                            {
+                                                "$ref": "#/components/schemas/Order"
+                                            },
+                                            {
+                                                "properties": {
+                                                    "status": {
+                                                        "enum": [
+                                                            "requires_payment",
+                                                            "paid",
+                                                            "completed",
+                                                            "canceled",
+                                                            "expired"
+                                                        ],
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        ]
                     }
                 }
             },
@@ -56206,8 +58008,98 @@ structure sendChimeInput {
         "207": {
             "content": {
                 "application/json": {
+                    "examples": {
+                        "invoice_partially_sent": {
+                            "summary": "Invoice accepted by email after SMS delivery failed",
+                            "value": {
+                                "delivery": {
+                                    "deliveries": [
+                                        {
+                                            "accepted_at": "2026-11-20T10:01:00Z",
+                                            "channel": "email",
+                                            "chime_id": "ch_invoice_email"
+                                        }
+                                    ],
+                                    "document_kind": "invoice",
+                                    "document_url": "https://pages.inttegro.com/invoices/or_invoice_example",
+                                    "failed_channels": [
+                                        "sms"
+                                    ],
+                                    "failures": [
+                                        {
+                                            "channel": "sms",
+                                            "error": "Delivery was not accepted"
+                                        }
+                                    ],
+                                    "sent_channels": [
+                                        "email"
+                                    ]
+                                },
+                                "order": {
+                                    "customer": {
+                                        "guest": false,
+                                        "id": "cu_invoice_customer",
+                                        "name": "Ama Mensah"
+                                    },
+                                    "id": "or_invoice_example",
+                                    "initiated_at": "2026-11-20T10:00:00Z",
+                                    "sealed_at": "2026-11-20T10:00:30Z",
+                                    "status": "requires_payment"
+                                }
+                            }
+                        }
+                    },
                     "schema": {
-                        "$ref": "#/components/schemas/OrderDocumentDeliveryResponse"
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/OrderDocumentDeliveryResponse"
+                            },
+                            {
+                                "properties": {
+                                    "delivery": {
+                                        "allOf": [
+                                            {
+                                                "$ref": "#/components/schemas/OrderDocumentPartialDelivery"
+                                            },
+                                            {
+                                                "properties": {
+                                                    "document_kind": {
+                                                        "enum": [
+                                                            "invoice"
+                                                        ],
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        ]
+                                    },
+                                    "order": {
+                                        "allOf": [
+                                            {
+                                                "$ref": "#/components/schemas/Order"
+                                            },
+                                            {
+                                                "properties": {
+                                                    "status": {
+                                                        "enum": [
+                                                            "requires_payment",
+                                                            "paid",
+                                                            "completed",
+                                                            "canceled",
+                                                            "expired"
+                                                        ],
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        ]
                     }
                 }
             },
@@ -56227,15 +58119,27 @@ structure sendOrderInvoice200 {
     @httpPayload
     @required
     @contentType("application/json")
-    body: OrderDocumentDeliveryResponse
+    body: sendOrderInvoice200body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
+
+structure sendOrderInvoice200body with [OrderDocumentDeliveryResponse] {}
+
+structure sendOrderInvoice200bodyallOf1delivery with [OrderDocumentDeliveryMixin] {}
+
+structure sendOrderInvoice200bodyallOf1order with [OrderMixin] {}
+
+structure sendOrderInvoice207body with [OrderDocumentDeliveryResponse] {}
+
+structure sendOrderInvoice207bodyallOf1delivery with [OrderDocumentPartialDelivery] {}
+
+structure sendOrderInvoice207bodyallOf1order with [OrderMixin] {}
 
 @error("client")
 @httpError(400)
@@ -56245,10 +58149,10 @@ structure sendOrderInvoice400 {
     @contentType("application/json")
     body: sendOrderInvoice400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -56367,10 +58271,10 @@ structure sendOrderInvoice401 {
     @contentType("application/json")
     body: sendOrderInvoice401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -56411,10 +58315,10 @@ structure sendOrderInvoice500 {
     @contentType("application/json")
     body: sendOrderInvoice500body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -56429,17 +58333,17 @@ structure sendOrderInvoice503 {
     @contentType("application/json")
     body: sendOrderInvoice503body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
     @dataExamples([
-        {
-            json: "30"
-        }
-    ])
+    {
+        "json": "30"
+    }
+])
     @httpHeader("Retry-After")
     Retry_After: String
 }
@@ -56513,8 +58417,98 @@ structure sendOrderInvoiceInput {
         "200": {
             "content": {
                 "application/json": {
+                    "examples": {
+                        "receipt_sent": {
+                            "summary": "Receipt accepted by the email delivery channel",
+                            "value": {
+                                "delivery": {
+                                    "deliveries": [
+                                        {
+                                            "accepted_at": "2026-11-20T10:06:00Z",
+                                            "channel": "email",
+                                            "chime_id": "ch_receipt_email"
+                                        }
+                                    ],
+                                    "document_kind": "receipt",
+                                    "document_url": "https://pages.inttegro.com/receipts/or_receipt_example",
+                                    "sent_channels": [
+                                        "email"
+                                    ]
+                                },
+                                "order": {
+                                    "customer": {
+                                        "guest": false,
+                                        "id": "cu_receipt_customer",
+                                        "name": "Ama Mensah"
+                                    },
+                                    "id": "or_receipt_example",
+                                    "initiated_at": "2026-11-20T10:00:00Z",
+                                    "paid_at": "2026-11-20T10:05:00Z",
+                                    "sealed_at": "2026-11-20T10:00:30Z",
+                                    "status": "paid"
+                                }
+                            }
+                        }
+                    },
                     "schema": {
-                        "$ref": "#/components/schemas/OrderDocumentDeliveryResponse"
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/OrderDocumentDeliveryResponse"
+                            },
+                            {
+                                "properties": {
+                                    "delivery": {
+                                        "allOf": [
+                                            {
+                                                "$ref": "#/components/schemas/OrderDocumentDelivery"
+                                            },
+                                            {
+                                                "properties": {
+                                                    "deliveries": {
+                                                        "minItems": 1,
+                                                        "type": "array"
+                                                    },
+                                                    "document_kind": {
+                                                        "enum": [
+                                                            "receipt"
+                                                        ],
+                                                        "type": "string"
+                                                    },
+                                                    "sent_channels": {
+                                                        "minItems": 1,
+                                                        "type": "array"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "deliveries"
+                                                ],
+                                                "type": "object"
+                                            }
+                                        ]
+                                    },
+                                    "order": {
+                                        "allOf": [
+                                            {
+                                                "$ref": "#/components/schemas/Order"
+                                            },
+                                            {
+                                                "properties": {
+                                                    "status": {
+                                                        "enum": [
+                                                            "paid",
+                                                            "completed"
+                                                        ],
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        ]
                     }
                 }
             },
@@ -56528,8 +58522,96 @@ structure sendOrderInvoiceInput {
         "207": {
             "content": {
                 "application/json": {
+                    "examples": {
+                        "receipt_partially_sent": {
+                            "summary": "Receipt accepted by email after SMS delivery failed",
+                            "value": {
+                                "delivery": {
+                                    "deliveries": [
+                                        {
+                                            "accepted_at": "2026-11-20T10:06:00Z",
+                                            "channel": "email",
+                                            "chime_id": "ch_receipt_email"
+                                        }
+                                    ],
+                                    "document_kind": "receipt",
+                                    "document_url": "https://pages.inttegro.com/receipts/or_receipt_example",
+                                    "failed_channels": [
+                                        "sms"
+                                    ],
+                                    "failures": [
+                                        {
+                                            "channel": "sms",
+                                            "error": "Delivery was not accepted"
+                                        }
+                                    ],
+                                    "sent_channels": [
+                                        "email"
+                                    ]
+                                },
+                                "order": {
+                                    "customer": {
+                                        "guest": false,
+                                        "id": "cu_receipt_customer",
+                                        "name": "Ama Mensah"
+                                    },
+                                    "id": "or_receipt_example",
+                                    "initiated_at": "2026-11-20T10:00:00Z",
+                                    "paid_at": "2026-11-20T10:05:00Z",
+                                    "sealed_at": "2026-11-20T10:00:30Z",
+                                    "status": "paid"
+                                }
+                            }
+                        }
+                    },
                     "schema": {
-                        "$ref": "#/components/schemas/OrderDocumentDeliveryResponse"
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/OrderDocumentDeliveryResponse"
+                            },
+                            {
+                                "properties": {
+                                    "delivery": {
+                                        "allOf": [
+                                            {
+                                                "$ref": "#/components/schemas/OrderDocumentPartialDelivery"
+                                            },
+                                            {
+                                                "properties": {
+                                                    "document_kind": {
+                                                        "enum": [
+                                                            "receipt"
+                                                        ],
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        ]
+                                    },
+                                    "order": {
+                                        "allOf": [
+                                            {
+                                                "$ref": "#/components/schemas/Order"
+                                            },
+                                            {
+                                                "properties": {
+                                                    "status": {
+                                                        "enum": [
+                                                            "paid",
+                                                            "completed"
+                                                        ],
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        ]
                     }
                 }
             },
@@ -56549,15 +58631,27 @@ structure sendOrderReceipt200 {
     @httpPayload
     @required
     @contentType("application/json")
-    body: OrderDocumentDeliveryResponse
+    body: sendOrderReceipt200body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
+
+structure sendOrderReceipt200body with [OrderDocumentDeliveryResponse] {}
+
+structure sendOrderReceipt200bodyallOf1delivery with [OrderDocumentDeliveryMixin] {}
+
+structure sendOrderReceipt200bodyallOf1order with [OrderMixin] {}
+
+structure sendOrderReceipt207body with [OrderDocumentDeliveryResponse] {}
+
+structure sendOrderReceipt207bodyallOf1delivery with [OrderDocumentPartialDelivery] {}
+
+structure sendOrderReceipt207bodyallOf1order with [OrderMixin] {}
 
 @error("client")
 @httpError(400)
@@ -56567,10 +58661,10 @@ structure sendOrderReceipt400 {
     @contentType("application/json")
     body: sendOrderReceipt400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -56689,10 +58783,10 @@ structure sendOrderReceipt401 {
     @contentType("application/json")
     body: sendOrderReceipt401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -56733,10 +58827,10 @@ structure sendOrderReceipt500 {
     @contentType("application/json")
     body: sendOrderReceipt500body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -56751,17 +58845,17 @@ structure sendOrderReceipt503 {
     @contentType("application/json")
     body: sendOrderReceipt503body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
     @dataExamples([
-        {
-            json: "30"
-        }
-    ])
+    {
+        "json": "30"
+    }
+])
     @httpHeader("Retry-After")
     Retry_After: String
 }
@@ -56836,10 +58930,10 @@ structure setPayoutDestinations200 {
     @contentType("application/json")
     body: PayoutSettingsMutationResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -56852,10 +58946,10 @@ structure setPayoutDestinations400 {
     @contentType("application/json")
     body: setPayoutDestinations400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -56961,10 +59055,10 @@ structure setPayoutDestinations401 {
     @contentType("application/json")
     body: setPayoutDestinations401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -57005,10 +59099,10 @@ structure setPayoutDestinations500 {
     @contentType("application/json")
     body: setPayoutDestinations500body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -57069,10 +59163,10 @@ structure streamFileContents200 {
     @contentType("application/octet-stream")
     body: Blob
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -57085,10 +59179,10 @@ structure streamFileContents400 {
     @contentType("application/json")
     body: streamFileContents400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -57100,19 +59194,19 @@ structure streamFileContents400body with [
 
 apply streamFileContents400body$message {
     @dataExamples([
-        {
-            json: "payment method could not be used for this order"
-        }
-    ])
+    {
+        "json": "payment method could not be used for this order"
+    }
+])
     @documentation("Concise, caller-safe explanation of why the request was rejected or could not finish.")
 }
 
 apply streamFileContents400body$detail {
     @dataExamples([
-        {
-            json: "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
-        }
-    ])
+    {
+        "json": "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
+    }
+])
     @documentation("Explanation of the relevant rule and next safe action. It never contains raw dependency, storage, or implementation errors.")
 }
 
@@ -57208,10 +59302,10 @@ structure streamFileContents401 {
     @contentType("application/json")
     body: streamFileContents401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -57223,19 +59317,19 @@ structure streamFileContents401body with [
 
 apply streamFileContents401body$message {
     @dataExamples([
-        {
-            json: "payment method could not be used for this order"
-        }
-    ])
+    {
+        "json": "payment method could not be used for this order"
+    }
+])
     @documentation("Concise, caller-safe explanation of why the request was rejected or could not finish.")
 }
 
 apply streamFileContents401body$detail {
     @dataExamples([
-        {
-            json: "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
-        }
-    ])
+    {
+        "json": "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
+    }
+])
     @documentation("Explanation of the relevant rule and next safe action. It never contains raw dependency, storage, or implementation errors.")
 }
 
@@ -57279,10 +59373,10 @@ structure streamFileContents404 {
     @contentType("application/json")
     body: streamFileContents404body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -57294,19 +59388,19 @@ structure streamFileContents404body with [
 
 apply streamFileContents404body$message {
     @dataExamples([
-        {
-            json: "payment method could not be used for this order"
-        }
-    ])
+    {
+        "json": "payment method could not be used for this order"
+    }
+])
     @documentation("Concise, caller-safe explanation of why the request was rejected or could not finish.")
 }
 
 apply streamFileContents404body$detail {
     @dataExamples([
-        {
-            json: "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
-        }
-    ])
+    {
+        "json": "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
+    }
+])
     @documentation("Explanation of the relevant rule and next safe action. It never contains raw dependency, storage, or implementation errors.")
 }
 
@@ -57324,10 +59418,10 @@ structure streamFileContents422 {
     @contentType("application/json")
     body: streamFileContents422body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -57339,19 +59433,19 @@ structure streamFileContents422body with [
 
 apply streamFileContents422body$message {
     @dataExamples([
-        {
-            json: "payment method could not be used for this order"
-        }
-    ])
+    {
+        "json": "payment method could not be used for this order"
+    }
+])
     @documentation("Concise, caller-safe explanation of why the request was rejected or could not finish.")
 }
 
 apply streamFileContents422body$detail {
     @dataExamples([
-        {
-            json: "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
-        }
-    ])
+    {
+        "json": "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
+    }
+])
     @documentation("Explanation of the relevant rule and next safe action. It never contains raw dependency, storage, or implementation errors.")
 }
 
@@ -57421,10 +59515,10 @@ structure streamFileContents424 {
     @contentType("application/json")
     body: streamFileContents424body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -57436,19 +59530,19 @@ structure streamFileContents424body with [
 
 apply streamFileContents424body$message {
     @dataExamples([
-        {
-            json: "payment method could not be used for this order"
-        }
-    ])
+    {
+        "json": "payment method could not be used for this order"
+    }
+])
     @documentation("Concise, caller-safe explanation of why the request was rejected or could not finish.")
 }
 
 apply streamFileContents424body$detail {
     @dataExamples([
-        {
-            json: "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
-        }
-    ])
+    {
+        "json": "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
+    }
+])
     @documentation("Explanation of the relevant rule and next safe action. It never contains raw dependency, storage, or implementation errors.")
 }
 
@@ -57466,17 +59560,17 @@ structure streamFileContents503 {
     @contentType("application/json")
     body: streamFileContents503body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
     @dataExamples([
-        {
-            json: "30"
-        }
-    ])
+    {
+        "json": "30"
+    }
+])
     @httpHeader("Retry-After")
     Retry_After: String
 }
@@ -57488,19 +59582,19 @@ structure streamFileContents503body with [
 
 apply streamFileContents503body$message {
     @dataExamples([
-        {
-            json: "payment method could not be used for this order"
-        }
-    ])
+    {
+        "json": "payment method could not be used for this order"
+    }
+])
     @documentation("Concise, caller-safe explanation of why the request was rejected or could not finish.")
 }
 
 apply streamFileContents503body$detail {
     @dataExamples([
-        {
-            json: "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
-        }
-    ])
+    {
+        "json": "the specified payment method could not be used for this order. verify that it belongs to the order customer and is active."
+    }
+])
     @documentation("Explanation of the relevant rule and next safe action. It never contains raw dependency, storage, or implementation errors.")
 }
 
@@ -57562,10 +59656,10 @@ structure tokenizePaymentMethod200 {
     @contentType("application/json")
     body: TokenizePaymentMethodResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -57578,10 +59672,10 @@ structure tokenizePaymentMethod400 {
     @contentType("application/json")
     body: tokenizePaymentMethod400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -57687,10 +59781,10 @@ structure tokenizePaymentMethod401 {
     @contentType("application/json")
     body: tokenizePaymentMethod401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -57731,10 +59825,10 @@ structure tokenizePaymentMethod422 {
     @contentType("application/json")
     body: tokenizePaymentMethod422body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -57783,10 +59877,10 @@ structure unarchivePaymentMethod200 {
     @contentType("application/json")
     body: UnarchivePaymentMethodResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -57799,10 +59893,10 @@ structure unarchivePaymentMethod400 {
     @contentType("application/json")
     body: unarchivePaymentMethod400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -57921,10 +60015,10 @@ structure unarchivePaymentMethod401 {
     @contentType("application/json")
     body: unarchivePaymentMethod401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -57965,10 +60059,10 @@ structure unarchivePaymentMethod404 {
     @contentType("application/json")
     body: unarchivePaymentMethod404body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -57991,10 +60085,10 @@ structure unpublishProduct200 {
     @contentType("application/json")
     body: ProductResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -58007,10 +60101,10 @@ structure unpublishProduct400 {
     @contentType("application/json")
     body: unpublishProduct400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -58116,10 +60210,10 @@ structure unpublishProduct401 {
     @contentType("application/json")
     body: unpublishProduct401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -58160,10 +60254,10 @@ structure unpublishProduct422 {
     @contentType("application/json")
     body: unpublishProduct422body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -58238,10 +60332,10 @@ structure updateApplication200 {
     @contentType("application/json")
     body: UpdateApplicationResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -58254,10 +60348,10 @@ structure updateApplication401 {
     @contentType("application/json")
     body: updateApplication401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -58298,10 +60392,10 @@ structure updateApplication422 {
     @contentType("application/json")
     body: updateApplication422body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -58467,10 +60561,10 @@ structure updateCustomer200 {
     @contentType("application/json")
     body: CustomerResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -58483,10 +60577,10 @@ structure updateCustomer400 {
     @contentType("application/json")
     body: updateCustomer400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -58592,10 +60686,10 @@ structure updateCustomer401 {
     @contentType("application/json")
     body: updateCustomer401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -58636,10 +60730,10 @@ structure updateCustomer422 {
     @contentType("application/json")
     body: updateCustomer422body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -58680,10 +60774,10 @@ structure updateCustomer500 {
     @contentType("application/json")
     body: updateCustomer500body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -58706,10 +60800,10 @@ structure updateFinancialAccount200 {
     @contentType("application/json")
     body: UpdateFinancialAccountResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -58722,10 +60816,10 @@ structure updateFinancialAccount400 {
     @contentType("application/json")
     body: updateFinancialAccount400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -58831,10 +60925,10 @@ structure updateFinancialAccount401 {
     @contentType("application/json")
     body: updateFinancialAccount401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -58875,10 +60969,10 @@ structure updateFinancialAccount500 {
     @contentType("application/json")
     body: updateFinancialAccount500body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -58901,10 +60995,10 @@ structure updateMessageTemplate200 {
     @contentType("application/json")
     body: MessageTemplateEnvelope
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -58917,10 +61011,10 @@ structure updateMessageTemplate400 {
     @contentType("application/json")
     body: updateMessageTemplate400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -59026,10 +61120,10 @@ structure updateMessageTemplate401 {
     @contentType("application/json")
     body: updateMessageTemplate401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -59070,10 +61164,10 @@ structure updateMessageTemplate404 {
     @contentType("application/json")
     body: updateMessageTemplate404body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -59101,10 +61195,10 @@ structure updateMessageTemplate409 {
     @contentType("application/json")
     body: updateMessageTemplate409body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -59145,17 +61239,17 @@ structure updateMessageTemplate503 {
     @contentType("application/json")
     body: updateMessageTemplate503body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
     @dataExamples([
-        {
-            json: "30"
-        }
-    ])
+    {
+        "json": "30"
+    }
+])
     @httpHeader("Retry-After")
     Retry_After: String
 }
@@ -59230,10 +61324,10 @@ structure updateOperatingPolicy200 {
     @contentType("application/json")
     body: OperatingPolicyResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -59666,10 +61760,10 @@ structure updateOrder200 {
     @contentType("application/json")
     body: OrderResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -59682,10 +61776,10 @@ structure updateOrder400 {
     @contentType("application/json")
     body: updateOrder400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -59817,10 +61911,10 @@ structure updateOrder401 {
     @contentType("application/json")
     body: updateOrder401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -59869,10 +61963,10 @@ structure updatePaymentMethod200 {
     @contentType("application/json")
     body: UpdatePaymentMethodResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -59885,10 +61979,10 @@ structure updatePaymentMethod400 {
     @contentType("application/json")
     body: updatePaymentMethod400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -60007,10 +62101,10 @@ structure updatePaymentMethod401 {
     @contentType("application/json")
     body: updatePaymentMethod401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -60051,10 +62145,10 @@ structure updatePaymentMethod404 {
     @contentType("application/json")
     body: updatePaymentMethod404body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -60077,10 +62171,10 @@ structure updatePrice200 {
     @contentType("application/json")
     body: PriceResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -60093,10 +62187,10 @@ structure updatePrice400 {
     @contentType("application/json")
     body: updatePrice400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -60202,10 +62296,10 @@ structure updatePrice401 {
     @contentType("application/json")
     body: updatePrice401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -60246,10 +62340,10 @@ structure updatePrice422 {
     @contentType("application/json")
     body: updatePrice422body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -60311,10 +62405,10 @@ structure updateProduct200 {
     @contentType("application/json")
     body: UpdateProductResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -60327,10 +62421,10 @@ structure updateProduct400 {
     @contentType("application/json")
     body: updateProduct400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -60436,10 +62530,10 @@ structure updateProduct401 {
     @contentType("application/json")
     body: updateProduct401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -60480,10 +62574,10 @@ structure updateProduct422 {
     @contentType("application/json")
     body: updateProduct422body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -60558,10 +62652,10 @@ structure updatePurchaseIntent200 {
     @contentType("application/json")
     body: PurchaseIntentResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -60574,10 +62668,10 @@ structure updatePurchaseIntent400 {
     @contentType("application/json")
     body: updatePurchaseIntent400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -60696,10 +62790,10 @@ structure updatePurchaseIntent401 {
     @contentType("application/json")
     body: updatePurchaseIntent401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -60740,10 +62834,10 @@ structure updatePurchaseIntent404 {
     @contentType("application/json")
     body: updatePurchaseIntent404body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -60758,10 +62852,10 @@ structure updatePurchaseIntent500 {
     @contentType("application/json")
     body: updatePurchaseIntent500body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -60784,10 +62878,10 @@ structure updateSecretKey200 {
     @contentType("application/json")
     body: UpdateSecretKeyResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -60800,10 +62894,10 @@ structure updateSecretKey401 {
     @contentType("application/json")
     body: updateSecretKey401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -60844,10 +62938,10 @@ structure updateSecretKey404 {
     @contentType("application/json")
     body: updateSecretKey404body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -60862,10 +62956,10 @@ structure updateSecretKey409 {
     @contentType("application/json")
     body: updateSecretKey409body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -60880,10 +62974,10 @@ structure updateSecretKey422 {
     @contentType("application/json")
     body: updateSecretKey422body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -61015,17 +63109,17 @@ structure updateSecretKey503 {
     @contentType("application/json")
     body: updateSecretKey503body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
     @dataExamples([
-        {
-            json: "30"
-        }
-    ])
+    {
+        "json": "30"
+    }
+])
     @httpHeader("Retry-After")
     Retry_After: String
 }
@@ -61087,10 +63181,10 @@ structure verifyOTP200 {
     @contentType("application/json")
     body: VerifyOTPResponse
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -61103,10 +63197,10 @@ structure verifyOTP400 {
     @contentType("application/json")
     body: verifyOTP400body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -61212,10 +63306,10 @@ structure verifyOTP401 {
     @contentType("application/json")
     body: verifyOTP401body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -61256,10 +63350,10 @@ structure verifyOTP422 {
     @contentType("application/json")
     body: verifyOTP422body
     @dataExamples([
-        {
-            json: "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
-        }
-    ])
+    {
+        "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
+    }
+])
     @httpHeader("X-Request-Id")
     X_Request_Id: String
 }
@@ -62098,6 +64192,16 @@ union ProductDetails {
 union ProductPriceSummary {
     FixedProductPriceSummary: FixedProductPriceSummary
     CustomerSelectedProductPriceSummary: CustomerSelectedProductPriceSummary
+}
+
+/// Product fulfillment mode. Only the marker matching `type` may be returned; older records may omit that otherwise empty marker.
+@untagged
+union ProductShipment {
+    alt0: ProductShipmentoneOfalt0
+    alt1: ProductShipmentoneOfalt1
+    alt2: ProductShipmentoneOfalt2
+    alt3: ProductShipmentoneOfalt3
+    alt4: ProductShipmentoneOfalt4
 }
 
 /// Exactly one of multi_use or single_use is returned as true. Order is present after a single-use intent is consumed.
@@ -64917,16 +67021,16 @@ list BroadcastDetailrecipients {
 /// Recipient objects for this broadcast. Each item must include `transport` and either inline contact details or `customer_id`.
 @dataExamples([
     {
-        json: [
+        "json": [
             {
-                transport: "email"
-                customer_id: "cu_abc123def456"
-            }
+                "customer_id": "cu_abc123def456",
+                "transport": "email"
+            },
             {
-                email: {
-                    address: "user@example.com"
-                }
-                type: "email"
+                "email": {
+                    "address": "user@example.com"
+                },
+                "type": "email"
             }
         ]
     }
@@ -65029,9 +67133,9 @@ list CountryBankDirectoryitems {
 /// Balance transaction aging specifications available
 @dataExamples([
     {
-        json: [
-            "twenty_four_hourly"
-            "forty_eight_hourly"
+        "json": [
+            "twenty_four_hourly",
+            "forty_eight_hourly",
             "hundred_sixty_eight_hourly"
         ]
     }
@@ -65043,8 +67147,8 @@ list CountrySpecificationbtAgingSpecs {
 /// Supported currencies in this country
 @dataExamples([
     {
-        json: [
-            "ghs"
+        "json": [
+            "ghs",
             "usd"
         ]
     }
@@ -65071,10 +67175,10 @@ list CountrySpecificationlegalEntityTypes {
 /// Supported payment methods in this country
 @dataExamples([
     {
-        json: [
-            "mobile_money"
-            "bank_account"
-            "payment_card"
+        "json": [
+            "mobile_money",
+            "bank_account",
+            "payment_card",
             "motito"
         ]
     }
@@ -65086,8 +67190,8 @@ list CountrySpecificationpaymentMethods {
 /// Available payout schedules for this country
 @dataExamples([
     {
-        json: [
-            "weekly"
+        "json": [
+            "weekly",
             "manual"
         ]
     }
@@ -65225,7 +67329,7 @@ list FinancialAccountSearchResponsesearchallOf1results {
 /// Stored file IDs returned by previews. Chime send, schedule, and broadcast currently reject stored-template attachments.
 @dataExamples([
     {
-        json: [
+        "json": [
             "file_invoicePdf"
         ]
     }
@@ -65279,6 +67383,9 @@ list OperatingPolicyVersionsPageversions {
 }
 
 /// Chime messages that were accepted for delivery.
+@length(
+    max: 2
+)
 list OrderDocumentDeliverydeliveries {
     member: OrderDocumentDeliveryAttempt
 }
@@ -65286,16 +67393,23 @@ list OrderDocumentDeliverydeliveries {
 /// Channels that failed to send.
 @dataExamples([
     {
-        json: [
+        "json": [
             "email"
         ]
     }
 ])
+@length(
+    max: 2
+)
+@uniqueItems
 list OrderDocumentDeliveryfailedChannels {
     member: OrderDocumentDeliveryfailedChannelsItem
 }
 
 /// Per-channel delivery failures.
+@length(
+    max: 2
+)
 list OrderDocumentDeliveryfailures {
     member: OrderDocumentDeliveryFailure
 }
@@ -65303,13 +67417,51 @@ list OrderDocumentDeliveryfailures {
 /// Channels accepted by Chime.
 @dataExamples([
     {
-        json: [
+        "json": [
             "sms"
         ]
     }
 ])
+@length(
+    max: 2
+)
+@uniqueItems
 list OrderDocumentDeliverysentChannels {
     member: OrderDocumentDeliverysentChannelsItem
+}
+
+@length(
+    min: 1
+    max: 2
+)
+list OrderDocumentPartialDeliverydeliveries {
+    member: OrderDocumentDeliveryAttempt
+}
+
+@length(
+    min: 1
+    max: 2
+)
+@uniqueItems
+list OrderDocumentPartialDeliveryfailedChannels {
+    member: OrderDocumentPartialDeliveryfailedChannelsItem
+}
+
+@length(
+    min: 1
+    max: 2
+)
+list OrderDocumentPartialDeliveryfailures {
+    member: OrderDocumentDeliveryFailure
+}
+
+@length(
+    min: 1
+    max: 2
+)
+@uniqueItems
+list OrderDocumentPartialDeliverysentChannels {
+    member: OrderDocumentPartialDeliverysentChannelsItem
 }
 
 /// Array of products, fees, and shipping charges
@@ -65361,6 +67513,9 @@ list PageProductsResponsepageproducts {
     member: Product
 }
 
+@length(
+    max: 256
+)
 list PagePurchaseIntentsResponsepagepurchaseIntents {
     member: PurchaseIntent
 }
@@ -65599,16 +67754,16 @@ list ReviewUploadRequestAttemptByOrdinalRequestreasons {
 /// Recipient objects for this scheduled chime. Each item must include `transport` and either inline contact details or `customer_id`.
 @dataExamples([
     {
-        json: [
+        "json": [
             {
-                transport: "sms"
-                customer_id: "cu_abc123def456"
-            }
+                "customer_id": "cu_abc123def456",
+                "transport": "sms"
+            },
             {
-                type: "phone"
-                phone: {
-                    number: "+233544998605"
-                }
+                "phone": {
+                    "number": "+233544998605"
+                },
+                "type": "phone"
             }
         ]
     }
@@ -65644,6 +67799,9 @@ list ScheduleDetailrecipients {
     member: String
 }
 
+@length(
+    max: 100
+)
 list SecretKeyPagekeys {
     member: SecretKey
 }
@@ -65725,6 +67883,12 @@ map FileMetadata {
 
 /// Validated provider-neutral email headers.
 map MessageHeaders {
+    key: String
+    value: String
+}
+
+/// Merchant-defined string values attached to a resource when at least one value is present.
+map NonEmptyCustomData {
     key: String
     value: String
 }
@@ -68632,6 +70796,10 @@ enum cancelOrder500bodyallOf1url {
     httpsstudiointtegrocomerrors = "https://studio.inttegro.com/errors"
 }
 
+enum cancelPayout200bodyallOf1payoutallOf1status {
+    canceled
+}
+
 enum cancelPayout400bodyallOf1oneOfalt0cause {
     invalid_request_parameter
 }
@@ -68848,6 +71016,10 @@ enum cancelPayout500bodyallOf1type {
 
 enum cancelPayout500bodyallOf1url {
     httpsstudiointtegrocomerrors = "https://studio.inttegro.com/errors"
+}
+
+enum cancelPurchaseIntent200bodyallOf1purchaseIntentallOf1status {
+    inactive
 }
 
 enum cancelPurchaseIntent400bodyallOf1oneOfalt0cause {
@@ -70468,7 +72640,7 @@ enum BalanceTransactionRefundAllocationtype {
 /// Raw SMS message content for a broadcast.
 @dataExamples([
     {
-        json: "Your order #12345 has shipped."
+        "json": "Your order #12345 has shipped."
     }
 ])
 string BroadcastRawSMSContent
@@ -71379,6 +73551,21 @@ enum OrderDocumentDeliverysentChannelsItem {
     sms
 }
 
+enum OrderDocumentPartialDeliverydocumentKind {
+    invoice
+    receipt
+}
+
+enum OrderDocumentPartialDeliveryfailedChannelsItem {
+    email
+    sms
+}
+
+enum OrderDocumentPartialDeliverysentChannelsItem {
+    email
+    sms
+}
+
 enum OrderFeeLineItemtype {
     fee
 }
@@ -71714,7 +73901,7 @@ enum ProductLineItemtype {
 /// An Inttegro Files API file or file-link reference. Remote URLs are not accepted.
 @dataExamples([
     {
-        json: "file_2xC7k9gK5yQnZ4w8P1sT6vR3"
+        "json": "file_2xC7k9gK5yQnZ4w8P1sT6vR3"
     }
 ])
 @length(
@@ -71742,11 +73929,23 @@ enum ProductShipmentInputtype {
     stream
 }
 
-enum ProductShipmenttype {
+enum ProductShipmentoneOfalt0type {
     delivery
+}
+
+enum ProductShipmentoneOfalt1type {
     download
+}
+
+enum ProductShipmentoneOfalt2type {
     render
+}
+
+enum ProductShipmentoneOfalt3type {
     service
+}
+
+enum ProductShipmentoneOfalt4type {
     stream
 }
 
@@ -76274,6 +78473,10 @@ enum createProduct422bodyallOf1oneOfalt2type {
 
 enum createProduct422bodyallOf1oneOfalt2url {
     httpsstudiointtegrocomerrors = "https://studio.inttegro.com/errors"
+}
+
+enum createPurchaseIntent200bodyallOf1purchaseIntentallOf1status {
+    active
 }
 
 enum createPurchaseIntent400bodyallOf1oneOfalt0cause {
@@ -96437,6 +98640,10 @@ enum scheduleChime503bodyallOf1erroroneOfalt3url {
     httpsstudiointtegrocomerrors = "https://studio.inttegro.com/errors"
 }
 
+enum schedulePayout200bodyallOf1payoutallOf1status {
+    scheduled
+}
+
 enum schedulePayout400bodyallOf1oneOfalt0cause {
     precondition_unmet
 }
@@ -98719,6 +100926,30 @@ enum sendChime503bodyallOf1erroroneOfalt3url {
     httpsstudiointtegrocomerrors = "https://studio.inttegro.com/errors"
 }
 
+enum sendOrderInvoice200bodyallOf1deliveryallOf1documentKind {
+    invoice
+}
+
+enum sendOrderInvoice200bodyallOf1orderallOf1status {
+    requires_payment
+    paid
+    completed
+    canceled
+    expired
+}
+
+enum sendOrderInvoice207bodyallOf1deliveryallOf1documentKind {
+    invoice
+}
+
+enum sendOrderInvoice207bodyallOf1orderallOf1status {
+    requires_payment
+    paid
+    completed
+    canceled
+    expired
+}
+
 enum sendOrderInvoice400bodyallOf1erroroneOfalt0cause {
     precondition_unmet
 }
@@ -99039,6 +101270,24 @@ enum sendOrderInvoice503bodyallOf1erroroneOfalt3type {
 
 enum sendOrderInvoice503bodyallOf1erroroneOfalt3url {
     httpsstudiointtegrocomet_transient_error = "https://studio.inttegro.com/e/t-transient_error"
+}
+
+enum sendOrderReceipt200bodyallOf1deliveryallOf1documentKind {
+    receipt
+}
+
+enum sendOrderReceipt200bodyallOf1orderallOf1status {
+    paid
+    completed
+}
+
+enum sendOrderReceipt207bodyallOf1deliveryallOf1documentKind {
+    receipt
+}
+
+enum sendOrderReceipt207bodyallOf1orderallOf1status {
+    paid
+    completed
 }
 
 enum sendOrderReceipt400bodyallOf1erroroneOfalt0cause {

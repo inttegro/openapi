@@ -53,7 +53,18 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/PurchaseIntentResponse'
+                                # Why: creation validates a future expiry and creates no cancellation
+                                # or single-use order claim, so its first public snapshot is active.
+                                allOf:
+                                    - $ref: '#/components/schemas/PurchaseIntentResponse'
+                                    - type: object
+                                      properties:
+                                          purchase_intent:
+                                              allOf:
+                                                  - $ref: '#/components/schemas/PurchaseIntent'
+                                                  - type: object
+                                                    properties:
+                                                        status: { type: string, enum: [active] }
                             # Why: this exact outcome keeps the Buy link, selected product, and
                             # effective special-offer price coherent for local integration tests.
                             examples:
@@ -191,6 +202,26 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/PurchaseIntentResponse'
+                            examples:
+                                updated:
+                                    summary: Active Buy link with revised quantity bounds
+                                    value:
+                                        purchase_intent:
+                                            allow_variants: false
+                                            application_id: app_example
+                                            created_at: "2026-11-17T10:00:00Z"
+                                            id: sale_updated_example
+                                            product:
+                                                id: prod_example
+                                                type: digital
+                                                name: Commerce Guide
+                                                active: true
+                                                created_at: "2026-11-17T10:00:00Z"
+                                                published_at: "2026-11-17T10:00:00Z"
+                                            quantity: { min: 2, max: 10 }
+                                            status: active
+                                            updated_at: "2026-11-20T10:00:00Z"
+                                            usage: { multi_use: true }
                 '400':
                     description: Bad request - invalid parameters
                     headers:
@@ -289,7 +320,39 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/PurchaseIntentResponse'
+                                # Why: a successful cancellation records inactive_at and returns the
+                                # same Buy link in its inactive effective state.
+                                allOf:
+                                    - $ref: '#/components/schemas/PurchaseIntentResponse'
+                                    - type: object
+                                      properties:
+                                          purchase_intent:
+                                              allOf:
+                                                  - $ref: '#/components/schemas/PurchaseIntent'
+                                                  - type: object
+                                                    required: [inactive_at]
+                                                    properties:
+                                                        status: { type: string, enum: [inactive] }
+                            examples:
+                                canceled:
+                                    summary: Buy link made inactive by an explicit cancellation
+                                    value:
+                                        purchase_intent:
+                                            allow_variants: false
+                                            application_id: app_example
+                                            created_at: "2026-11-17T10:00:00Z"
+                                            id: sale_canceled_example
+                                            inactive_at: "2026-11-20T10:00:00Z"
+                                            product:
+                                                id: prod_example
+                                                type: digital
+                                                name: Commerce Guide
+                                                active: true
+                                                created_at: "2026-11-17T10:00:00Z"
+                                                published_at: "2026-11-17T10:00:00Z"
+                                            quantity: { min: 1, max: 5 }
+                                            status: inactive
+                                            usage: { multi_use: true }
                 '400':
                     description: Bad request - invalid parameters
                     headers:
@@ -383,6 +446,25 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/PurchaseIntentResponse'
+                            examples:
+                                found:
+                                    summary: Active reusable Buy link found by ID
+                                    value:
+                                        purchase_intent:
+                                            allow_variants: false
+                                            application_id: app_example
+                                            created_at: "2026-11-17T10:00:00Z"
+                                            id: sale_found_example
+                                            product:
+                                                id: prod_example
+                                                type: digital
+                                                name: Commerce Guide
+                                                active: true
+                                                created_at: "2026-11-17T10:00:00Z"
+                                                published_at: "2026-11-17T10:00:00Z"
+                                            quantity: { min: 1, max: 5 }
+                                            status: active
+                                            usage: { multi_use: true }
                 '400':
                     description: Bad request - invalid parameters
                     headers:
@@ -1076,16 +1158,23 @@ components:
                               operation: count
                               source: /purchase_intents/*
                     properties:
+                        # Why: the public request caps both coordinates, and size is the exact
+                        # returned item count rather than an independent synthesized value.
                         number:
                             type: integer
+                            minimum: 1
+                            maximum: 10
                             description: One-based page number returned
                             example: 1
                         purchase_intents:
                             type: array
+                            maxItems: 256
                             items:
                                 $ref: '#/components/schemas/PurchaseIntent'
                         size:
                             type: integer
+                            minimum: 0
+                            maximum: 256
                             description: Number of purchase intents actually returned
                             example: 2
         PurchaseIntentResponse:
@@ -1465,7 +1554,7 @@ components:
                 - usage
             # Why: every Buy link targets exactly one catalog resource. Allowing both or neither
             # would produce a schema-valid response that checkout cannot resolve.
-            anyOf:
+            oneOf:
                 - required: [product]
                 - required: [bundle]
             # Effective Buy-link status is derived from these persisted lifecycle facts.

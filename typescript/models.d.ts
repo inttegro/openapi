@@ -2952,6 +2952,9 @@ export type MessageTemplateVariableItemInput = (Closed<{
 /** Variable values used when rendering a template. */
 export type MessageTemplateVariables = JSONData;
 
+/** Merchant-defined string values attached to a resource when at least one value is present. */
+export type NonEmptyCustomData = Readonly<Record<string, string>>;
+
 export type OperatingPolicy = Closed<{
   readonly "id": `op_${string}`;
   readonly "version": number;
@@ -3058,7 +3061,7 @@ export type Order = ((Closed<{
     readonly "resource_type"?: "purchase_intent";
     readonly "resource_id"?: string;
   }>;
-  readonly "custom_data"?: CustomData;
+  readonly "custom_data"?: NonEmptyCustomData;
   readonly "customer": Closed<{
     readonly "id": `cu_${string}`;
     readonly "guest": boolean;
@@ -3088,7 +3091,7 @@ export type Order = ((Closed<{
   readonly "receipt_number"?: string;
   /** All refunds issued for this order, newest first. Omitted when no refunds exist. */
   readonly "refunds"?: readonly (Refund)[];
-  readonly "invoice_settings"?: InvoiceSettings;
+  readonly "invoice_settings"?: OrderInvoiceSettingsResponse;
   /** Current lifecycle state of the order */
   readonly "status": ("preparing" | "requires_payment" | "paid" | "completed" | "canceled" | "expired" | "unknown");
   /** When the order was finalized and became immutable—ready for payment or fulfillment */
@@ -3258,7 +3261,7 @@ export type OrderDocumentDeliveryRequest = Closed<{
 /** Successful or partially successful deliberate order document delivery. */
 export type OrderDocumentDeliveryResponse = Closed<{
   readonly "delivery": OrderDocumentDelivery;
-  readonly "order"?: Order;
+  readonly "order": Order;
 }>;
 
 /** Bounded aggregate of Chime-accepted sends for one generated order document. */
@@ -3278,6 +3281,16 @@ export type OrderDocumentFormat = Closed<{
   readonly "url": Uri;
 }>;
 
+/** Partial order-document delivery with at least one accepted and one failed channel. */
+export type OrderDocumentPartialDelivery = (Closed<{
+  readonly "deliveries": readonly (OrderDocumentDeliveryAttempt)[];
+  readonly "document_kind": ("invoice" | "receipt");
+  readonly "document_url": Uri;
+  readonly "failed_channels": (readonly (("email" | "sms"))[]);
+  readonly "failures": readonly (OrderDocumentDeliveryFailure)[];
+  readonly "sent_channels": (readonly (("email" | "sms"))[]);
+}>);
+
 /** Order operation error. The latest Order snapshot is included when available. */
 export type OrderErrorResponse = Closed<{
   readonly "error": Error;
@@ -3294,6 +3307,17 @@ export type OrderFeeLineItem = Closed<{
     readonly "amount": Amount;
     readonly "label": string;
   }>;
+}>;
+
+/** Persisted order-level invoice rendering data returned when at least one setting is present. */
+export type OrderInvoiceSettingsResponse = Closed<{
+  /** Optional invoice number. */
+  readonly "number"?: string;
+  /** Optional invoice memo. */
+  readonly "memo"?: string;
+  /** Optional invoice footer. */
+  readonly "footer"?: string;
+  readonly "custom_data"?: CustomData;
 }>;
 
 export type OrderLineItem = (OrderProductLineItem | OrderFeeLineItem | OrderShippingLineItem | OrderDiscountLineItem);
@@ -4405,7 +4429,7 @@ export type Product = ((Closed<{
   /** Product attributes */
   readonly "attributes"?: readonly (ProductAttribute)[];
   readonly "dimensions"?: ProductDimensions;
-  readonly "custom_data"?: CustomData;
+  readonly "custom_data"?: NonEmptyCustomData;
   /** Whether product is published and available */
   readonly "active": boolean;
   /** Product creation timestamp */
@@ -4515,12 +4539,21 @@ export type ProductSearchResponse = Closed<{
 /** Service fulfillment marker. */
 export type ProductService = Record<string, never>;
 
+/** Product fulfillment mode. Only the marker matching `type` may be returned; older records may omit that otherwise empty marker. */
 export type ProductShipment = (Closed<{
-  readonly "type": ("delivery" | "download" | "render" | "service" | "stream");
+  readonly "type": "delivery";
   readonly "delivery"?: ProductDelivery;
+}> | Closed<{
+  readonly "type": "download";
   readonly "download"?: ProductDownload;
+}> | Closed<{
+  readonly "type": "render";
   readonly "render"?: ProductRender;
+}> | Closed<{
+  readonly "type": "service";
   readonly "service"?: ProductService;
+}> | Closed<{
+  readonly "type": "stream";
   readonly "stream"?: ProductStream;
 }>);
 

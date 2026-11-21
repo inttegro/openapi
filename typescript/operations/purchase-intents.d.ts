@@ -29,7 +29,12 @@ export interface PurchaseIntentsOperations {
           readonly "X-Request-Id"?: string;
         };
         readonly content: {
-          readonly "application/json": Output.PurchaseIntentResponse;
+          readonly "application/json": Output.PurchaseIntentResponse & {
+            readonly "purchase_intent"?: Output.PurchaseIntent & {
+              readonly "status"?: "inactive";
+              readonly "inactive_at": unknown;
+            };
+          };
         };
       };
       readonly "400": {
@@ -137,7 +142,12 @@ export interface PurchaseIntentsOperations {
         };
       };
     };
-    readonly result: { readonly status: 200; readonly content_type: "application/json"; readonly body: Output.PurchaseIntentResponse } | { readonly status: 400; readonly content_type: "application/json"; readonly body: Output.Error & (((({
+    readonly result: { readonly status: 200; readonly content_type: "application/json"; readonly body: Output.PurchaseIntentResponse & {
+  readonly "purchase_intent"?: Output.PurchaseIntent & {
+    readonly "status"?: "inactive";
+    readonly "inactive_at": unknown;
+  };
+} } | { readonly status: 400; readonly content_type: "application/json"; readonly body: Output.Error & (((({
   readonly "cause": "precondition_unmet";
   readonly "code": ("purchase_intent_already_used" | "purchase_intent_bundle_price_unavailable" | "purchase_intent_bundle_unavailable");
   readonly "fix_code": "satisfy_precondition";
@@ -233,7 +243,11 @@ export interface PurchaseIntentsOperations {
           readonly "X-Request-Id"?: string;
         };
         readonly content: {
-          readonly "application/json": Output.PurchaseIntentResponse;
+          readonly "application/json": Output.PurchaseIntentResponse & {
+            readonly "purchase_intent"?: Output.PurchaseIntent & {
+              readonly "status"?: "active";
+            };
+          };
         };
       };
       readonly "400": {
@@ -341,7 +355,11 @@ export interface PurchaseIntentsOperations {
         };
       };
     };
-    readonly result: { readonly status: 200; readonly content_type: "application/json"; readonly body: Output.PurchaseIntentResponse } | { readonly status: 400; readonly content_type: "application/json"; readonly body: Output.Error & (((({
+    readonly result: { readonly status: 200; readonly content_type: "application/json"; readonly body: Output.PurchaseIntentResponse & {
+  readonly "purchase_intent"?: Output.PurchaseIntent & {
+    readonly "status"?: "active";
+  };
+} } | { readonly status: 400; readonly content_type: "application/json"; readonly body: Output.Error & (((({
   readonly "cause": "precondition_unmet";
   readonly "code": ("purchase_intent_bundle_price_unavailable" | "purchase_intent_bundle_unavailable" | "purchase_intent_price_unavailable" | "purchase_intent_product_unavailable");
   readonly "fix_code": "satisfy_precondition";

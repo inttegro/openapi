@@ -597,6 +597,13 @@ components:
             description: Merchant-defined string values attached to a resource. SDKs expose this as a semantic collection rather than a raw map.
             additionalProperties:
                 type: string
+        NonEmptyCustomData:
+            type: object
+            # Why: public response serializers omit custom-data maps with no entries.
+            minProperties: 1
+            description: Merchant-defined string values attached to a resource when at least one value is present.
+            additionalProperties:
+                type: string
         CustomDataInput:
             type: object
             description: Merchant-defined values accepted on resource creation. Values are serialized to strings before storage.

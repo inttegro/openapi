@@ -1204,7 +1204,48 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/OrderDocumentDeliveryResponse'
+                                # Why: invoice delivery can only succeed after finalization, and the
+                                # operation can never return a receipt-shaped or draft order result.
+                                allOf:
+                                    - $ref: '#/components/schemas/OrderDocumentDeliveryResponse'
+                                    - type: object
+                                      properties:
+                                          delivery:
+                                              allOf:
+                                                  - $ref: '#/components/schemas/OrderDocumentDelivery'
+                                                  - type: object
+                                                    required: [deliveries]
+                                                    properties:
+                                                        document_kind: { type: string, enum: [invoice] }
+                                                        deliveries: { type: array, minItems: 1 }
+                                                        sent_channels: { type: array, minItems: 1 }
+                                          order:
+                                              allOf:
+                                                  - $ref: '#/components/schemas/Order'
+                                                  - type: object
+                                                    properties:
+                                                        status: { type: string, enum: [requires_payment, paid, completed, canceled, expired] }
+                            examples:
+                                invoice_sent:
+                                    summary: Invoice accepted by the email delivery channel
+                                    value:
+                                        delivery:
+                                            deliveries:
+                                                - accepted_at: "2026-11-20T10:01:00Z"
+                                                  channel: email
+                                                  chime_id: ch_invoice_email
+                                            document_kind: invoice
+                                            document_url: https://pages.inttegro.com/invoices/or_invoice_example
+                                            sent_channels: [email]
+                                        order:
+                                            customer:
+                                                guest: false
+                                                id: cu_invoice_customer
+                                                name: Ama Mensah
+                                            id: or_invoice_example
+                                            initiated_at: "2026-11-20T10:00:00Z"
+                                            sealed_at: "2026-11-20T10:00:30Z"
+                                            status: requires_payment
                 '207':
                     description: Partial success - at least one channel sent and at least one channel failed.
                     headers:
@@ -1213,7 +1254,49 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/OrderDocumentDeliveryResponse'
+                                # Why: HTTP 207 means the same invoice attempt produced both an
+                                # accepted delivery and a recorded per-channel failure.
+                                allOf:
+                                    - $ref: '#/components/schemas/OrderDocumentDeliveryResponse'
+                                    - type: object
+                                      properties:
+                                          delivery:
+                                              allOf:
+                                                  - $ref: '#/components/schemas/OrderDocumentPartialDelivery'
+                                                  - type: object
+                                                    properties:
+                                                        document_kind: { type: string, enum: [invoice] }
+                                          order:
+                                              allOf:
+                                                  - $ref: '#/components/schemas/Order'
+                                                  - type: object
+                                                    properties:
+                                                        status: { type: string, enum: [requires_payment, paid, completed, canceled, expired] }
+                            examples:
+                                invoice_partially_sent:
+                                    summary: Invoice accepted by email after SMS delivery failed
+                                    value:
+                                        delivery:
+                                            deliveries:
+                                                - accepted_at: "2026-11-20T10:01:00Z"
+                                                  channel: email
+                                                  chime_id: ch_invoice_email
+                                            document_kind: invoice
+                                            document_url: https://pages.inttegro.com/invoices/or_invoice_example
+                                            failed_channels: [sms]
+                                            failures:
+                                                - channel: sms
+                                                  error: Delivery was not accepted
+                                            sent_channels: [email]
+                                        order:
+                                            customer:
+                                                guest: false
+                                                id: cu_invoice_customer
+                                                name: Ama Mensah
+                                            id: or_invoice_example
+                                            initiated_at: "2026-11-20T10:00:00Z"
+                                            sealed_at: "2026-11-20T10:00:30Z"
+                                            status: requires_payment
                 '400':
                     description: Bad request or unmet precondition. Possible codes include `draft_mode_order_has_no_invoice`, `order_delivery_contact_missing`, and `order_not_found`.
                     headers:
@@ -1327,7 +1410,49 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/OrderDocumentDeliveryResponse'
+                                # Why: receipt delivery is only available for paid or completed orders
+                                # and must never synthesize the invoice document kind.
+                                allOf:
+                                    - $ref: '#/components/schemas/OrderDocumentDeliveryResponse'
+                                    - type: object
+                                      properties:
+                                          delivery:
+                                              allOf:
+                                                  - $ref: '#/components/schemas/OrderDocumentDelivery'
+                                                  - type: object
+                                                    required: [deliveries]
+                                                    properties:
+                                                        document_kind: { type: string, enum: [receipt] }
+                                                        deliveries: { type: array, minItems: 1 }
+                                                        sent_channels: { type: array, minItems: 1 }
+                                          order:
+                                              allOf:
+                                                  - $ref: '#/components/schemas/Order'
+                                                  - type: object
+                                                    properties:
+                                                        status: { type: string, enum: [paid, completed] }
+                            examples:
+                                receipt_sent:
+                                    summary: Receipt accepted by the email delivery channel
+                                    value:
+                                        delivery:
+                                            deliveries:
+                                                - accepted_at: "2026-11-20T10:06:00Z"
+                                                  channel: email
+                                                  chime_id: ch_receipt_email
+                                            document_kind: receipt
+                                            document_url: https://pages.inttegro.com/receipts/or_receipt_example
+                                            sent_channels: [email]
+                                        order:
+                                            customer:
+                                                guest: false
+                                                id: cu_receipt_customer
+                                                name: Ama Mensah
+                                            id: or_receipt_example
+                                            initiated_at: "2026-11-20T10:00:00Z"
+                                            paid_at: "2026-11-20T10:05:00Z"
+                                            sealed_at: "2026-11-20T10:00:30Z"
+                                            status: paid
                 '207':
                     description: Partial success - at least one channel sent and at least one channel failed.
                     headers:
@@ -1336,7 +1461,50 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/OrderDocumentDeliveryResponse'
+                                # Why: HTTP 207 means the same receipt attempt produced both an
+                                # accepted delivery and a recorded per-channel failure.
+                                allOf:
+                                    - $ref: '#/components/schemas/OrderDocumentDeliveryResponse'
+                                    - type: object
+                                      properties:
+                                          delivery:
+                                              allOf:
+                                                  - $ref: '#/components/schemas/OrderDocumentPartialDelivery'
+                                                  - type: object
+                                                    properties:
+                                                        document_kind: { type: string, enum: [receipt] }
+                                          order:
+                                              allOf:
+                                                  - $ref: '#/components/schemas/Order'
+                                                  - type: object
+                                                    properties:
+                                                        status: { type: string, enum: [paid, completed] }
+                            examples:
+                                receipt_partially_sent:
+                                    summary: Receipt accepted by email after SMS delivery failed
+                                    value:
+                                        delivery:
+                                            deliveries:
+                                                - accepted_at: "2026-11-20T10:06:00Z"
+                                                  channel: email
+                                                  chime_id: ch_receipt_email
+                                            document_kind: receipt
+                                            document_url: https://pages.inttegro.com/receipts/or_receipt_example
+                                            failed_channels: [sms]
+                                            failures:
+                                                - channel: sms
+                                                  error: Delivery was not accepted
+                                            sent_channels: [email]
+                                        order:
+                                            customer:
+                                                guest: false
+                                                id: cu_receipt_customer
+                                                name: Ama Mensah
+                                            id: or_receipt_example
+                                            initiated_at: "2026-11-20T10:00:00Z"
+                                            paid_at: "2026-11-20T10:05:00Z"
+                                            sealed_at: "2026-11-20T10:00:30Z"
+                                            status: paid
                 '400':
                     description: Bad request or unmet precondition. Possible codes include `order_delivery_contact_missing`, `order_not_found`, and `order_receipt_missing`.
                     headers:
@@ -2000,6 +2168,28 @@ components:
                     example: "Payment due within 7 days."
                 custom_data:
                     $ref: './common.yml#/components/schemas/CustomData'
+        OrderInvoiceSettingsResponse:
+            type: object
+            additionalProperties: false
+            # Why: parsing collapses empty invoice settings to absence before persistence,
+            # while request schemas intentionally continue accepting an empty object.
+            minProperties: 1
+            description: Persisted order-level invoice rendering data returned when at least one setting is present.
+            properties:
+                number:
+                    type: string
+                    description: Optional invoice number.
+                    example: "INV-1001"
+                memo:
+                    type: string
+                    description: Optional invoice memo.
+                    example: "Thanks for your order."
+                footer:
+                    type: string
+                    description: Optional invoice footer.
+                    example: "Payment due within 7 days."
+                custom_data:
+                    $ref: './common.yml#/components/schemas/CustomData'
         OrderPayoutSettingsRequest:
             type: object
             additionalProperties: false
@@ -2414,7 +2604,7 @@ components:
             type: object
             additionalProperties: false
             description: Successful or partially successful deliberate order document delivery.
-            required: [delivery]
+            required: [delivery, order]
             properties:
                 delivery:
                     $ref: '#/components/schemas/OrderDocumentDelivery'
@@ -2437,16 +2627,15 @@ components:
             additionalProperties: false
             description: Delivery result for one hosted order document link.
             required: [document_kind, document_url, sent_channels]
-            # A channel is attempted once and is recorded in exactly one outcome
-            # collection, so failed channels cannot also be accepted channels.
             x-simile-constraints:
-                - set:
-                      left: /failed_channels
-                      relation: disjoint
-                      right: /sent_channels
+                - distinct:
+                      source: /deliveries/*/channel
+                - distinct:
+                      source: /failures/*/channel
             properties:
                 deliveries:
                     type: array
+                    maxItems: 2
                     description: Chime messages that were accepted for delivery.
                     items:
                         $ref: '#/components/schemas/OrderDocumentDeliveryAttempt'
@@ -2462,6 +2651,8 @@ components:
                     example: "https://pages.inttegro.com/invoices/or_48ZW7BGvYUBWc1i6WBkL2jr0iPQP5jUy76mmmHpt"
                 failed_channels:
                     type: array
+                    maxItems: 2
+                    uniqueItems: true
                     description: Channels that failed to send.
                     items:
                         type: string
@@ -2469,16 +2660,70 @@ components:
                     example: ["email"]
                 failures:
                     type: array
+                    maxItems: 2
                     description: Per-channel delivery failures.
                     items:
                         $ref: '#/components/schemas/OrderDocumentDeliveryFailure'
                 sent_channels:
                     type: array
+                    maxItems: 2
+                    uniqueItems: true
                     description: Channels accepted by Chime.
                     items:
                         type: string
                         enum: [email, sms]
                     example: ["sms"]
+        OrderDocumentPartialDelivery:
+            type: object
+            additionalProperties: false
+            description: Partial order-document delivery with at least one accepted and one failed channel.
+            required: [deliveries, document_kind, document_url, failed_channels, failures, sent_channels]
+            # Why: a partial result records each attempted channel in exactly one outcome set;
+            # both sets exist on this named schema, so the relationship is constructive in every frontend.
+            x-simile-constraints:
+                - set:
+                      left: /failed_channels
+                      relation: disjoint
+                      right: /sent_channels
+                - distinct:
+                      source: /deliveries/*/channel
+                - distinct:
+                      source: /failures/*/channel
+            properties:
+                deliveries:
+                    type: array
+                    minItems: 1
+                    maxItems: 2
+                    items:
+                        $ref: '#/components/schemas/OrderDocumentDeliveryAttempt'
+                document_kind:
+                    type: string
+                    enum: [invoice, receipt]
+                document_url:
+                    type: string
+                    format: uri
+                failed_channels:
+                    type: array
+                    minItems: 1
+                    maxItems: 2
+                    uniqueItems: true
+                    items:
+                        type: string
+                        enum: [email, sms]
+                failures:
+                    type: array
+                    minItems: 1
+                    maxItems: 2
+                    items:
+                        $ref: '#/components/schemas/OrderDocumentDeliveryFailure'
+                sent_channels:
+                    type: array
+                    minItems: 1
+                    maxItems: 2
+                    uniqueItems: true
+                    items:
+                        type: string
+                        enum: [email, sms]
         OrderDocumentDeliveryAttempt:
             type: object
             additionalProperties: false
@@ -2886,6 +3131,8 @@ components:
                 created_from:
                     type: object
                     additionalProperties: false
+                    # Why: the serializer omits an attribution object with no public evidence.
+                    minProperties: 1
                     description: Attribution for the public resource that created this order, when available.
                     properties:
                         source:
@@ -2896,7 +3143,8 @@ components:
                         resource_id:
                             type: string
                 custom_data:
-                    $ref: './common.yml#/components/schemas/CustomData'
+                    # Why: empty custom data is omitted from public order responses.
+                    $ref: './common.yml#/components/schemas/NonEmptyCustomData'
                 customer:
                     type: object
                     additionalProperties: false
@@ -2968,7 +3216,7 @@ components:
                     items:
                         $ref: './refunds.yml#/components/schemas/Refund'
                 invoice_settings:
-                    $ref: '#/components/schemas/InvoiceSettings'
+                    $ref: '#/components/schemas/OrderInvoiceSettingsResponse'
                 status:
                     type: string
                     enum: [preparing, requires_payment, paid, completed, canceled, expired, unknown]

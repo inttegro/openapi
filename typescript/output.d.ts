@@ -2570,6 +2570,7 @@ export namespace Output {
     readonly "type": ("string" | "number" | "integer" | "boolean" | "url" | "email" | "phone" | "date" | "datetime");
   }>);
   export type MessageTemplateVariables = Output.JSONData;
+  export type NonEmptyCustomData = Readonly<Record<string, string>>;
   export type OperatingPolicy = Closed<{
     readonly "id": `op_${string}`;
     readonly "version": number;
@@ -2659,7 +2660,7 @@ export namespace Output {
       readonly "resource_type"?: "purchase_intent";
       readonly "resource_id"?: string;
     }>;
-    readonly "custom_data"?: Output.CustomData;
+    readonly "custom_data"?: Output.NonEmptyCustomData;
     readonly "customer": Closed<{
       readonly "id": `cu_${string}`;
       readonly "guest": boolean;
@@ -2689,7 +2690,7 @@ export namespace Output {
     readonly "receipt_number"?: string;
     /** All refunds issued for this order, newest first. Omitted when no refunds exist. */
     readonly "refunds"?: readonly (Output.Refund)[];
-    readonly "invoice_settings"?: Output.InvoiceSettings;
+    readonly "invoice_settings"?: Output.OrderInvoiceSettingsResponse;
     /** Current lifecycle state of the order */
     readonly "status": ("preparing" | "requires_payment" | "paid" | "completed" | "canceled" | "expired" | "unknown");
     /** When the order was finalized and became immutable—ready for payment or fulfillment */
@@ -2843,7 +2844,7 @@ export namespace Output {
   }>;
   export type OrderDocumentDeliveryResponse = Closed<{
     readonly "delivery": Output.OrderDocumentDelivery;
-    readonly "order"?: Output.Order;
+    readonly "order": Output.Order;
   }>;
   export type OrderDocumentDeliverySummary = Closed<{
     /** Accepted send totals grouped by delivery channel. Channels with no accepted sends are omitted. */
@@ -2859,6 +2860,14 @@ export namespace Output {
   export type OrderDocumentFormat = Closed<{
     readonly "url": Uri;
   }>;
+  export type OrderDocumentPartialDelivery = (Closed<{
+    readonly "deliveries": readonly (Output.OrderDocumentDeliveryAttempt)[];
+    readonly "document_kind": ("invoice" | "receipt");
+    readonly "document_url": Uri;
+    readonly "failed_channels": (readonly (("email" | "sms"))[]);
+    readonly "failures": readonly (Output.OrderDocumentDeliveryFailure)[];
+    readonly "sent_channels": (readonly (("email" | "sms"))[]);
+  }>);
   export type OrderErrorResponse = Closed<{
     readonly "error": Output.Error;
     readonly "order"?: Output.Order;
@@ -2873,6 +2882,15 @@ export namespace Output {
       readonly "amount": Output.Amount;
       readonly "label": string;
     }>;
+  }>;
+  export type OrderInvoiceSettingsResponse = Closed<{
+    /** Optional invoice number. */
+    readonly "number"?: string;
+    /** Optional invoice memo. */
+    readonly "memo"?: string;
+    /** Optional invoice footer. */
+    readonly "footer"?: string;
+    readonly "custom_data"?: Output.CustomData;
   }>;
   export type OrderLineItem = (Output.OrderProductLineItem | Output.OrderFeeLineItem | Output.OrderShippingLineItem | Output.OrderDiscountLineItem);
   export type OrderPaymentAttempt = ((Closed<{
@@ -3856,7 +3874,7 @@ export namespace Output {
     /** Product attributes */
     readonly "attributes"?: readonly (Output.ProductAttribute)[];
     readonly "dimensions"?: Output.ProductDimensions;
-    readonly "custom_data"?: Output.CustomData;
+    readonly "custom_data"?: Output.NonEmptyCustomData;
     /** Whether product is published and available */
     readonly "active": boolean;
     /** Product creation timestamp */
@@ -3943,11 +3961,19 @@ export namespace Output {
   }>;
   export type ProductService = Record<string, never>;
   export type ProductShipment = (Closed<{
-    readonly "type": ("delivery" | "download" | "render" | "service" | "stream");
+    readonly "type": "delivery";
     readonly "delivery"?: Output.ProductDelivery;
+  }> | Closed<{
+    readonly "type": "download";
     readonly "download"?: Output.ProductDownload;
+  }> | Closed<{
+    readonly "type": "render";
     readonly "render"?: Output.ProductRender;
+  }> | Closed<{
+    readonly "type": "service";
     readonly "service"?: Output.ProductService;
+  }> | Closed<{
+    readonly "type": "stream";
     readonly "stream"?: Output.ProductStream;
   }>);
   export type ProductShipmentInput = (Closed<{

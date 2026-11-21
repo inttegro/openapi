@@ -1845,10 +1845,6 @@ export interface ProductsResponseRelations {
             readonly "to": "/product/category";
           },
           {
-            readonly "from": "/custom_data";
-            readonly "to": "/product/custom_data";
-          },
-          {
             readonly "from": "/description";
             readonly "to": "/product/description";
           },
@@ -1867,10 +1863,6 @@ export interface ProductsResponseRelations {
           {
             readonly "from": "/reference";
             readonly "to": "/product/reference";
-          },
-          {
-            readonly "from": "/shipment";
-            readonly "to": "/product/shipment";
           },
           {
             readonly "from": "/tax_code";
@@ -2021,10 +2013,6 @@ export interface ProductsResponseRelations {
           {
             readonly "from": "/category";
             readonly "to": "/product/category";
-          },
-          {
-            readonly "from": "/custom_data";
-            readonly "to": "/product/custom_data";
           },
           {
             readonly "from": "/description";

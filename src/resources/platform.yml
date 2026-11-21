@@ -1017,6 +1017,21 @@ paths:
                                               - { request: /capabilities/payouts/bt_aging_spec/id, equals: bt_aging_spec_168_hourly }
                                       then:
                                           set: { /operating_policy/capabilities/payouts/bt_aging_spec/t_plus: 168h }
+                            examples:
+                                updated:
+                                    summary: Newly activated operating-policy version
+                                    value:
+                                        operating_policy:
+                                            active_version: 2
+                                            capabilities: {}
+                                            children_policy_id: cp_example
+                                            children_policy_version: 1
+                                            created_at: "2026-11-17T10:00:00Z"
+                                            id: op_example
+                                            name: Updated operating policy
+                                            updated_at: "2026-11-20T10:00:00Z"
+                                            version: 2
+                                            version_created_at: "2026-11-20T10:00:00Z"
                 '400':
                     description: Invalid operating policy update request.
                     content:
@@ -2546,22 +2561,31 @@ components:
                 - total
                 - has_more
                 - keys
-            # `size` is the requested capacity; `count` is the returned key count.
+            # Why: the service normalizes capacity to 1-100, while count is both the
+            # exact returned-key count and no greater than the page capacity or total.
             x-simile-constraints:
                 - aggregate:
                       target: /count
                       operation: count
                       source: /keys/*
+                - bounded:
+                      path: /count
+                      maximum: { path: /size }
+                - bounded:
+                      path: /count
+                      maximum: { path: /total }
             properties:
                 number:
                     type: integer
                     minimum: 1
                 size:
                     type: integer
-                    minimum: 0
+                    minimum: 1
+                    maximum: 100
                 count:
                     type: integer
                     minimum: 0
+                    maximum: 100
                 total:
                     type: integer
                     minimum: 0
@@ -2569,6 +2593,7 @@ components:
                     type: boolean
                 keys:
                     type: array
+                    maxItems: 100
                     items:
                         $ref: '#/components/schemas/SecretKey'
         SecretKeyUsagePage:

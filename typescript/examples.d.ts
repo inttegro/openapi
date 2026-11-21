@@ -3,6 +3,37 @@
 
 /** Provider-authored examples retained as literal witness types. */
 export interface OperationExamples {
+  readonly "cancelPurchaseIntent": {
+    readonly "responses": {
+      readonly "200": {
+        readonly "canceled": {
+          readonly "purchase_intent": {
+            readonly "allow_variants": false;
+            readonly "application_id": "app_example";
+            readonly "created_at": "2026-11-17T10:00:00Z";
+            readonly "id": "sale_canceled_example";
+            readonly "inactive_at": "2026-11-20T10:00:00Z";
+            readonly "product": {
+              readonly "id": "prod_example";
+              readonly "type": "digital";
+              readonly "name": "Commerce Guide";
+              readonly "active": true;
+              readonly "created_at": "2026-11-17T10:00:00Z";
+              readonly "published_at": "2026-11-17T10:00:00Z";
+            };
+            readonly "quantity": {
+              readonly "min": 1;
+              readonly "max": 5;
+            };
+            readonly "status": "inactive";
+            readonly "usage": {
+              readonly "multi_use": true;
+            };
+          };
+        };
+      };
+    };
+  };
   readonly "createOrder": {
     readonly "request": {
       readonly "finalized_requires_payment": {
@@ -327,6 +358,36 @@ export interface OperationExamples {
       };
     };
   };
+  readonly "lookupPurchaseIntent": {
+    readonly "responses": {
+      readonly "200": {
+        readonly "found": {
+          readonly "purchase_intent": {
+            readonly "allow_variants": false;
+            readonly "application_id": "app_example";
+            readonly "created_at": "2026-11-17T10:00:00Z";
+            readonly "id": "sale_found_example";
+            readonly "product": {
+              readonly "id": "prod_example";
+              readonly "type": "digital";
+              readonly "name": "Commerce Guide";
+              readonly "active": true;
+              readonly "created_at": "2026-11-17T10:00:00Z";
+              readonly "published_at": "2026-11-17T10:00:00Z";
+            };
+            readonly "quantity": {
+              readonly "min": 1;
+              readonly "max": 5;
+            };
+            readonly "status": "active";
+            readonly "usage": {
+              readonly "multi_use": true;
+            };
+          };
+        };
+      };
+    };
+  };
   readonly "schedulePayout": {
     readonly "responses": {
       readonly "400": {
@@ -350,6 +411,150 @@ export interface OperationExamples {
             readonly "fix_code": "satisfy_precondition";
             readonly "type": "bad_request";
             readonly "url": "https://studio.inttegro.com/errors";
+          };
+        };
+      };
+    };
+  };
+  readonly "sendOrderInvoice": {
+    readonly "responses": {
+      readonly "200": {
+        readonly "invoice_sent": {
+          readonly "delivery": {
+            readonly "deliveries": readonly [
+              {
+                readonly "accepted_at": "2026-11-20T10:01:00Z";
+                readonly "channel": "email";
+                readonly "chime_id": "ch_invoice_email";
+              },
+            ];
+            readonly "document_kind": "invoice";
+            readonly "document_url": "https://pages.inttegro.com/invoices/or_invoice_example";
+            readonly "sent_channels": readonly [
+              "email",
+            ];
+          };
+          readonly "order": {
+            readonly "customer": {
+              readonly "guest": false;
+              readonly "id": "cu_invoice_customer";
+              readonly "name": "Ama Mensah";
+            };
+            readonly "id": "or_invoice_example";
+            readonly "initiated_at": "2026-11-20T10:00:00Z";
+            readonly "sealed_at": "2026-11-20T10:00:30Z";
+            readonly "status": "requires_payment";
+          };
+        };
+      };
+      readonly "207": {
+        readonly "invoice_partially_sent": {
+          readonly "delivery": {
+            readonly "deliveries": readonly [
+              {
+                readonly "accepted_at": "2026-11-20T10:01:00Z";
+                readonly "channel": "email";
+                readonly "chime_id": "ch_invoice_email";
+              },
+            ];
+            readonly "document_kind": "invoice";
+            readonly "document_url": "https://pages.inttegro.com/invoices/or_invoice_example";
+            readonly "failed_channels": readonly [
+              "sms",
+            ];
+            readonly "failures": readonly [
+              {
+                readonly "channel": "sms";
+                readonly "error": "Delivery was not accepted";
+              },
+            ];
+            readonly "sent_channels": readonly [
+              "email",
+            ];
+          };
+          readonly "order": {
+            readonly "customer": {
+              readonly "guest": false;
+              readonly "id": "cu_invoice_customer";
+              readonly "name": "Ama Mensah";
+            };
+            readonly "id": "or_invoice_example";
+            readonly "initiated_at": "2026-11-20T10:00:00Z";
+            readonly "sealed_at": "2026-11-20T10:00:30Z";
+            readonly "status": "requires_payment";
+          };
+        };
+      };
+    };
+  };
+  readonly "sendOrderReceipt": {
+    readonly "responses": {
+      readonly "200": {
+        readonly "receipt_sent": {
+          readonly "delivery": {
+            readonly "deliveries": readonly [
+              {
+                readonly "accepted_at": "2026-11-20T10:06:00Z";
+                readonly "channel": "email";
+                readonly "chime_id": "ch_receipt_email";
+              },
+            ];
+            readonly "document_kind": "receipt";
+            readonly "document_url": "https://pages.inttegro.com/receipts/or_receipt_example";
+            readonly "sent_channels": readonly [
+              "email",
+            ];
+          };
+          readonly "order": {
+            readonly "customer": {
+              readonly "guest": false;
+              readonly "id": "cu_receipt_customer";
+              readonly "name": "Ama Mensah";
+            };
+            readonly "id": "or_receipt_example";
+            readonly "initiated_at": "2026-11-20T10:00:00Z";
+            readonly "paid_at": "2026-11-20T10:05:00Z";
+            readonly "sealed_at": "2026-11-20T10:00:30Z";
+            readonly "status": "paid";
+          };
+        };
+      };
+      readonly "207": {
+        readonly "receipt_partially_sent": {
+          readonly "delivery": {
+            readonly "deliveries": readonly [
+              {
+                readonly "accepted_at": "2026-11-20T10:06:00Z";
+                readonly "channel": "email";
+                readonly "chime_id": "ch_receipt_email";
+              },
+            ];
+            readonly "document_kind": "receipt";
+            readonly "document_url": "https://pages.inttegro.com/receipts/or_receipt_example";
+            readonly "failed_channels": readonly [
+              "sms",
+            ];
+            readonly "failures": readonly [
+              {
+                readonly "channel": "sms";
+                readonly "error": "Delivery was not accepted";
+              },
+            ];
+            readonly "sent_channels": readonly [
+              "email",
+            ];
+          };
+          readonly "order": {
+            readonly "customer": {
+              readonly "guest": false;
+              readonly "id": "cu_receipt_customer";
+              readonly "name": "Ama Mensah";
+            };
+            readonly "id": "or_receipt_example";
+            readonly "initiated_at": "2026-11-20T10:00:00Z";
+            readonly "paid_at": "2026-11-20T10:05:00Z";
+            readonly "sealed_at": "2026-11-20T10:00:30Z";
+            readonly "status": "paid";
           };
         };
       };
@@ -381,6 +586,57 @@ export interface OperationExamples {
           readonly "fix_code": "change_request_parameters";
           readonly "type": "invalid_request";
           readonly "url": "https://studio.inttegro.com/errors";
+        };
+      };
+    };
+  };
+  readonly "updateOperatingPolicy": {
+    readonly "responses": {
+      readonly "200": {
+        readonly "updated": {
+          readonly "operating_policy": {
+            readonly "active_version": 2;
+            readonly "capabilities": {};
+            readonly "children_policy_id": "cp_example";
+            readonly "children_policy_version": 1;
+            readonly "created_at": "2026-11-17T10:00:00Z";
+            readonly "id": "op_example";
+            readonly "name": "Updated operating policy";
+            readonly "updated_at": "2026-11-20T10:00:00Z";
+            readonly "version": 2;
+            readonly "version_created_at": "2026-11-20T10:00:00Z";
+          };
+        };
+      };
+    };
+  };
+  readonly "updatePurchaseIntent": {
+    readonly "responses": {
+      readonly "200": {
+        readonly "updated": {
+          readonly "purchase_intent": {
+            readonly "allow_variants": false;
+            readonly "application_id": "app_example";
+            readonly "created_at": "2026-11-17T10:00:00Z";
+            readonly "id": "sale_updated_example";
+            readonly "product": {
+              readonly "id": "prod_example";
+              readonly "type": "digital";
+              readonly "name": "Commerce Guide";
+              readonly "active": true;
+              readonly "created_at": "2026-11-17T10:00:00Z";
+              readonly "published_at": "2026-11-17T10:00:00Z";
+            };
+            readonly "quantity": {
+              readonly "min": 2;
+              readonly "max": 10;
+            };
+            readonly "status": "active";
+            readonly "updated_at": "2026-11-20T10:00:00Z";
+            readonly "usage": {
+              readonly "multi_use": true;
+            };
+          };
         };
       };
     };

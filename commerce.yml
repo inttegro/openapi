@@ -6,8 +6,8 @@ info:
     description: Machine-readable reference for the public Inttegro API
     # Why: contract and client artifacts are reviewed as one immutable bundle;
     # changing soundness rules or executable examples requires a new bundle identity.
-    version: 0.1.0-beta87
-    x-inttegro-collection-version: 0.1.0-beta87
+    version: 0.1.0-beta91
+    x-inttegro-collection-version: 0.1.0-beta91
     contact:
         name: Inttegro Engineering
         url: "https://inttegro.com"
@@ -4308,7 +4308,48 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/OrderDocumentDeliveryResponse'
+                                # Why: invoice delivery can only succeed after finalization, and the
+                                # operation can never return a receipt-shaped or draft order result.
+                                allOf:
+                                    - $ref: '#/components/schemas/OrderDocumentDeliveryResponse'
+                                    - type: object
+                                      properties:
+                                          delivery:
+                                              allOf:
+                                                  - $ref: '#/components/schemas/OrderDocumentDelivery'
+                                                  - type: object
+                                                    required: [deliveries]
+                                                    properties:
+                                                        document_kind: { type: string, enum: [invoice] }
+                                                        deliveries: { type: array, minItems: 1 }
+                                                        sent_channels: { type: array, minItems: 1 }
+                                          order:
+                                              allOf:
+                                                  - $ref: '#/components/schemas/Order'
+                                                  - type: object
+                                                    properties:
+                                                        status: { type: string, enum: [requires_payment, paid, completed, canceled, expired] }
+                            examples:
+                                invoice_sent:
+                                    summary: Invoice accepted by the email delivery channel
+                                    value:
+                                        delivery:
+                                            deliveries:
+                                                - accepted_at: "2026-11-20T10:01:00Z"
+                                                  channel: email
+                                                  chime_id: ch_invoice_email
+                                            document_kind: invoice
+                                            document_url: https://pages.inttegro.com/invoices/or_invoice_example
+                                            sent_channels: [email]
+                                        order:
+                                            customer:
+                                                guest: false
+                                                id: cu_invoice_customer
+                                                name: Ama Mensah
+                                            id: or_invoice_example
+                                            initiated_at: "2026-11-20T10:00:00Z"
+                                            sealed_at: "2026-11-20T10:00:30Z"
+                                            status: requires_payment
                 '207':
                     description: Partial success - at least one channel sent and at least one channel failed.
                     headers:
@@ -4317,7 +4358,49 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/OrderDocumentDeliveryResponse'
+                                # Why: HTTP 207 means the same invoice attempt produced both an
+                                # accepted delivery and a recorded per-channel failure.
+                                allOf:
+                                    - $ref: '#/components/schemas/OrderDocumentDeliveryResponse'
+                                    - type: object
+                                      properties:
+                                          delivery:
+                                              allOf:
+                                                  - $ref: '#/components/schemas/OrderDocumentPartialDelivery'
+                                                  - type: object
+                                                    properties:
+                                                        document_kind: { type: string, enum: [invoice] }
+                                          order:
+                                              allOf:
+                                                  - $ref: '#/components/schemas/Order'
+                                                  - type: object
+                                                    properties:
+                                                        status: { type: string, enum: [requires_payment, paid, completed, canceled, expired] }
+                            examples:
+                                invoice_partially_sent:
+                                    summary: Invoice accepted by email after SMS delivery failed
+                                    value:
+                                        delivery:
+                                            deliveries:
+                                                - accepted_at: "2026-11-20T10:01:00Z"
+                                                  channel: email
+                                                  chime_id: ch_invoice_email
+                                            document_kind: invoice
+                                            document_url: https://pages.inttegro.com/invoices/or_invoice_example
+                                            failed_channels: [sms]
+                                            failures:
+                                                - channel: sms
+                                                  error: Delivery was not accepted
+                                            sent_channels: [email]
+                                        order:
+                                            customer:
+                                                guest: false
+                                                id: cu_invoice_customer
+                                                name: Ama Mensah
+                                            id: or_invoice_example
+                                            initiated_at: "2026-11-20T10:00:00Z"
+                                            sealed_at: "2026-11-20T10:00:30Z"
+                                            status: requires_payment
                 '400':
                     description: Bad request or unmet precondition. Possible codes include `draft_mode_order_has_no_invoice`, `order_delivery_contact_missing`, and `order_not_found`.
                     headers:
@@ -4431,7 +4514,49 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/OrderDocumentDeliveryResponse'
+                                # Why: receipt delivery is only available for paid or completed orders
+                                # and must never synthesize the invoice document kind.
+                                allOf:
+                                    - $ref: '#/components/schemas/OrderDocumentDeliveryResponse'
+                                    - type: object
+                                      properties:
+                                          delivery:
+                                              allOf:
+                                                  - $ref: '#/components/schemas/OrderDocumentDelivery'
+                                                  - type: object
+                                                    required: [deliveries]
+                                                    properties:
+                                                        document_kind: { type: string, enum: [receipt] }
+                                                        deliveries: { type: array, minItems: 1 }
+                                                        sent_channels: { type: array, minItems: 1 }
+                                          order:
+                                              allOf:
+                                                  - $ref: '#/components/schemas/Order'
+                                                  - type: object
+                                                    properties:
+                                                        status: { type: string, enum: [paid, completed] }
+                            examples:
+                                receipt_sent:
+                                    summary: Receipt accepted by the email delivery channel
+                                    value:
+                                        delivery:
+                                            deliveries:
+                                                - accepted_at: "2026-11-20T10:06:00Z"
+                                                  channel: email
+                                                  chime_id: ch_receipt_email
+                                            document_kind: receipt
+                                            document_url: https://pages.inttegro.com/receipts/or_receipt_example
+                                            sent_channels: [email]
+                                        order:
+                                            customer:
+                                                guest: false
+                                                id: cu_receipt_customer
+                                                name: Ama Mensah
+                                            id: or_receipt_example
+                                            initiated_at: "2026-11-20T10:00:00Z"
+                                            paid_at: "2026-11-20T10:05:00Z"
+                                            sealed_at: "2026-11-20T10:00:30Z"
+                                            status: paid
                 '207':
                     description: Partial success - at least one channel sent and at least one channel failed.
                     headers:
@@ -4440,7 +4565,50 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/OrderDocumentDeliveryResponse'
+                                # Why: HTTP 207 means the same receipt attempt produced both an
+                                # accepted delivery and a recorded per-channel failure.
+                                allOf:
+                                    - $ref: '#/components/schemas/OrderDocumentDeliveryResponse'
+                                    - type: object
+                                      properties:
+                                          delivery:
+                                              allOf:
+                                                  - $ref: '#/components/schemas/OrderDocumentPartialDelivery'
+                                                  - type: object
+                                                    properties:
+                                                        document_kind: { type: string, enum: [receipt] }
+                                          order:
+                                              allOf:
+                                                  - $ref: '#/components/schemas/Order'
+                                                  - type: object
+                                                    properties:
+                                                        status: { type: string, enum: [paid, completed] }
+                            examples:
+                                receipt_partially_sent:
+                                    summary: Receipt accepted by email after SMS delivery failed
+                                    value:
+                                        delivery:
+                                            deliveries:
+                                                - accepted_at: "2026-11-20T10:06:00Z"
+                                                  channel: email
+                                                  chime_id: ch_receipt_email
+                                            document_kind: receipt
+                                            document_url: https://pages.inttegro.com/receipts/or_receipt_example
+                                            failed_channels: [sms]
+                                            failures:
+                                                - channel: sms
+                                                  error: Delivery was not accepted
+                                            sent_channels: [email]
+                                        order:
+                                            customer:
+                                                guest: false
+                                                id: cu_receipt_customer
+                                                name: Ama Mensah
+                                            id: or_receipt_example
+                                            initiated_at: "2026-11-20T10:00:00Z"
+                                            paid_at: "2026-11-20T10:05:00Z"
+                                            sealed_at: "2026-11-20T10:00:30Z"
+                                            status: paid
                 '400':
                     description: Bad request or unmet precondition. Possible codes include `order_delivery_contact_missing`, `order_not_found`, and `order_receipt_missing`.
                     headers:
@@ -6160,6 +6328,21 @@ paths:
                                               - { request: /capabilities/payouts/bt_aging_spec/id, equals: bt_aging_spec_168_hourly }
                                       then:
                                           set: { /operating_policy/capabilities/payouts/bt_aging_spec/t_plus: 168h }
+                            examples:
+                                updated:
+                                    summary: Newly activated operating-policy version
+                                    value:
+                                        operating_policy:
+                                            active_version: 2
+                                            capabilities: {}
+                                            children_policy_id: cp_example
+                                            children_policy_version: 1
+                                            created_at: "2026-11-17T10:00:00Z"
+                                            id: op_example
+                                            name: Updated operating policy
+                                            updated_at: "2026-11-20T10:00:00Z"
+                                            version: 2
+                                            version_created_at: "2026-11-20T10:00:00Z"
                 '400':
                     description: Invalid operating policy update request.
                     content:
@@ -7967,7 +8150,19 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/PayoutResponse'
+                                # Why: scheduling persists the payout before returning; a successful
+                                # response is the scheduled snapshot, never an arbitrary terminal state.
+                                allOf:
+                                    - $ref: '#/components/schemas/PayoutResponse'
+                                    - type: object
+                                      properties:
+                                          payout:
+                                              allOf:
+                                                  - $ref: '#/components/schemas/Payout'
+                                                  - type: object
+                                                    required: [scheduled_at]
+                                                    properties:
+                                                        status: { type: string, enum: [scheduled] }
                 '400':
                     description: Bad request - invalid schedule parameters
                     headers:
@@ -8522,7 +8717,19 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/PayoutResponse'
+                                # Why: cancellation commits its terminal timestamp and public reason
+                                # before returning the same payout selected by the caller.
+                                allOf:
+                                    - $ref: '#/components/schemas/PayoutResponse'
+                                    - type: object
+                                      properties:
+                                          payout:
+                                              allOf:
+                                                  - $ref: '#/components/schemas/Payout'
+                                                  - type: object
+                                                    required: [canceled_at, cancellation, scheduled_at]
+                                                    properties:
+                                                        status: { type: string, enum: [canceled] }
                 '401':
                     description: Unauthorized - missing or invalid API key
                     headers:
@@ -11205,13 +11412,16 @@ paths:
                                     - { from: /about, to: /product/about }
                                     - { from: /attributes, to: /product/attributes }
                                     - { from: /category, to: /product/category }
-                                    - { from: /custom_data, to: /product/custom_data }
+                                    # Why: empty request custom data is valid but omitted from the response;
+                                    # the current relation language cannot conditionally echo only nonempty maps.
                                     - { from: /description, to: /product/description }
                                     - { from: /dimensions, to: /product/dimensions }
                                     - { from: /media, to: /product/media }
                                     - { from: /name, to: /product/name }
                                     - { from: /reference, to: /product/reference }
-                                    - { from: /shipment, to: /product/shipment }
+                                    # Why: an absent shipment must remain absent, while a present response may add
+                                    # its type-specific marker. The relation language cannot express both branches
+                                    # without falsely requiring or copying the whole response-owned object.
                                     - { from: /tax_code, to: /product/tax_code }
                                     - { from: /type, to: /product/type }
                                     - { from: /unit_dimension, to: /product/unit_dim }
@@ -11510,7 +11720,8 @@ paths:
                                     - { from: /product_id, to: /product/id }
                                     - { from: /about, to: /product/about }
                                     - { from: /category, to: /product/category }
-                                    - { from: /custom_data, to: /product/custom_data }
+                                    # Why: clearing custom data removes the response field, so an unconditional
+                                    # request-to-response copy would make the public update contract false.
                                     - { from: /description, to: /product/description }
                                     - { from: /dimensions, to: /product/dimensions }
                                     - { from: /name, to: /product/name }
@@ -11951,7 +12162,18 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/PurchaseIntentResponse'
+                                # Why: creation validates a future expiry and creates no cancellation
+                                # or single-use order claim, so its first public snapshot is active.
+                                allOf:
+                                    - $ref: '#/components/schemas/PurchaseIntentResponse'
+                                    - type: object
+                                      properties:
+                                          purchase_intent:
+                                              allOf:
+                                                  - $ref: '#/components/schemas/PurchaseIntent'
+                                                  - type: object
+                                                    properties:
+                                                        status: { type: string, enum: [active] }
                             # Why: this exact outcome keeps the Buy link, selected product, and
                             # effective special-offer price coherent for local integration tests.
                             examples:
@@ -12089,6 +12311,26 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/PurchaseIntentResponse'
+                            examples:
+                                updated:
+                                    summary: Active Buy link with revised quantity bounds
+                                    value:
+                                        purchase_intent:
+                                            allow_variants: false
+                                            application_id: app_example
+                                            created_at: "2026-11-17T10:00:00Z"
+                                            id: sale_updated_example
+                                            product:
+                                                id: prod_example
+                                                type: digital
+                                                name: Commerce Guide
+                                                active: true
+                                                created_at: "2026-11-17T10:00:00Z"
+                                                published_at: "2026-11-17T10:00:00Z"
+                                            quantity: { min: 2, max: 10 }
+                                            status: active
+                                            updated_at: "2026-11-20T10:00:00Z"
+                                            usage: { multi_use: true }
                 '400':
                     description: Bad request - invalid parameters
                     headers:
@@ -12187,7 +12429,39 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/PurchaseIntentResponse'
+                                # Why: a successful cancellation records inactive_at and returns the
+                                # same Buy link in its inactive effective state.
+                                allOf:
+                                    - $ref: '#/components/schemas/PurchaseIntentResponse'
+                                    - type: object
+                                      properties:
+                                          purchase_intent:
+                                              allOf:
+                                                  - $ref: '#/components/schemas/PurchaseIntent'
+                                                  - type: object
+                                                    required: [inactive_at]
+                                                    properties:
+                                                        status: { type: string, enum: [inactive] }
+                            examples:
+                                canceled:
+                                    summary: Buy link made inactive by an explicit cancellation
+                                    value:
+                                        purchase_intent:
+                                            allow_variants: false
+                                            application_id: app_example
+                                            created_at: "2026-11-17T10:00:00Z"
+                                            id: sale_canceled_example
+                                            inactive_at: "2026-11-20T10:00:00Z"
+                                            product:
+                                                id: prod_example
+                                                type: digital
+                                                name: Commerce Guide
+                                                active: true
+                                                created_at: "2026-11-17T10:00:00Z"
+                                                published_at: "2026-11-17T10:00:00Z"
+                                            quantity: { min: 1, max: 5 }
+                                            status: inactive
+                                            usage: { multi_use: true }
                 '400':
                     description: Bad request - invalid parameters
                     headers:
@@ -12281,6 +12555,25 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/PurchaseIntentResponse'
+                            examples:
+                                found:
+                                    summary: Active reusable Buy link found by ID
+                                    value:
+                                        purchase_intent:
+                                            allow_variants: false
+                                            application_id: app_example
+                                            created_at: "2026-11-17T10:00:00Z"
+                                            id: sale_found_example
+                                            product:
+                                                id: prod_example
+                                                type: digital
+                                                name: Commerce Guide
+                                                active: true
+                                                created_at: "2026-11-17T10:00:00Z"
+                                                published_at: "2026-11-17T10:00:00Z"
+                                            quantity: { min: 1, max: 5 }
+                                            status: active
+                                            usage: { multi_use: true }
                 '400':
                     description: Bad request - invalid parameters
                     headers:
@@ -14832,6 +15125,13 @@ components:
             description: Merchant-defined string values attached to a resource. SDKs expose this as a semantic collection rather than a raw map.
             additionalProperties:
                 type: string
+        NonEmptyCustomData:
+            type: object
+            # Why: public response serializers omit custom-data maps with no entries.
+            minProperties: 1
+            description: Merchant-defined string values attached to a resource when at least one value is present.
+            additionalProperties:
+                type: string
         CustomDataInput:
             type: object
             description: Merchant-defined values accepted on resource creation. Values are serialized to strings before storage.
@@ -15159,22 +15459,31 @@ components:
                 - total
                 - has_more
                 - keys
-            # `size` is the requested capacity; `count` is the returned key count.
+            # Why: the service normalizes capacity to 1-100, while count is both the
+            # exact returned-key count and no greater than the page capacity or total.
             x-simile-constraints:
                 - aggregate:
                       target: /count
                       operation: count
                       source: /keys/*
+                - bounded:
+                      path: /count
+                      maximum: { path: /size }
+                - bounded:
+                      path: /count
+                      maximum: { path: /total }
             properties:
                 number:
                     type: integer
                     minimum: 1
                 size:
                     type: integer
-                    minimum: 0
+                    minimum: 1
+                    maximum: 100
                 count:
                     type: integer
                     minimum: 0
+                    maximum: 100
                 total:
                     type: integer
                     minimum: 0
@@ -15182,6 +15491,7 @@ components:
                     type: boolean
                 keys:
                     type: array
+                    maxItems: 100
                     items:
                         $ref: '#/components/schemas/SecretKey'
         SecretKeyUsagePage:
@@ -16839,6 +17149,28 @@ components:
                     example: "Payment due within 7 days."
                 custom_data:
                     $ref: '#/components/schemas/CustomData'
+        OrderInvoiceSettingsResponse:
+            type: object
+            additionalProperties: false
+            # Why: parsing collapses empty invoice settings to absence before persistence,
+            # while request schemas intentionally continue accepting an empty object.
+            minProperties: 1
+            description: Persisted order-level invoice rendering data returned when at least one setting is present.
+            properties:
+                number:
+                    type: string
+                    description: Optional invoice number.
+                    example: "INV-1001"
+                memo:
+                    type: string
+                    description: Optional invoice memo.
+                    example: "Thanks for your order."
+                footer:
+                    type: string
+                    description: Optional invoice footer.
+                    example: "Payment due within 7 days."
+                custom_data:
+                    $ref: '#/components/schemas/CustomData'
         OrderPayoutSettingsRequest:
             type: object
             additionalProperties: false
@@ -17198,23 +17530,45 @@ components:
                     type: string
                     enum: [delivery, download, render, stream]
         ProductShipment:
-            type: object
-            additionalProperties: false
-            required: [type]
-            properties:
-                type:
-                    type: string
-                    enum: [delivery, download, render, service, stream]
-                delivery:
-                    $ref: '#/components/schemas/ProductDelivery'
-                download:
-                    $ref: '#/components/schemas/ProductDownload'
-                render:
-                    $ref: '#/components/schemas/ProductRender'
-                service:
-                    $ref: '#/components/schemas/ProductService'
-                stream:
-                    $ref: '#/components/schemas/ProductStream'
+            description: Product fulfillment mode. Only the marker matching `type` may be returned; older records may omit that otherwise empty marker.
+            # Why: the serializer emits only the selected fulfillment branch. A closed union prevents
+            # clients and synthesizers from treating every empty marker object as simultaneously relevant.
+            oneOf:
+                - type: object
+                  additionalProperties: false
+                  required: [type]
+                  properties:
+                      type: { type: string, enum: [delivery] }
+                      delivery:
+                          $ref: '#/components/schemas/ProductDelivery'
+                - type: object
+                  additionalProperties: false
+                  required: [type]
+                  properties:
+                      type: { type: string, enum: [download] }
+                      download:
+                          $ref: '#/components/schemas/ProductDownload'
+                - type: object
+                  additionalProperties: false
+                  required: [type]
+                  properties:
+                      type: { type: string, enum: [render] }
+                      render:
+                          $ref: '#/components/schemas/ProductRender'
+                - type: object
+                  additionalProperties: false
+                  required: [type]
+                  properties:
+                      type: { type: string, enum: [service] }
+                      service:
+                          $ref: '#/components/schemas/ProductService'
+                - type: object
+                  additionalProperties: false
+                  required: [type]
+                  properties:
+                      type: { type: string, enum: [stream] }
+                      stream:
+                          $ref: '#/components/schemas/ProductStream'
         ProductDelivery:
             type: object
             additionalProperties: false
@@ -18124,16 +18478,23 @@ components:
                               operation: count
                               source: /purchase_intents/*
                     properties:
+                        # Why: the public request caps both coordinates, and size is the exact
+                        # returned item count rather than an independent synthesized value.
                         number:
                             type: integer
+                            minimum: 1
+                            maximum: 10
                             description: One-based page number returned
                             example: 1
                         purchase_intents:
                             type: array
+                            maxItems: 256
                             items:
                                 $ref: '#/components/schemas/PurchaseIntent'
                         size:
                             type: integer
+                            minimum: 0
+                            maximum: 256
                             description: Number of purchase intents actually returned
                             example: 2
         PurchaseIntentResponse:
@@ -18513,7 +18874,7 @@ components:
                 - usage
             # Why: every Buy link targets exactly one catalog resource. Allowing both or neither
             # would produce a schema-valid response that checkout cannot resolve.
-            anyOf:
+            oneOf:
                 - required: [product]
                 - required: [bundle]
             # Effective Buy-link status is derived from these persisted lifecycle facts.
@@ -18741,7 +19102,8 @@ components:
                 dimensions:
                     $ref: '#/components/schemas/ProductDimensions'
                 custom_data:
-                    $ref: '#/components/schemas/CustomData'
+                    # Why: the product serializer omits maps with no public custom-data entries.
+                    $ref: '#/components/schemas/NonEmptyCustomData'
                 active:
                     type: boolean
                     description: Whether product is published and available
@@ -20267,7 +20629,7 @@ components:
             type: object
             additionalProperties: false
             description: Successful or partially successful deliberate order document delivery.
-            required: [delivery]
+            required: [delivery, order]
             properties:
                 delivery:
                     $ref: '#/components/schemas/OrderDocumentDelivery'
@@ -20290,16 +20652,15 @@ components:
             additionalProperties: false
             description: Delivery result for one hosted order document link.
             required: [document_kind, document_url, sent_channels]
-            # A channel is attempted once and is recorded in exactly one outcome
-            # collection, so failed channels cannot also be accepted channels.
             x-simile-constraints:
-                - set:
-                      left: /failed_channels
-                      relation: disjoint
-                      right: /sent_channels
+                - distinct:
+                      source: /deliveries/*/channel
+                - distinct:
+                      source: /failures/*/channel
             properties:
                 deliveries:
                     type: array
+                    maxItems: 2
                     description: Chime messages that were accepted for delivery.
                     items:
                         $ref: '#/components/schemas/OrderDocumentDeliveryAttempt'
@@ -20315,6 +20676,8 @@ components:
                     example: "https://pages.inttegro.com/invoices/or_48ZW7BGvYUBWc1i6WBkL2jr0iPQP5jUy76mmmHpt"
                 failed_channels:
                     type: array
+                    maxItems: 2
+                    uniqueItems: true
                     description: Channels that failed to send.
                     items:
                         type: string
@@ -20322,16 +20685,70 @@ components:
                     example: ["email"]
                 failures:
                     type: array
+                    maxItems: 2
                     description: Per-channel delivery failures.
                     items:
                         $ref: '#/components/schemas/OrderDocumentDeliveryFailure'
                 sent_channels:
                     type: array
+                    maxItems: 2
+                    uniqueItems: true
                     description: Channels accepted by Chime.
                     items:
                         type: string
                         enum: [email, sms]
                     example: ["sms"]
+        OrderDocumentPartialDelivery:
+            type: object
+            additionalProperties: false
+            description: Partial order-document delivery with at least one accepted and one failed channel.
+            required: [deliveries, document_kind, document_url, failed_channels, failures, sent_channels]
+            # Why: a partial result records each attempted channel in exactly one outcome set;
+            # both sets exist on this named schema, so the relationship is constructive in every frontend.
+            x-simile-constraints:
+                - set:
+                      left: /failed_channels
+                      relation: disjoint
+                      right: /sent_channels
+                - distinct:
+                      source: /deliveries/*/channel
+                - distinct:
+                      source: /failures/*/channel
+            properties:
+                deliveries:
+                    type: array
+                    minItems: 1
+                    maxItems: 2
+                    items:
+                        $ref: '#/components/schemas/OrderDocumentDeliveryAttempt'
+                document_kind:
+                    type: string
+                    enum: [invoice, receipt]
+                document_url:
+                    type: string
+                    format: uri
+                failed_channels:
+                    type: array
+                    minItems: 1
+                    maxItems: 2
+                    uniqueItems: true
+                    items:
+                        type: string
+                        enum: [email, sms]
+                failures:
+                    type: array
+                    minItems: 1
+                    maxItems: 2
+                    items:
+                        $ref: '#/components/schemas/OrderDocumentDeliveryFailure'
+                sent_channels:
+                    type: array
+                    minItems: 1
+                    maxItems: 2
+                    uniqueItems: true
+                    items:
+                        type: string
+                        enum: [email, sms]
         OrderDocumentDeliveryAttempt:
             type: object
             additionalProperties: false
@@ -21552,6 +21969,8 @@ components:
                 created_from:
                     type: object
                     additionalProperties: false
+                    # Why: the serializer omits an attribution object with no public evidence.
+                    minProperties: 1
                     description: Attribution for the public resource that created this order, when available.
                     properties:
                         source:
@@ -21562,7 +21981,8 @@ components:
                         resource_id:
                             type: string
                 custom_data:
-                    $ref: '#/components/schemas/CustomData'
+                    # Why: empty custom data is omitted from public order responses.
+                    $ref: '#/components/schemas/NonEmptyCustomData'
                 customer:
                     type: object
                     additionalProperties: false
@@ -21634,7 +22054,7 @@ components:
                     items:
                         $ref: '#/components/schemas/Refund'
                 invoice_settings:
-                    $ref: '#/components/schemas/InvoiceSettings'
+                    $ref: '#/components/schemas/OrderInvoiceSettingsResponse'
                 status:
                     type: string
                     enum: [preparing, requires_payment, paid, completed, canceled, expired, unknown]

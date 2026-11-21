@@ -1,5 +1,5 @@
 // Internal compiler IR generated from commerce.yml; DO NOT EDIT OR PUBLISH AS THE TYPESCRIPT CONTRACT.
-// OpenAPI SHA-256: 8fe16cafb48f0cd17300007a3a959834f35d005a2ce5d977921457f293f5e8fc
+// OpenAPI SHA-256: 4085a787c27246361fe2740441cef8caec48b06da25ab03593fee8a46e40adf3
 // This file contains declarations only and emits no JavaScript.
 
 import type {
@@ -10,11 +10,11 @@ import type {
   RelationWellFormed,
 } from "./proof-kernel";
 
-export type CollectionVersion = "0.1.0-beta87";
-export type SourceOpenApiSha256 = "8fe16cafb48f0cd17300007a3a959834f35d005a2ce5d977921457f293f5e8fc";
+export type CollectionVersion = "0.1.0-beta91";
+export type SourceOpenApiSha256 = "4085a787c27246361fe2740441cef8caec48b06da25ab03593fee8a46e40adf3";
 export type OperationCount = 135;
-export type SchemaCount = 601;
-export type ConstraintCount = 238;
+export type SchemaCount = 604;
+export type ConstraintCount = 244;
 export type ResponseRelationCount = 111;
 
 /** Closed OpenAPI schema algebra. InferSchema turns a node into its payload type. */
@@ -12714,6 +12714,13 @@ export interface SchemaDefinitions {
       },
     ];
   };
+  readonly "NonEmptyCustomData": {
+    readonly "type": "object";
+    readonly "minProperties": 1;
+    readonly "additionalProperties": {
+      readonly "type": "string";
+    };
+  };
   readonly "OperatingPolicy": {
     readonly "type": "object";
     readonly "additionalProperties": false;
@@ -13303,6 +13310,7 @@ export interface SchemaDefinitions {
       readonly "created_from": {
         readonly "type": "object";
         readonly "additionalProperties": false;
+        readonly "minProperties": 1;
         readonly "properties": {
           readonly "source": {
             readonly "type": "string";
@@ -13319,7 +13327,7 @@ export interface SchemaDefinitions {
         };
       };
       readonly "custom_data": {
-        readonly "$ref": "#/components/schemas/CustomData";
+        readonly "$ref": "#/components/schemas/NonEmptyCustomData";
       };
       readonly "customer": {
         readonly "type": "object";
@@ -13411,7 +13419,7 @@ export interface SchemaDefinitions {
         };
       };
       readonly "invoice_settings": {
-        readonly "$ref": "#/components/schemas/InvoiceSettings";
+        readonly "$ref": "#/components/schemas/OrderInvoiceSettingsResponse";
       };
       readonly "status": {
         readonly "type": "string";
@@ -14163,16 +14171,20 @@ export interface SchemaDefinitions {
     ];
     readonly "x-simile-constraints": readonly [
       {
-        readonly "set": {
-          readonly "left": "/failed_channels";
-          readonly "relation": "disjoint";
-          readonly "right": "/sent_channels";
+        readonly "distinct": {
+          readonly "source": "/deliveries/*/channel";
+        };
+      },
+      {
+        readonly "distinct": {
+          readonly "source": "/failures/*/channel";
         };
       },
     ];
     readonly "properties": {
       readonly "deliveries": {
         readonly "type": "array";
+        readonly "maxItems": 2;
         readonly "items": {
           readonly "$ref": "#/components/schemas/OrderDocumentDeliveryAttempt";
         };
@@ -14190,6 +14202,8 @@ export interface SchemaDefinitions {
       };
       readonly "failed_channels": {
         readonly "type": "array";
+        readonly "maxItems": 2;
+        readonly "uniqueItems": true;
         readonly "items": {
           readonly "type": "string";
           readonly "enum": readonly [
@@ -14200,12 +14214,15 @@ export interface SchemaDefinitions {
       };
       readonly "failures": {
         readonly "type": "array";
+        readonly "maxItems": 2;
         readonly "items": {
           readonly "$ref": "#/components/schemas/OrderDocumentDeliveryFailure";
         };
       };
       readonly "sent_channels": {
         readonly "type": "array";
+        readonly "maxItems": 2;
+        readonly "uniqueItems": true;
         readonly "items": {
           readonly "type": "string";
           readonly "enum": readonly [
@@ -14314,6 +14331,7 @@ export interface SchemaDefinitions {
     readonly "additionalProperties": false;
     readonly "required": readonly [
       "delivery",
+      "order",
     ];
     readonly "properties": {
       readonly "delivery": {
@@ -14366,6 +14384,92 @@ export interface SchemaDefinitions {
       readonly "url": {
         readonly "type": "string";
         readonly "format": "uri";
+      };
+    };
+  };
+  readonly "OrderDocumentPartialDelivery": {
+    readonly "type": "object";
+    readonly "additionalProperties": false;
+    readonly "required": readonly [
+      "deliveries",
+      "document_kind",
+      "document_url",
+      "failed_channels",
+      "failures",
+      "sent_channels",
+    ];
+    readonly "x-simile-constraints": readonly [
+      {
+        readonly "set": {
+          readonly "left": "/failed_channels";
+          readonly "relation": "disjoint";
+          readonly "right": "/sent_channels";
+        };
+      },
+      {
+        readonly "distinct": {
+          readonly "source": "/deliveries/*/channel";
+        };
+      },
+      {
+        readonly "distinct": {
+          readonly "source": "/failures/*/channel";
+        };
+      },
+    ];
+    readonly "properties": {
+      readonly "deliveries": {
+        readonly "type": "array";
+        readonly "minItems": 1;
+        readonly "maxItems": 2;
+        readonly "items": {
+          readonly "$ref": "#/components/schemas/OrderDocumentDeliveryAttempt";
+        };
+      };
+      readonly "document_kind": {
+        readonly "type": "string";
+        readonly "enum": readonly [
+          "invoice",
+          "receipt",
+        ];
+      };
+      readonly "document_url": {
+        readonly "type": "string";
+        readonly "format": "uri";
+      };
+      readonly "failed_channels": {
+        readonly "type": "array";
+        readonly "minItems": 1;
+        readonly "maxItems": 2;
+        readonly "uniqueItems": true;
+        readonly "items": {
+          readonly "type": "string";
+          readonly "enum": readonly [
+            "email",
+            "sms",
+          ];
+        };
+      };
+      readonly "failures": {
+        readonly "type": "array";
+        readonly "minItems": 1;
+        readonly "maxItems": 2;
+        readonly "items": {
+          readonly "$ref": "#/components/schemas/OrderDocumentDeliveryFailure";
+        };
+      };
+      readonly "sent_channels": {
+        readonly "type": "array";
+        readonly "minItems": 1;
+        readonly "maxItems": 2;
+        readonly "uniqueItems": true;
+        readonly "items": {
+          readonly "type": "string";
+          readonly "enum": readonly [
+            "email",
+            "sms",
+          ];
+        };
       };
     };
   };
@@ -14424,6 +14528,25 @@ export interface SchemaDefinitions {
             readonly "type": "string";
           };
         };
+      };
+    };
+  };
+  readonly "OrderInvoiceSettingsResponse": {
+    readonly "type": "object";
+    readonly "additionalProperties": false;
+    readonly "minProperties": 1;
+    readonly "properties": {
+      readonly "number": {
+        readonly "type": "string";
+      };
+      readonly "memo": {
+        readonly "type": "string";
+      };
+      readonly "footer": {
+        readonly "type": "string";
+      };
+      readonly "custom_data": {
+        readonly "$ref": "#/components/schemas/CustomData";
       };
     };
   };
@@ -15920,15 +16043,20 @@ export interface SchemaDefinitions {
         readonly "properties": {
           readonly "number": {
             readonly "type": "integer";
+            readonly "minimum": 1;
+            readonly "maximum": 10;
           };
           readonly "purchase_intents": {
             readonly "type": "array";
+            readonly "maxItems": 256;
             readonly "items": {
               readonly "$ref": "#/components/schemas/PurchaseIntent";
             };
           };
           readonly "size": {
             readonly "type": "integer";
+            readonly "minimum": 0;
+            readonly "maximum": 256;
           };
         };
       };
@@ -18841,7 +18969,7 @@ export interface SchemaDefinitions {
         readonly "$ref": "#/components/schemas/ProductDimensions";
       };
       readonly "custom_data": {
-        readonly "$ref": "#/components/schemas/CustomData";
+        readonly "$ref": "#/components/schemas/NonEmptyCustomData";
       };
       readonly "active": {
         readonly "type": "boolean";
@@ -19199,38 +19327,98 @@ export interface SchemaDefinitions {
     readonly "additionalProperties": false;
   };
   readonly "ProductShipment": {
-    readonly "type": "object";
-    readonly "additionalProperties": false;
-    readonly "required": readonly [
-      "type",
-    ];
-    readonly "properties": {
-      readonly "type": {
-        readonly "type": "string";
-        readonly "enum": readonly [
-          "delivery",
-          "download",
-          "render",
-          "service",
-          "stream",
+    readonly "oneOf": readonly [
+      {
+        readonly "type": "object";
+        readonly "additionalProperties": false;
+        readonly "required": readonly [
+          "type",
         ];
-      };
-      readonly "delivery": {
-        readonly "$ref": "#/components/schemas/ProductDelivery";
-      };
-      readonly "download": {
-        readonly "$ref": "#/components/schemas/ProductDownload";
-      };
-      readonly "render": {
-        readonly "$ref": "#/components/schemas/ProductRender";
-      };
-      readonly "service": {
-        readonly "$ref": "#/components/schemas/ProductService";
-      };
-      readonly "stream": {
-        readonly "$ref": "#/components/schemas/ProductStream";
-      };
-    };
+        readonly "properties": {
+          readonly "type": {
+            readonly "type": "string";
+            readonly "enum": readonly [
+              "delivery",
+            ];
+          };
+          readonly "delivery": {
+            readonly "$ref": "#/components/schemas/ProductDelivery";
+          };
+        };
+      },
+      {
+        readonly "type": "object";
+        readonly "additionalProperties": false;
+        readonly "required": readonly [
+          "type",
+        ];
+        readonly "properties": {
+          readonly "type": {
+            readonly "type": "string";
+            readonly "enum": readonly [
+              "download",
+            ];
+          };
+          readonly "download": {
+            readonly "$ref": "#/components/schemas/ProductDownload";
+          };
+        };
+      },
+      {
+        readonly "type": "object";
+        readonly "additionalProperties": false;
+        readonly "required": readonly [
+          "type",
+        ];
+        readonly "properties": {
+          readonly "type": {
+            readonly "type": "string";
+            readonly "enum": readonly [
+              "render",
+            ];
+          };
+          readonly "render": {
+            readonly "$ref": "#/components/schemas/ProductRender";
+          };
+        };
+      },
+      {
+        readonly "type": "object";
+        readonly "additionalProperties": false;
+        readonly "required": readonly [
+          "type",
+        ];
+        readonly "properties": {
+          readonly "type": {
+            readonly "type": "string";
+            readonly "enum": readonly [
+              "service",
+            ];
+          };
+          readonly "service": {
+            readonly "$ref": "#/components/schemas/ProductService";
+          };
+        };
+      },
+      {
+        readonly "type": "object";
+        readonly "additionalProperties": false;
+        readonly "required": readonly [
+          "type",
+        ];
+        readonly "properties": {
+          readonly "type": {
+            readonly "type": "string";
+            readonly "enum": readonly [
+              "stream",
+            ];
+          };
+          readonly "stream": {
+            readonly "$ref": "#/components/schemas/ProductStream";
+          };
+        };
+      },
+    ];
   };
   readonly "ProductShipmentInput": {
     readonly "type": "object";
@@ -19287,7 +19475,7 @@ export interface SchemaDefinitions {
       "status",
       "usage",
     ];
-    readonly "anyOf": readonly [
+    readonly "oneOf": readonly [
       {
         readonly "required": readonly [
           "product",
@@ -22417,6 +22605,22 @@ export interface SchemaDefinitions {
           readonly "source": "/keys/*";
         };
       },
+      {
+        readonly "bounded": {
+          readonly "path": "/count";
+          readonly "maximum": {
+            readonly "path": "/size";
+          };
+        };
+      },
+      {
+        readonly "bounded": {
+          readonly "path": "/count";
+          readonly "maximum": {
+            readonly "path": "/total";
+          };
+        };
+      },
     ];
     readonly "properties": {
       readonly "number": {
@@ -22425,11 +22629,13 @@ export interface SchemaDefinitions {
       };
       readonly "size": {
         readonly "type": "integer";
-        readonly "minimum": 0;
+        readonly "minimum": 1;
+        readonly "maximum": 100;
       };
       readonly "count": {
         readonly "type": "integer";
         readonly "minimum": 0;
+        readonly "maximum": 100;
       };
       readonly "total": {
         readonly "type": "integer";
@@ -22440,6 +22646,7 @@ export interface SchemaDefinitions {
       };
       readonly "keys": {
         readonly "type": "array";
+        readonly "maxItems": 100;
         readonly "items": {
           readonly "$ref": "#/components/schemas/SecretKey";
         };
@@ -26535,10 +26742,34 @@ export interface SchemaConstraintSites {
   readonly "OrderDocumentDelivery": {
     readonly "/": readonly [
       {
+        readonly "distinct": {
+          readonly "source": "/deliveries/*/channel";
+        };
+      },
+      {
+        readonly "distinct": {
+          readonly "source": "/failures/*/channel";
+        };
+      },
+    ];
+  };
+  readonly "OrderDocumentPartialDelivery": {
+    readonly "/": readonly [
+      {
         readonly "set": {
           readonly "left": "/failed_channels";
           readonly "relation": "disjoint";
           readonly "right": "/sent_channels";
+        };
+      },
+      {
+        readonly "distinct": {
+          readonly "source": "/deliveries/*/channel";
+        };
+      },
+      {
+        readonly "distinct": {
+          readonly "source": "/failures/*/channel";
         };
       },
     ];
@@ -28250,6 +28481,22 @@ export interface SchemaConstraintSites {
           readonly "target": "/count";
           readonly "operation": "count";
           readonly "source": "/keys/*";
+        };
+      },
+      {
+        readonly "bounded": {
+          readonly "path": "/count";
+          readonly "maximum": {
+            readonly "path": "/size";
+          };
+        };
+      },
+      {
+        readonly "bounded": {
+          readonly "path": "/count";
+          readonly "maximum": {
+            readonly "path": "/total";
+          };
         };
       },
     ];
@@ -35249,7 +35496,39 @@ export interface OperationDefinitions {
         readonly "content": {
           readonly "application/json": {
             readonly "schema": {
-              readonly "$ref": "#/components/schemas/PayoutResponse";
+              readonly "allOf": readonly [
+                {
+                  readonly "$ref": "#/components/schemas/PayoutResponse";
+                },
+                {
+                  readonly "type": "object";
+                  readonly "properties": {
+                    readonly "payout": {
+                      readonly "allOf": readonly [
+                        {
+                          readonly "$ref": "#/components/schemas/Payout";
+                        },
+                        {
+                          readonly "type": "object";
+                          readonly "required": readonly [
+                            "canceled_at",
+                            "cancellation",
+                            "scheduled_at",
+                          ];
+                          readonly "properties": {
+                            readonly "status": {
+                              readonly "type": "string";
+                              readonly "enum": readonly [
+                                "canceled",
+                              ];
+                            };
+                          };
+                        },
+                      ];
+                    };
+                  };
+                },
+              ];
             };
           };
         };
@@ -35750,7 +36029,37 @@ export interface OperationDefinitions {
         readonly "content": {
           readonly "application/json": {
             readonly "schema": {
-              readonly "$ref": "#/components/schemas/PurchaseIntentResponse";
+              readonly "allOf": readonly [
+                {
+                  readonly "$ref": "#/components/schemas/PurchaseIntentResponse";
+                },
+                {
+                  readonly "type": "object";
+                  readonly "properties": {
+                    readonly "purchase_intent": {
+                      readonly "allOf": readonly [
+                        {
+                          readonly "$ref": "#/components/schemas/PurchaseIntent";
+                        },
+                        {
+                          readonly "type": "object";
+                          readonly "required": readonly [
+                            "inactive_at",
+                          ];
+                          readonly "properties": {
+                            readonly "status": {
+                              readonly "type": "string";
+                              readonly "enum": readonly [
+                                "inactive",
+                              ];
+                            };
+                          };
+                        },
+                      ];
+                    };
+                  };
+                },
+              ];
             };
           };
         };
@@ -48765,10 +49074,6 @@ export interface OperationDefinitions {
                   readonly "to": "/product/category";
                 },
                 {
-                  readonly "from": "/custom_data";
-                  readonly "to": "/product/custom_data";
-                },
-                {
                   readonly "from": "/description";
                   readonly "to": "/product/description";
                 },
@@ -48787,10 +49092,6 @@ export interface OperationDefinitions {
                 {
                   readonly "from": "/reference";
                   readonly "to": "/product/reference";
-                },
-                {
-                  readonly "from": "/shipment";
-                  readonly "to": "/product/shipment";
                 },
                 {
                   readonly "from": "/tax_code";
@@ -49422,7 +49723,34 @@ export interface OperationDefinitions {
         readonly "content": {
           readonly "application/json": {
             readonly "schema": {
-              readonly "$ref": "#/components/schemas/PurchaseIntentResponse";
+              readonly "allOf": readonly [
+                {
+                  readonly "$ref": "#/components/schemas/PurchaseIntentResponse";
+                },
+                {
+                  readonly "type": "object";
+                  readonly "properties": {
+                    readonly "purchase_intent": {
+                      readonly "allOf": readonly [
+                        {
+                          readonly "$ref": "#/components/schemas/PurchaseIntent";
+                        },
+                        {
+                          readonly "type": "object";
+                          readonly "properties": {
+                            readonly "status": {
+                              readonly "type": "string";
+                              readonly "enum": readonly [
+                                "active",
+                              ];
+                            };
+                          };
+                        },
+                      ];
+                    };
+                  };
+                },
+              ];
             };
           };
         };
@@ -96371,7 +96699,37 @@ export interface OperationDefinitions {
         readonly "content": {
           readonly "application/json": {
             readonly "schema": {
-              readonly "$ref": "#/components/schemas/PayoutResponse";
+              readonly "allOf": readonly [
+                {
+                  readonly "$ref": "#/components/schemas/PayoutResponse";
+                },
+                {
+                  readonly "type": "object";
+                  readonly "properties": {
+                    readonly "payout": {
+                      readonly "allOf": readonly [
+                        {
+                          readonly "$ref": "#/components/schemas/Payout";
+                        },
+                        {
+                          readonly "type": "object";
+                          readonly "required": readonly [
+                            "scheduled_at",
+                          ];
+                          readonly "properties": {
+                            readonly "status": {
+                              readonly "type": "string";
+                              readonly "enum": readonly [
+                                "scheduled",
+                              ];
+                            };
+                          };
+                        },
+                      ];
+                    };
+                  };
+                },
+              ];
             };
           };
         };
@@ -101630,7 +101988,67 @@ export interface OperationDefinitions {
         readonly "content": {
           readonly "application/json": {
             readonly "schema": {
-              readonly "$ref": "#/components/schemas/OrderDocumentDeliveryResponse";
+              readonly "allOf": readonly [
+                {
+                  readonly "$ref": "#/components/schemas/OrderDocumentDeliveryResponse";
+                },
+                {
+                  readonly "type": "object";
+                  readonly "properties": {
+                    readonly "delivery": {
+                      readonly "allOf": readonly [
+                        {
+                          readonly "$ref": "#/components/schemas/OrderDocumentDelivery";
+                        },
+                        {
+                          readonly "type": "object";
+                          readonly "required": readonly [
+                            "deliveries",
+                          ];
+                          readonly "properties": {
+                            readonly "document_kind": {
+                              readonly "type": "string";
+                              readonly "enum": readonly [
+                                "invoice",
+                              ];
+                            };
+                            readonly "deliveries": {
+                              readonly "type": "array";
+                              readonly "minItems": 1;
+                            };
+                            readonly "sent_channels": {
+                              readonly "type": "array";
+                              readonly "minItems": 1;
+                            };
+                          };
+                        },
+                      ];
+                    };
+                    readonly "order": {
+                      readonly "allOf": readonly [
+                        {
+                          readonly "$ref": "#/components/schemas/Order";
+                        },
+                        {
+                          readonly "type": "object";
+                          readonly "properties": {
+                            readonly "status": {
+                              readonly "type": "string";
+                              readonly "enum": readonly [
+                                "requires_payment",
+                                "paid",
+                                "completed",
+                                "canceled",
+                                "expired",
+                              ];
+                            };
+                          };
+                        },
+                      ];
+                    };
+                  };
+                },
+              ];
             };
           };
         };
@@ -101646,7 +102064,56 @@ export interface OperationDefinitions {
         readonly "content": {
           readonly "application/json": {
             readonly "schema": {
-              readonly "$ref": "#/components/schemas/OrderDocumentDeliveryResponse";
+              readonly "allOf": readonly [
+                {
+                  readonly "$ref": "#/components/schemas/OrderDocumentDeliveryResponse";
+                },
+                {
+                  readonly "type": "object";
+                  readonly "properties": {
+                    readonly "delivery": {
+                      readonly "allOf": readonly [
+                        {
+                          readonly "$ref": "#/components/schemas/OrderDocumentPartialDelivery";
+                        },
+                        {
+                          readonly "type": "object";
+                          readonly "properties": {
+                            readonly "document_kind": {
+                              readonly "type": "string";
+                              readonly "enum": readonly [
+                                "invoice",
+                              ];
+                            };
+                          };
+                        },
+                      ];
+                    };
+                    readonly "order": {
+                      readonly "allOf": readonly [
+                        {
+                          readonly "$ref": "#/components/schemas/Order";
+                        },
+                        {
+                          readonly "type": "object";
+                          readonly "properties": {
+                            readonly "status": {
+                              readonly "type": "string";
+                              readonly "enum": readonly [
+                                "requires_payment",
+                                "paid",
+                                "completed",
+                                "canceled",
+                                "expired",
+                              ];
+                            };
+                          };
+                        },
+                      ];
+                    };
+                  };
+                },
+              ];
             };
           };
         };
@@ -102375,7 +102842,64 @@ export interface OperationDefinitions {
         readonly "content": {
           readonly "application/json": {
             readonly "schema": {
-              readonly "$ref": "#/components/schemas/OrderDocumentDeliveryResponse";
+              readonly "allOf": readonly [
+                {
+                  readonly "$ref": "#/components/schemas/OrderDocumentDeliveryResponse";
+                },
+                {
+                  readonly "type": "object";
+                  readonly "properties": {
+                    readonly "delivery": {
+                      readonly "allOf": readonly [
+                        {
+                          readonly "$ref": "#/components/schemas/OrderDocumentDelivery";
+                        },
+                        {
+                          readonly "type": "object";
+                          readonly "required": readonly [
+                            "deliveries",
+                          ];
+                          readonly "properties": {
+                            readonly "document_kind": {
+                              readonly "type": "string";
+                              readonly "enum": readonly [
+                                "receipt",
+                              ];
+                            };
+                            readonly "deliveries": {
+                              readonly "type": "array";
+                              readonly "minItems": 1;
+                            };
+                            readonly "sent_channels": {
+                              readonly "type": "array";
+                              readonly "minItems": 1;
+                            };
+                          };
+                        },
+                      ];
+                    };
+                    readonly "order": {
+                      readonly "allOf": readonly [
+                        {
+                          readonly "$ref": "#/components/schemas/Order";
+                        },
+                        {
+                          readonly "type": "object";
+                          readonly "properties": {
+                            readonly "status": {
+                              readonly "type": "string";
+                              readonly "enum": readonly [
+                                "paid",
+                                "completed",
+                              ];
+                            };
+                          };
+                        },
+                      ];
+                    };
+                  };
+                },
+              ];
             };
           };
         };
@@ -102391,7 +102915,53 @@ export interface OperationDefinitions {
         readonly "content": {
           readonly "application/json": {
             readonly "schema": {
-              readonly "$ref": "#/components/schemas/OrderDocumentDeliveryResponse";
+              readonly "allOf": readonly [
+                {
+                  readonly "$ref": "#/components/schemas/OrderDocumentDeliveryResponse";
+                },
+                {
+                  readonly "type": "object";
+                  readonly "properties": {
+                    readonly "delivery": {
+                      readonly "allOf": readonly [
+                        {
+                          readonly "$ref": "#/components/schemas/OrderDocumentPartialDelivery";
+                        },
+                        {
+                          readonly "type": "object";
+                          readonly "properties": {
+                            readonly "document_kind": {
+                              readonly "type": "string";
+                              readonly "enum": readonly [
+                                "receipt",
+                              ];
+                            };
+                          };
+                        },
+                      ];
+                    };
+                    readonly "order": {
+                      readonly "allOf": readonly [
+                        {
+                          readonly "$ref": "#/components/schemas/Order";
+                        },
+                        {
+                          readonly "type": "object";
+                          readonly "properties": {
+                            readonly "status": {
+                              readonly "type": "string";
+                              readonly "enum": readonly [
+                                "paid",
+                                "completed",
+                              ];
+                            };
+                          };
+                        },
+                      ];
+                    };
+                  };
+                },
+              ];
             };
           };
         };
@@ -111916,10 +112486,6 @@ export interface OperationDefinitions {
                   readonly "to": "/product/category";
                 },
                 {
-                  readonly "from": "/custom_data";
-                  readonly "to": "/product/custom_data";
-                },
-                {
                   readonly "from": "/description";
                   readonly "to": "/product/description";
                 },
@@ -114611,6 +115177,37 @@ export type ResponseRelation<
 
 /** Named examples are literal witness types, not runtime values. */
 export interface OperationExamples {
+  readonly "cancelPurchaseIntent": {
+    readonly "responses": {
+      readonly "200": {
+        readonly "canceled": {
+          readonly "purchase_intent": {
+            readonly "allow_variants": false;
+            readonly "application_id": "app_example";
+            readonly "created_at": "2026-11-17T10:00:00Z";
+            readonly "id": "sale_canceled_example";
+            readonly "inactive_at": "2026-11-20T10:00:00Z";
+            readonly "product": {
+              readonly "id": "prod_example";
+              readonly "type": "digital";
+              readonly "name": "Commerce Guide";
+              readonly "active": true;
+              readonly "created_at": "2026-11-17T10:00:00Z";
+              readonly "published_at": "2026-11-17T10:00:00Z";
+            };
+            readonly "quantity": {
+              readonly "min": 1;
+              readonly "max": 5;
+            };
+            readonly "status": "inactive";
+            readonly "usage": {
+              readonly "multi_use": true;
+            };
+          };
+        };
+      };
+    };
+  };
   readonly "createOrder": {
     readonly "request": {
       readonly "finalized_requires_payment": {
@@ -114935,6 +115532,36 @@ export interface OperationExamples {
       };
     };
   };
+  readonly "lookupPurchaseIntent": {
+    readonly "responses": {
+      readonly "200": {
+        readonly "found": {
+          readonly "purchase_intent": {
+            readonly "allow_variants": false;
+            readonly "application_id": "app_example";
+            readonly "created_at": "2026-11-17T10:00:00Z";
+            readonly "id": "sale_found_example";
+            readonly "product": {
+              readonly "id": "prod_example";
+              readonly "type": "digital";
+              readonly "name": "Commerce Guide";
+              readonly "active": true;
+              readonly "created_at": "2026-11-17T10:00:00Z";
+              readonly "published_at": "2026-11-17T10:00:00Z";
+            };
+            readonly "quantity": {
+              readonly "min": 1;
+              readonly "max": 5;
+            };
+            readonly "status": "active";
+            readonly "usage": {
+              readonly "multi_use": true;
+            };
+          };
+        };
+      };
+    };
+  };
   readonly "schedulePayout": {
     readonly "responses": {
       readonly "400": {
@@ -114958,6 +115585,150 @@ export interface OperationExamples {
             readonly "fix_code": "satisfy_precondition";
             readonly "type": "bad_request";
             readonly "url": "https://studio.inttegro.com/errors";
+          };
+        };
+      };
+    };
+  };
+  readonly "sendOrderInvoice": {
+    readonly "responses": {
+      readonly "200": {
+        readonly "invoice_sent": {
+          readonly "delivery": {
+            readonly "deliveries": readonly [
+              {
+                readonly "accepted_at": "2026-11-20T10:01:00Z";
+                readonly "channel": "email";
+                readonly "chime_id": "ch_invoice_email";
+              },
+            ];
+            readonly "document_kind": "invoice";
+            readonly "document_url": "https://pages.inttegro.com/invoices/or_invoice_example";
+            readonly "sent_channels": readonly [
+              "email",
+            ];
+          };
+          readonly "order": {
+            readonly "customer": {
+              readonly "guest": false;
+              readonly "id": "cu_invoice_customer";
+              readonly "name": "Ama Mensah";
+            };
+            readonly "id": "or_invoice_example";
+            readonly "initiated_at": "2026-11-20T10:00:00Z";
+            readonly "sealed_at": "2026-11-20T10:00:30Z";
+            readonly "status": "requires_payment";
+          };
+        };
+      };
+      readonly "207": {
+        readonly "invoice_partially_sent": {
+          readonly "delivery": {
+            readonly "deliveries": readonly [
+              {
+                readonly "accepted_at": "2026-11-20T10:01:00Z";
+                readonly "channel": "email";
+                readonly "chime_id": "ch_invoice_email";
+              },
+            ];
+            readonly "document_kind": "invoice";
+            readonly "document_url": "https://pages.inttegro.com/invoices/or_invoice_example";
+            readonly "failed_channels": readonly [
+              "sms",
+            ];
+            readonly "failures": readonly [
+              {
+                readonly "channel": "sms";
+                readonly "error": "Delivery was not accepted";
+              },
+            ];
+            readonly "sent_channels": readonly [
+              "email",
+            ];
+          };
+          readonly "order": {
+            readonly "customer": {
+              readonly "guest": false;
+              readonly "id": "cu_invoice_customer";
+              readonly "name": "Ama Mensah";
+            };
+            readonly "id": "or_invoice_example";
+            readonly "initiated_at": "2026-11-20T10:00:00Z";
+            readonly "sealed_at": "2026-11-20T10:00:30Z";
+            readonly "status": "requires_payment";
+          };
+        };
+      };
+    };
+  };
+  readonly "sendOrderReceipt": {
+    readonly "responses": {
+      readonly "200": {
+        readonly "receipt_sent": {
+          readonly "delivery": {
+            readonly "deliveries": readonly [
+              {
+                readonly "accepted_at": "2026-11-20T10:06:00Z";
+                readonly "channel": "email";
+                readonly "chime_id": "ch_receipt_email";
+              },
+            ];
+            readonly "document_kind": "receipt";
+            readonly "document_url": "https://pages.inttegro.com/receipts/or_receipt_example";
+            readonly "sent_channels": readonly [
+              "email",
+            ];
+          };
+          readonly "order": {
+            readonly "customer": {
+              readonly "guest": false;
+              readonly "id": "cu_receipt_customer";
+              readonly "name": "Ama Mensah";
+            };
+            readonly "id": "or_receipt_example";
+            readonly "initiated_at": "2026-11-20T10:00:00Z";
+            readonly "paid_at": "2026-11-20T10:05:00Z";
+            readonly "sealed_at": "2026-11-20T10:00:30Z";
+            readonly "status": "paid";
+          };
+        };
+      };
+      readonly "207": {
+        readonly "receipt_partially_sent": {
+          readonly "delivery": {
+            readonly "deliveries": readonly [
+              {
+                readonly "accepted_at": "2026-11-20T10:06:00Z";
+                readonly "channel": "email";
+                readonly "chime_id": "ch_receipt_email";
+              },
+            ];
+            readonly "document_kind": "receipt";
+            readonly "document_url": "https://pages.inttegro.com/receipts/or_receipt_example";
+            readonly "failed_channels": readonly [
+              "sms",
+            ];
+            readonly "failures": readonly [
+              {
+                readonly "channel": "sms";
+                readonly "error": "Delivery was not accepted";
+              },
+            ];
+            readonly "sent_channels": readonly [
+              "email",
+            ];
+          };
+          readonly "order": {
+            readonly "customer": {
+              readonly "guest": false;
+              readonly "id": "cu_receipt_customer";
+              readonly "name": "Ama Mensah";
+            };
+            readonly "id": "or_receipt_example";
+            readonly "initiated_at": "2026-11-20T10:00:00Z";
+            readonly "paid_at": "2026-11-20T10:05:00Z";
+            readonly "sealed_at": "2026-11-20T10:00:30Z";
+            readonly "status": "paid";
           };
         };
       };
@@ -114989,6 +115760,57 @@ export interface OperationExamples {
           readonly "fix_code": "change_request_parameters";
           readonly "type": "invalid_request";
           readonly "url": "https://studio.inttegro.com/errors";
+        };
+      };
+    };
+  };
+  readonly "updateOperatingPolicy": {
+    readonly "responses": {
+      readonly "200": {
+        readonly "updated": {
+          readonly "operating_policy": {
+            readonly "active_version": 2;
+            readonly "capabilities": {};
+            readonly "children_policy_id": "cp_example";
+            readonly "children_policy_version": 1;
+            readonly "created_at": "2026-11-17T10:00:00Z";
+            readonly "id": "op_example";
+            readonly "name": "Updated operating policy";
+            readonly "updated_at": "2026-11-20T10:00:00Z";
+            readonly "version": 2;
+            readonly "version_created_at": "2026-11-20T10:00:00Z";
+          };
+        };
+      };
+    };
+  };
+  readonly "updatePurchaseIntent": {
+    readonly "responses": {
+      readonly "200": {
+        readonly "updated": {
+          readonly "purchase_intent": {
+            readonly "allow_variants": false;
+            readonly "application_id": "app_example";
+            readonly "created_at": "2026-11-17T10:00:00Z";
+            readonly "id": "sale_updated_example";
+            readonly "product": {
+              readonly "id": "prod_example";
+              readonly "type": "digital";
+              readonly "name": "Commerce Guide";
+              readonly "active": true;
+              readonly "created_at": "2026-11-17T10:00:00Z";
+              readonly "published_at": "2026-11-17T10:00:00Z";
+            };
+            readonly "quantity": {
+              readonly "min": 2;
+              readonly "max": 10;
+            };
+            readonly "status": "active";
+            readonly "updated_at": "2026-11-20T10:00:00Z";
+            readonly "usage": {
+              readonly "multi_use": true;
+            };
+          };
         };
       };
     };
@@ -115348,366 +116170,384 @@ type _ConstraintProof116 = Assert<
   ConstraintsWellFormed<Schema<"OrderDocumentDelivery">, readonly [SchemaConstraintSites["OrderDocumentDelivery"]["/"][0]]>
 >;
 type _ConstraintProof117 = Assert<
-  ConstraintsWellFormed<Schema<"OrderPaymentAttempt">, readonly [SchemaConstraintSites["OrderPaymentAttempt"]["/"][0]]>
+  ConstraintsWellFormed<Schema<"OrderDocumentDelivery">, readonly [SchemaConstraintSites["OrderDocumentDelivery"]["/"][1]]>
 >;
 type _ConstraintProof118 = Assert<
-  ConstraintsWellFormed<Schema<"OrderPaymentAttempt">, readonly [SchemaConstraintSites["OrderPaymentAttempt"]["/"][1]]>
+  ConstraintsWellFormed<Schema<"OrderDocumentPartialDelivery">, readonly [SchemaConstraintSites["OrderDocumentPartialDelivery"]["/"][0]]>
 >;
 type _ConstraintProof119 = Assert<
-  ConstraintsWellFormed<Schema<"OrderPaymentAttempt">, readonly [SchemaConstraintSites["OrderPaymentAttempt"]["/"][2]]>
+  ConstraintsWellFormed<Schema<"OrderDocumentPartialDelivery">, readonly [SchemaConstraintSites["OrderDocumentPartialDelivery"]["/"][1]]>
 >;
 type _ConstraintProof120 = Assert<
-  ConstraintsWellFormed<Schema<"OrderPaymentMethod">, readonly [SchemaConstraintSites["OrderPaymentMethod"]["/"][0]]>
+  ConstraintsWellFormed<Schema<"OrderDocumentPartialDelivery">, readonly [SchemaConstraintSites["OrderDocumentPartialDelivery"]["/"][2]]>
 >;
 type _ConstraintProof121 = Assert<
-  ConstraintsWellFormed<Schema<"OrderPaymentMethod">, readonly [SchemaConstraintSites["OrderPaymentMethod"]["/"][1]]>
+  ConstraintsWellFormed<Schema<"OrderPaymentAttempt">, readonly [SchemaConstraintSites["OrderPaymentAttempt"]["/"][0]]>
 >;
 type _ConstraintProof122 = Assert<
-  ConstraintsWellFormed<Schema<"OrderPaymentMethod">, readonly [SchemaConstraintSites["OrderPaymentMethod"]["/"][2]]>
+  ConstraintsWellFormed<Schema<"OrderPaymentAttempt">, readonly [SchemaConstraintSites["OrderPaymentAttempt"]["/"][1]]>
 >;
 type _ConstraintProof123 = Assert<
-  ConstraintsWellFormed<Schema<"OrderPaymentMethod">, readonly [SchemaConstraintSites["OrderPaymentMethod"]["/"][3]]>
+  ConstraintsWellFormed<Schema<"OrderPaymentAttempt">, readonly [SchemaConstraintSites["OrderPaymentAttempt"]["/"][2]]>
 >;
 type _ConstraintProof124 = Assert<
-  ConstraintsWellFormed<Schema<"OrderPaymentMethod">, readonly [SchemaConstraintSites["OrderPaymentMethod"]["/"][4]]>
+  ConstraintsWellFormed<Schema<"OrderPaymentMethod">, readonly [SchemaConstraintSites["OrderPaymentMethod"]["/"][0]]>
 >;
 type _ConstraintProof125 = Assert<
-  ConstraintsWellFormed<Schema<"OrderPaymentMethod">, readonly [SchemaConstraintSites["OrderPaymentMethod"]["/"][5]]>
+  ConstraintsWellFormed<Schema<"OrderPaymentMethod">, readonly [SchemaConstraintSites["OrderPaymentMethod"]["/"][1]]>
 >;
 type _ConstraintProof126 = Assert<
-  ConstraintsWellFormed<Schema<"OrderPaymentMethod">, readonly [SchemaConstraintSites["OrderPaymentMethod"]["/"][6]]>
+  ConstraintsWellFormed<Schema<"OrderPaymentMethod">, readonly [SchemaConstraintSites["OrderPaymentMethod"]["/"][2]]>
 >;
 type _ConstraintProof127 = Assert<
-  ConstraintsWellFormed<Schema<"OTPTransaction">, readonly [SchemaConstraintSites["OTPTransaction"]["/"][0]]>
+  ConstraintsWellFormed<Schema<"OrderPaymentMethod">, readonly [SchemaConstraintSites["OrderPaymentMethod"]["/"][3]]>
 >;
 type _ConstraintProof128 = Assert<
-  ConstraintsWellFormed<Schema<"OTPTransaction">, readonly [SchemaConstraintSites["OTPTransaction"]["/"][1]]>
+  ConstraintsWellFormed<Schema<"OrderPaymentMethod">, readonly [SchemaConstraintSites["OrderPaymentMethod"]["/"][4]]>
 >;
 type _ConstraintProof129 = Assert<
-  ConstraintsWellFormed<Schema<"OTPTransaction">, readonly [SchemaConstraintSites["OTPTransaction"]["/"][2]]>
+  ConstraintsWellFormed<Schema<"OrderPaymentMethod">, readonly [SchemaConstraintSites["OrderPaymentMethod"]["/"][5]]>
 >;
 type _ConstraintProof130 = Assert<
-  ConstraintsWellFormed<Schema<"OTPTransaction">, readonly [SchemaConstraintSites["OTPTransaction"]["/"][3]]>
+  ConstraintsWellFormed<Schema<"OrderPaymentMethod">, readonly [SchemaConstraintSites["OrderPaymentMethod"]["/"][6]]>
 >;
 type _ConstraintProof131 = Assert<
-  ConstraintsWellFormed<Schema<"OTPTransaction">, readonly [SchemaConstraintSites["OTPTransaction"]["/"][4]]>
+  ConstraintsWellFormed<Schema<"OTPTransaction">, readonly [SchemaConstraintSites["OTPTransaction"]["/"][0]]>
 >;
 type _ConstraintProof132 = Assert<
-  ConstraintsWellFormed<Schema<"OTPTransaction">, readonly [SchemaConstraintSites["OTPTransaction"]["/"][5]]>
+  ConstraintsWellFormed<Schema<"OTPTransaction">, readonly [SchemaConstraintSites["OTPTransaction"]["/"][1]]>
 >;
 type _ConstraintProof133 = Assert<
-  ConstraintsWellFormed<Schema<"OTPTransaction">, readonly [SchemaConstraintSites["OTPTransaction"]["/"][6]]>
+  ConstraintsWellFormed<Schema<"OTPTransaction">, readonly [SchemaConstraintSites["OTPTransaction"]["/"][2]]>
 >;
 type _ConstraintProof134 = Assert<
-  ConstraintsWellFormed<Schema<"OTPTransaction">, readonly [SchemaConstraintSites["OTPTransaction"]["/"][7]]>
+  ConstraintsWellFormed<Schema<"OTPTransaction">, readonly [SchemaConstraintSites["OTPTransaction"]["/"][3]]>
 >;
 type _ConstraintProof135 = Assert<
-  ConstraintsWellFormed<Schema<"OTPTransaction">, readonly [SchemaConstraintSites["OTPTransaction"]["/"][8]]>
+  ConstraintsWellFormed<Schema<"OTPTransaction">, readonly [SchemaConstraintSites["OTPTransaction"]["/"][4]]>
 >;
 type _ConstraintProof136 = Assert<
-  ConstraintsWellFormed<Schema<"OTPTransaction">, readonly [SchemaConstraintSites["OTPTransaction"]["/"][9]]>
+  ConstraintsWellFormed<Schema<"OTPTransaction">, readonly [SchemaConstraintSites["OTPTransaction"]["/"][5]]>
 >;
 type _ConstraintProof137 = Assert<
-  ConstraintsWellFormed<PathValue<Schema<"PageChimesResponse">, "/page">, readonly [SchemaConstraintSites["PageChimesResponse"]["/page"][0]]>
+  ConstraintsWellFormed<Schema<"OTPTransaction">, readonly [SchemaConstraintSites["OTPTransaction"]["/"][6]]>
 >;
 type _ConstraintProof138 = Assert<
-  ConstraintsWellFormed<Schema<"PageFilesRequest">, readonly [SchemaConstraintSites["PageFilesRequest"]["/"][0]]>
+  ConstraintsWellFormed<Schema<"OTPTransaction">, readonly [SchemaConstraintSites["OTPTransaction"]["/"][7]]>
 >;
 type _ConstraintProof139 = Assert<
-  ConstraintsWellFormed<PathValue<Schema<"PageOrdersResponse">, "/page">, readonly [SchemaConstraintSites["PageOrdersResponse"]["/page"][0]]>
+  ConstraintsWellFormed<Schema<"OTPTransaction">, readonly [SchemaConstraintSites["OTPTransaction"]["/"][8]]>
 >;
 type _ConstraintProof140 = Assert<
-  ConstraintsWellFormed<PathValue<Schema<"PageProductsResponse">, "/page">, readonly [SchemaConstraintSites["PageProductsResponse"]["/page"][0]]>
+  ConstraintsWellFormed<Schema<"OTPTransaction">, readonly [SchemaConstraintSites["OTPTransaction"]["/"][9]]>
 >;
 type _ConstraintProof141 = Assert<
-  ConstraintsWellFormed<PathValue<Schema<"PagePurchaseIntentsResponse">, "/page">, readonly [SchemaConstraintSites["PagePurchaseIntentsResponse"]["/page"][0]]>
+  ConstraintsWellFormed<PathValue<Schema<"PageChimesResponse">, "/page">, readonly [SchemaConstraintSites["PageChimesResponse"]["/page"][0]]>
 >;
 type _ConstraintProof142 = Assert<
-  ConstraintsWellFormed<Schema<"PaymentBalanceTransaction">, readonly [SchemaConstraintSites["PaymentBalanceTransaction"]["/"][0]]>
+  ConstraintsWellFormed<Schema<"PageFilesRequest">, readonly [SchemaConstraintSites["PageFilesRequest"]["/"][0]]>
 >;
 type _ConstraintProof143 = Assert<
-  ConstraintsWellFormed<Schema<"PaymentBalanceTransaction">, readonly [SchemaConstraintSites["PaymentBalanceTransaction"]["/"][1]]>
+  ConstraintsWellFormed<PathValue<Schema<"PageOrdersResponse">, "/page">, readonly [SchemaConstraintSites["PageOrdersResponse"]["/page"][0]]>
 >;
 type _ConstraintProof144 = Assert<
-  ConstraintsWellFormed<Schema<"PaymentMethodObject">, readonly [SchemaConstraintSites["PaymentMethodObject"]["/"][0]]>
+  ConstraintsWellFormed<PathValue<Schema<"PageProductsResponse">, "/page">, readonly [SchemaConstraintSites["PageProductsResponse"]["/page"][0]]>
 >;
 type _ConstraintProof145 = Assert<
-  ConstraintsWellFormed<Schema<"PaymentMethodObject">, readonly [SchemaConstraintSites["PaymentMethodObject"]["/"][1]]>
+  ConstraintsWellFormed<PathValue<Schema<"PagePurchaseIntentsResponse">, "/page">, readonly [SchemaConstraintSites["PagePurchaseIntentsResponse"]["/page"][0]]>
 >;
 type _ConstraintProof146 = Assert<
-  ConstraintsWellFormed<Schema<"PaymentMethodObject">, readonly [SchemaConstraintSites["PaymentMethodObject"]["/"][2]]>
+  ConstraintsWellFormed<Schema<"PaymentBalanceTransaction">, readonly [SchemaConstraintSites["PaymentBalanceTransaction"]["/"][0]]>
 >;
 type _ConstraintProof147 = Assert<
-  ConstraintsWellFormed<Schema<"PaymentMethodObject">, readonly [SchemaConstraintSites["PaymentMethodObject"]["/"][3]]>
+  ConstraintsWellFormed<Schema<"PaymentBalanceTransaction">, readonly [SchemaConstraintSites["PaymentBalanceTransaction"]["/"][1]]>
 >;
 type _ConstraintProof148 = Assert<
-  ConstraintsWellFormed<Schema<"PaymentMethodObject">, readonly [SchemaConstraintSites["PaymentMethodObject"]["/"][4]]>
+  ConstraintsWellFormed<Schema<"PaymentMethodObject">, readonly [SchemaConstraintSites["PaymentMethodObject"]["/"][0]]>
 >;
 type _ConstraintProof149 = Assert<
-  ConstraintsWellFormed<Schema<"PaymentMethodObject">, readonly [SchemaConstraintSites["PaymentMethodObject"]["/"][5]]>
+  ConstraintsWellFormed<Schema<"PaymentMethodObject">, readonly [SchemaConstraintSites["PaymentMethodObject"]["/"][1]]>
 >;
 type _ConstraintProof150 = Assert<
-  ConstraintsWellFormed<Schema<"PaymentMethodObject">, readonly [SchemaConstraintSites["PaymentMethodObject"]["/"][6]]>
+  ConstraintsWellFormed<Schema<"PaymentMethodObject">, readonly [SchemaConstraintSites["PaymentMethodObject"]["/"][2]]>
 >;
 type _ConstraintProof151 = Assert<
-  ConstraintsWellFormed<Schema<"PaymentMethodObject">, readonly [SchemaConstraintSites["PaymentMethodObject"]["/"][7]]>
+  ConstraintsWellFormed<Schema<"PaymentMethodObject">, readonly [SchemaConstraintSites["PaymentMethodObject"]["/"][3]]>
 >;
 type _ConstraintProof152 = Assert<
-  ConstraintsWellFormed<Schema<"PaymentMethodObject">, readonly [SchemaConstraintSites["PaymentMethodObject"]["/"][8]]>
+  ConstraintsWellFormed<Schema<"PaymentMethodObject">, readonly [SchemaConstraintSites["PaymentMethodObject"]["/"][4]]>
 >;
 type _ConstraintProof153 = Assert<
-  ConstraintsWellFormed<Schema<"PaymentMethodObject">, readonly [SchemaConstraintSites["PaymentMethodObject"]["/"][9]]>
+  ConstraintsWellFormed<Schema<"PaymentMethodObject">, readonly [SchemaConstraintSites["PaymentMethodObject"]["/"][5]]>
 >;
 type _ConstraintProof154 = Assert<
-  ConstraintsWellFormed<Schema<"PaymentMethodObject">, readonly [SchemaConstraintSites["PaymentMethodObject"]["/"][10]]>
+  ConstraintsWellFormed<Schema<"PaymentMethodObject">, readonly [SchemaConstraintSites["PaymentMethodObject"]["/"][6]]>
 >;
 type _ConstraintProof155 = Assert<
-  ConstraintsWellFormed<Schema<"PaymentMethodObject">, readonly [SchemaConstraintSites["PaymentMethodObject"]["/"][11]]>
+  ConstraintsWellFormed<Schema<"PaymentMethodObject">, readonly [SchemaConstraintSites["PaymentMethodObject"]["/"][7]]>
 >;
 type _ConstraintProof156 = Assert<
-  ConstraintsWellFormed<Schema<"PaymentMethodObject">, readonly [SchemaConstraintSites["PaymentMethodObject"]["/"][12]]>
+  ConstraintsWellFormed<Schema<"PaymentMethodObject">, readonly [SchemaConstraintSites["PaymentMethodObject"]["/"][8]]>
 >;
 type _ConstraintProof157 = Assert<
-  ConstraintsWellFormed<Schema<"PaymentMethodObject">, readonly [SchemaConstraintSites["PaymentMethodObject"]["/"][13]]>
+  ConstraintsWellFormed<Schema<"PaymentMethodObject">, readonly [SchemaConstraintSites["PaymentMethodObject"]["/"][9]]>
 >;
 type _ConstraintProof158 = Assert<
-  ConstraintsWellFormed<Schema<"PaymentMethodObject">, readonly [SchemaConstraintSites["PaymentMethodObject"]["/"][14]]>
+  ConstraintsWellFormed<Schema<"PaymentMethodObject">, readonly [SchemaConstraintSites["PaymentMethodObject"]["/"][10]]>
 >;
 type _ConstraintProof159 = Assert<
-  ConstraintsWellFormed<PathValue<Schema<"PaymentMethodObject">, "/mobile_money">, readonly [SchemaConstraintSites["PaymentMethodObject"]["/mobile_money"][0]]>
+  ConstraintsWellFormed<Schema<"PaymentMethodObject">, readonly [SchemaConstraintSites["PaymentMethodObject"]["/"][11]]>
 >;
 type _ConstraintProof160 = Assert<
-  ConstraintsWellFormed<PathValue<Schema<"PaymentMethodPageResponse">, "/page">, readonly [SchemaConstraintSites["PaymentMethodPageResponse"]["/page"][0]]>
+  ConstraintsWellFormed<Schema<"PaymentMethodObject">, readonly [SchemaConstraintSites["PaymentMethodObject"]["/"][12]]>
 >;
 type _ConstraintProof161 = Assert<
-  ConstraintsWellFormed<Schema<"Payout">, readonly [SchemaConstraintSites["Payout"]["/"][0]]>
+  ConstraintsWellFormed<Schema<"PaymentMethodObject">, readonly [SchemaConstraintSites["PaymentMethodObject"]["/"][13]]>
 >;
 type _ConstraintProof162 = Assert<
-  ConstraintsWellFormed<Schema<"Payout">, readonly [SchemaConstraintSites["Payout"]["/"][1]]>
+  ConstraintsWellFormed<Schema<"PaymentMethodObject">, readonly [SchemaConstraintSites["PaymentMethodObject"]["/"][14]]>
 >;
 type _ConstraintProof163 = Assert<
-  ConstraintsWellFormed<Schema<"Payout">, readonly [SchemaConstraintSites["Payout"]["/"][2]]>
+  ConstraintsWellFormed<PathValue<Schema<"PaymentMethodObject">, "/mobile_money">, readonly [SchemaConstraintSites["PaymentMethodObject"]["/mobile_money"][0]]>
 >;
 type _ConstraintProof164 = Assert<
-  ConstraintsWellFormed<Schema<"Payout">, readonly [SchemaConstraintSites["Payout"]["/"][3]]>
+  ConstraintsWellFormed<PathValue<Schema<"PaymentMethodPageResponse">, "/page">, readonly [SchemaConstraintSites["PaymentMethodPageResponse"]["/page"][0]]>
 >;
 type _ConstraintProof165 = Assert<
-  ConstraintsWellFormed<Schema<"Payout">, readonly [SchemaConstraintSites["Payout"]["/"][4]]>
+  ConstraintsWellFormed<Schema<"Payout">, readonly [SchemaConstraintSites["Payout"]["/"][0]]>
 >;
 type _ConstraintProof166 = Assert<
-  ConstraintsWellFormed<Schema<"Payout">, readonly [SchemaConstraintSites["Payout"]["/"][5]]>
+  ConstraintsWellFormed<Schema<"Payout">, readonly [SchemaConstraintSites["Payout"]["/"][1]]>
 >;
 type _ConstraintProof167 = Assert<
-  ConstraintsWellFormed<Schema<"Payout">, readonly [SchemaConstraintSites["Payout"]["/"][6]]>
+  ConstraintsWellFormed<Schema<"Payout">, readonly [SchemaConstraintSites["Payout"]["/"][2]]>
 >;
 type _ConstraintProof168 = Assert<
-  ConstraintsWellFormed<Schema<"Payout">, readonly [SchemaConstraintSites["Payout"]["/"][7]]>
+  ConstraintsWellFormed<Schema<"Payout">, readonly [SchemaConstraintSites["Payout"]["/"][3]]>
 >;
 type _ConstraintProof169 = Assert<
-  ConstraintsWellFormed<Schema<"Payout">, readonly [SchemaConstraintSites["Payout"]["/"][8]]>
+  ConstraintsWellFormed<Schema<"Payout">, readonly [SchemaConstraintSites["Payout"]["/"][4]]>
 >;
 type _ConstraintProof170 = Assert<
-  ConstraintsWellFormed<Schema<"Payout">, readonly [SchemaConstraintSites["Payout"]["/"][9]]>
+  ConstraintsWellFormed<Schema<"Payout">, readonly [SchemaConstraintSites["Payout"]["/"][5]]>
 >;
 type _ConstraintProof171 = Assert<
-  ConstraintsWellFormed<Schema<"Payout">, readonly [SchemaConstraintSites["Payout"]["/"][10]]>
+  ConstraintsWellFormed<Schema<"Payout">, readonly [SchemaConstraintSites["Payout"]["/"][6]]>
 >;
 type _ConstraintProof172 = Assert<
-  ConstraintsWellFormed<Schema<"Payout">, readonly [SchemaConstraintSites["Payout"]["/"][11]]>
+  ConstraintsWellFormed<Schema<"Payout">, readonly [SchemaConstraintSites["Payout"]["/"][7]]>
 >;
 type _ConstraintProof173 = Assert<
-  ConstraintsWellFormed<Schema<"Payout">, readonly [SchemaConstraintSites["Payout"]["/"][12]]>
+  ConstraintsWellFormed<Schema<"Payout">, readonly [SchemaConstraintSites["Payout"]["/"][8]]>
 >;
 type _ConstraintProof174 = Assert<
-  ConstraintsWellFormed<Schema<"PayoutAmountLimits">, readonly [SchemaConstraintSites["PayoutAmountLimits"]["/"][0]]>
+  ConstraintsWellFormed<Schema<"Payout">, readonly [SchemaConstraintSites["Payout"]["/"][9]]>
 >;
 type _ConstraintProof175 = Assert<
-  ConstraintsWellFormed<Schema<"PayoutBalanceTransaction">, readonly [SchemaConstraintSites["PayoutBalanceTransaction"]["/"][0]]>
+  ConstraintsWellFormed<Schema<"Payout">, readonly [SchemaConstraintSites["Payout"]["/"][10]]>
 >;
 type _ConstraintProof176 = Assert<
-  ConstraintsWellFormed<Schema<"PayoutBalanceTransaction">, readonly [SchemaConstraintSites["PayoutBalanceTransaction"]["/"][1]]>
+  ConstraintsWellFormed<Schema<"Payout">, readonly [SchemaConstraintSites["Payout"]["/"][11]]>
 >;
 type _ConstraintProof177 = Assert<
-  ConstraintsWellFormed<Schema<"PolicyAmountRange">, readonly [SchemaConstraintSites["PolicyAmountRange"]["/"][0]]>
+  ConstraintsWellFormed<Schema<"Payout">, readonly [SchemaConstraintSites["Payout"]["/"][12]]>
 >;
 type _ConstraintProof178 = Assert<
-  ConstraintsWellFormed<Schema<"PriceEmbeddedProduct">, readonly [SchemaConstraintSites["PriceEmbeddedProduct"]["/"][0]]>
+  ConstraintsWellFormed<Schema<"PayoutAmountLimits">, readonly [SchemaConstraintSites["PayoutAmountLimits"]["/"][0]]>
 >;
 type _ConstraintProof179 = Assert<
-  ConstraintsWellFormed<Schema<"PriceEmbeddedProduct">, readonly [SchemaConstraintSites["PriceEmbeddedProduct"]["/"][1]]>
+  ConstraintsWellFormed<Schema<"PayoutBalanceTransaction">, readonly [SchemaConstraintSites["PayoutBalanceTransaction"]["/"][0]]>
 >;
 type _ConstraintProof180 = Assert<
-  ConstraintsWellFormed<PathValue<Schema<"PricePageResponse">, "/page">, readonly [SchemaConstraintSites["PricePageResponse"]["/page"][0]]>
+  ConstraintsWellFormed<Schema<"PayoutBalanceTransaction">, readonly [SchemaConstraintSites["PayoutBalanceTransaction"]["/"][1]]>
 >;
 type _ConstraintProof181 = Assert<
-  ConstraintsWellFormed<Schema<"Product">, readonly [SchemaConstraintSites["Product"]["/"][0]]>
+  ConstraintsWellFormed<Schema<"PolicyAmountRange">, readonly [SchemaConstraintSites["PolicyAmountRange"]["/"][0]]>
 >;
 type _ConstraintProof182 = Assert<
-  ConstraintsWellFormed<Schema<"Product">, readonly [SchemaConstraintSites["Product"]["/"][1]]>
+  ConstraintsWellFormed<Schema<"PriceEmbeddedProduct">, readonly [SchemaConstraintSites["PriceEmbeddedProduct"]["/"][0]]>
 >;
 type _ConstraintProof183 = Assert<
-  ConstraintsWellFormed<Schema<"Product">, readonly [SchemaConstraintSites["Product"]["/"][2]]>
+  ConstraintsWellFormed<Schema<"PriceEmbeddedProduct">, readonly [SchemaConstraintSites["PriceEmbeddedProduct"]["/"][1]]>
 >;
 type _ConstraintProof184 = Assert<
-  ConstraintsWellFormed<Schema<"PurchaseIntent">, readonly [SchemaConstraintSites["PurchaseIntent"]["/"][0]]>
+  ConstraintsWellFormed<PathValue<Schema<"PricePageResponse">, "/page">, readonly [SchemaConstraintSites["PricePageResponse"]["/page"][0]]>
 >;
 type _ConstraintProof185 = Assert<
-  ConstraintsWellFormed<Schema<"PurchaseIntent">, readonly [SchemaConstraintSites["PurchaseIntent"]["/"][1]]>
+  ConstraintsWellFormed<Schema<"Product">, readonly [SchemaConstraintSites["Product"]["/"][0]]>
 >;
 type _ConstraintProof186 = Assert<
-  ConstraintsWellFormed<Schema<"PurchaseIntent">, readonly [SchemaConstraintSites["PurchaseIntent"]["/"][2]]>
+  ConstraintsWellFormed<Schema<"Product">, readonly [SchemaConstraintSites["Product"]["/"][1]]>
 >;
 type _ConstraintProof187 = Assert<
-  ConstraintsWellFormed<Schema<"PurchaseIntent">, readonly [SchemaConstraintSites["PurchaseIntent"]["/"][3]]>
+  ConstraintsWellFormed<Schema<"Product">, readonly [SchemaConstraintSites["Product"]["/"][2]]>
 >;
 type _ConstraintProof188 = Assert<
-  ConstraintsWellFormed<Schema<"PurchaseIntent">, readonly [SchemaConstraintSites["PurchaseIntent"]["/"][4]]>
+  ConstraintsWellFormed<Schema<"PurchaseIntent">, readonly [SchemaConstraintSites["PurchaseIntent"]["/"][0]]>
 >;
 type _ConstraintProof189 = Assert<
-  ConstraintsWellFormed<Schema<"PurchaseIntent">, readonly [SchemaConstraintSites["PurchaseIntent"]["/"][5]]>
+  ConstraintsWellFormed<Schema<"PurchaseIntent">, readonly [SchemaConstraintSites["PurchaseIntent"]["/"][1]]>
 >;
 type _ConstraintProof190 = Assert<
-  ConstraintsWellFormed<Schema<"PurchaseIntent">, readonly [SchemaConstraintSites["PurchaseIntent"]["/"][6]]>
+  ConstraintsWellFormed<Schema<"PurchaseIntent">, readonly [SchemaConstraintSites["PurchaseIntent"]["/"][2]]>
 >;
 type _ConstraintProof191 = Assert<
-  ConstraintsWellFormed<Schema<"PurchaseIntent">, readonly [SchemaConstraintSites["PurchaseIntent"]["/"][7]]>
+  ConstraintsWellFormed<Schema<"PurchaseIntent">, readonly [SchemaConstraintSites["PurchaseIntent"]["/"][3]]>
 >;
 type _ConstraintProof192 = Assert<
-  ConstraintsWellFormed<Schema<"PurchaseIntent">, readonly [SchemaConstraintSites["PurchaseIntent"]["/"][8]]>
+  ConstraintsWellFormed<Schema<"PurchaseIntent">, readonly [SchemaConstraintSites["PurchaseIntent"]["/"][4]]>
 >;
 type _ConstraintProof193 = Assert<
-  ConstraintsWellFormed<Schema<"PurchaseIntent">, readonly [SchemaConstraintSites["PurchaseIntent"]["/"][9]]>
+  ConstraintsWellFormed<Schema<"PurchaseIntent">, readonly [SchemaConstraintSites["PurchaseIntent"]["/"][5]]>
 >;
 type _ConstraintProof194 = Assert<
-  ConstraintsWellFormed<Schema<"PurchaseIntent">, readonly [SchemaConstraintSites["PurchaseIntent"]["/"][10]]>
+  ConstraintsWellFormed<Schema<"PurchaseIntent">, readonly [SchemaConstraintSites["PurchaseIntent"]["/"][6]]>
 >;
 type _ConstraintProof195 = Assert<
-  ConstraintsWellFormed<PathValue<Schema<"PurchaseIntent">, "/quantity">, readonly [SchemaConstraintSites["PurchaseIntent"]["/quantity"][0]]>
+  ConstraintsWellFormed<Schema<"PurchaseIntent">, readonly [SchemaConstraintSites["PurchaseIntent"]["/"][7]]>
 >;
 type _ConstraintProof196 = Assert<
-  ConstraintsWellFormed<Schema<"Refund">, readonly [SchemaConstraintSites["Refund"]["/"][0]]>
+  ConstraintsWellFormed<Schema<"PurchaseIntent">, readonly [SchemaConstraintSites["PurchaseIntent"]["/"][8]]>
 >;
 type _ConstraintProof197 = Assert<
-  ConstraintsWellFormed<Schema<"Refund">, readonly [SchemaConstraintSites["Refund"]["/"][1]]>
+  ConstraintsWellFormed<Schema<"PurchaseIntent">, readonly [SchemaConstraintSites["PurchaseIntent"]["/"][9]]>
 >;
 type _ConstraintProof198 = Assert<
-  ConstraintsWellFormed<Schema<"Refund">, readonly [SchemaConstraintSites["Refund"]["/"][2]]>
+  ConstraintsWellFormed<Schema<"PurchaseIntent">, readonly [SchemaConstraintSites["PurchaseIntent"]["/"][10]]>
 >;
 type _ConstraintProof199 = Assert<
-  ConstraintsWellFormed<Schema<"Refund">, readonly [SchemaConstraintSites["Refund"]["/"][3]]>
+  ConstraintsWellFormed<PathValue<Schema<"PurchaseIntent">, "/quantity">, readonly [SchemaConstraintSites["PurchaseIntent"]["/quantity"][0]]>
 >;
 type _ConstraintProof200 = Assert<
-  ConstraintsWellFormed<Schema<"Refund">, readonly [SchemaConstraintSites["Refund"]["/"][4]]>
+  ConstraintsWellFormed<Schema<"Refund">, readonly [SchemaConstraintSites["Refund"]["/"][0]]>
 >;
 type _ConstraintProof201 = Assert<
-  ConstraintsWellFormed<Schema<"Refund">, readonly [SchemaConstraintSites["Refund"]["/"][5]]>
+  ConstraintsWellFormed<Schema<"Refund">, readonly [SchemaConstraintSites["Refund"]["/"][1]]>
 >;
 type _ConstraintProof202 = Assert<
-  ConstraintsWellFormed<Schema<"Refund">, readonly [SchemaConstraintSites["Refund"]["/"][6]]>
+  ConstraintsWellFormed<Schema<"Refund">, readonly [SchemaConstraintSites["Refund"]["/"][2]]>
 >;
 type _ConstraintProof203 = Assert<
-  ConstraintsWellFormed<Schema<"Refund">, readonly [SchemaConstraintSites["Refund"]["/"][7]]>
+  ConstraintsWellFormed<Schema<"Refund">, readonly [SchemaConstraintSites["Refund"]["/"][3]]>
 >;
 type _ConstraintProof204 = Assert<
-  ConstraintsWellFormed<Schema<"Refund">, readonly [SchemaConstraintSites["Refund"]["/"][8]]>
+  ConstraintsWellFormed<Schema<"Refund">, readonly [SchemaConstraintSites["Refund"]["/"][4]]>
 >;
 type _ConstraintProof205 = Assert<
-  ConstraintsWellFormed<Schema<"RefundLineItem">, readonly [SchemaConstraintSites["RefundLineItem"]["/"][0]]>
+  ConstraintsWellFormed<Schema<"Refund">, readonly [SchemaConstraintSites["Refund"]["/"][5]]>
 >;
 type _ConstraintProof206 = Assert<
-  ConstraintsWellFormed<Schema<"RefundLineItem">, readonly [SchemaConstraintSites["RefundLineItem"]["/"][1]]>
+  ConstraintsWellFormed<Schema<"Refund">, readonly [SchemaConstraintSites["Refund"]["/"][6]]>
 >;
 type _ConstraintProof207 = Assert<
-  ConstraintsWellFormed<Schema<"RefundPage">, readonly [SchemaConstraintSites["RefundPage"]["/"][0]]>
+  ConstraintsWellFormed<Schema<"Refund">, readonly [SchemaConstraintSites["Refund"]["/"][7]]>
 >;
 type _ConstraintProof208 = Assert<
-  ConstraintsWellFormed<Schema<"ResourceSearchPage">, readonly [SchemaConstraintSites["ResourceSearchPage"]["/"][0]]>
+  ConstraintsWellFormed<Schema<"Refund">, readonly [SchemaConstraintSites["Refund"]["/"][8]]>
 >;
 type _ConstraintProof209 = Assert<
-  ConstraintsWellFormed<Schema<"ResourceSearchSort">, readonly [SchemaConstraintSites["ResourceSearchSort"]["/"][0]]>
+  ConstraintsWellFormed<Schema<"RefundLineItem">, readonly [SchemaConstraintSites["RefundLineItem"]["/"][0]]>
 >;
 type _ConstraintProof210 = Assert<
-  ConstraintsWellFormed<Schema<"ScheduleCreationDetail">, readonly [SchemaConstraintSites["ScheduleCreationDetail"]["/"][0]]>
+  ConstraintsWellFormed<Schema<"RefundLineItem">, readonly [SchemaConstraintSites["RefundLineItem"]["/"][1]]>
 >;
 type _ConstraintProof211 = Assert<
-  ConstraintsWellFormed<Schema<"ScheduleDetail">, readonly [SchemaConstraintSites["ScheduleDetail"]["/"][0]]>
+  ConstraintsWellFormed<Schema<"RefundPage">, readonly [SchemaConstraintSites["RefundPage"]["/"][0]]>
 >;
 type _ConstraintProof212 = Assert<
-  ConstraintsWellFormed<Schema<"SecretKey">, readonly [SchemaConstraintSites["SecretKey"]["/"][0]]>
+  ConstraintsWellFormed<Schema<"ResourceSearchPage">, readonly [SchemaConstraintSites["ResourceSearchPage"]["/"][0]]>
 >;
 type _ConstraintProof213 = Assert<
-  ConstraintsWellFormed<Schema<"SecretKey">, readonly [SchemaConstraintSites["SecretKey"]["/"][1]]>
+  ConstraintsWellFormed<Schema<"ResourceSearchSort">, readonly [SchemaConstraintSites["ResourceSearchSort"]["/"][0]]>
 >;
 type _ConstraintProof214 = Assert<
-  ConstraintsWellFormed<Schema<"SecretKey">, readonly [SchemaConstraintSites["SecretKey"]["/"][2]]>
+  ConstraintsWellFormed<Schema<"ScheduleCreationDetail">, readonly [SchemaConstraintSites["ScheduleCreationDetail"]["/"][0]]>
 >;
 type _ConstraintProof215 = Assert<
-  ConstraintsWellFormed<Schema<"SecretKey">, readonly [SchemaConstraintSites["SecretKey"]["/"][3]]>
+  ConstraintsWellFormed<Schema<"ScheduleDetail">, readonly [SchemaConstraintSites["ScheduleDetail"]["/"][0]]>
 >;
 type _ConstraintProof216 = Assert<
-  ConstraintsWellFormed<Schema<"SecretKey">, readonly [SchemaConstraintSites["SecretKey"]["/"][4]]>
+  ConstraintsWellFormed<Schema<"SecretKey">, readonly [SchemaConstraintSites["SecretKey"]["/"][0]]>
 >;
 type _ConstraintProof217 = Assert<
-  ConstraintsWellFormed<Schema<"SecretKey">, readonly [SchemaConstraintSites["SecretKey"]["/"][5]]>
+  ConstraintsWellFormed<Schema<"SecretKey">, readonly [SchemaConstraintSites["SecretKey"]["/"][1]]>
 >;
 type _ConstraintProof218 = Assert<
-  ConstraintsWellFormed<Schema<"SecretKeyPage">, readonly [SchemaConstraintSites["SecretKeyPage"]["/"][0]]>
+  ConstraintsWellFormed<Schema<"SecretKey">, readonly [SchemaConstraintSites["SecretKey"]["/"][2]]>
 >;
 type _ConstraintProof219 = Assert<
-  ConstraintsWellFormed<Schema<"SecretKeyUsagePage">, readonly [SchemaConstraintSites["SecretKeyUsagePage"]["/"][0]]>
+  ConstraintsWellFormed<Schema<"SecretKey">, readonly [SchemaConstraintSites["SecretKey"]["/"][3]]>
 >;
 type _ConstraintProof220 = Assert<
-  ConstraintsWellFormed<PathValue<Schema<"UpdatePurchaseIntentRequestFields">, "/quantity">, readonly [SchemaConstraintSites["UpdatePurchaseIntentRequestFields"]["/quantity"][0]]>
+  ConstraintsWellFormed<Schema<"SecretKey">, readonly [SchemaConstraintSites["SecretKey"]["/"][4]]>
 >;
 type _ConstraintProof221 = Assert<
-  ConstraintsWellFormed<Schema<"UploadRequestAttempt">, readonly [SchemaConstraintSites["UploadRequestAttempt"]["/"][0]]>
+  ConstraintsWellFormed<Schema<"SecretKey">, readonly [SchemaConstraintSites["SecretKey"]["/"][5]]>
 >;
 type _ConstraintProof222 = Assert<
-  ConstraintsWellFormed<Schema<"UploadRequestAttempt">, readonly [SchemaConstraintSites["UploadRequestAttempt"]["/"][1]]>
+  ConstraintsWellFormed<Schema<"SecretKeyPage">, readonly [SchemaConstraintSites["SecretKeyPage"]["/"][0]]>
 >;
 type _ConstraintProof223 = Assert<
-  ConstraintsWellFormed<Schema<"UploadRequestAttempts">, readonly [SchemaConstraintSites["UploadRequestAttempts"]["/"][0]]>
+  ConstraintsWellFormed<Schema<"SecretKeyPage">, readonly [SchemaConstraintSites["SecretKeyPage"]["/"][1]]>
 >;
 type _ConstraintProof224 = Assert<
-  ConstraintsWellFormed<Schema<"UploadRequestConstraints">, readonly [SchemaConstraintSites["UploadRequestConstraints"]["/"][0]]>
+  ConstraintsWellFormed<Schema<"SecretKeyPage">, readonly [SchemaConstraintSites["SecretKeyPage"]["/"][2]]>
 >;
 type _ConstraintProof225 = Assert<
-  ConstraintsWellFormed<Schema<"UploadRequestObject">, readonly [SchemaConstraintSites["UploadRequestObject"]["/"][0]]>
+  ConstraintsWellFormed<Schema<"SecretKeyUsagePage">, readonly [SchemaConstraintSites["SecretKeyUsagePage"]["/"][0]]>
 >;
 type _ConstraintProof226 = Assert<
-  ConstraintsWellFormed<Schema<"UploadRequestObject">, readonly [SchemaConstraintSites["UploadRequestObject"]["/"][1]]>
+  ConstraintsWellFormed<PathValue<Schema<"UpdatePurchaseIntentRequestFields">, "/quantity">, readonly [SchemaConstraintSites["UpdatePurchaseIntentRequestFields"]["/quantity"][0]]>
 >;
 type _ConstraintProof227 = Assert<
-  ConstraintsWellFormed<Schema<"UploadRequestObject">, readonly [SchemaConstraintSites["UploadRequestObject"]["/"][2]]>
+  ConstraintsWellFormed<Schema<"UploadRequestAttempt">, readonly [SchemaConstraintSites["UploadRequestAttempt"]["/"][0]]>
 >;
 type _ConstraintProof228 = Assert<
-  ConstraintsWellFormed<Schema<"UploadRequestObject">, readonly [SchemaConstraintSites["UploadRequestObject"]["/"][3]]>
+  ConstraintsWellFormed<Schema<"UploadRequestAttempt">, readonly [SchemaConstraintSites["UploadRequestAttempt"]["/"][1]]>
 >;
 type _ConstraintProof229 = Assert<
-  ConstraintsWellFormed<Schema<"UploadRequestObject">, readonly [SchemaConstraintSites["UploadRequestObject"]["/"][4]]>
+  ConstraintsWellFormed<Schema<"UploadRequestAttempts">, readonly [SchemaConstraintSites["UploadRequestAttempts"]["/"][0]]>
 >;
 type _ConstraintProof230 = Assert<
-  ConstraintsWellFormed<Schema<"UploadRequestObject">, readonly [SchemaConstraintSites["UploadRequestObject"]["/"][5]]>
+  ConstraintsWellFormed<Schema<"UploadRequestConstraints">, readonly [SchemaConstraintSites["UploadRequestConstraints"]["/"][0]]>
 >;
 type _ConstraintProof231 = Assert<
-  ConstraintsWellFormed<Schema<"UploadRequestObject">, readonly [SchemaConstraintSites["UploadRequestObject"]["/"][6]]>
+  ConstraintsWellFormed<Schema<"UploadRequestObject">, readonly [SchemaConstraintSites["UploadRequestObject"]["/"][0]]>
 >;
 type _ConstraintProof232 = Assert<
-  ConstraintsWellFormed<Schema<"UploadRequestObject">, readonly [SchemaConstraintSites["UploadRequestObject"]["/"][7]]>
+  ConstraintsWellFormed<Schema<"UploadRequestObject">, readonly [SchemaConstraintSites["UploadRequestObject"]["/"][1]]>
 >;
 type _ConstraintProof233 = Assert<
-  ConstraintsWellFormed<Schema<"UploadRequestObject">, readonly [SchemaConstraintSites["UploadRequestObject"]["/"][8]]>
+  ConstraintsWellFormed<Schema<"UploadRequestObject">, readonly [SchemaConstraintSites["UploadRequestObject"]["/"][2]]>
 >;
 type _ConstraintProof234 = Assert<
-  ConstraintsWellFormed<Schema<"UploadRequestObject">, readonly [SchemaConstraintSites["UploadRequestObject"]["/"][9]]>
+  ConstraintsWellFormed<Schema<"UploadRequestObject">, readonly [SchemaConstraintSites["UploadRequestObject"]["/"][3]]>
 >;
 type _ConstraintProof235 = Assert<
-  ConstraintsWellFormed<Schema<"UploadRequestObject">, readonly [SchemaConstraintSites["UploadRequestObject"]["/"][10]]>
+  ConstraintsWellFormed<Schema<"UploadRequestObject">, readonly [SchemaConstraintSites["UploadRequestObject"]["/"][4]]>
 >;
 type _ConstraintProof236 = Assert<
-  ConstraintsWellFormed<Schema<"UploadRequestPage">, readonly [SchemaConstraintSites["UploadRequestPage"]["/"][0]]>
+  ConstraintsWellFormed<Schema<"UploadRequestObject">, readonly [SchemaConstraintSites["UploadRequestObject"]["/"][5]]>
 >;
 type _ConstraintProof237 = Assert<
+  ConstraintsWellFormed<Schema<"UploadRequestObject">, readonly [SchemaConstraintSites["UploadRequestObject"]["/"][6]]>
+>;
+type _ConstraintProof238 = Assert<
+  ConstraintsWellFormed<Schema<"UploadRequestObject">, readonly [SchemaConstraintSites["UploadRequestObject"]["/"][7]]>
+>;
+type _ConstraintProof239 = Assert<
+  ConstraintsWellFormed<Schema<"UploadRequestObject">, readonly [SchemaConstraintSites["UploadRequestObject"]["/"][8]]>
+>;
+type _ConstraintProof240 = Assert<
+  ConstraintsWellFormed<Schema<"UploadRequestObject">, readonly [SchemaConstraintSites["UploadRequestObject"]["/"][9]]>
+>;
+type _ConstraintProof241 = Assert<
+  ConstraintsWellFormed<Schema<"UploadRequestObject">, readonly [SchemaConstraintSites["UploadRequestObject"]["/"][10]]>
+>;
+type _ConstraintProof242 = Assert<
+  ConstraintsWellFormed<Schema<"UploadRequestPage">, readonly [SchemaConstraintSites["UploadRequestPage"]["/"][0]]>
+>;
+type _ConstraintProof243 = Assert<
   ConstraintsWellFormed<Schema<"UploadRequestReview">, readonly [SchemaConstraintSites["UploadRequestReview"]["/"][0]]>
 >;
 

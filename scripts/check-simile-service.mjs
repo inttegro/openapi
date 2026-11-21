@@ -1,8 +1,9 @@
 import assert from "node:assert/strict";
 import { existsSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
+import { createServer } from "node:net";
 import { tmpdir } from "node:os";
 import { dirname, resolve } from "node:path";
-import { spawnSync } from "node:child_process";
+import { spawn, spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import YAML from "yaml";
 
@@ -11,7 +12,7 @@ const openapiDir = resolve(scriptDir, "..");
 const specificationPath = resolve(openapiDir, "commerce.yml");
 const configurationPath = resolve(openapiDir, "simile", "inttegro.simile.hcl");
 const stateBehaviorPath = resolve(openapiDir, "simile", "state.hcl");
-const behaviorPaths = ["behaviors.hcl", "errors.hcl", "state.hcl", "faults.hcl"]
+const behaviorPaths = ["principals.hcl", "behaviors.hcl", "errors.hcl", "state.hcl", "faults.hcl"]
   .map((file) => resolve(openapiDir, "simile", file));
 const behaviorArguments = behaviorPaths.flatMap((path) => ["--behavior", path]);
 const simile = process.env.SIMILE_BIN ?? resolve(openapiDir, "../simile/target/debug/simile");
@@ -38,6 +39,7 @@ const synthesisSeeds = new Map([
   // explicit public default keeps this contract gate deterministic while the
   // simulator implementation is corrected independently.
   ["pagePaymentMethods", { page_number: 1 }],
+  ["pagePrices", { page_number: 1 }],
   ["updateOperatingPolicy", {
     operating_policy_id: "op_example",
     expected_version: 1,
@@ -49,6 +51,24 @@ const synthesisSeeds = new Map([
 // non-empty array and cannot complete an item through PurchaseIntent's product-or-bundle union.
 const runtimeSynthesisGaps = new Map([
   ["pagePurchaseIntents", "array-item synthesis through the purchase-intent target union"],
+  // Why: the public schedule and unsealed-cancel snapshots correctly omit `amount`. Current
+  // Simile treats the optional target of Payout's bounded clause as required while synthesizing
+  // these operation refinements; making it required would contradict the API.
+  ["schedulePayout", "optional bounded payout amount in the scheduled snapshot"],
+  ["cancelPayout", "optional bounded payout amount in the unsealed canceled snapshot"],
+  ["lookupPayout", "optional bounded payout amount across lifecycle snapshots"],
+]);
+
+// Why: these document responses deliberately carry a realistic nested order snapshot. Selecting
+// the reviewed success example avoids reducing that public shape merely to fit finite search.
+const synthesisOutcomes = new Map([
+  ["createPurchaseIntent", "created"],
+  ["updatePurchaseIntent", "updated"],
+  ["cancelPurchaseIntent", "canceled"],
+  ["lookupPurchaseIntent", "found"],
+  ["updateOperatingPolicy", "updated"],
+  ["sendOrderInvoice", "invoice_sent"],
+  ["sendOrderReceipt", "receipt_sent"],
 ]);
 
 const namedOutcomes = [
@@ -61,6 +81,19 @@ const namedOutcomes = [
   ["tokenizePaymentMethod", ["malformed_body", "payment_method_invalid_body", { code: "invalid_request_body" }]],
   ["createProduct", ["gallery_too_large", "product_gallery_too_large", { code: "product_media_gallery_too_large" }]],
   ["createPurchaseIntent", ["invalid_quantity_range", "purchase_intent_invalid_quantity_range", { code: "invalid_purchase_intent_quantity_range" }]],
+  ["sendOrderInvoice", ["invoice_sent", "order_invoice_sent", { delivery: { document_kind: "invoice", sent_channels: ["email"] }, order: { id: "or_invoice_example", status: "requires_payment" } }]],
+  ["sendOrderInvoice", ["invoice_partially_sent", "order_invoice_partially_sent", { delivery: { document_kind: "invoice", sent_channels: ["email"], failed_channels: ["sms"] } }]],
+  ["sendOrderReceipt", ["receipt_sent", "order_receipt_sent", { delivery: { document_kind: "receipt", sent_channels: ["email"] }, order: { id: "or_receipt_example", status: "paid" } }]],
+  ["sendOrderReceipt", ["receipt_partially_sent", "order_receipt_partially_sent", { delivery: { document_kind: "receipt", sent_channels: ["email"], failed_channels: ["sms"] } }]],
+  ["cancelPurchaseIntent", ["canceled", "purchase_intent_canceled", { purchase_intent: { id: "sale_canceled_example", status: "inactive", inactive_at: "2026-11-20T10:00:00Z" } }]],
+  ["updatePurchaseIntent", ["updated", "purchase_intent_updated", { purchase_intent: { id: "sale_updated_example", status: "active", quantity: { min: 2, max: 10 } } }]],
+  ["lookupPurchaseIntent", ["found", "purchase_intent_found", { purchase_intent: { id: "sale_found_example", status: "active" } }]],
+  ["updateOperatingPolicy", [
+    "updated",
+    "operating_policy_updated",
+    { operating_policy: { id: "op_example", version: 2, active_version: 2, name: "Updated operating policy" } },
+    { operating_policy_id: "op_example", expected_version: 1, name: "Updated operating policy" },
+  ]],
 ];
 
 const providerOutcomes = [
@@ -136,10 +169,13 @@ try {
   assert.equal(description.service, "inttegro", "published service name drifted");
   assert.equal(description.listen, "127.0.0.1:4242", "published listener drifted");
   assert.equal(description.operationCount, 135, "composition-root operation count drifted");
-  assert.equal(description.scenarios.length, 33, "published scenario catalogue drifted");
+  assert.equal(description.scenarios.length, 41, "published scenario catalogue drifted");
   assert.equal(description.backends.length, 4, "published backend catalogue drifted");
   assert.equal(description.asyncOperations.length, 3, "published async catalogue drifted");
   assert.equal(description.faultProfiles.length, 2, "published fault-profile catalogue drifted");
+  assert.equal(description.principals.length, 1, "published principal catalogue drifted");
+  assert.equal(description.profiles.length, 3, "published fixture-profile catalogue drifted");
+  assert.equal(description.principalSetups.length, 1, "published setup-workflow catalogue drifted");
 
   const artifactPath = resolve(work, "inttegro.similec");
   runSimile([
@@ -155,7 +191,7 @@ try {
   assert.equal(inspection.operations, 135, "compiled public operation count drifted");
   assert.equal(inspection.publicExportSafe, true, "compiled artifact is not public-export safe");
   assert.equal(inspection.providerAuthoredOutcomes, 19, "provider-authored outcome inventory drifted");
-  assert.equal(inspection.scenarioSelections, 28, "exact-outcome scenario inventory drifted");
+  assert.equal(inspection.scenarioSelections, 36, "exact-outcome scenario inventory drifted");
   assert.equal(inspection.scenarioFaults, 5, "deterministic fault scenario inventory drifted");
   assert.equal(inspection.resources, 4, "abstract test-backend inventory drifted");
   assert.equal(inspection.asyncOperations, 3, "declared asynchronous-work inventory drifted");
@@ -166,6 +202,71 @@ try {
   assert.equal(inspection.conventionInferredEffects, 0, "unreviewed convention-inferred effects appeared");
   assert.equal(inspection.faults, 2, "environmental fault inventory drifted");
   assert.equal(inspection.faultProfiles, 2, "fault-profile inventory drifted");
+  assert.equal(inspection.securitySchemes, 1, "compiled security-scheme inventory drifted");
+  assert.equal(inspection.principals, 1, "compiled principal inventory drifted");
+  assert.equal(inspection.profiles, 3, "compiled fixture-profile inventory drifted");
+  // Why: principal setup belongs to the composition root, while this artifact intentionally
+  // compiles the portable behavior modules without service-only declarations.
+  assert.equal(inspection.principalSetups, 0, "behavior modules unexpectedly declared setup");
+
+  // Why: a successful compile can still leave public outcomes or consequences underspecified.
+  // Keep every fidelity-audit category explicit so a new warning cannot enter unnoticed.
+  const audit = JSON.parse(runSimile(["audit", artifactPath, "--output", "json"]).stdout);
+  assert.equal(audit.errors, 0, "compiled service has fidelity-audit errors");
+  const auditWarnings = Object.groupBy(audit.findings, (finding) => finding.code);
+  assert.deepEqual(
+    Object.keys(auditWarnings).sort(),
+    ["outcome.schema_only", "state.no_effect"],
+    "an unreviewed fidelity-audit warning category appeared",
+  );
+  assert.equal(auditWarnings["outcome.schema_only"].length, 107, "schema-only outcome inventory drifted");
+  assert.equal(auditWarnings["state.no_effect"].length, 58, "explicit no-effect operation inventory drifted");
+
+  // Why: compiling setup metadata does not prove that it can provision a durable profile or that
+  // sensitive issued values stay out of machine-readable command output.
+  const registryHome = resolve(work, "simile-home");
+  const registryEnvironment = { SIMILE_HOME: registryHome };
+  runSimile([
+    "register",
+    "inttegro",
+    "--config",
+    configurationPath,
+    "--output",
+    "json",
+  ], true, registryEnvironment);
+  const setupOutput = runSimile([
+    "setup",
+    "inttegro",
+    "--profile",
+    "contract-test",
+    "--set",
+    "name=Contract test application",
+    "--set",
+    "alias=contract-test",
+    "--output",
+    "json",
+  ], true, registryEnvironment).stdout;
+  assert.ok(!setupOutput.includes("simile_test_"), "setup output exposed a sensitive credential");
+  const setup = JSON.parse(setupOutput);
+  assert.equal(setup.profile.name, "contract-test", "setup profile name drifted");
+  assert.equal(setup.profile.principal, "application", "setup principal drifted");
+  assert.equal(setup.profile.current, true, "first setup profile was not selected");
+  assert.deepEqual(setup.profile.credentialSchemes, ["bearerAuth"], "setup credential scheme drifted");
+  const profileOutput = runSimile([
+    "profile",
+    "inttegro",
+    "contract-test",
+    "--output",
+    "json",
+  ], true, registryEnvironment).stdout;
+  assert.ok(!profileOutput.includes("simile_test_"), "profile output exposed a sensitive credential");
+  const credentials = readFileSync(setup.credentialsFile, "utf8");
+  const issuedCredential = credentials.match(/^API_KEY="([^"]+)"$/m)?.[1];
+  assert.ok(issuedCredential?.startsWith("simile_test_"), "setup did not issue a local bearer credential");
+
+  // Why: profile compilation and setup are insufficient unless the running HTTP service actually
+  // preserves public routes while enforcing active, revoked, expired, and missing credentials.
+  const authenticationChecks = await verifyAuthentication(registryEnvironment, issuedCredential);
 
   const operations = collectOperations();
   assert.equal(operations.length, 135, "OpenAPI public operation count drifted");
@@ -179,8 +280,24 @@ try {
       continue;
     }
     if (synthesisSeeds.has(operationId)) {
+      // Why: request-bound exact outcomes need their public construction sources before Simile can
+      // prove the response. Prefer that complete operation exercise over response-only synthesis.
       runOperation(operationId, synthesisSeeds.get(operationId));
       seeded += 1;
+      continue;
+    }
+    if (synthesisOutcomes.has(operationId)) {
+      runSimile([
+        "run",
+        specificationPath,
+        "--operation-id",
+        operationId,
+        "--outcome",
+        synthesisOutcomes.get(operationId),
+        "--output",
+        "json",
+      ]);
+      synthesized += 1;
       continue;
     }
     runSimile(["run", specificationPath, "--operation-id", operationId, "--output", "json"]);
@@ -262,12 +379,16 @@ try {
     supplied += 1;
   }
 
-  for (const [operationId, [outcome, scenario, expected]] of namedOutcomes) {
+  for (const [operationId, [outcome, scenario, expected, requestBody]] of namedOutcomes) {
+    const requestArguments = requestBody === undefined
+      ? []
+      : ["--request", JSON.stringify({ body: requestBody })];
     const actual = JSON.parse(runSimile([
       "run",
       specificationPath,
       "--operation-id",
       operationId,
+      ...requestArguments,
       "--outcome",
       outcome,
       "--output",
@@ -281,6 +402,7 @@ try {
       ...behaviorArguments,
       "--operation-id",
       operationId,
+      ...requestArguments,
       "--scenario",
       scenario,
       "--output",
@@ -356,6 +478,8 @@ try {
       `${supplied} supplied valid requests replayed, ` +
       `${namedOutcomes.length} contract outcomes and ${providerOutcomes.length} provider outcomes selected, ` +
       `${invalidRequests.length} invalid requests rejected, ` +
+      `${authenticationChecks} authentication cases verified, ` +
+      `${audit.warnings} reviewed fidelity warnings, ` +
       `${nonJsonOperations.size} transport-only operations documented`,
   );
 } finally {
@@ -380,16 +504,21 @@ function collectOperations() {
 }
 
 function runOperation(operationId, body, shouldSucceed = true) {
-  return runSimile([
+  const args = [
     "run",
     specificationPath,
     "--operation-id",
     operationId,
     "--request",
     JSON.stringify({ body }),
-    "--output",
-    "json",
-  ], shouldSucceed);
+  ];
+  if (synthesisOutcomes.has(operationId)) {
+    // Why: exact provider examples keep complex response unions deterministic while the supplied
+    // request is still independently parsed and validated by the same compiled operation.
+    args.push("--outcome", synthesisOutcomes.get(operationId));
+  }
+  args.push("--output", "json");
+  return runSimile(args, shouldSucceed);
 }
 
 function assertPartial(actual, expected, label) {
@@ -403,11 +532,92 @@ function assertPartial(actual, expected, label) {
   }
 }
 
-function runSimile(args, shouldSucceed = true) {
+async function verifyAuthentication(environment, issuedCredential) {
+  const port = await availablePort();
+  const baseUrl = `http://127.0.0.1:${port}`;
+  const service = spawn(simile, ["start", "inttegro", "--port", String(port)], {
+    cwd: openapiDir,
+    env: { ...process.env, SIMILE_COLOR: "never", ...environment },
+    stdio: ["ignore", "pipe", "pipe"],
+  });
+  let output = "";
+  service.stdout.on("data", (chunk) => { output += chunk; });
+  service.stderr.on("data", (chunk) => { output += chunk; });
+
+  try {
+    const publicResponse = await waitForService(service, `${baseUrl}/spec/countries`, () => output);
+    assert.equal(publicResponse.status, 200, "public operation unexpectedly required authentication");
+
+    const cases = [
+      [undefined, 401, "missing credential"],
+      ["simile_test_active", 200, "active fixture credential"],
+      ["simile_test_revoked", 401, "revoked fixture credential"],
+      ["simile_test_expired", 401, "expired fixture credential"],
+      [issuedCredential, 200, "setup-issued credential"],
+    ];
+    for (const [credential, expectedStatus, label] of cases) {
+      const headers = credential === undefined
+        ? {}
+        : { authorization: `Bearer ${credential}` };
+      const response = await fetch(`${baseUrl}/apps/lookup`, { method: "POST", headers });
+      assert.equal(response.status, expectedStatus, `${label} returned an unexpected status`);
+    }
+    return cases.length;
+  } finally {
+    await stopService(service);
+  }
+}
+
+function availablePort() {
+  return new Promise((resolvePort, reject) => {
+    const server = createServer();
+    server.once("error", reject);
+    server.listen(0, "127.0.0.1", () => {
+      const address = server.address();
+      const port = typeof address === "object" && address ? address.port : undefined;
+      server.close((error) => {
+        if (error) reject(error);
+        else if (port === undefined) reject(new Error("could not allocate an HTTP test port"));
+        else resolvePort(port);
+      });
+    });
+  });
+}
+
+async function waitForService(service, url, serviceOutput) {
+  for (let attempt = 0; attempt < 100; attempt += 1) {
+    if (service.exitCode !== null) {
+      throw new Error(`Simile service exited before readiness\n${serviceOutput()}`);
+    }
+    try {
+      return await fetch(url, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: "{}",
+      });
+    } catch {
+      await new Promise((resolveDelay) => setTimeout(resolveDelay, 50));
+    }
+  }
+  throw new Error(`Simile service did not become ready\n${serviceOutput()}`);
+}
+
+async function stopService(service) {
+  if (service.exitCode !== null) return;
+  const exited = new Promise((resolveExit) => service.once("exit", resolveExit));
+  service.kill("SIGINT");
+  await Promise.race([
+    exited,
+    new Promise((resolveDelay) => setTimeout(resolveDelay, 2_000)),
+  ]);
+  if (service.exitCode === null) service.kill("SIGTERM");
+}
+
+function runSimile(args, shouldSucceed = true, environment = {}) {
   const result = spawnSync(simile, args, {
     cwd: openapiDir,
     encoding: "utf8",
-    env: { ...process.env, SIMILE_COLOR: "never" },
+    env: { ...process.env, SIMILE_COLOR: "never", ...environment },
   });
   if ((result.status === 0) !== shouldSucceed) {
     const expectation = shouldSucceed ? "succeed" : "fail";

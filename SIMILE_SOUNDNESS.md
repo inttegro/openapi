@@ -36,7 +36,8 @@ construct during synthesis.
 | `/components/schemas/CustomerSelectedAmountParams` | 1 `bounded` | An optional maximum customer-selected amount cannot be below the required minimum. |
 | `/components/schemas/CustomerSelectedAmount` | 1 `bounded` | The returned optional maximum customer-selected amount cannot be below the minimum. |
 | `/components/schemas/MessageTemplatesPage` | 1 `aggregate(count)` | `size` equals the number of templates returned after filtering. |
-| `/components/schemas/OrderDocumentDelivery` | 1 `set(disjoint)` | A delivery channel cannot be both accepted and failed in the same attempt result. |
+| `/components/schemas/OrderDocumentDelivery` | 2 `distinct` | Accepted and failed attempt lists cannot repeat one delivery channel. |
+| `/components/schemas/OrderDocumentPartialDelivery` | 1 `set(disjoint)`, 2 `distinct` | A partially sent invoice or receipt cannot record one channel as both accepted and failed, or repeat one channel within an outcome list. |
 | `/components/schemas/PaymentMethodPageResponse/properties/page` | 1 `aggregate(count)` | `size` equals the number of payment methods returned after hydration/filtering. |
 | `/components/schemas/CheckoutOrder` | 3 `ordered`, 7 `implies`, 2 `equal` | Order lifecycle timestamps agree with status, terminal branches are mutually coherent, and a present payment has exactly the order total and currency. |
 | `/components/schemas/CheckoutOrder/properties/payment` | 4 `ordered`, 10 `implies` | Payment timestamps are chronological; action, overdue, processing, success, failure, cancellation, expiry, and compatibility `unknown` snapshots cannot contradict their public evidence. |
@@ -67,7 +68,12 @@ construct during synthesis.
 The audit also uses ordinary OpenAPI keywords for local rules: positive order quantities and money
 values, nonempty refund and payout contribution arrays, fixed masked-account lengths, the
 `processing` payment status already emitted by the implementation, and anchored type-prefix
-patterns on 118 public resource-identifier fields. The public `Error` machine fields (`cause`,
+patterns on 118 public resource-identifier fields. Response-only object schemas also prevent empty
+product/order custom data, empty persisted invoice settings, and empty order attribution, while the
+request schemas continue accepting the shapes supported by their parsers. Product shipment is a
+closed five-branch union, and operation responses narrow invoice/receipt kind, order lifecycle,
+payout lifecycle, and Buy-link lifecycle without changing their public envelopes. The public
+`Error` machine fields (`cause`,
 `code`, `fix_code`, and `type`) are finite enums taken from public error constructors and the
 documented error catalog; `url` is likewise limited to the canonical Studio error pages. The
 `Error.oneOf` variants then bind those fields into the 327 complete tuples emitted by public
@@ -119,9 +125,10 @@ Smithy retains the same status/content-type maps on each operation under
   `censor/secretkey/readmodel/readmodel.go`, `upper/ariadne/translation.go`,
   `octo/{file,filelink,uploadrequest}`, `upper/{customer,purchaseintent,price,paymentmethod,refund,fa,order,product}`,
   and `mercurio/{messagetemplate,chime}`.
-- `set(disjoint)` on `OrderDocumentDelivery` follows
+- `OrderDocumentDelivery` and `OrderDocumentPartialDelivery` follow
   `upper/order/document/delivery.go`: every prepared channel is attempted once and appended to
-  either `Sent` or `Failed`, while the public serializer projects those two result sets.
+  either `Sent` or `Failed`. It is used only by HTTP 207 branches, where both channel arrays are
+  required; a complete success intentionally omits the empty failure arrays.
 
 No new `multiply`, `aggregate(min)`, or `aggregate(max)` clause was added. The audited public
 schemas do not expose a proven derived target that those operators can construct without crossing
@@ -211,6 +218,10 @@ misstate the public contract:
   snapshots likewise remain response-owned rather than falsely echoed from selectors.
 - Expiry checks against the current clock and server normalization or capping of page sizes are not
   expressible as deterministic request-to-response clauses with the current operators.
+- Product creation and update cannot unconditionally copy `custom_data` or shipment from request to
+  response: empty custom data and absent shipment are omitted, while a present response shipment may
+  add its type-specific marker. The relation language has no nonempty-map or conditional object-copy
+  transform, so the response schemas enforce the emitted shapes without claiming a false echo.
 
 ## Verification
 
@@ -243,7 +254,7 @@ all JSON-capable operations, replays every supplied example and additional union
 validates nine exact named scenarios plus negative requests.
 
 The current run compiles the full OpenAPI document, exercises 49 audited schema locations, and
-accepts/rejects 362 fixture payloads across 181 allow-listed relationships. Two Purchase Intent
+accepts/rejects 374 fixture payloads across 187 allow-listed relationships. Two Purchase Intent
 schemas use explicit valid witnesses because finite unconstrained generation can choose an
 expensive non-empty target-union branch; every individual relationship still has both a sound and
 an unsound fixture.
