@@ -803,9 +803,8 @@ async function verifyStatefulProductWorkflow(environment, issuedCredential, isol
     );
     checks += 1;
 
-    // Why: the current relation language cannot derive an order total from a price_id without a
-    // state lookup. Reusing the previously returned amount still proves cross-operation handoff
-    // while leaving that unsupported state-aware derivation visible in the audit report.
+    // Why: a real catalog workflow sends the stored price reference, not a duplicated amount. This
+    // proves that state resolution snapshots the public price and reconciles the resulting total.
     const orderResponse = await fetch(`${first.baseUrl}/orders/create`, {
       method: "POST",
       headers,
@@ -815,7 +814,7 @@ async function verifyStatefulProductWorkflow(environment, issuedCredential, isol
         execute_payment: false,
         line_items: [{
           type: "product",
-          product: { product_id: product.id, price: price.fixed_amount, quantity: 2 },
+          product: { product_id: product.id, price_id: price.id, quantity: 2 },
         }],
       }),
     });
@@ -836,7 +835,17 @@ async function verifyStatefulProductWorkflow(environment, issuedCredential, isol
     assert.deepEqual(
       order.line_item_group.line_items[0].product.price,
       price.fixed_amount,
-      "order did not retain the amount handed off from the created price",
+      "order did not snapshot the amount resolved from the stored price",
+    );
+    assert.equal(
+      order.line_item_group.line_items[0].product.price_id,
+      price.id,
+      "order did not retain the stored price reference",
+    );
+    assert.deepEqual(
+      order.line_item_group.total,
+      { currency: price.fixed_amount.currency, value: price.fixed_amount.value * 2 },
+      "order total did not reconcile with the resolved price and quantity",
     );
     checks += 1;
 

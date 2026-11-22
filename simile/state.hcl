@@ -153,6 +153,38 @@ effect "mutate_customer" {
   }
 }
 
+# Why: createOrder accepts a catalog price reference instead of an inline amount. Resolving the
+# stored public price lets Simile snapshot the same amount and reconcile the order total while the
+# caller's request remains the contract-valid price_id branch.
+behavior "createOrder" {
+  resolve "db.resources" {
+    collection = "prices"
+    key        = "/line_items/*/product/price_id"
+    select     = "/fixed_amount"
+    into       = "/line_items/*/product/price"
+
+    where {
+      stored  = "/product_id"
+      request = "/line_items/*/product/product_id"
+    }
+
+    where {
+      stored = "/type"
+      equals = "fixed_amount"
+    }
+
+    where {
+      stored = "/active"
+      equals = true
+    }
+
+    where {
+      stored = "/archived_at"
+      state  = "null-or-absent"
+    }
+  }
+}
+
 effect "mutate_order" {
   description = "Record the latest public order snapshot after an order or checkout transition."
   operations = [
