@@ -33,14 +33,14 @@ structure untagged {}
 
 
 @collectionVersion(
-"0.1.0-beta97"
+"0.1.0-beta99"
 )
 @auth([
     httpBearerAuth
 ])
 @httpBearerAuth
 service Inttegro {
-    version: "0.1.0-beta97"
+    version: "0.1.0-beta99"
     operations: [
         activatePaymentMethod
         activatePrice
@@ -7440,7 +7440,7 @@ structure archivePrice200 {
     @httpPayload
     @required
     @contentType("application/json")
-    body: PriceResponse
+    body: ArchivedPriceResponse
     @dataExamples([
     {
         "json": "req_01hzz8y7q5r4q4f6r6q6k2z3w1"
@@ -10855,6 +10855,15 @@ structure ApplicationOperatingPolicy {
     @required
     source: OperatingPolicySource
 }
+
+structure ArchivedPriceResponse {
+    @required
+    price: ArchivedPriceResponseprice
+}
+
+structure ArchivedPriceResponsepriceoneOfalt0 with [FixedCatalogPriceMixin] {}
+
+structure ArchivedPriceResponsepriceoneOfalt1 with [CustomerSelectedCatalogPriceMixin] {}
 
 structure ArchivePaymentMethodRequest {
     /// ID of the payment method to archive
@@ -15824,7 +15833,7 @@ structure CustomerSelectedAmountParamscurrency {}
         ]
     }
 )
-structure CustomerSelectedCatalogPrice with [CustomerSelectedCatalogPriceFields] {}
+structure CustomerSelectedCatalogPrice with [CustomerSelectedCatalogPriceMixin] {}
 
 @simileSchema(
 {
@@ -16058,6 +16067,38 @@ structure CustomerSelectedCatalogPriceFields {
 
 /// Embedded product details, if this price belongs to a product
 structure CustomerSelectedCatalogPriceFieldsproduct with [PriceEmbeddedProduct] {}
+
+@simileSchema(
+{
+        "allOf": [
+            {
+                "shape": "CustomerSelectedCatalogPriceFields"
+            },
+            {
+                "anyOf": [
+                    {
+                        "properties": {
+                            "product_id": {}
+                        },
+                        "required": [
+                            "product_id"
+                        ]
+                    },
+                    {
+                        "properties": {
+                            "product": {}
+                        },
+                        "required": [
+                            "product"
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+)
+@mixin
+structure CustomerSelectedCatalogPriceMixin with [CustomerSelectedCatalogPriceFields] {}
 
 structure CustomerSelectedCatalogPriceParams {
     /// Product ID to associate this price with. It is immutable once set.
@@ -17801,7 +17842,172 @@ structure FinancialInstitutionmobileMoneyProvider {
         }
     ]
 )
-structure FixedCatalogPrice {
+structure FixedCatalogPrice with [FixedCatalogPriceMixin] {}
+
+@simileSchema(
+{
+        "additionalProperties": false,
+        "properties": {
+            "about": {
+                "description": "Longer description of this price",
+                "example": "Standard pricing for individual customers",
+                "type": [
+                    "string",
+                    "null"
+                ]
+            },
+            "active": {
+                "description": "Whether this price is active and usable in new flows",
+                "example": true,
+                "type": "boolean"
+            },
+            "archived_at": {
+                "description": "Archive timestamp (if archived). A non-null value means `active` is false.",
+                "format": "date-time",
+                "type": [
+                    "string",
+                    "null"
+                ]
+            },
+            "created_at": {
+                "description": "Price creation timestamp",
+                "example": "2024-01-15T10:30:00Z",
+                "format": "date-time",
+                "type": "string"
+            },
+            "fixed_amount": {
+                "shape": "Amount"
+            },
+            "id": {
+                "description": "Unique price identifier with pr_ prefix",
+                "example": "pr_xyz789",
+                "pattern": "^pr_",
+                "type": "string"
+            },
+            "label": {
+                "description": "Short label for this price",
+                "example": "Standard pricing",
+                "type": [
+                    "string",
+                    "null"
+                ]
+            },
+            "product": {
+                "allOf": [
+                    {
+                        "shape": "PriceEmbeddedProduct"
+                    }
+                ],
+                "description": "Embedded product details, if this price belongs to a product",
+                "type": [
+                    "object",
+                    "null"
+                ]
+            },
+            "product_id": {
+                "description": "Product ID when the operation returns the relationship by reference",
+                "example": "prod_abc123",
+                "pattern": "^prod_",
+                "type": "string"
+            },
+            "type": {
+                "enum": [
+                    "fixed_amount"
+                ],
+                "type": "string"
+            },
+            "updated_at": {
+                "description": "Last update timestamp",
+                "example": "2024-01-20T14:45:00Z",
+                "format": "date-time",
+                "type": [
+                    "string",
+                    "null"
+                ]
+            }
+        },
+        "required": [
+            "id",
+            "active",
+            "type",
+            "created_at",
+            "fixed_amount"
+        ],
+        "simileConstraints": [
+            {
+                "ordered": {
+                    "paths": [
+                        "/created_at",
+                        "/updated_at"
+                    ]
+                }
+            },
+            {
+                "ordered": {
+                    "paths": [
+                        "/created_at",
+                        "/archived_at"
+                    ]
+                }
+            },
+            {
+                "implies": {
+                    "then": {
+                        "all": [
+                            {
+                                "path": "/archived_at",
+                                "state": "null-or-absent"
+                            }
+                        ]
+                    },
+                    "when": {
+                        "equals": true,
+                        "path": "/active"
+                    }
+                }
+            }
+        ],
+        "type": "object"
+    }
+)
+@simileConstraints(
+[
+        {
+            "ordered": {
+                "paths": [
+                    "/created_at",
+                    "/updated_at"
+                ]
+            }
+        },
+        {
+            "ordered": {
+                "paths": [
+                    "/created_at",
+                    "/archived_at"
+                ]
+            }
+        },
+        {
+            "implies": {
+                "then": {
+                    "all": [
+                        {
+                            "path": "/archived_at",
+                            "state": "null-or-absent"
+                        }
+                    ]
+                },
+                "when": {
+                    "equals": true,
+                    "path": "/active"
+                }
+            }
+        }
+    ]
+)
+@mixin
+structure FixedCatalogPriceMixin {
     /// Unique price identifier with pr_ prefix
     @dataExamples([
     {
@@ -17833,6 +18039,8 @@ structure FixedCatalogPrice {
 ])
     @required
     active: Boolean
+    @required
+    type: FixedCatalogPricetype
     @required
     fixed_amount: Amount
     /// Product ID when the operation returns the relationship by reference
@@ -64126,6 +64334,12 @@ union ApplicationCapabilitiesResponsecapabilitiespayouts {
     EnabledApplicationCapability: EnabledApplicationCapability
     RestrictedApplicationCapability: RestrictedApplicationCapability
     PendingReviewApplicationCapability: PendingReviewApplicationCapability
+}
+
+@untagged
+union ArchivedPriceResponseprice {
+    alt0: ArchivedPriceResponsepriceoneOfalt0
+    alt1: ArchivedPriceResponsepriceoneOfalt1
 }
 
 /// Merchant balance entry caused by a payment, refund, or payout. `type` is the

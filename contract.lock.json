@@ -1,11 +1,11 @@
 {
   "version": 5,
-  "collection_version": "0.1.0-beta97",
-  "openapi_sha256": "73248c5e2677d19da98dc97cf7ce14188d9689465a21ad0c306fe9fad12a6a6c",
-  "smithy_sha256": "38186bac58e356c8f19e418b258b8653bb1c0d6e377fede8ccc841b13664719f",
-  "typescript_sha256": "8d72ce49ce1f3ce26e586c23670db0f3db425ba027abb9b90375cc3456fa2dd6",
-  "insomnia_sha256": "dd7eea890e4202d657691dbb43a18a8f7016bdb021dada411371de78112b3028",
-  "postman_sha256": "a6210303e0cb04e2c27ad99b351e2b0d71b71ad406812a8a66339a625a16d11e",
+  "collection_version": "0.1.0-beta99",
+  "openapi_sha256": "ff4b575234c0bc68d68912ac8e4feffa0d262de94617229287b2c7bdcb06a611",
+  "smithy_sha256": "a8ca6b56ad8d5c8bd501cf071049e03a73b37476da602b3ca3e02ab3f09df1a4",
+  "typescript_sha256": "36304f958e49ba8e9b249ed245922d52851c077d107c369e03c3314f9db37f2c",
+  "insomnia_sha256": "e2d97f6195db905653228711dd21b5e831a53440a98333bcf131ef7c1b5f8f1d",
+  "postman_sha256": "e42a3106d35f2ddcdd835c960e598211c9868e4b1c8a7cc14765a082c1001c7d",
   "operation_count": 135,
   "insomnia_request_count": 135,
   "postman_request_count": 135

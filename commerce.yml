@@ -6,8 +6,8 @@ info:
     description: Machine-readable reference for the public Inttegro API
     # Why: contract and client artifacts are reviewed as one immutable bundle;
     # changing soundness rules or executable examples requires a new bundle identity.
-    version: 0.1.0-beta97
-    x-inttegro-collection-version: 0.1.0-beta97
+    version: 0.1.0-beta99
+    x-inttegro-collection-version: 0.1.0-beta99
     contact:
         name: Inttegro Engineering
         url: "https://inttegro.com"
@@ -13365,7 +13365,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/PriceResponse'
+                                $ref: '#/components/schemas/ArchivedPriceResponse'
                             # Why: this operation must return a result reachable from the caller-selected resource or page.
                             x-simile-from-request:
                                 bindings:
@@ -19415,6 +19415,29 @@ components:
             properties:
                 price:
                     $ref: '#/components/schemas/CatalogPrice'
+        ArchivedPriceResponse:
+            type: object
+            additionalProperties: false
+            required: [price]
+            properties:
+                price:
+                    # Why: a successful archive must expose the lifecycle evidence callers need
+                    # to distinguish it from ordinary deactivation.
+                    oneOf:
+                        - allOf:
+                              - $ref: '#/components/schemas/FixedCatalogPrice'
+                              - type: object
+                                required: [active, archived_at]
+                                properties:
+                                    active: { type: boolean, enum: [false] }
+                                    archived_at: { type: string, format: date-time }
+                        - allOf:
+                              - $ref: '#/components/schemas/CustomerSelectedCatalogPrice'
+                              - type: object
+                                required: [active, archived_at]
+                                properties:
+                                    active: { type: boolean, enum: [false] }
+                                    archived_at: { type: string, format: date-time }
         CatalogPriceParams:
             oneOf:
                 - $ref: '#/components/schemas/FixedCatalogPriceParams'

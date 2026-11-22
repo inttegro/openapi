@@ -572,6 +572,49 @@
                 }
             }
         },
+        "com.inttegro.api#ArchivedPriceResponse": {
+            "type": "structure",
+            "members": {
+                "price": {
+                    "target": "com.inttegro.api#ArchivedPriceResponseprice",
+                    "traits": {
+                        "smithy.api#required": {}
+                    }
+                }
+            }
+        },
+        "com.inttegro.api#ArchivedPriceResponseprice": {
+            "type": "union",
+            "members": {
+                "alt0": {
+                    "target": "com.inttegro.api#ArchivedPriceResponsepriceoneOfalt0"
+                },
+                "alt1": {
+                    "target": "com.inttegro.api#ArchivedPriceResponsepriceoneOfalt1"
+                }
+            },
+            "traits": {
+                "com.inttegro.api#untagged": {}
+            }
+        },
+        "com.inttegro.api#ArchivedPriceResponsepriceoneOfalt0": {
+            "type": "structure",
+            "mixins": [
+                {
+                    "target": "com.inttegro.api#FixedCatalogPriceMixin"
+                }
+            ],
+            "members": {}
+        },
+        "com.inttegro.api#ArchivedPriceResponsepriceoneOfalt1": {
+            "type": "structure",
+            "mixins": [
+                {
+                    "target": "com.inttegro.api#CustomerSelectedCatalogPriceMixin"
+                }
+            ],
+            "members": {}
+        },
         "com.inttegro.api#BalanceHolds": {
             "type": "structure",
             "members": {
@@ -9429,7 +9472,7 @@
             "type": "structure",
             "mixins": [
                 {
-                    "target": "com.inttegro.api#CustomerSelectedCatalogPriceFields"
+                    "target": "com.inttegro.api#CustomerSelectedCatalogPriceMixin"
                 }
             ],
             "members": {},
@@ -9756,6 +9799,45 @@
                         "smithy.api#enumValue": "customer_selected_amount"
                     }
                 }
+            }
+        },
+        "com.inttegro.api#CustomerSelectedCatalogPriceMixin": {
+            "type": "structure",
+            "mixins": [
+                {
+                    "target": "com.inttegro.api#CustomerSelectedCatalogPriceFields"
+                }
+            ],
+            "members": {},
+            "traits": {
+                "com.inttegro.api#simileSchema": {
+                    "allOf": [
+                        {
+                            "shape": "CustomerSelectedCatalogPriceFields"
+                        },
+                        {
+                            "anyOf": [
+                                {
+                                    "properties": {
+                                        "product_id": {}
+                                    },
+                                    "required": [
+                                        "product_id"
+                                    ]
+                                },
+                                {
+                                    "properties": {
+                                        "product": {}
+                                    },
+                                    "required": [
+                                        "product"
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                },
+                "smithy.api#mixin": {}
             }
         },
         "com.inttegro.api#CustomerSelectedCatalogPriceParams": {
@@ -15844,6 +15926,175 @@
         },
         "com.inttegro.api#FixedCatalogPrice": {
             "type": "structure",
+            "mixins": [
+                {
+                    "target": "com.inttegro.api#FixedCatalogPriceMixin"
+                }
+            ],
+            "members": {},
+            "traits": {
+                "com.inttegro.api#simileConstraints": [
+                    {
+                        "ordered": {
+                            "paths": [
+                                "/created_at",
+                                "/updated_at"
+                            ]
+                        }
+                    },
+                    {
+                        "ordered": {
+                            "paths": [
+                                "/created_at",
+                                "/archived_at"
+                            ]
+                        }
+                    },
+                    {
+                        "implies": {
+                            "then": {
+                                "all": [
+                                    {
+                                        "path": "/archived_at",
+                                        "state": "null-or-absent"
+                                    }
+                                ]
+                            },
+                            "when": {
+                                "equals": true,
+                                "path": "/active"
+                            }
+                        }
+                    }
+                ],
+                "com.inttegro.api#simileSchema": {
+                    "additionalProperties": false,
+                    "properties": {
+                        "about": {
+                            "description": "Longer description of this price",
+                            "example": "Standard pricing for individual customers",
+                            "type": [
+                                "string",
+                                "null"
+                            ]
+                        },
+                        "active": {
+                            "description": "Whether this price is active and usable in new flows",
+                            "example": true,
+                            "type": "boolean"
+                        },
+                        "archived_at": {
+                            "description": "Archive timestamp (if archived). A non-null value means `active` is false.",
+                            "format": "date-time",
+                            "type": [
+                                "string",
+                                "null"
+                            ]
+                        },
+                        "created_at": {
+                            "description": "Price creation timestamp",
+                            "example": "2024-01-15T10:30:00Z",
+                            "format": "date-time",
+                            "type": "string"
+                        },
+                        "fixed_amount": {
+                            "shape": "Amount"
+                        },
+                        "id": {
+                            "description": "Unique price identifier with pr_ prefix",
+                            "example": "pr_xyz789",
+                            "pattern": "^pr_",
+                            "type": "string"
+                        },
+                        "label": {
+                            "description": "Short label for this price",
+                            "example": "Standard pricing",
+                            "type": [
+                                "string",
+                                "null"
+                            ]
+                        },
+                        "product": {
+                            "allOf": [
+                                {
+                                    "shape": "PriceEmbeddedProduct"
+                                }
+                            ],
+                            "description": "Embedded product details, if this price belongs to a product",
+                            "type": [
+                                "object",
+                                "null"
+                            ]
+                        },
+                        "product_id": {
+                            "description": "Product ID when the operation returns the relationship by reference",
+                            "example": "prod_abc123",
+                            "pattern": "^prod_",
+                            "type": "string"
+                        },
+                        "type": {
+                            "enum": [
+                                "fixed_amount"
+                            ],
+                            "type": "string"
+                        },
+                        "updated_at": {
+                            "description": "Last update timestamp",
+                            "example": "2024-01-20T14:45:00Z",
+                            "format": "date-time",
+                            "type": [
+                                "string",
+                                "null"
+                            ]
+                        }
+                    },
+                    "required": [
+                        "id",
+                        "active",
+                        "type",
+                        "created_at",
+                        "fixed_amount"
+                    ],
+                    "simileConstraints": [
+                        {
+                            "ordered": {
+                                "paths": [
+                                    "/created_at",
+                                    "/updated_at"
+                                ]
+                            }
+                        },
+                        {
+                            "ordered": {
+                                "paths": [
+                                    "/created_at",
+                                    "/archived_at"
+                                ]
+                            }
+                        },
+                        {
+                            "implies": {
+                                "then": {
+                                    "all": [
+                                        {
+                                            "path": "/archived_at",
+                                            "state": "null-or-absent"
+                                        }
+                                    ]
+                                },
+                                "when": {
+                                    "equals": true,
+                                    "path": "/active"
+                                }
+                            }
+                        }
+                    ],
+                    "type": "object"
+                }
+            }
+        },
+        "com.inttegro.api#FixedCatalogPriceMixin": {
+            "type": "structure",
             "members": {
                 "id": {
                     "target": "smithy.api#String",
@@ -15889,6 +16140,12 @@
                             }
                         ],
                         "smithy.api#documentation": "Whether this price is active and usable in new flows",
+                        "smithy.api#required": {}
+                    }
+                },
+                "type": {
+                    "target": "com.inttegro.api#FixedCatalogPricetype",
+                    "traits": {
                         "smithy.api#required": {}
                     }
                 },
@@ -16104,7 +16361,8 @@
                         }
                     ],
                     "type": "object"
-                }
+                },
+                "smithy.api#mixin": {}
             }
         },
         "com.inttegro.api#FixedCatalogPriceParams": {
@@ -16927,7 +17185,7 @@
         },
         "com.inttegro.api#Inttegro": {
             "type": "service",
-            "version": "0.1.0-beta97",
+            "version": "0.1.0-beta99",
             "operations": [
                 {
                     "target": "com.inttegro.api#activatePaymentMethod"
@@ -17336,7 +17594,7 @@
                 }
             ],
             "traits": {
-                "com.inttegro.api#collectionVersion": "0.1.0-beta97",
+                "com.inttegro.api#collectionVersion": "0.1.0-beta99",
                 "smithy.api#auth": [
                     "smithy.api#httpBearerAuth"
                 ],
@@ -49944,7 +50202,7 @@
             "type": "structure",
             "members": {
                 "body": {
-                    "target": "com.inttegro.api#PriceResponse",
+                    "target": "com.inttegro.api#ArchivedPriceResponse",
                     "traits": {
                         "com.inttegro.api#contentType": "application/json",
                         "smithy.api#httpPayload": {},

@@ -90,6 +90,15 @@ export namespace Output {
     readonly "capabilities": Output.OperatingPolicyCapabilities;
     readonly "source": Output.OperatingPolicySource;
   }>;
+  export type ArchivedPriceResponse = (Closed<{
+    readonly "price": (Output.FixedCatalogPrice & {
+      readonly "active": false;
+      readonly "archived_at": DateTime;
+    } | Output.CustomerSelectedCatalogPrice & {
+      readonly "active": false;
+      readonly "archived_at": DateTime;
+    });
+  }>);
   export type ArchivePaymentMethodRequest = Closed<{
     /** ID of the payment method to archive */
     readonly "payment_method_id": `pm_${string}`;

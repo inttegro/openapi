@@ -1304,7 +1304,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/PriceResponse'
+                                $ref: '#/components/schemas/ArchivedPriceResponse'
                             # Why: this operation must return a result reachable from the caller-selected resource or page.
                             x-simile-from-request:
                                 bindings:
@@ -2250,6 +2250,29 @@ components:
             properties:
                 price:
                     $ref: '#/components/schemas/CatalogPrice'
+        ArchivedPriceResponse:
+            type: object
+            additionalProperties: false
+            required: [price]
+            properties:
+                price:
+                    # Why: a successful archive must expose the lifecycle evidence callers need
+                    # to distinguish it from ordinary deactivation.
+                    oneOf:
+                        - allOf:
+                              - $ref: '#/components/schemas/FixedCatalogPrice'
+                              - type: object
+                                required: [active, archived_at]
+                                properties:
+                                    active: { type: boolean, enum: [false] }
+                                    archived_at: { type: string, format: date-time }
+                        - allOf:
+                              - $ref: './customers.yml#/components/schemas/CustomerSelectedCatalogPrice'
+                              - type: object
+                                required: [active, archived_at]
+                                properties:
+                                    active: { type: boolean, enum: [false] }
+                                    archived_at: { type: string, format: date-time }
         CatalogPriceParams:
             oneOf:
                 - $ref: '#/components/schemas/FixedCatalogPriceParams'

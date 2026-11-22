@@ -237,7 +237,7 @@ export interface PricesOperations {
           readonly "X-Request-Id"?: string;
         };
         readonly content: {
-          readonly "application/json": Output.PriceResponse;
+          readonly "application/json": Output.ArchivedPriceResponse;
         };
       };
       readonly "400": {
@@ -343,7 +343,7 @@ export interface PricesOperations {
         };
       };
     };
-    readonly result: { readonly status: 200; readonly content_type: "application/json"; readonly body: Output.PriceResponse } | { readonly status: 400; readonly content_type: "application/json"; readonly body: Output.Error & (((({
+    readonly result: { readonly status: 200; readonly content_type: "application/json"; readonly body: Output.ArchivedPriceResponse } | { readonly status: 400; readonly content_type: "application/json"; readonly body: Output.Error & (((({
   readonly "cause": "invalid_request_parameter";
   readonly "code": ("idempotency_key_invalid" | "idempotency_key_mismatch" | "idempotency_key_unsupported");
   readonly "fix_code": "change_request_parameters";

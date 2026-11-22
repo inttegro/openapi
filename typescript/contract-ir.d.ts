@@ -1,5 +1,5 @@
 // Internal compiler IR generated from commerce.yml; DO NOT EDIT OR PUBLISH AS THE TYPESCRIPT CONTRACT.
-// OpenAPI SHA-256: 73248c5e2677d19da98dc97cf7ce14188d9689465a21ad0c306fe9fad12a6a6c
+// OpenAPI SHA-256: ff4b575234c0bc68d68912ac8e4feffa0d262de94617229287b2c7bdcb06a611
 // This file contains declarations only and emits no JavaScript.
 
 import type {
@@ -10,10 +10,10 @@ import type {
   RelationWellFormed,
 } from "./proof-kernel";
 
-export type CollectionVersion = "0.1.0-beta97";
-export type SourceOpenApiSha256 = "73248c5e2677d19da98dc97cf7ce14188d9689465a21ad0c306fe9fad12a6a6c";
+export type CollectionVersion = "0.1.0-beta99";
+export type SourceOpenApiSha256 = "ff4b575234c0bc68d68912ac8e4feffa0d262de94617229287b2c7bdcb06a611";
 export type OperationCount = 135;
-export type SchemaCount = 604;
+export type SchemaCount = 605;
 export type ConstraintCount = 244;
 export type ResponseRelationCount = 124;
 
@@ -330,6 +330,71 @@ export interface SchemaDefinitions {
       };
       readonly "source": {
         readonly "$ref": "#/components/schemas/OperatingPolicySource";
+      };
+    };
+  };
+  readonly "ArchivedPriceResponse": {
+    readonly "type": "object";
+    readonly "additionalProperties": false;
+    readonly "required": readonly [
+      "price",
+    ];
+    readonly "properties": {
+      readonly "price": {
+        readonly "oneOf": readonly [
+          {
+            readonly "allOf": readonly [
+              {
+                readonly "$ref": "#/components/schemas/FixedCatalogPrice";
+              },
+              {
+                readonly "type": "object";
+                readonly "required": readonly [
+                  "active",
+                  "archived_at",
+                ];
+                readonly "properties": {
+                  readonly "active": {
+                    readonly "type": "boolean";
+                    readonly "enum": readonly [
+                      false,
+                    ];
+                  };
+                  readonly "archived_at": {
+                    readonly "type": "string";
+                    readonly "format": "date-time";
+                  };
+                };
+              },
+            ];
+          },
+          {
+            readonly "allOf": readonly [
+              {
+                readonly "$ref": "#/components/schemas/CustomerSelectedCatalogPrice";
+              },
+              {
+                readonly "type": "object";
+                readonly "required": readonly [
+                  "active",
+                  "archived_at",
+                ];
+                readonly "properties": {
+                  readonly "active": {
+                    readonly "type": "boolean";
+                    readonly "enum": readonly [
+                      false,
+                    ];
+                  };
+                  readonly "archived_at": {
+                    readonly "type": "string";
+                    readonly "format": "date-time";
+                  };
+                };
+              },
+            ];
+          },
+        ];
       };
     };
   };
@@ -32009,7 +32074,7 @@ export interface OperationDefinitions {
         readonly "content": {
           readonly "application/json": {
             readonly "schema": {
-              readonly "$ref": "#/components/schemas/PriceResponse";
+              readonly "$ref": "#/components/schemas/ArchivedPriceResponse";
             };
             readonly "relation": {
               readonly "bindings": readonly [

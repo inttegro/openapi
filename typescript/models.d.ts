@@ -105,6 +105,16 @@ export type ApplicationOperatingPolicy = Closed<{
   readonly "source": OperatingPolicySource;
 }>;
 
+export type ArchivedPriceResponse = (Closed<{
+  readonly "price": (FixedCatalogPrice & {
+    readonly "active": false;
+    readonly "archived_at": DateTime;
+  } | CustomerSelectedCatalogPrice & {
+    readonly "active": false;
+    readonly "archived_at": DateTime;
+  });
+}>);
+
 export type ArchivePaymentMethodRequest = Closed<{
   /** ID of the payment method to archive */
   readonly "payment_method_id": `pm_${string}`;
