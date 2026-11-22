@@ -2703,7 +2703,8 @@ components:
         ChimeTransmission:
             type: object
             additionalProperties: false
-            required: [address, created_at, gateway, id, initialized_at, mechanism, status]
+            description: Public delivery lifecycle for a Chime.
+            required: [address, created_at, initialized_at, mechanism, status]
             # Delivery status must be backed by the corresponding mutually exclusive transmission evidence.
             x-simile-constraints:
                 - ordered:
@@ -2745,31 +2746,10 @@ components:
                 delivered_at:
                     type: string
                     format: date-time
-                email_events:
-                    type: array
-                    items:
-                        $ref: '#/components/schemas/ChimeEmailEvent'
-                email_failure_code:
-                    type: string
-                email_failure_reason:
-                    type: string
-                email_status:
-                    type: string
-                error:
-                    type: string
                 failed_at:
                     type: string
                     format: date-time
-                gateway:
-                    type: string
-                gateway_message_id:
-                    type: string
-                id:
-                    type: string
                 initialized_at:
-                    type: string
-                    format: date-time
-                last_email_event_at:
                     type: string
                     format: date-time
                 mechanism:
@@ -2786,42 +2766,6 @@ components:
                 suppressed_at:
                     type: string
                     format: date-time
-                suppression_reason:
-                    type: string
-        ChimeEmailEvent:
-            type: object
-            additionalProperties: false
-            required: [id, occurred_at, provider, provider_message_id, type]
-            properties:
-                bounce_sub_type:
-                    type: string
-                bounce_type:
-                    type: string
-                complaint_sub_type:
-                    type: string
-                id:
-                    type: string
-                occurred_at:
-                    type: string
-                    format: date-time
-                provider:
-                    type: string
-                provider_message_id:
-                    type: string
-                reason:
-                    type: string
-                reason_code:
-                    type: string
-                recipient:
-                    type: string
-                source:
-                    type: string
-                suppress_recipient:
-                    type: boolean
-                temporary:
-                    type: boolean
-                type:
-                    type: string
         ChimeEmailMessageInput:
             type: object
             additionalProperties: false

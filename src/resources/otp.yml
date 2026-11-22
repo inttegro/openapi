@@ -310,10 +310,6 @@ components:
                     type: string
                     description: SMS body or email copy containing the required `{token}` placeholder and optional `{service}` placeholder. Email templates must contain `{token}` exactly once. A custom template replaces the purpose-specific default body, while `purpose` still controls the email subject and heading. Email sends this as the plain-text fallback and renders the copy around a prominent code in the HTML version. Defaults are transport-specific.
                     example: "Your {service} code is {token}."
-                preferred_gateway:
-                    type: string
-                    description: Optional SMS gateway; not valid for email OTP delivery. Email uses the configured default provider.
-                    example: "arkesel"
                 purpose:
                     $ref: '#/components/schemas/OTPPurpose'
                 recipient:

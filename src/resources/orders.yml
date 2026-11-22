@@ -1295,7 +1295,6 @@ paths:
                                             failed_channels: [sms]
                                             failures:
                                                 - channel: sms
-                                                  error: Delivery was not accepted
                                             sent_channels: [email]
                                         order:
                                             customer:
@@ -1511,7 +1510,6 @@ paths:
                                             failed_channels: [sms]
                                             failures:
                                                 - channel: sms
-                                                  error: Delivery was not accepted
                                             sent_channels: [email]
                                         order:
                                             customer:
@@ -2774,10 +2772,6 @@ components:
                     enum: [email, sms]
                     description: Delivery channel.
                     example: "email"
-                error:
-                    type: string
-                    description: Provider or Chime error for this channel.
-                    example: "chime api returned status=503"
         OrderDocumentDeliverySummary:
             type: object
             additionalProperties: false

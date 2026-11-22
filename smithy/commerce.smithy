@@ -33,14 +33,14 @@ structure untagged {}
 
 
 @collectionVersion(
-"0.1.0-beta99"
+"0.1.0-beta100"
 )
 @auth([
     httpBearerAuth
 ])
 @httpBearerAuth
 service Inttegro {
-    version: "0.1.0-beta99"
+    version: "0.1.0-beta100"
     operations: [
         activatePaymentMethod
         activatePrice
@@ -10798,6 +10798,12 @@ structure ApplicationCapabilitiesResponsecapabilities {
     payouts: ApplicationCapabilitiesResponsecapabilitiespayouts
 }
 
+/// Public capability states currently available to the application. Newly created applications can return an empty object until capabilities become available.
+structure ApplicationCapabilityProjection {
+    payments: ApplicationCapabilityProjectionpayments
+    payouts: ApplicationCapabilityProjectionpayouts
+}
+
 @simileSchema(
 {
         "additionalProperties": false,
@@ -13095,29 +13101,6 @@ structure Chime {
     transmission: ChimeTransmission
 }
 
-structure ChimeEmailEvent {
-    bounce_sub_type: String
-    bounce_type: String
-    complaint_sub_type: String
-    @required
-    id: String
-    @required
-    @timestampFormat("date-time")
-    occurred_at: Timestamp
-    @required
-    provider: String
-    @required
-    provider_message_id: String
-    reason: String
-    reason_code: String
-    recipient: String
-    source: String
-    suppress_recipient: Boolean
-    temporary: Boolean
-    @required
-    type: String
-}
-
 structure ChimeEmailMailbox {
     /// Optional display name
     @dataExamples([
@@ -13462,6 +13445,7 @@ structure ChimeSMSSettings {
     max_sender_char_len: Integer
 }
 
+/// Public delivery lifecycle for a Chime.
 @simileConstraints(
 [
         {
@@ -13582,23 +13566,11 @@ structure ChimeTransmission {
     created_at: Timestamp
     @timestampFormat("date-time")
     delivered_at: Timestamp
-    email_events: ChimeTransmissionemailEvents
-    email_failure_code: String
-    email_failure_reason: String
-    email_status: String
-    error: String
     @timestampFormat("date-time")
     failed_at: Timestamp
     @required
-    gateway: String
-    gateway_message_id: String
-    @required
-    id: String
-    @required
     @timestampFormat("date-time")
     initialized_at: Timestamp
-    @timestampFormat("date-time")
-    last_email_event_at: Timestamp
     @required
     mechanism: ChimeTransmissionmechanism
     @timestampFormat("date-time")
@@ -13608,7 +13580,6 @@ structure ChimeTransmission {
     status: String
     @timestampFormat("date-time")
     suppressed_at: Timestamp
-    suppression_reason: String
 }
 
 structure CompleteOrderRequest {
@@ -17262,7 +17233,6 @@ structure FinancialAccountCommonResponse {
     id: String
     institution: FinancialInstitution
     label: String
-    account_name_enquiry: FinancialAccountNameEnquiry
     pull_configuration: FinancialAccountPullConfiguration
     push_configuration: FinancialAccountPushConfiguration
     reference: String
@@ -17383,16 +17353,6 @@ structure FinancialAccountMandate {
     ip_address: String
     @required
     user_agent: String
-}
-
-/// Evidence that the provider resolved the bank account holder name before the account was persisted. This confirms account resolution, not ownership.
-structure FinancialAccountNameEnquiry {
-    @required
-    @timestampFormat("date-time")
-    completed_at: Timestamp
-    @required
-    provider_id: String
-    provider_reference: String
 }
 
 structure FinancialAccountOwnerCreateResponse {
@@ -18294,11 +18254,6 @@ structure GhanaBankAccountUpdateResponse with [GhanaBankAccountResponseMixin] {}
                 "example": "Your {service} code is {token}.",
                 "type": "string"
             },
-            "preferred_gateway": {
-                "description": "Optional SMS gateway; not valid for email OTP delivery. Email uses the configured default provider.",
-                "example": "arkesel",
-                "type": "string"
-            },
             "purpose": {
                 "shape": "OTPPurpose"
             },
@@ -18376,13 +18331,6 @@ structure InitiateOTPRequest {
     }
 ])
     message_template: String
-    /// Optional SMS gateway; not valid for email OTP delivery. Email uses the configured default provider.
-    @dataExamples([
-    {
-        "json": "arkesel"
-    }
-])
-    preferred_gateway: String
     @required
     purpose: OTPPurpose
     /// Phone number in international format (E.164) or bare email address. Transport is inferred from the address unless specified.
@@ -20894,13 +20842,6 @@ structure OrderDocumentDeliveryErrorResponse {
 structure OrderDocumentDeliveryFailure {
     @required
     channel: OrderDocumentDeliveryFailurechannel
-    /// Provider or Chime error for this channel.
-    @dataExamples([
-    {
-        "json": "chime api returned status=503"
-    }
-])
-    error: String
 }
 
 /// Delivery result for one hosted order document link.
@@ -58492,8 +58433,7 @@ structure sendChimeInput {
                                     ],
                                     "failures": [
                                         {
-                                            "channel": "sms",
-                                            "error": "Delivery was not accepted"
+                                            "channel": "sms"
                                         }
                                     ],
                                     "sent_channels": [
@@ -59022,8 +58962,7 @@ structure sendOrderInvoiceInput {
                                     ],
                                     "failures": [
                                         {
-                                            "channel": "sms",
-                                            "error": "Delivery was not accepted"
+                                            "channel": "sms"
                                         }
                                     ],
                                     "sent_channels": [
@@ -64337,6 +64276,19 @@ union ApplicationCapabilitiesResponsecapabilitiespayouts {
 }
 
 @untagged
+union ApplicationCapabilityProjectionpayments {
+    EnabledApplicationCapability: EnabledApplicationCapability
+    RestrictedApplicationCapability: RestrictedApplicationCapability
+}
+
+@untagged
+union ApplicationCapabilityProjectionpayouts {
+    EnabledApplicationCapability: EnabledApplicationCapability
+    RestrictedApplicationCapability: RestrictedApplicationCapability
+    PendingReviewApplicationCapability: PendingReviewApplicationCapability
+}
+
+@untagged
 union ArchivedPriceResponseprice {
     alt0: ArchivedPriceResponsepriceoneOfalt0
     alt1: ArchivedPriceResponsepriceoneOfalt1
@@ -67610,10 +67562,6 @@ list ChimeEmailSafetyResultreasonCodes {
 /// From addresses authorized for reusable message templates.
 list ChimeEmailSettingsallowedFrom {
     member: String
-}
-
-list ChimeTransmissionemailEvents {
-    member: ChimeEmailEvent
 }
 
 /// Branches available for this bank
@@ -73103,9 +73051,6 @@ enum AddCustomerSelectedProductPriceRequesttype {
 enum AddFixedProductPriceRequesttype {
     fixed_amount
 }
-
-/// Public capability states currently available to the application. Newly created applications can return an empty object until capabilities become available. New capability keys may appear over time.
-document ApplicationCapabilityProjection
 
 enum BalanceTransactionAllocationBasetype {
     payout

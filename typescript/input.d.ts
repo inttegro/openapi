@@ -71,10 +71,10 @@ export namespace Input {
       readonly "payouts": (Input.EnabledApplicationCapability | Input.RestrictedApplicationCapability | Input.PendingReviewApplicationCapability);
     }>);
   }>);
-  export type ApplicationCapabilityProjection = ({
+  export type ApplicationCapabilityProjection = (Closed<{
     readonly "payments"?: (Input.EnabledApplicationCapability | Input.RestrictedApplicationCapability);
     readonly "payouts"?: (Input.EnabledApplicationCapability | Input.RestrictedApplicationCapability | Input.PendingReviewApplicationCapability);
-  });
+  }>);
   export type ApplicationCapabilityRequirement = (Closed<{
     /** Stable public identifier for the requirement. */
     readonly "code": string;
@@ -602,22 +602,6 @@ export namespace Input {
     readonly "sender_id": string;
     readonly "transmission"?: Input.ChimeTransmission;
   }>;
-  export type ChimeEmailEvent = Closed<{
-    readonly "bounce_sub_type"?: string;
-    readonly "bounce_type"?: string;
-    readonly "complaint_sub_type"?: string;
-    readonly "id": string;
-    readonly "occurred_at": DateTime;
-    readonly "provider": string;
-    readonly "provider_message_id": string;
-    readonly "reason"?: string;
-    readonly "reason_code"?: string;
-    readonly "recipient"?: string;
-    readonly "source"?: string;
-    readonly "suppress_recipient"?: boolean;
-    readonly "temporary"?: boolean;
-    readonly "type": string;
-  }>;
   export type ChimeEmailMailbox = Closed<{
     /** Optional display name */
     readonly "name"?: string;
@@ -734,23 +718,13 @@ export namespace Input {
     readonly "address": string;
     readonly "created_at": DateTime;
     readonly "delivered_at"?: DateTime;
-    readonly "email_events"?: readonly (Input.ChimeEmailEvent)[];
-    readonly "email_failure_code"?: string;
-    readonly "email_failure_reason"?: string;
-    readonly "email_status"?: string;
-    readonly "error"?: string;
     readonly "failed_at"?: DateTime;
-    readonly "gateway": string;
-    readonly "gateway_message_id"?: string;
-    readonly "id": string;
     readonly "initialized_at": DateTime;
-    readonly "last_email_event_at"?: DateTime;
     readonly "mechanism": ("sms" | "email");
     readonly "sent_at"?: DateTime;
     readonly "sent_via"?: ("sms" | "email");
     readonly "status": string;
     readonly "suppressed_at"?: DateTime;
-    readonly "suppression_reason"?: string;
   }>);
   export type CompleteOrderRequest = Closed<{
     /** Unique identifier of the order to complete */
@@ -1972,7 +1946,6 @@ export namespace Input {
     readonly "id": `fa_${string}`;
     readonly "institution"?: Input.FinancialInstitution;
     readonly "label"?: string;
-    readonly "account_name_enquiry"?: Input.FinancialAccountNameEnquiry;
     readonly "pull_configuration"?: Input.FinancialAccountPullConfiguration;
     readonly "push_configuration"?: Input.FinancialAccountPushConfiguration;
     readonly "reference"?: string;
@@ -2038,11 +2011,6 @@ export namespace Input {
     readonly "id": `fm_${string}`;
     readonly "ip_address": string;
     readonly "user_agent": string;
-  }>;
-  export type FinancialAccountNameEnquiry = Closed<{
-    readonly "completed_at": DateTime;
-    readonly "provider_id": string;
-    readonly "provider_reference"?: string;
   }>;
   export type FinancialAccountOwnerCreateResponse = Closed<{
     readonly "address": Input.FinancialAccountAddressCreateResponse;
@@ -2279,8 +2247,6 @@ export namespace Input {
     readonly "async_delivery"?: boolean;
     /** SMS body or email copy containing the required `{token}` placeholder and optional `{service}` placeholder. Email templates must contain `{token}` exactly once. A custom template replaces the purpose-specific default body, while `purpose` still controls the email subject and heading. Email sends this as the plain-text fallback and renders the copy around a prominent code in the HTML version. Defaults are transport-specific. */
     readonly "message_template"?: string;
-    /** Optional SMS gateway; not valid for email OTP delivery. Email uses the configured default provider. */
-    readonly "preferred_gateway"?: string;
     readonly "purpose": Input.OTPPurpose;
     /** Phone number in international format (E.164) or bare email address. Transport is inferred from the address unless specified. */
     readonly "recipient": string;
@@ -2844,8 +2810,6 @@ export namespace Input {
   export type OrderDocumentDeliveryFailure = (Closed<{
     /** Delivery channel. */
     readonly "channel": ("email" | "sms");
-    /** Provider or Chime error for this channel. */
-    readonly "error"?: string;
   }>);
   export type OrderDocumentDeliveryRequest = Closed<{
     /** Order whose hosted invoice or receipt link should be delivered. */

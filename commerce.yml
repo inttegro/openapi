@@ -6,8 +6,8 @@ info:
     description: Machine-readable reference for the public Inttegro API
     # Why: contract and client artifacts are reviewed as one immutable bundle;
     # changing soundness rules or executable examples requires a new bundle identity.
-    version: 0.1.0-beta99
-    x-inttegro-collection-version: 0.1.0-beta99
+    version: 0.1.0-beta100
+    x-inttegro-collection-version: 0.1.0-beta100
     contact:
         name: Inttegro Engineering
         url: "https://inttegro.com"
@@ -4397,7 +4397,6 @@ paths:
                                             failed_channels: [sms]
                                             failures:
                                                 - channel: sms
-                                                  error: Delivery was not accepted
                                             sent_channels: [email]
                                         order:
                                             customer:
@@ -4613,7 +4612,6 @@ paths:
                                             failed_channels: [sms]
                                             failures:
                                                 - channel: sms
-                                                  error: Delivery was not accepted
                                             sent_channels: [email]
                                         order:
                                             customer:
@@ -14131,7 +14129,7 @@ components:
                                 - $ref: '#/components/schemas/PendingReviewApplicationCapability'
         ApplicationCapabilityProjection:
             type: object
-            description: Public capability states currently available to the application. Newly created applications can return an empty object until capabilities become available. New capability keys may appear over time.
+            description: Public capability states currently available to the application. Newly created applications can return an empty object until capabilities become available.
             properties:
                 payments:
                     oneOf:
@@ -14142,7 +14140,7 @@ components:
                         - $ref: '#/components/schemas/EnabledApplicationCapability'
                         - $ref: '#/components/schemas/RestrictedApplicationCapability'
                         - $ref: '#/components/schemas/PendingReviewApplicationCapability'
-            additionalProperties: true
+            additionalProperties: false
         PolicyAmountRange:
             type: object
             additionalProperties: false
@@ -20904,10 +20902,6 @@ components:
                     enum: [email, sms]
                     description: Delivery channel.
                     example: "email"
-                error:
-                    type: string
-                    description: Provider or Chime error for this channel.
-                    example: "chime api returned status=503"
         OrderDocumentDeliverySummary:
             type: object
             additionalProperties: false
@@ -25159,8 +25153,6 @@ components:
                     $ref: '#/components/schemas/FinancialInstitution'
                 label:
                     type: string
-                account_name_enquiry:
-                    $ref: '#/components/schemas/FinancialAccountNameEnquiry'
                 pull_configuration:
                     $ref: '#/components/schemas/FinancialAccountPullConfiguration'
                 push_configuration:
@@ -25174,19 +25166,6 @@ components:
                     enum: [wallet, bank_account, dosh_account]
                 verification:
                     $ref: '#/components/schemas/FinancialAccountVerification'
-        FinancialAccountNameEnquiry:
-            type: object
-            additionalProperties: false
-            required: [completed_at, provider_id]
-            description: Evidence that the provider resolved the bank account holder name before the account was persisted. This confirms account resolution, not ownership.
-            properties:
-                completed_at:
-                    type: string
-                    format: date-time
-                provider_id:
-                    type: string
-                provider_reference:
-                    type: string
         FinancialAccountVerification:
             type: object
             required: [initiated_at, request]
@@ -27197,7 +27176,8 @@ components:
         ChimeTransmission:
             type: object
             additionalProperties: false
-            required: [address, created_at, gateway, id, initialized_at, mechanism, status]
+            description: Public delivery lifecycle for a Chime.
+            required: [address, created_at, initialized_at, mechanism, status]
             # Delivery status must be backed by the corresponding mutually exclusive transmission evidence.
             x-simile-constraints:
                 - ordered:
@@ -27239,31 +27219,10 @@ components:
                 delivered_at:
                     type: string
                     format: date-time
-                email_events:
-                    type: array
-                    items:
-                        $ref: '#/components/schemas/ChimeEmailEvent'
-                email_failure_code:
-                    type: string
-                email_failure_reason:
-                    type: string
-                email_status:
-                    type: string
-                error:
-                    type: string
                 failed_at:
                     type: string
                     format: date-time
-                gateway:
-                    type: string
-                gateway_message_id:
-                    type: string
-                id:
-                    type: string
                 initialized_at:
-                    type: string
-                    format: date-time
-                last_email_event_at:
                     type: string
                     format: date-time
                 mechanism:
@@ -27280,42 +27239,6 @@ components:
                 suppressed_at:
                     type: string
                     format: date-time
-                suppression_reason:
-                    type: string
-        ChimeEmailEvent:
-            type: object
-            additionalProperties: false
-            required: [id, occurred_at, provider, provider_message_id, type]
-            properties:
-                bounce_sub_type:
-                    type: string
-                bounce_type:
-                    type: string
-                complaint_sub_type:
-                    type: string
-                id:
-                    type: string
-                occurred_at:
-                    type: string
-                    format: date-time
-                provider:
-                    type: string
-                provider_message_id:
-                    type: string
-                reason:
-                    type: string
-                reason_code:
-                    type: string
-                recipient:
-                    type: string
-                source:
-                    type: string
-                suppress_recipient:
-                    type: boolean
-                temporary:
-                    type: boolean
-                type:
-                    type: string
         ChimeEmailMessageInput:
             type: object
             additionalProperties: false
@@ -27890,10 +27813,6 @@ components:
                     type: string
                     description: SMS body or email copy containing the required `{token}` placeholder and optional `{service}` placeholder. Email templates must contain `{token}` exactly once. A custom template replaces the purpose-specific default body, while `purpose` still controls the email subject and heading. Email sends this as the plain-text fallback and renders the copy around a prominent code in the HTML version. Defaults are transport-specific.
                     example: "Your {service} code is {token}."
-                preferred_gateway:
-                    type: string
-                    description: Optional SMS gateway; not valid for email OTP delivery. Email uses the configured default provider.
-                    example: "arkesel"
                 purpose:
                     $ref: '#/components/schemas/OTPPurpose'
                 recipient:

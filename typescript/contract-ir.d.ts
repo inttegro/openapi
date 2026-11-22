@@ -1,5 +1,5 @@
 // Internal compiler IR generated from commerce.yml; DO NOT EDIT OR PUBLISH AS THE TYPESCRIPT CONTRACT.
-// OpenAPI SHA-256: ff4b575234c0bc68d68912ac8e4feffa0d262de94617229287b2c7bdcb06a611
+// OpenAPI SHA-256: 56c091cf0c5fdd6163ebfb0c3ad6c723ab86064d10196fcd5792b526b3fa5d29
 // This file contains declarations only and emits no JavaScript.
 
 import type {
@@ -10,10 +10,10 @@ import type {
   RelationWellFormed,
 } from "./proof-kernel";
 
-export type CollectionVersion = "0.1.0-beta99";
-export type SourceOpenApiSha256 = "ff4b575234c0bc68d68912ac8e4feffa0d262de94617229287b2c7bdcb06a611";
+export type CollectionVersion = "0.1.0-beta100";
+export type SourceOpenApiSha256 = "56c091cf0c5fdd6163ebfb0c3ad6c723ab86064d10196fcd5792b526b3fa5d29";
 export type OperationCount = 135;
-export type SchemaCount = 605;
+export type SchemaCount = 603;
 export type ConstraintCount = 244;
 export type ResponseRelationCount = 124;
 
@@ -276,7 +276,7 @@ export interface SchemaDefinitions {
         ];
       };
     };
-    readonly "additionalProperties": true;
+    readonly "additionalProperties": false;
   };
   readonly "ApplicationCapabilityRequirement": {
     readonly "type": "object";
@@ -3204,62 +3204,6 @@ export interface SchemaDefinitions {
       };
     };
   };
-  readonly "ChimeEmailEvent": {
-    readonly "type": "object";
-    readonly "additionalProperties": false;
-    readonly "required": readonly [
-      "id",
-      "occurred_at",
-      "provider",
-      "provider_message_id",
-      "type",
-    ];
-    readonly "properties": {
-      readonly "bounce_sub_type": {
-        readonly "type": "string";
-      };
-      readonly "bounce_type": {
-        readonly "type": "string";
-      };
-      readonly "complaint_sub_type": {
-        readonly "type": "string";
-      };
-      readonly "id": {
-        readonly "type": "string";
-      };
-      readonly "occurred_at": {
-        readonly "type": "string";
-        readonly "format": "date-time";
-      };
-      readonly "provider": {
-        readonly "type": "string";
-      };
-      readonly "provider_message_id": {
-        readonly "type": "string";
-      };
-      readonly "reason": {
-        readonly "type": "string";
-      };
-      readonly "reason_code": {
-        readonly "type": "string";
-      };
-      readonly "recipient": {
-        readonly "type": "string";
-      };
-      readonly "source": {
-        readonly "type": "string";
-      };
-      readonly "suppress_recipient": {
-        readonly "type": "boolean";
-      };
-      readonly "temporary": {
-        readonly "type": "boolean";
-      };
-      readonly "type": {
-        readonly "type": "string";
-      };
-    };
-  };
   readonly "ChimeEmailMailbox": {
     readonly "type": "object";
     readonly "additionalProperties": false;
@@ -3658,8 +3602,6 @@ export interface SchemaDefinitions {
     readonly "required": readonly [
       "address",
       "created_at",
-      "gateway",
-      "id",
       "initialized_at",
       "mechanism",
       "status",
@@ -3786,42 +3728,11 @@ export interface SchemaDefinitions {
         readonly "type": "string";
         readonly "format": "date-time";
       };
-      readonly "email_events": {
-        readonly "type": "array";
-        readonly "items": {
-          readonly "$ref": "#/components/schemas/ChimeEmailEvent";
-        };
-      };
-      readonly "email_failure_code": {
-        readonly "type": "string";
-      };
-      readonly "email_failure_reason": {
-        readonly "type": "string";
-      };
-      readonly "email_status": {
-        readonly "type": "string";
-      };
-      readonly "error": {
-        readonly "type": "string";
-      };
       readonly "failed_at": {
         readonly "type": "string";
         readonly "format": "date-time";
       };
-      readonly "gateway": {
-        readonly "type": "string";
-      };
-      readonly "gateway_message_id": {
-        readonly "type": "string";
-      };
-      readonly "id": {
-        readonly "type": "string";
-      };
       readonly "initialized_at": {
-        readonly "type": "string";
-        readonly "format": "date-time";
-      };
-      readonly "last_email_event_at": {
         readonly "type": "string";
         readonly "format": "date-time";
       };
@@ -3849,9 +3760,6 @@ export interface SchemaDefinitions {
       readonly "suppressed_at": {
         readonly "type": "string";
         readonly "format": "date-time";
-      };
-      readonly "suppression_reason": {
-        readonly "type": "string";
       };
     };
   };
@@ -10292,9 +10200,6 @@ export interface SchemaDefinitions {
       readonly "label": {
         readonly "type": "string";
       };
-      readonly "account_name_enquiry": {
-        readonly "$ref": "#/components/schemas/FinancialAccountNameEnquiry";
-      };
       readonly "pull_configuration": {
         readonly "$ref": "#/components/schemas/FinancialAccountPullConfiguration";
       };
@@ -10570,26 +10475,6 @@ export interface SchemaDefinitions {
         readonly "type": "string";
       };
       readonly "user_agent": {
-        readonly "type": "string";
-      };
-    };
-  };
-  readonly "FinancialAccountNameEnquiry": {
-    readonly "type": "object";
-    readonly "additionalProperties": false;
-    readonly "required": readonly [
-      "completed_at",
-      "provider_id",
-    ];
-    readonly "properties": {
-      readonly "completed_at": {
-        readonly "type": "string";
-        readonly "format": "date-time";
-      };
-      readonly "provider_id": {
-        readonly "type": "string";
-      };
-      readonly "provider_reference": {
         readonly "type": "string";
       };
     };
@@ -11583,9 +11468,6 @@ export interface SchemaDefinitions {
         readonly "default": false;
       };
       readonly "message_template": {
-        readonly "type": "string";
-      };
-      readonly "preferred_gateway": {
         readonly "type": "string";
       };
       readonly "purpose": {
@@ -14372,9 +14254,6 @@ export interface SchemaDefinitions {
           "email",
           "sms",
         ];
-      };
-      readonly "error": {
-        readonly "type": "string";
       };
     };
   };
@@ -115882,7 +115761,6 @@ export interface OperationExamples {
             readonly "failures": readonly [
               {
                 readonly "channel": "sms";
-                readonly "error": "Delivery was not accepted";
               },
             ];
             readonly "sent_channels": readonly [
@@ -115954,7 +115832,6 @@ export interface OperationExamples {
             readonly "failures": readonly [
               {
                 readonly "channel": "sms";
-                readonly "error": "Delivery was not accepted";
               },
             ];
             readonly "sent_channels": readonly [

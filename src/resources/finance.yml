@@ -2884,8 +2884,6 @@ components:
                     $ref: '#/components/schemas/FinancialInstitution'
                 label:
                     type: string
-                account_name_enquiry:
-                    $ref: '#/components/schemas/FinancialAccountNameEnquiry'
                 pull_configuration:
                     $ref: '#/components/schemas/FinancialAccountPullConfiguration'
                 push_configuration:
@@ -2899,19 +2897,6 @@ components:
                     enum: [wallet, bank_account, dosh_account]
                 verification:
                     $ref: '#/components/schemas/FinancialAccountVerification'
-        FinancialAccountNameEnquiry:
-            type: object
-            additionalProperties: false
-            required: [completed_at, provider_id]
-            description: Evidence that the provider resolved the bank account holder name before the account was persisted. This confirms account resolution, not ownership.
-            properties:
-                completed_at:
-                    type: string
-                    format: date-time
-                provider_id:
-                    type: string
-                provider_reference:
-                    type: string
         FinancialAccountVerification:
             type: object
             required: [initiated_at, request]

@@ -80,11 +80,11 @@ export type ApplicationCapabilitiesResponse = (Closed<{
   }>);
 }>);
 
-/** Public capability states currently available to the application. Newly created applications can return an empty object until capabilities become available. New capability keys may appear over time. */
-export type ApplicationCapabilityProjection = ({
+/** Public capability states currently available to the application. Newly created applications can return an empty object until capabilities become available. */
+export type ApplicationCapabilityProjection = (Closed<{
   readonly "payments"?: (EnabledApplicationCapability | RestrictedApplicationCapability);
   readonly "payouts"?: (EnabledApplicationCapability | RestrictedApplicationCapability | PendingReviewApplicationCapability);
-});
+}>);
 
 export type ApplicationCapabilityRequirement = (Closed<{
   /** Stable public identifier for the requirement. */
@@ -703,23 +703,6 @@ export type Chime = Closed<{
   readonly "transmission"?: ChimeTransmission;
 }>;
 
-export type ChimeEmailEvent = Closed<{
-  readonly "bounce_sub_type"?: string;
-  readonly "bounce_type"?: string;
-  readonly "complaint_sub_type"?: string;
-  readonly "id": string;
-  readonly "occurred_at": DateTime;
-  readonly "provider": string;
-  readonly "provider_message_id": string;
-  readonly "reason"?: string;
-  readonly "reason_code"?: string;
-  readonly "recipient"?: string;
-  readonly "source"?: string;
-  readonly "suppress_recipient"?: boolean;
-  readonly "temporary"?: boolean;
-  readonly "type": string;
-}>;
-
 export type ChimeEmailMailbox = Closed<{
   /** Optional display name */
   readonly "name"?: string;
@@ -854,27 +837,18 @@ export type ChimeSMSSettings = Closed<{
   readonly "max_sender_char_len": number;
 }>;
 
+/** Public delivery lifecycle for a Chime. */
 export type ChimeTransmission = (Closed<{
   readonly "address": string;
   readonly "created_at": DateTime;
   readonly "delivered_at"?: DateTime;
-  readonly "email_events"?: readonly (ChimeEmailEvent)[];
-  readonly "email_failure_code"?: string;
-  readonly "email_failure_reason"?: string;
-  readonly "email_status"?: string;
-  readonly "error"?: string;
   readonly "failed_at"?: DateTime;
-  readonly "gateway": string;
-  readonly "gateway_message_id"?: string;
-  readonly "id": string;
   readonly "initialized_at": DateTime;
-  readonly "last_email_event_at"?: DateTime;
   readonly "mechanism": ("sms" | "email");
   readonly "sent_at"?: DateTime;
   readonly "sent_via"?: ("sms" | "email");
   readonly "status": string;
   readonly "suppressed_at"?: DateTime;
-  readonly "suppression_reason"?: string;
 }>);
 
 export type CompleteOrderRequest = Closed<{
@@ -2236,7 +2210,6 @@ export type FinancialAccountCommonResponse = (Closed<{
   readonly "id": `fa_${string}`;
   readonly "institution"?: FinancialInstitution;
   readonly "label"?: string;
-  readonly "account_name_enquiry"?: FinancialAccountNameEnquiry;
   readonly "pull_configuration"?: FinancialAccountPullConfiguration;
   readonly "push_configuration"?: FinancialAccountPushConfiguration;
   readonly "reference"?: string;
@@ -2313,13 +2286,6 @@ export type FinancialAccountMandate = Closed<{
   readonly "id": `fm_${string}`;
   readonly "ip_address": string;
   readonly "user_agent": string;
-}>;
-
-/** Evidence that the provider resolved the bank account holder name before the account was persisted. This confirms account resolution, not ownership. */
-export type FinancialAccountNameEnquiry = Closed<{
-  readonly "completed_at": DateTime;
-  readonly "provider_id": string;
-  readonly "provider_reference"?: string;
 }>;
 
 export type FinancialAccountOwnerCreateResponse = Closed<{
@@ -2596,8 +2562,6 @@ export type InitiateOTPRequest = unknown & (Closed<{
   readonly "async_delivery"?: boolean;
   /** SMS body or email copy containing the required `{token}` placeholder and optional `{service}` placeholder. Email templates must contain `{token}` exactly once. A custom template replaces the purpose-specific default body, while `purpose` still controls the email subject and heading. Email sends this as the plain-text fallback and renders the copy around a prominent code in the HTML version. Defaults are transport-specific. */
   readonly "message_template"?: string;
-  /** Optional SMS gateway; not valid for email OTP delivery. Email uses the configured default provider. */
-  readonly "preferred_gateway"?: string;
   readonly "purpose": OTPPurpose;
   /** Phone number in international format (E.164) or bare email address. Transport is inferred from the address unless specified. */
   readonly "recipient": string;
@@ -3259,8 +3223,6 @@ export type OrderDocumentDeliveryErrorResponse = Closed<{
 export type OrderDocumentDeliveryFailure = (Closed<{
   /** Delivery channel. */
   readonly "channel": ("email" | "sms");
-  /** Provider or Chime error for this channel. */
-  readonly "error"?: string;
 }>);
 
 export type OrderDocumentDeliveryRequest = Closed<{

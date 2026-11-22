@@ -465,7 +465,6 @@ export interface OperationExamples {
             readonly "failures": readonly [
               {
                 readonly "channel": "sms";
-                readonly "error": "Delivery was not accepted";
               },
             ];
             readonly "sent_channels": readonly [
@@ -537,7 +536,6 @@ export interface OperationExamples {
             readonly "failures": readonly [
               {
                 readonly "channel": "sms";
-                readonly "error": "Delivery was not accepted";
               },
             ];
             readonly "sent_channels": readonly [

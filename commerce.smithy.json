@@ -437,9 +437,48 @@
             }
         },
         "com.inttegro.api#ApplicationCapabilityProjection": {
-            "type": "document",
+            "type": "structure",
+            "members": {
+                "payments": {
+                    "target": "com.inttegro.api#ApplicationCapabilityProjectionpayments"
+                },
+                "payouts": {
+                    "target": "com.inttegro.api#ApplicationCapabilityProjectionpayouts"
+                }
+            },
             "traits": {
-                "smithy.api#documentation": "Public capability states currently available to the application. Newly created applications can return an empty object until capabilities become available. New capability keys may appear over time."
+                "smithy.api#documentation": "Public capability states currently available to the application. Newly created applications can return an empty object until capabilities become available."
+            }
+        },
+        "com.inttegro.api#ApplicationCapabilityProjectionpayments": {
+            "type": "union",
+            "members": {
+                "EnabledApplicationCapability": {
+                    "target": "com.inttegro.api#EnabledApplicationCapability"
+                },
+                "RestrictedApplicationCapability": {
+                    "target": "com.inttegro.api#RestrictedApplicationCapability"
+                }
+            },
+            "traits": {
+                "com.inttegro.api#untagged": {}
+            }
+        },
+        "com.inttegro.api#ApplicationCapabilityProjectionpayouts": {
+            "type": "union",
+            "members": {
+                "EnabledApplicationCapability": {
+                    "target": "com.inttegro.api#EnabledApplicationCapability"
+                },
+                "RestrictedApplicationCapability": {
+                    "target": "com.inttegro.api#RestrictedApplicationCapability"
+                },
+                "PendingReviewApplicationCapability": {
+                    "target": "com.inttegro.api#PendingReviewApplicationCapability"
+                }
+            },
+            "traits": {
+                "com.inttegro.api#untagged": {}
             }
         },
         "com.inttegro.api#ApplicationCapabilityRequirement": {
@@ -4610,69 +4649,6 @@
                 "smithy.api#documentation": "A notification sent to one recipient"
             }
         },
-        "com.inttegro.api#ChimeEmailEvent": {
-            "type": "structure",
-            "members": {
-                "bounce_sub_type": {
-                    "target": "smithy.api#String"
-                },
-                "bounce_type": {
-                    "target": "smithy.api#String"
-                },
-                "complaint_sub_type": {
-                    "target": "smithy.api#String"
-                },
-                "id": {
-                    "target": "smithy.api#String",
-                    "traits": {
-                        "smithy.api#required": {}
-                    }
-                },
-                "occurred_at": {
-                    "target": "smithy.api#Timestamp",
-                    "traits": {
-                        "smithy.api#required": {},
-                        "smithy.api#timestampFormat": "date-time"
-                    }
-                },
-                "provider": {
-                    "target": "smithy.api#String",
-                    "traits": {
-                        "smithy.api#required": {}
-                    }
-                },
-                "provider_message_id": {
-                    "target": "smithy.api#String",
-                    "traits": {
-                        "smithy.api#required": {}
-                    }
-                },
-                "reason": {
-                    "target": "smithy.api#String"
-                },
-                "reason_code": {
-                    "target": "smithy.api#String"
-                },
-                "recipient": {
-                    "target": "smithy.api#String"
-                },
-                "source": {
-                    "target": "smithy.api#String"
-                },
-                "suppress_recipient": {
-                    "target": "smithy.api#Boolean"
-                },
-                "temporary": {
-                    "target": "smithy.api#Boolean"
-                },
-                "type": {
-                    "target": "smithy.api#String",
-                    "traits": {
-                        "smithy.api#required": {}
-                    }
-                }
-            }
-        },
         "com.inttegro.api#ChimeEmailMailbox": {
             "type": "structure",
             "members": {
@@ -5442,52 +5418,16 @@
                         "smithy.api#timestampFormat": "date-time"
                     }
                 },
-                "email_events": {
-                    "target": "com.inttegro.api#ChimeTransmissionemailEvents"
-                },
-                "email_failure_code": {
-                    "target": "smithy.api#String"
-                },
-                "email_failure_reason": {
-                    "target": "smithy.api#String"
-                },
-                "email_status": {
-                    "target": "smithy.api#String"
-                },
-                "error": {
-                    "target": "smithy.api#String"
-                },
                 "failed_at": {
                     "target": "smithy.api#Timestamp",
                     "traits": {
                         "smithy.api#timestampFormat": "date-time"
                     }
                 },
-                "gateway": {
-                    "target": "smithy.api#String",
-                    "traits": {
-                        "smithy.api#required": {}
-                    }
-                },
-                "gateway_message_id": {
-                    "target": "smithy.api#String"
-                },
-                "id": {
-                    "target": "smithy.api#String",
-                    "traits": {
-                        "smithy.api#required": {}
-                    }
-                },
                 "initialized_at": {
                     "target": "smithy.api#Timestamp",
                     "traits": {
                         "smithy.api#required": {},
-                        "smithy.api#timestampFormat": "date-time"
-                    }
-                },
-                "last_email_event_at": {
-                    "target": "smithy.api#Timestamp",
-                    "traits": {
                         "smithy.api#timestampFormat": "date-time"
                     }
                 },
@@ -5517,9 +5457,6 @@
                     "traits": {
                         "smithy.api#timestampFormat": "date-time"
                     }
-                },
-                "suppression_reason": {
-                    "target": "smithy.api#String"
                 }
             },
             "traits": {
@@ -5632,13 +5569,8 @@
                             }
                         }
                     }
-                ]
-            }
-        },
-        "com.inttegro.api#ChimeTransmissionemailEvents": {
-            "type": "list",
-            "member": {
-                "target": "com.inttegro.api#ChimeEmailEvent"
+                ],
+                "smithy.api#documentation": "Public delivery lifecycle for a Chime."
             }
         },
         "com.inttegro.api#ChimeTransmissionmechanism": {
@@ -14674,9 +14606,6 @@
                 "label": {
                     "target": "smithy.api#String"
                 },
-                "account_name_enquiry": {
-                    "target": "com.inttegro.api#FinancialAccountNameEnquiry"
-                },
                 "pull_configuration": {
                     "target": "com.inttegro.api#FinancialAccountPullConfiguration"
                 },
@@ -15080,30 +15009,6 @@
                         "smithy.api#required": {}
                     }
                 }
-            }
-        },
-        "com.inttegro.api#FinancialAccountNameEnquiry": {
-            "type": "structure",
-            "members": {
-                "completed_at": {
-                    "target": "smithy.api#Timestamp",
-                    "traits": {
-                        "smithy.api#required": {},
-                        "smithy.api#timestampFormat": "date-time"
-                    }
-                },
-                "provider_id": {
-                    "target": "smithy.api#String",
-                    "traits": {
-                        "smithy.api#required": {}
-                    }
-                },
-                "provider_reference": {
-                    "target": "smithy.api#String"
-                }
-            },
-            "traits": {
-                "smithy.api#documentation": "Evidence that the provider resolved the bank account holder name before the account was persisted. This confirms account resolution, not ownership."
             }
         },
         "com.inttegro.api#FinancialAccountOwnerCreateResponse": {
@@ -16785,17 +16690,6 @@
                         "smithy.api#documentation": "SMS body or email copy containing the required `{token}` placeholder and optional `{service}` placeholder. Email templates must contain `{token}` exactly once. A custom template replaces the purpose-specific default body, while `purpose` still controls the email subject and heading. Email sends this as the plain-text fallback and renders the copy around a prominent code in the HTML version. Defaults are transport-specific."
                     }
                 },
-                "preferred_gateway": {
-                    "target": "smithy.api#String",
-                    "traits": {
-                        "com.inttegro.api#dataExamples": [
-                            {
-                                "json": "arkesel"
-                            }
-                        ],
-                        "smithy.api#documentation": "Optional SMS gateway; not valid for email OTP delivery. Email uses the configured default provider."
-                    }
-                },
                 "purpose": {
                     "target": "com.inttegro.api#OTPPurpose",
                     "traits": {
@@ -16916,11 +16810,6 @@
                         "message_template": {
                             "description": "SMS body or email copy containing the required `{token}` placeholder and optional `{service}` placeholder. Email templates must contain `{token}` exactly once. A custom template replaces the purpose-specific default body, while `purpose` still controls the email subject and heading. Email sends this as the plain-text fallback and renders the copy around a prominent code in the HTML version. Defaults are transport-specific.",
                             "example": "Your {service} code is {token}.",
-                            "type": "string"
-                        },
-                        "preferred_gateway": {
-                            "description": "Optional SMS gateway; not valid for email OTP delivery. Email uses the configured default provider.",
-                            "example": "arkesel",
                             "type": "string"
                         },
                         "purpose": {
@@ -17185,7 +17074,7 @@
         },
         "com.inttegro.api#Inttegro": {
             "type": "service",
-            "version": "0.1.0-beta99",
+            "version": "0.1.0-beta100",
             "operations": [
                 {
                     "target": "com.inttegro.api#activatePaymentMethod"
@@ -17594,7 +17483,7 @@
                 }
             ],
             "traits": {
-                "com.inttegro.api#collectionVersion": "0.1.0-beta99",
+                "com.inttegro.api#collectionVersion": "0.1.0-beta100",
                 "smithy.api#auth": [
                     "smithy.api#httpBearerAuth"
                 ],
@@ -21950,17 +21839,6 @@
                     "target": "com.inttegro.api#OrderDocumentDeliveryFailurechannel",
                     "traits": {
                         "smithy.api#required": {}
-                    }
-                },
-                "error": {
-                    "target": "smithy.api#String",
-                    "traits": {
-                        "com.inttegro.api#dataExamples": [
-                            {
-                                "json": "chime api returned status=503"
-                            }
-                        ],
-                        "smithy.api#documentation": "Provider or Chime error for this channel."
                     }
                 }
             },
@@ -220876,8 +220754,7 @@
                                                 ],
                                                 "failures": [
                                                     {
-                                                        "channel": "sms",
-                                                        "error": "Delivery was not accepted"
+                                                        "channel": "sms"
                                                     }
                                                 ],
                                                 "sent_channels": [
@@ -223031,8 +222908,7 @@
                                                 ],
                                                 "failures": [
                                                     {
-                                                        "channel": "sms",
-                                                        "error": "Delivery was not accepted"
+                                                        "channel": "sms"
                                                     }
                                                 ],
                                                 "sent_channels": [
