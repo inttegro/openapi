@@ -392,7 +392,9 @@ effect "mutate_product" {
   description = "Record the latest public product catalog snapshot."
   operations  = ["createProduct", "updateProduct", "publishProduct", "unpublishProduct", "archiveProduct"]
 
-  action "db.resources" "put" {
+  # Why: some product mutations intentionally return a partial public product; merging that
+  # snapshot preserves fields required by the full lookup contract without inventing internals.
+  action "db.resources" "merge" {
     collection = "products"
     key        = response.product.id
     value      = response.product

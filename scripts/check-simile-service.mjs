@@ -240,11 +240,34 @@ try {
   const issuedCredential = credentials.match(/^API_KEY="([^"]+)"$/m)?.[1];
   assert.ok(issuedCredential?.startsWith("simile_test_"), "setup did not issue a local bearer credential");
 
+  // Why: two independently provisioned consumers are required to prove that durable state is
+  // tenant-scoped rather than merely authenticated behind different credentials.
+  const isolatedSetup = JSON.parse(runSimile([
+    "setup",
+    "inttegro",
+    "--profile",
+    "isolated-contract-test",
+    "--set",
+    "name=Isolated contract test application",
+    "--set",
+    "alias=isolated-contract-test",
+    "--output",
+    "json",
+  ], true, registryEnvironment).stdout);
+  const isolatedCredentials = readFileSync(isolatedSetup.credentialsFile, "utf8");
+  const isolatedCredential = isolatedCredentials.match(/^API_KEY="([^"]+)"$/m)?.[1];
+  assert.ok(isolatedCredential?.startsWith("simile_test_"), "second setup did not issue a credential");
+  assert.notEqual(isolatedCredential, issuedCredential, "independent profiles received the same credential");
+
   // Why: profile compilation and setup are insufficient unless the running HTTP service actually
   // preserves public routes while enforcing active, revoked, expired, and missing credentials.
   const authenticationChecks = await verifyAuthentication(registryEnvironment, issuedCredential);
   const transportChecks = await verifyFileDeliveryTransport(registryEnvironment, issuedCredential);
-  const stateChecks = await verifyStatefulProductWorkflow(registryEnvironment, issuedCredential);
+  const stateChecks = await verifyStatefulProductWorkflow(
+    registryEnvironment,
+    issuedCredential,
+    isolatedCredential,
+  );
 
   const operations = collectOperations();
   assert.equal(operations.length, 135, "OpenAPI public operation count drifted");
@@ -439,7 +462,13 @@ try {
       `0 runtime synthesis gaps`,
   );
 } finally {
-  rmSync(work, { recursive: true, force: true });
+  // Why: failed durable-state tests are otherwise impossible to diagnose after cleanup. Retain
+  // the isolated registry only when a maintainer explicitly opts in; normal CI remains spotless.
+  if (process.env.SIMILE_KEEP_TEST_WORK === "1") {
+    console.error(`Retained Simile test work at ${work}`);
+  } else {
+    rmSync(work, { recursive: true, force: true });
+  }
 }
 
 function collectOperations() {
@@ -605,7 +634,266 @@ async function verifyFileDeliveryTransport(environment, issuedCredential) {
   return 3;
 }
 
-async function verifyStatefulProductWorkflow(environment, issuedCredential) {
+async function verifyStatefulProductWorkflow(environment, issuedCredential, isolatedCredential) {
+  const headers = {
+    authorization: `Bearer ${issuedCredential}`,
+    "content-type": "application/json",
+  };
+  const first = await startRegisteredService(environment);
+  let product;
+  let price;
+  let purchaseIntent;
+  let order;
+  let checks = 0;
+  try {
+    const createdResponse = await fetch(`${first.baseUrl}/products/create`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify({ type: "digital", name: "Stateful integration guide", publish: true }),
+    });
+    assert.equal(createdResponse.status, 200, "stateful product creation failed");
+    const created = await createdResponse.json();
+    product = created.product;
+    assert.ok(product?.id, "stateful product creation returned no identifier");
+    checks += 1;
+
+    // Why: an update must preserve identity and request-owned fields while staying within its
+    // intentionally narrower response contract; full-field preservation is checked by lookup.
+    const updatedResponse = await fetch(`${first.baseUrl}/products/update`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify({
+        product_id: product.id,
+        name: "Stateful integration guide, second edition",
+        description: "Exercises mutation replay and durable state.",
+      }),
+    });
+    const updatedBody = await updatedResponse.text();
+    assert.equal(
+      updatedResponse.status,
+      200,
+      `stateful product update failed after storing ${JSON.stringify(product)}: ${updatedBody}\n${first.output()}`,
+    );
+    const updated = JSON.parse(updatedBody).product;
+    assert.equal(updated.id, product.id, "product update changed the resource identity");
+    assert.equal(updated.name, "Stateful integration guide, second edition", "product update lost the new name");
+    assert.equal(updated.type, product.type, "product update changed an untouched product type");
+    assert.equal(updated.active, undefined, "product update escaped its narrow public response shape");
+    product = { ...product, ...updated };
+    checks += 1;
+
+    // Why: a useful emulator must return the snapshot committed by creation rather than synthesize
+    // an unrelated resource merely because the lookup response schema permits one.
+    const lookupResponse = await fetch(`${first.baseUrl}/products/lookup`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify({ product_id: product.id }),
+    });
+    assert.equal(lookupResponse.status, 200, "stateful product lookup failed");
+    const lookedUpProduct = (await lookupResponse.json()).product;
+    assert.deepEqual(lookedUpProduct, product, "lookup did not replay merged product state");
+    assert.equal(lookedUpProduct.active, true, "product update erased the stored publication state");
+    checks += 1;
+
+    const pageResponse = await fetch(`${first.baseUrl}/products/page`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify({ page_number: 1, page_size: 25 }),
+    });
+    assert.equal(pageResponse.status, 200, "stateful product page failed");
+    const page = (await pageResponse.json()).page;
+    assert.ok(page.products.some((candidate) => candidate.id === product.id), "page omitted stored product");
+    assert.equal(page.size, page.products.length, "page size did not reconcile with stored products");
+    checks += 1;
+
+    // Why: authenticating a second consumer is insufficient proof of isolation; the same running
+    // service must show that its catalog projection cannot observe the first profile's write.
+    const isolatedPageResponse = await fetch(`${first.baseUrl}/products/page`, {
+      method: "POST",
+      headers: {
+        authorization: `Bearer ${isolatedCredential}`,
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({ page_number: 1, page_size: 25 }),
+    });
+    assert.equal(isolatedPageResponse.status, 200, "isolated profile product page failed");
+    const isolatedPage = (await isolatedPageResponse.json()).page;
+    assert.ok(
+      !isolatedPage.products.some((candidate) => candidate.id === product.id),
+      "a product written by one profile leaked into another profile",
+    );
+    checks += 1;
+
+    // Why: resource IDs returned by one operation must remain usable by dependent operations; a
+    // schema-valid but unrelated price would make the emulator unsuitable for workflow testing.
+    const priceResponse = await fetch(`${first.baseUrl}/products/add_price`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify({
+        product_id: product.id,
+        label: "Stateful integration price",
+        type: "fixed_amount",
+        fixed_amount: { currency: "ghs", value: 20000 },
+      }),
+    });
+    assert.equal(priceResponse.status, 200, "stateful product price creation failed");
+    price = (await priceResponse.json()).price;
+    assert.ok(price?.id, "stateful product price creation returned no identifier");
+    assert.equal(price.product_id, product.id, "created price did not retain its product reference");
+    assert.deepEqual(price.fixed_amount, { currency: "ghs", value: 20000 }, "created price changed its amount");
+    checks += 1;
+
+    const priceLookupResponse = await fetch(`${first.baseUrl}/prices/lookup`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify({ price_id: price.id }),
+    });
+    assert.equal(priceLookupResponse.status, 200, "stateful price lookup failed");
+    assert.deepEqual((await priceLookupResponse.json()).price, price, "price lookup did not replay stored state");
+    checks += 1;
+
+    const pricePageResponse = await fetch(`${first.baseUrl}/prices/page`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify({ page_number: 1, page_size: 25, product_id: product.id }),
+    });
+    assert.equal(pricePageResponse.status, 200, "stateful price page failed");
+    const pricePage = (await pricePageResponse.json()).page;
+    assert.ok(pricePage.prices.some((candidate) => candidate.id === price.id), "price page omitted stored price");
+    assert.equal(pricePage.size, pricePage.prices.length, "price page size did not reconcile with stored prices");
+    checks += 1;
+
+    const purchaseIntentResponse = await fetch(`${first.baseUrl}/purchase_intents/create`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify({
+        product_id: product.id,
+        price_id: price.id,
+        quantity: { min: 1, max: 3 },
+        usage: { multi_use: true },
+      }),
+    });
+    const purchaseIntentBody = await purchaseIntentResponse.text();
+    assert.equal(
+      purchaseIntentResponse.status,
+      200,
+      `stateful Buy-link creation failed: ${purchaseIntentBody}\n${first.output()}`,
+    );
+    purchaseIntent = JSON.parse(purchaseIntentBody).purchase_intent;
+    assert.ok(purchaseIntent?.id, "stateful Buy-link creation returned no identifier");
+    assert.equal(purchaseIntent.product?.id, product.id, "Buy link did not retain its product reference");
+    assert.equal(purchaseIntent.price?.id, price.id, "Buy link did not retain its price reference");
+    checks += 1;
+
+    const purchaseIntentLookupResponse = await fetch(`${first.baseUrl}/purchase_intents/lookup`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify({ id: purchaseIntent.id }),
+    });
+    const purchaseIntentLookupBody = await purchaseIntentLookupResponse.text();
+    assert.equal(
+      purchaseIntentLookupResponse.status,
+      200,
+      `stateful Buy-link lookup failed after storing ${JSON.stringify(purchaseIntent)}: ${purchaseIntentLookupBody}\n${first.output()}`,
+    );
+    assert.deepEqual(
+      JSON.parse(purchaseIntentLookupBody).purchase_intent,
+      purchaseIntent,
+      "Buy-link lookup did not replay stored state",
+    );
+    checks += 1;
+
+    // Why: the current relation language cannot derive an order total from a price_id without a
+    // state lookup. Reusing the previously returned amount still proves cross-operation handoff
+    // while leaving that unsupported state-aware derivation visible in the audit report.
+    const orderResponse = await fetch(`${first.baseUrl}/orders/create`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify({
+        customer_data: { name: "Stateful Test Customer", email_address: "stateful@example.test" },
+        finalize: true,
+        execute_payment: false,
+        line_items: [{
+          type: "product",
+          product: { product_id: product.id, price: price.fixed_amount, quantity: 2 },
+        }],
+      }),
+    });
+    const orderBody = await orderResponse.text();
+    assert.equal(
+      orderResponse.status,
+      200,
+      `stateful order creation failed: ${orderBody}\n${first.output()}`,
+    );
+    order = JSON.parse(orderBody).order;
+    assert.ok(order?.id, "stateful order creation returned no identifier");
+    assert.equal(order.status, "requires_payment", "stateful order selected the wrong lifecycle branch");
+    assert.equal(
+      order.line_item_group.line_items[0].product.product_id,
+      product.id,
+      "order did not retain its product reference",
+    );
+    assert.deepEqual(
+      order.line_item_group.line_items[0].product.price,
+      price.fixed_amount,
+      "order did not retain the amount handed off from the created price",
+    );
+    checks += 1;
+
+    const orderLookupResponse = await fetch(`${first.baseUrl}/orders/lookup`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify({ order_id: order.id }),
+    });
+    assert.equal(orderLookupResponse.status, 200, "stateful order lookup failed");
+    assert.deepEqual((await orderLookupResponse.json()).order, order, "order lookup did not replay stored state");
+    checks += 1;
+  } finally {
+    await stopService(first.service);
+  }
+
+  // Why: in-process reads do not prove durable emulation. Restart the registered service and
+  // require every resource in the workflow to survive as the exact previously committed snapshot.
+  const restarted = await startRegisteredService(environment);
+  try {
+    for (const [path, body, field, expected] of [
+      ["/products/lookup", { product_id: product.id }, "product", product],
+      ["/prices/lookup", { price_id: price.id }, "price", price],
+      ["/purchase_intents/lookup", { id: purchaseIntent.id }, "purchase_intent", purchaseIntent],
+      ["/orders/lookup", { order_id: order.id }, "order", order],
+    ]) {
+      const response = await fetch(`${restarted.baseUrl}${path}`, {
+        method: "POST",
+        headers,
+        body: JSON.stringify(body),
+      });
+      assert.equal(response.status, 200, `${path} failed after service restart`);
+      assert.deepEqual((await response.json())[field], expected, `${path} lost durable state after restart`);
+      checks += 1;
+    }
+    // Why: persistence must retain the tenant boundary as well as the resource documents.
+    const isolatedResponse = await fetch(`${restarted.baseUrl}/products/page`, {
+      method: "POST",
+      headers: {
+        authorization: `Bearer ${isolatedCredential}`,
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({ page_number: 1, page_size: 25 }),
+    });
+    assert.equal(isolatedResponse.status, 200, "isolated profile page failed after restart");
+    const isolatedPage = (await isolatedResponse.json()).page;
+    assert.ok(
+      !isolatedPage.products.some((candidate) => candidate.id === product.id),
+      "restart collapsed independently persisted profile state",
+    );
+    checks += 1;
+  } finally {
+    await stopService(restarted.service);
+  }
+  return checks;
+}
+
+async function startRegisteredService(environment) {
   const port = await availablePort();
   const baseUrl = `http://127.0.0.1:${port}`;
   const service = spawn(simile, ["start", "inttegro", "--port", String(port)], {
@@ -616,46 +904,8 @@ async function verifyStatefulProductWorkflow(environment, issuedCredential) {
   let output = "";
   service.stdout.on("data", (chunk) => { output += chunk; });
   service.stderr.on("data", (chunk) => { output += chunk; });
-
-  try {
-    await waitForService(service, `${baseUrl}/spec/countries`, () => output);
-    const headers = {
-      authorization: `Bearer ${issuedCredential}`,
-      "content-type": "application/json",
-    };
-    const createdResponse = await fetch(`${baseUrl}/products/create`, {
-      method: "POST",
-      headers,
-      body: JSON.stringify({ type: "digital", name: "Stateful integration guide", publish: true }),
-    });
-    assert.equal(createdResponse.status, 200, "stateful product creation failed");
-    const created = await createdResponse.json();
-    const product = created.product;
-    assert.ok(product?.id, "stateful product creation returned no identifier");
-
-    // Why: a useful emulator must return the snapshot committed by creation rather than synthesize
-    // an unrelated resource merely because the lookup response schema permits one.
-    const lookupResponse = await fetch(`${baseUrl}/products/lookup`, {
-      method: "POST",
-      headers,
-      body: JSON.stringify({ product_id: product.id }),
-    });
-    assert.equal(lookupResponse.status, 200, "stateful product lookup failed");
-    assert.deepEqual((await lookupResponse.json()).product, product, "lookup did not replay product state");
-
-    const pageResponse = await fetch(`${baseUrl}/products/page`, {
-      method: "POST",
-      headers,
-      body: JSON.stringify({ page_number: 1, page_size: 25 }),
-    });
-    assert.equal(pageResponse.status, 200, "stateful product page failed");
-    const page = (await pageResponse.json()).page;
-    assert.ok(page.products.some((candidate) => candidate.id === product.id), "page omitted stored product");
-    assert.equal(page.size, page.products.length, "page size did not reconcile with stored products");
-    return 3;
-  } finally {
-    await stopService(service);
-  }
+  await waitForService(service, `${baseUrl}/spec/countries`, () => output);
+  return { baseUrl, service, output: () => output };
 }
 
 function availablePort() {
