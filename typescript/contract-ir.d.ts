@@ -1,5 +1,5 @@
 // Internal compiler IR generated from commerce.yml; DO NOT EDIT OR PUBLISH AS THE TYPESCRIPT CONTRACT.
-// OpenAPI SHA-256: 56f340ee622551cc02c6ca78b3b40070be5e356cca1509b664d5b0abc113969f
+// OpenAPI SHA-256: 9f3f89c66c2ea60db129cb6b10317aeb77fbd9d86c7ef0a6bc1101cf33a69962
 // This file contains declarations only and emits no JavaScript.
 
 import type {
@@ -10,8 +10,8 @@ import type {
   RelationWellFormed,
 } from "./proof-kernel";
 
-export type CollectionVersion = "0.1.0-beta95";
-export type SourceOpenApiSha256 = "56f340ee622551cc02c6ca78b3b40070be5e356cca1509b664d5b0abc113969f";
+export type CollectionVersion = "0.1.0-beta96";
+export type SourceOpenApiSha256 = "9f3f89c66c2ea60db129cb6b10317aeb77fbd9d86c7ef0a6bc1101cf33a69962";
 export type OperationCount = 135;
 export type SchemaCount = 604;
 export type ConstraintCount = 244;
@@ -33274,10 +33274,6 @@ export interface OperationDefinitions {
             };
             readonly "relation": {
               readonly "bindings": readonly [
-                {
-                  readonly "from": "/email";
-                  readonly "to": "/broadcast/email";
-                },
                 {
                   readonly "from": "/purpose";
                   readonly "to": "/broadcast/purpose";
@@ -95757,10 +95753,6 @@ export interface OperationDefinitions {
             readonly "relation": {
               readonly "bindings": readonly [
                 {
-                  readonly "from": "/email";
-                  readonly "to": "/scheduled_chime/email";
-                },
-                {
                   readonly "from": "/full_message";
                   readonly "to": "/scheduled_chime/full_message";
                 },
@@ -100987,10 +100979,6 @@ export interface OperationDefinitions {
                 {
                   readonly "from": "/custom_data";
                   readonly "to": "/chime/custom_data";
-                },
-                {
-                  readonly "from": "/email";
-                  readonly "to": "/chime/email";
                 },
                 {
                   readonly "from": "/full_message";

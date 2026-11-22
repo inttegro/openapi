@@ -6,8 +6,8 @@ info:
     description: Machine-readable reference for the public Inttegro API
     # Why: contract and client artifacts are reviewed as one immutable bundle;
     # changing soundness rules or executable examples requires a new bundle identity.
-    version: 0.1.0-beta95
-    x-inttegro-collection-version: 0.1.0-beta95
+    version: 0.1.0-beta96
+    x-inttegro-collection-version: 0.1.0-beta96
     contact:
         name: Inttegro Engineering
         url: "https://inttegro.com"
@@ -330,12 +330,12 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/ChimeResponse'
-                            # Why: a successful send must preserve the caller's recipient and authored message fields;
-                            # otherwise Simile could acknowledge a different notification.
+                            # Why: a successful send must preserve caller-owned fields that Mercurio does not
+                            # normalize. Email content is deliberately excluded because the public handler trims,
+                            # parses, and enriches that object before serialization.
                             x-simile-from-request:
                                 bindings:
                                     - { from: /custom_data, to: /chime/custom_data }
-                                    - { from: /email, to: /chime/email }
                                     - { from: /full_message, to: /chime/full_message }
                                     - { from: /purpose, to: /chime/purpose }
                                     - { from: /recipient, to: /chime/recipient }
@@ -757,11 +757,10 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/ScheduleResponse'
-                            # Why: scheduling must preserve the caller's content, timing, and sender choices; recipient
-                            # objects are resolved to canonical string addresses and therefore are not direct echoes.
+                            # Why: scheduling preserves timing and scalar content choices. Recipient objects and
+                            # email content are resolved or normalized and therefore are not direct echoes.
                             x-simile-from-request:
                                 bindings:
-                                    - { from: /email, to: /scheduled_chime/email }
                                     - { from: /full_message, to: /scheduled_chime/full_message }
                                     - { from: /purpose, to: /scheduled_chime/purpose }
                                     - { from: /send_after, to: /scheduled_chime/send_after }
@@ -920,11 +919,10 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/BroadcastResponse'
-                            # Why: a broadcast preserves its caller-authored content and sender; recipient objects are
-                            # resolved to canonical delivery addresses and cannot be asserted as direct echoes.
+                            # Why: a broadcast preserves its scalar purpose and sender. Recipient objects and email
+                            # content are resolved or normalized and cannot be asserted as direct echoes.
                             x-simile-from-request:
                                 bindings:
-                                    - { from: /email, to: /broadcast/email }
                                     - { from: /purpose, to: /broadcast/purpose }
                                     - { from: /sender, to: /broadcast/sender_id }
                 '400':

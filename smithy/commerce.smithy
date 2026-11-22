@@ -33,14 +33,14 @@ structure untagged {}
 
 
 @collectionVersion(
-"0.1.0-beta95"
+"0.1.0-beta96"
 )
 @auth([
     httpBearerAuth
 ])
 @httpBearerAuth
 service Inttegro {
-    version: "0.1.0-beta95"
+    version: "0.1.0-beta96"
     operations: [
         activatePaymentMethod
         activatePrice
@@ -511,10 +511,6 @@ operation archiveProduct {
         "202": {
             "application/json": {
                 "bindings": [
-                    {
-                        "from": "/email",
-                        "to": "/broadcast/email"
-                    },
                     {
                         "from": "/purpose",
                         "to": "/broadcast/purpose"
@@ -4667,10 +4663,6 @@ operation revokeFileLink {
             "application/json": {
                 "bindings": [
                     {
-                        "from": "/email",
-                        "to": "/scheduled_chime/email"
-                    },
-                    {
                         "from": "/full_message",
                         "to": "/scheduled_chime/full_message"
                     },
@@ -5034,10 +5026,6 @@ operation selectCheckoutAmount {
                     {
                         "from": "/custom_data",
                         "to": "/chime/custom_data"
-                    },
-                    {
-                        "from": "/email",
-                        "to": "/chime/email"
                     },
                     {
                         "from": "/full_message",

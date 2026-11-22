@@ -1596,10 +1596,6 @@ export interface ChimesResponseRelations {
       readonly "application/json": {
         readonly "bindings": readonly [
           {
-            readonly "from": "/email";
-            readonly "to": "/broadcast/email";
-          },
-          {
             readonly "from": "/purpose";
             readonly "to": "/broadcast/purpose";
           },
@@ -1641,10 +1637,6 @@ export interface ChimesResponseRelations {
       readonly "application/json": {
         readonly "bindings": readonly [
           {
-            readonly "from": "/email";
-            readonly "to": "/scheduled_chime/email";
-          },
-          {
             readonly "from": "/full_message";
             readonly "to": "/scheduled_chime/full_message";
           },
@@ -1671,10 +1663,6 @@ export interface ChimesResponseRelations {
           {
             readonly "from": "/custom_data";
             readonly "to": "/chime/custom_data";
-          },
-          {
-            readonly "from": "/email";
-            readonly "to": "/chime/email";
           },
           {
             readonly "from": "/full_message";
