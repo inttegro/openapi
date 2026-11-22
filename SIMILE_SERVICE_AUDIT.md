@@ -4,8 +4,8 @@
 
 - Service and CLI name: `inttegro`
 - OpenAPI authority: `commerce.yml` (OpenAPI 3.0.3, `0.1.0-beta99`)
-- Service configuration: `simile/inttegro.simile.hcl`
-- Behavior overlays: `simile/principals.hcl`, `simile/behaviors.hcl`, `simile/errors.hcl`, `simile/state.hcl`, and `simile/faults.hcl`
+- Service configuration: `simile/Simfile`
+- HCL modules: `simile/principals.hcl`, `simile/behaviors.hcl`, `simile/errors.hcl`, `simile/state.hcl`, and `simile/faults.hcl`
 - Listener: `127.0.0.1:4242`
 - Primary public workflows: application and key management; catalog, product, price, and Buy-link management; checkout, orders, payments, refunds, balances, payouts, and financial accounts; customers, Chimes, OTP, files, upload requests, and policy management.
 
@@ -98,18 +98,16 @@ npm run test:request-response-relations
 npm run postman:check
 npm test
 simile compile commerce.yml \
-  --behavior simile/principals.hcl \
-  --behavior simile/behaviors.hcl \
-  --behavior simile/errors.hcl \
-  --behavior simile/state.hcl \
-  --behavior simile/faults.hcl \
+  --module simile/principals.hcl \
+  --module simile/behaviors.hcl \
+  --module simile/errors.hcl \
+  --module simile/state.hcl \
+  --module simile/faults.hcl \
   --artifact /tmp/inttegro.similec \
   --output json
 simile audit /tmp/inttegro.similec --output json
 simile inspect /tmp/inttegro.similec --output json
-SIMILE_HOME="$(mktemp -d)" simile register inttegro \
-  --config ./simile/inttegro.simile.hcl \
-  --output json
+(cd simile && SIMILE_HOME="$(mktemp -d)" simile register --output json)
 ```
 
 Results:
@@ -123,7 +121,7 @@ Results:
 - Supplied requests: all request examples declared directly in OpenAPI replayed successfully, along with bank-account owner-source alternatives, a Dosh marker, bundle Buy links with catalog and special-offer prices, and a complete operating-policy capability snapshot; 16 valid supplied requests ran in total.
 - Negative requests: missing financial-account subtype data, missing financial-account owner data, an unsupported mobile-money network, and a contradictory Purchase Intent target/quantity payload were rejected.
 - Exact outcomes: all 17 runnable contract selections and all 19 directly exercised provider-authored domain outcomes returned their complete expected payloads with no unrelated optional fields. These include complete and partial invoice/receipt delivery, create/update/lookup/cancel Buy-link lifecycle snapshots, and an activated operating-policy version. HTTP-adapter checks additionally proved non-empty binary delivery and exact 302/303 redirect `Location` headers.
-- Composition root: `simile describe service inttegro --config ./simile/inttegro.simile.hcl` resolved the contract and all five modules, reporting 135 operations, 42 scenarios, three backends, three async units, two fault profiles, one application principal, three fixture profiles, and one setup workflow at `127.0.0.1:4242`.
+- Composition root: `cd simile && simile describe service` resolved the conventional `Simfile`, contract, and all five modules, reporting 135 operations, 42 scenarios, three backends, three async units, two fault profiles, one application principal, three fixture profiles, and one setup workflow at `127.0.0.1:4242`.
 - Application setup: isolated registration created a named application profile, issued one redacted bearer credential, preserved the public application identifier, and selected the first profile without exposing sensitive values in setup or profile JSON.
 - Stateful HTTP behavior: 25 adapter checks exercised product creation, partial mutation with full-snapshot preservation, lookup, paging, product-price creation, Purchase Intent creation, and order creation from the stored `price_id`. The order line snapshot and total matched the resolved fixed amount and quantity. Missing, mismatched, inactive, and archived prices selected their exact public errors and did not create orders. The same product, price, Purchase Intent, and order survived a service restart, while a second independently provisioned application could not read the first application's state before or after restart.
 - Idempotent recovery: four adapter checks simulated a response lost after commit, restarted the service, replayed the same key and request to recover the committed order, looked that order up, and rejected a changed request under the same key with the exact `idempotency_key_mismatch` tuple.

@@ -10,14 +10,14 @@ import YAML from "yaml";
 const scriptDir = dirname(fileURLToPath(import.meta.url));
 const openapiDir = resolve(scriptDir, "..");
 const specificationPath = resolve(openapiDir, "commerce.yml");
-const configurationPath = resolve(openapiDir, "simile", "inttegro.simile.hcl");
-const stateBehaviorPath = resolve(openapiDir, "simile", "state.hcl");
-const behaviorPaths = ["principals.hcl", "behaviors.hcl", "errors.hcl", "state.hcl", "faults.hcl"]
+const configurationPath = resolve(openapiDir, "simile", "Simfile");
+const stateModulePath = resolve(openapiDir, "simile", "state.hcl");
+const modulePaths = ["principals.hcl", "behaviors.hcl", "errors.hcl", "state.hcl", "faults.hcl"]
   .map((file) => resolve(openapiDir, "simile", file));
-const behaviorArguments = behaviorPaths.flatMap((path) => ["--behavior", path]);
+const moduleArguments = modulePaths.flatMap((path) => ["--module", path]);
 const simile = process.env.SIMILE_BIN ?? resolve(openapiDir, "../simile/target/debug/simile");
 const document = YAML.parse(readFileSync(specificationPath, "utf8"));
-const stateBehavior = readFileSync(stateBehaviorPath, "utf8");
+const stateModule = readFileSync(stateModulePath, "utf8");
 const methods = new Set(["delete", "get", "patch", "post", "put"]);
 const work = mkdtempSync(resolve(tmpdir(), "inttegro-simile-service-"));
 
@@ -122,7 +122,7 @@ if (!existsSync(simile)) {
 
 try {
   // Why: keep the state model aligned with the stable public resource vocabulary used by the API.
-  const publishedCollectionNames = [...stateBehavior.matchAll(
+  const publishedCollectionNames = [...stateModule.matchAll(
     /^\s*collection\s*=\s*"([^"]+)"\s*$/gm,
   )].map((match) => match[1]);
   assert.deepEqual(
@@ -179,7 +179,7 @@ try {
   runSimile([
     "compile",
     specificationPath,
-    ...behaviorArguments,
+    ...moduleArguments,
     "--artifact",
     artifactPath,
     "--output",
@@ -403,7 +403,7 @@ try {
     const scenarioActual = JSON.parse(runSimile([
       "run",
       specificationPath,
-      ...behaviorArguments,
+      ...moduleArguments,
       "--operation-id",
       operationId,
       ...requestArguments,
@@ -423,7 +423,7 @@ try {
     const actual = JSON.parse(runSimile([
       "run",
       specificationPath,
-      ...behaviorArguments,
+      ...moduleArguments,
       "--operation-id",
       operationId,
       "--outcome",
@@ -438,7 +438,7 @@ try {
     const scenarioActual = JSON.parse(runSimile([
       "run",
       specificationPath,
-      ...behaviorArguments,
+      ...moduleArguments,
       "--operation-id",
       operationId,
       "--scenario",

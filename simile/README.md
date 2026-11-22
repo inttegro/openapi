@@ -6,17 +6,18 @@ observable integration behavior that OpenAPI cannot express by itself.
 
 ## Modules
 
-- `inttegro.simile.hcl` composes the listener, OpenAPI contract, and behavior modules.
+- `Simfile` composes the listener, OpenAPI contract, and HCL modules.
 - `principals.hcl` declares the application caller and active, revoked, and expired test profiles.
 - `behaviors.hcl` selects reviewed named OpenAPI outcomes through opaque scenarios.
 - `errors.hcl` supplies exact, operation-valid domain failures and scenarios.
 - `state.hcl` declares emulator-owned state, scheduled work, and source-backed async effects.
 - `faults.hcl` provides opt-in latency and lost-response testing plus reproducible profiles.
 
-Register and run the service from the OpenAPI repository root:
+Register and run the service from the `simile` directory:
 
 ```bash
-simile register inttegro --config ./simile/inttegro.simile.hcl
+cd simile
+simile register
 simile setup inttegro --profile checkout --set name="Checkout development"
 simile start inttegro
 ```

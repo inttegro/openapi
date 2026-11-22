@@ -26,7 +26,7 @@ const publicFiles = [
   "errors.hcl",
   "state.hcl",
   "faults.hcl",
-  "inttegro.simile.hcl",
+  "Simfile",
   "README.md",
 ];
 
@@ -41,18 +41,14 @@ try {
     copyFileSync(resolve(openapiDir, "simile", file), resolve(simileDir, file));
   }
 
-  const configuration = resolve(simileDir, "inttegro.simile.hcl");
   // Why: a passing monorepo test can accidentally depend on source files, generated artifacts, or
   // package dependencies that customers do not receive. Compile from only the published bundle.
   const descriptionOutput = runSimile([
     "describe",
     "service",
-    "inttegro",
-    "--config",
-    configuration,
     "--output",
     "json",
-  ]).stdout;
+  ], simileDir).stdout;
   assert.ok(
     !descriptionOutput.includes(openapiDir),
     "clean-room service description retained a path into the provider monorepo",
@@ -62,12 +58,9 @@ try {
 
   runSimile([
     "register",
-    "inttegro",
-    "--config",
-    configuration,
     "--output",
     "json",
-  ]);
+  ], simileDir);
   const setup = JSON.parse(runSimile([
     "setup",
     "inttegro",
@@ -112,9 +105,9 @@ try {
   rmSync(work, { recursive: true, force: true });
 }
 
-function runSimile(arguments_) {
+function runSimile(arguments_, cwd = distribution) {
   const result = spawnSync(simile, arguments_, {
-    cwd: distribution,
+    cwd,
     encoding: "utf8",
     env: { ...process.env, SIMILE_COLOR: "never", ...environment },
   });

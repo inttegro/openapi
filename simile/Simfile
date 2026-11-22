@@ -14,9 +14,9 @@ service "inttegro" {
     endpoint = "https://reports.inttegro.dev/v1/reports"
   }
 
-  # Why: each module exposes one independently reviewable class of public test behavior while
-  # routes, schemas, statuses, and wire payloads remain owned by the public OpenAPI contract.
-  behaviors = [
+  # Why: neutral modules keep identities, outcomes, state, and faults independently reviewable
+  # while routes, schemas, statuses, and wire payloads remain owned by the public contract.
+  modules = [
     "./principals.hcl",
     "./behaviors.hcl",
     "./errors.hcl",
