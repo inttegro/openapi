@@ -65,6 +65,22 @@ paths:
                                                   - type: object
                                                     properties:
                                                         status: { type: string, enum: [active] }
+                            # Why: the handler resolves these public selectors into the returned
+                            # catalog snapshots and stores the request-owned Buy-link settings.
+                            # Binding them prevents a synthesized success from referring to a
+                            # different offer than the caller submitted.
+                            x-simile-from-request:
+                                bindings:
+                                    - { from: /product_id, to: /purchase_intent/product/id }
+                                    - { from: /product/id, to: /purchase_intent/product/id }
+                                    - { from: /bundle_id, to: /purchase_intent/bundle/id }
+                                    - { from: /bundle/id, to: /purchase_intent/bundle/id }
+                                    - { from: /price_id, to: /purchase_intent/price/id }
+                                    - { from: /price/id, to: /purchase_intent/price/id }
+                                    - { from: /quantity, to: /purchase_intent/quantity }
+                                    - { from: /usage, to: /purchase_intent/usage }
+                                    - { from: /expires_at, to: /purchase_intent/expires_at }
+                                    - { from: /presentation, to: /purchase_intent/presentation }
                             # Why: this exact outcome keeps the Buy link, selected product, and
                             # effective special-offer price coherent for local integration tests.
                             examples:

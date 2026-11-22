@@ -33,14 +33,14 @@ structure untagged {}
 
 
 @collectionVersion(
-"0.1.0-beta96"
+"0.1.0-beta97"
 )
 @auth([
     httpBearerAuth
 ])
 @httpBearerAuth
 service Inttegro {
-    version: "0.1.0-beta96"
+    version: "0.1.0-beta97"
     operations: [
         activatePaymentMethod
         activatePrice
@@ -1841,6 +1841,56 @@ operation createProduct {
 @tags([
     "Purchase Intents"
 ])
+@responseRelations(
+{
+        "200": {
+            "application/json": {
+                "bindings": [
+                    {
+                        "from": "/product_id",
+                        "to": "/purchase_intent/product/id"
+                    },
+                    {
+                        "from": "/product/id",
+                        "to": "/purchase_intent/product/id"
+                    },
+                    {
+                        "from": "/bundle_id",
+                        "to": "/purchase_intent/bundle/id"
+                    },
+                    {
+                        "from": "/bundle/id",
+                        "to": "/purchase_intent/bundle/id"
+                    },
+                    {
+                        "from": "/price_id",
+                        "to": "/purchase_intent/price/id"
+                    },
+                    {
+                        "from": "/price/id",
+                        "to": "/purchase_intent/price/id"
+                    },
+                    {
+                        "from": "/quantity",
+                        "to": "/purchase_intent/quantity"
+                    },
+                    {
+                        "from": "/usage",
+                        "to": "/purchase_intent/usage"
+                    },
+                    {
+                        "from": "/expires_at",
+                        "to": "/purchase_intent/expires_at"
+                    },
+                    {
+                        "from": "/presentation",
+                        "to": "/purchase_intent/presentation"
+                    }
+                ]
+            }
+        }
+    }
+)
 operation createPurchaseIntent {
     input: createPurchaseIntentInput
     output: createPurchaseIntent200

@@ -1014,6 +1014,54 @@ export interface PurchaseIntentsResponseRelations {
       };
     };
   };
+  readonly "createPurchaseIntent": {
+    readonly "200": {
+      readonly "application/json": {
+        readonly "bindings": readonly [
+          {
+            readonly "from": "/product_id";
+            readonly "to": "/purchase_intent/product/id";
+          },
+          {
+            readonly "from": "/product/id";
+            readonly "to": "/purchase_intent/product/id";
+          },
+          {
+            readonly "from": "/bundle_id";
+            readonly "to": "/purchase_intent/bundle/id";
+          },
+          {
+            readonly "from": "/bundle/id";
+            readonly "to": "/purchase_intent/bundle/id";
+          },
+          {
+            readonly "from": "/price_id";
+            readonly "to": "/purchase_intent/price/id";
+          },
+          {
+            readonly "from": "/price/id";
+            readonly "to": "/purchase_intent/price/id";
+          },
+          {
+            readonly "from": "/quantity";
+            readonly "to": "/purchase_intent/quantity";
+          },
+          {
+            readonly "from": "/usage";
+            readonly "to": "/purchase_intent/usage";
+          },
+          {
+            readonly "from": "/expires_at";
+            readonly "to": "/purchase_intent/expires_at";
+          },
+          {
+            readonly "from": "/presentation";
+            readonly "to": "/purchase_intent/presentation";
+          },
+        ];
+      };
+    };
+  };
   readonly "lookupPurchaseIntent": {
     readonly "200": {
       readonly "application/json": {

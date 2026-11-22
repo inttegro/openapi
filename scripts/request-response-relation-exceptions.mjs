@@ -14,6 +14,5 @@ export const relationExceptions = new Map([
   ["openFileLink", "the success payload is an application/octet-stream transport body or redirect"],
   ["fulfillUploadRequest", "Simile does not currently compile request-response relations for multipart bodies"],
   ["getPaymentMethodSettings", "the empty request returns authentication-scoped payment settings"],
-  ["createPurchaseIntent", "Simile cannot yet combine target-preserving relations with the public product-or-bundle response union"],
   ["listCountrySpecs", "the empty request returns static public country specifications"],
 ]);
