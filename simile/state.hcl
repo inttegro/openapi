@@ -1,11 +1,6 @@
 # Public response snapshots make successful mutations inspectable in local integration tests.
 backend "db" "resources" {
-  description = "Emulator-owned snapshots of public resources created or changed during a test."
-}
-
-# Singleton configuration is retained independently from resource snapshots.
-backend "db" "configuration" {
-  description = "Emulator-owned snapshots of singleton public service configuration."
+  description = "Emulator-owned snapshots of public resources and configuration changed during a test."
 }
 
 backend "queue" "work" {
@@ -295,7 +290,7 @@ effect "mutate_payout_settings" {
   description = "Record the latest public payout settings snapshot."
   operations  = ["setPayoutDestinations", "disableAutomaticPayouts", "enableAutomaticPayouts"]
 
-  action "db.configuration" "put" {
+  action "db.resources" "put" {
     collection = "payout_settings"
     key        = "current"
     value      = response.settings

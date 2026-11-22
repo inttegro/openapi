@@ -3,7 +3,7 @@
 ## Resolved inputs
 
 - Service and CLI name: `inttegro`
-- OpenAPI authority: `commerce.yml` (OpenAPI 3.0.3, `0.1.0-beta95`)
+- OpenAPI authority: `commerce.yml` (OpenAPI 3.0.3, `0.1.0-beta96`)
 - Service configuration: `simile/inttegro.simile.hcl`
 - Behavior overlays: `simile/principals.hcl`, `simile/behaviors.hcl`, `simile/errors.hcl`, `simile/state.hcl`, and `simile/faults.hcl`
 - Listener: `127.0.0.1:4242`
@@ -49,7 +49,7 @@ No public route, method, field name, status, content type, or request/response e
 
 The local setup declares the public application caller, three synthetic credential-lifecycle profiles, and one application-setup workflow. Setup creates a local application identity through `createApplication`, stores its generated bearer credential as sensitive profile data, and withholds that credential from command output. The fixture profiles provide deterministic active, revoked, and expired authentication states.
 
-The service also declares four portable Simile backends: two logical state namespaces, one queue, and one scheduler. Twenty-nine explicitly authored effects record public resource snapshots or schedule only source-backed consequences. Three asynchronous units represent the operations documented as continuing after acceptance: Chime broadcast processing, refund processing, and file cleanup. Inttegro uses POST for reads, so the test gate requires zero convention-inferred effects; this prevents lookup operations from becoming false writes.
+The service also declares three portable Simile backends: one logical public-state namespace, one queue, and one scheduler. Twenty-nine explicitly authored effects record public resource snapshots or schedule only source-backed consequences. Three asynchronous units represent the operations documented as continuing after acceptance: Chime broadcast processing, refund processing, and file cleanup. Inttegro uses POST for reads, so the test gate requires zero convention-inferred effects; this prevents lookup operations from becoming false writes. Simile's conservative POST `/lookup` and `/page` read convention now returns the snapshots those authored effects commit.
 
 ## Soundness ownership
 
@@ -60,7 +60,7 @@ This pass added no speculative payload relationships. Purchase Intent target/var
 ## Remaining gaps
 
 - Two operations include transport-only successes: `openFileLink` can return bytes or a redirect, and `streamFileContents` can return bytes or a redirect. Their bodyless redirect headers and non-empty binary responses are exercised through Simile's HTTP adapter rather than represented as JSON payloads.
-- Durable effects make mutation consequences inspectable, but a later lookup is not yet automatically served from the stored snapshot. The configuration therefore does not claim a complete CRUD replica.
+- Durable effects now make ordinary single-resource POST `/lookup` and POST `/page` operations read the snapshots committed by successful mutations. Composite selectors, filtered pages, searches, and multi-resource projections remain outside the conservative state convention and are still schema-synthesized unless an exact outcome covers them.
 - Deferred work is committed to Simile's durable local outbox and uses leased retries and dead-letter storage. The service library exposes dead-letter inspection and redelivery, while a dedicated operator CLI remains unavailable.
 - Bearer authentication now exercises active, revoked, expired, missing, and setup-generated credentials. Multipart decoding is supported; request-to-response projection for multipart bodies remains unavailable, so the two multipart success relations stay explicit exceptions.
 - No public callback or webhook contract is currently declared. The configuration does not invent event names, payloads, or delivery destinations to approximate one.
@@ -100,7 +100,7 @@ SIMILE_HOME="$(mktemp -d)" simile register inttegro \
 Results:
 
 - Redocly: valid OpenAPI; five unused-component warnings. Two are the pre-existing balance-transaction bases; three retain the formerly shared search components so existing component consumers are not broken while operations use stricter route-specific schemas.
-- Simile compile: success with compiler 0.3.0, OpenAPI 3.0.3, service version `0.1.0-beta95`, 135 operations, four abstract resources, three async operations, one principal, and three fixture profiles.
+- Simile compile: success with compiler 0.3.0, OpenAPI 3.0.3, service version `0.1.0-beta96`, 135 operations, three abstract resources, three async operations, one principal, and three fixture profiles.
 - Artifact inspection: format 21, 135 operations, 637 responses, 661 outcomes, 616 schema-synthesized outcomes, 21 provider-authored outcomes, 37 scenario selections, five scenario faults, 29 provider-authored effects, zero convention-inferred effects, two faults, two fault profiles, one security scheme, one principal, three fixture profiles, and `publicExportSafe: true`.
 - Fidelity audit: zero errors. Its 165 reviewed warnings comprise 107 operations whose remaining statuses intentionally use schema synthesis and 58 POST operations without effects. Of the latter, 55 are public reads expressed as POST; `sendOrderInvoice` and `sendOrderReceipt` depend on recipient data resolved from the referenced order, and `reconcileFileReferences` is keyed by both public resource type and ID. The HCL action language cannot construct those three effects from the operation payloads without guessing unavailable values or collapsing distinct resources, so they remain explicit rather than approximated.
 - Request/response synthesis: all 135 operations synthesized directly without fallback outcomes or request seeds. Four focused regressions additionally exercise zero-valued pagination, protected dynamic bounds, and high policy-version projection.
@@ -108,8 +108,9 @@ Results:
 - Supplied requests: all request examples declared directly in OpenAPI replayed successfully, along with bank-account owner-source alternatives, a Dosh marker, bundle Buy links with catalog and special-offer prices, and a complete operating-policy capability snapshot; 16 valid supplied requests ran in total.
 - Negative requests: missing financial-account subtype data, missing financial-account owner data, an unsupported mobile-money network, and a contradictory Purchase Intent target/quantity payload were rejected.
 - Exact outcomes: all 17 runnable contract selections and all 19 provider-authored domain outcomes returned their expected public payload shape and values. These include complete and partial invoice/receipt delivery, create/update/lookup/cancel Buy-link lifecycle snapshots, and an activated operating-policy version. HTTP-adapter checks additionally proved non-empty binary delivery and exact 302/303 redirect `Location` headers.
-- Composition root: `simile describe service inttegro --config ./simile/inttegro.simile.hcl` resolved the contract and all five modules, reporting 135 operations, 42 scenarios, four backends, three async units, two fault profiles, one application principal, three fixture profiles, and one setup workflow at `127.0.0.1:4242`.
+- Composition root: `simile describe service inttegro --config ./simile/inttegro.simile.hcl` resolved the contract and all five modules, reporting 135 operations, 42 scenarios, three backends, three async units, two fault profiles, one application principal, three fixture profiles, and one setup workflow at `127.0.0.1:4242`.
 - Application setup: isolated registration created a named application profile, issued one redacted bearer credential, preserved the public application identifier, and selected the first profile without exposing sensitive values in setup or profile JSON.
-- Full package gate: passed. OpenAPI, Smithy IDL/AST, TypeScript declarations, Insomnia, and Postman agree on all 135 operations; TypeScript compiles; every generated artifact is current; and the reviewed `0.1.0-beta95` contract lock matches.
+- Stateful HTTP behavior: product creation, lookup, and paging were exercised through the running adapter. Lookup returned the exact committed product snapshot, and the page included that snapshot with a reconciled `size`.
+- Full package gate: passed. OpenAPI, Smithy IDL/AST, TypeScript declarations, Insomnia, and Postman agree on all 135 operations; TypeScript compiles; every generated artifact is current; and the reviewed `0.1.0-beta96` contract lock matches.
 
 With `smithytranslate` available, the full contract gate additionally re-proves 118 typed-ID patterns, 327 global error tuples, all 498 operation/status error mappings, 187 allow-listed cross-field relationships with 374 sound/unsound fixture payloads, generated Postman parity, deterministic OpenAPI/Smithy artifacts, and the contract lock.

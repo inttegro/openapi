@@ -146,7 +146,7 @@ try {
   assert.equal(description.listen, "127.0.0.1:4242", "published listener drifted");
   assert.equal(description.operationCount, 135, "composition-root operation count drifted");
   assert.equal(description.scenarios.length, 42, "published scenario catalogue drifted");
-  assert.equal(description.backends.length, 4, "published backend catalogue drifted");
+  assert.equal(description.backends.length, 3, "published backend catalogue drifted");
   assert.equal(description.asyncOperations.length, 3, "published async catalogue drifted");
   assert.equal(description.faultProfiles.length, 2, "published fault-profile catalogue drifted");
   assert.equal(description.principals.length, 1, "published principal catalogue drifted");
@@ -169,7 +169,7 @@ try {
   assert.equal(inspection.providerAuthoredOutcomes, 21, "provider-authored outcome inventory drifted");
   assert.equal(inspection.scenarioSelections, 37, "exact-outcome scenario inventory drifted");
   assert.equal(inspection.scenarioFaults, 5, "deterministic fault scenario inventory drifted");
-  assert.equal(inspection.resources, 4, "abstract test-backend inventory drifted");
+  assert.equal(inspection.resources, 3, "abstract test-backend inventory drifted");
   assert.equal(inspection.asyncOperations, 3, "declared asynchronous-work inventory drifted");
   assert.equal(inspection.effects, 29, "public effect inventory drifted");
   assert.equal(inspection.providerAuthoredEffects, 29, "public effects must remain explicitly authored");
@@ -244,6 +244,7 @@ try {
   // preserves public routes while enforcing active, revoked, expired, and missing credentials.
   const authenticationChecks = await verifyAuthentication(registryEnvironment, issuedCredential);
   const transportChecks = await verifyFileDeliveryTransport(registryEnvironment, issuedCredential);
+  const stateChecks = await verifyStatefulProductWorkflow(registryEnvironment, issuedCredential);
 
   const operations = collectOperations();
   assert.equal(operations.length, 135, "OpenAPI public operation count drifted");
@@ -433,6 +434,7 @@ try {
       `${invalidRequests.length} invalid requests rejected, ` +
       `${authenticationChecks} authentication cases verified, ` +
       `${transportChecks} transport responses verified, ` +
+      `${stateChecks} stateful product checks verified, ` +
       `${audit.warnings} reviewed fidelity warnings, ` +
       `0 runtime synthesis gaps`,
   );
@@ -601,6 +603,59 @@ async function verifyFileDeliveryTransport(environment, issuedCredential) {
   }
 
   return 3;
+}
+
+async function verifyStatefulProductWorkflow(environment, issuedCredential) {
+  const port = await availablePort();
+  const baseUrl = `http://127.0.0.1:${port}`;
+  const service = spawn(simile, ["start", "inttegro", "--port", String(port)], {
+    cwd: openapiDir,
+    env: { ...process.env, SIMILE_COLOR: "never", ...environment },
+    stdio: ["ignore", "pipe", "pipe"],
+  });
+  let output = "";
+  service.stdout.on("data", (chunk) => { output += chunk; });
+  service.stderr.on("data", (chunk) => { output += chunk; });
+
+  try {
+    await waitForService(service, `${baseUrl}/spec/countries`, () => output);
+    const headers = {
+      authorization: `Bearer ${issuedCredential}`,
+      "content-type": "application/json",
+    };
+    const createdResponse = await fetch(`${baseUrl}/products/create`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify({ type: "digital", name: "Stateful integration guide", publish: true }),
+    });
+    assert.equal(createdResponse.status, 200, "stateful product creation failed");
+    const created = await createdResponse.json();
+    const product = created.product;
+    assert.ok(product?.id, "stateful product creation returned no identifier");
+
+    // Why: a useful emulator must return the snapshot committed by creation rather than synthesize
+    // an unrelated resource merely because the lookup response schema permits one.
+    const lookupResponse = await fetch(`${baseUrl}/products/lookup`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify({ product_id: product.id }),
+    });
+    assert.equal(lookupResponse.status, 200, "stateful product lookup failed");
+    assert.deepEqual((await lookupResponse.json()).product, product, "lookup did not replay product state");
+
+    const pageResponse = await fetch(`${baseUrl}/products/page`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify({ page_number: 1, page_size: 25 }),
+    });
+    assert.equal(pageResponse.status, 200, "stateful product page failed");
+    const page = (await pageResponse.json()).page;
+    assert.ok(page.products.some((candidate) => candidate.id === product.id), "page omitted stored product");
+    assert.equal(page.size, page.products.length, "page size did not reconcile with stored products");
+    return 3;
+  } finally {
+    await stopService(service);
+  }
 }
 
 function availablePort() {
