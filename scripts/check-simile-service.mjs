@@ -49,7 +49,20 @@ const namedOutcomes = [
       owner: { name: "Jane Mensah", address: { country: "GH" } },
     },
   ]],
-  ["createPurchaseIntent", ["created", "purchase_intent_created", { purchase_intent: { id: "sale_example", status: "active", price: { nominal: { currency: "ghs", value: 15000 } } } }]],
+  ["createPurchaseIntent", [
+    "created",
+    "purchase_intent_created",
+    { purchase_intent: { id: "sale_example", status: "active", price: { nominal: { currency: "ghs", value: 15000 } } } },
+    // Why: the success contract intentionally copies caller-owned selectors into the response.
+    // Use the example's selectors so exact-fidelity checks distinguish declared substitutions
+    // from unrelated output drift or superfluous synthesized fields.
+    {
+      product_id: "prod_example",
+      price: { nominal: { currency: "ghs", value: 15000 } },
+      quantity: { min: 1, max: 5 },
+      usage: { multi_use: true },
+    },
+  ]],
   ["sendChime", ["cooldown_active", "chime_cooldown_active", { error: { code: "chime_cooldown_active" } }]],
   ["createOrder", ["payment_method_invalid", "order_payment_method_invalid", { code: "payment_method_invalid" }]],
   ["createRefund", ["currency_mismatch", "refund_currency_mismatch", { error: { code: "refund_currency_mismatch" } }]],
@@ -72,26 +85,35 @@ const namedOutcomes = [
   ]],
 ];
 
+const publicError = (cause, code, fixCode, type, url = "https://studio.inttegro.com/errors") => ({
+  cause,
+  code,
+  fix_code: fixCode,
+  type,
+  url,
+});
+const wrappedError = (...arguments_) => ({ error: publicError(...arguments_) });
+
 const providerOutcomes = [
-  ["verifyOTP", "otp_transaction_expired", "otp_expired", { error: { code: "otp_transaction_expired" } }],
-  ["verifyOTP", "otp_max_verification_attempts_exceeded", "otp_attempts_exhausted", { error: { code: "otp_max_verification_attempts_exceeded" } }],
-  ["lookupCustomer", "customer_not_found", "customer_not_found", { code: "customer_not_found" }],
-  ["lookupOrder", "order_not_found", "order_not_found", { code: "order_not_found" }],
-  ["lookupProduct", "product_not_found", "product_not_found", { code: "product_not_found" }],
-  ["lookupPurchaseIntent", "purchase_intent_not_found", "purchase_intent_not_found", { code: "purchase_intent_not_found" }],
-  ["lookupPaymentMethod", "payment_method_not_found", "payment_method_not_found", { code: "payment_method_not_found" }],
-  ["createRefund", "refund_insufficient_merchant_balance", "refund_insufficient_balance", { error: { code: "refund_insufficient_merchant_balance" } }],
-  ["cancelRefund", "refund_not_found", "refund_not_found", { error: { code: "refund_not_found" } }],
-  ["cancelRefund", "refund_cannot_cancel", "refund_cannot_cancel", { error: { code: "refund_cannot_cancel" } }],
-  ["completeOrder", "order_payment_not_paid", "order_payment_not_paid", { code: "order_payment_not_paid" }],
-  ["confirmPayment", "confirmation_bad_token", "confirmation_bad_token", { error: { code: "confirmation_bad_token" } }],
-  ["confirmPayment", "payment_transition_conflict", "payment_transition_conflict", { error: { code: "payment_transition_conflict" } }],
-  ["lookupFile", "file_not_found", "file_not_found", { code: "file_not_found" }],
-  ["openFileLink", "file_link_expired", "file_link_expired", { code: "file_link_expired" }],
-  ["lookupUploadRequest", "upload_request_not_found", "upload_request_not_found", { code: "upload_request_not_found" }],
-  ["fulfillUploadRequest", "upload_request_expired", "upload_request_expired", { code: "upload_request_expired" }],
-  ["activatePrice", "price_archived", "price_archived", { code: "price_archived" }],
-  ["archiveProduct", "product_already_archived", "product_already_archived", { code: "product_already_archived" }],
+  ["verifyOTP", "otp_transaction_expired", "otp_expired", wrappedError("precondition_unmet", "otp_transaction_expired", "satisfy_precondition", "bad_request")],
+  ["verifyOTP", "otp_max_verification_attempts_exceeded", "otp_attempts_exhausted", wrappedError("precondition_unmet", "otp_max_verification_attempts_exceeded", "satisfy_precondition", "bad_request")],
+  ["lookupCustomer", "customer_not_found", "customer_not_found", publicError("invalid_request_parameter", "customer_not_found", "change_request_parameters", "invalid_request_parameter")],
+  ["lookupOrder", "order_not_found", "order_not_found", publicError("invalid_request_parameter", "order_not_found", "change_request_parameters", "invalid_request_parameter")],
+  ["lookupProduct", "product_not_found", "product_not_found", publicError("invalid_request_parameter", "product_not_found", "change_request_parameters", "invalid_request_parameter")],
+  ["lookupPurchaseIntent", "purchase_intent_not_found", "purchase_intent_not_found", publicError("invalid_request_parameter", "purchase_intent_not_found", "change_request_parameters", "invalid_request_parameter")],
+  ["lookupPaymentMethod", "payment_method_not_found", "payment_method_not_found", publicError("invalid_request_parameter", "payment_method_not_found", "change_request_parameters", "invalid_request_parameter")],
+  ["createRefund", "refund_insufficient_merchant_balance", "refund_insufficient_balance", wrappedError("precondition_unmet", "refund_insufficient_merchant_balance", "satisfy_precondition", "bad_request")],
+  ["cancelRefund", "refund_not_found", "refund_not_found", wrappedError("invalid_request_parameter", "refund_not_found", "change_request_parameters", "invalid_request_parameter")],
+  ["cancelRefund", "refund_cannot_cancel", "refund_cannot_cancel", wrappedError("resource_state_conflict", "refund_cannot_cancel", "refresh_resource_state", "state_conflict")],
+  ["completeOrder", "order_payment_not_paid", "order_payment_not_paid", publicError("precondition_unmet", "order_payment_not_paid", "satisfy_precondition", "bad_request")],
+  ["confirmPayment", "confirmation_bad_token", "confirmation_bad_token", wrappedError("invalid_request_parameter", "confirmation_bad_token", "change_request_parameters", "invalid_request_parameter")],
+  ["confirmPayment", "payment_transition_conflict", "payment_transition_conflict", wrappedError("resource_state_conflict", "payment_transition_conflict", "refresh_resource_state", "state_conflict", "https://studio.inttegro.com/e/payment_transition_conflict")],
+  ["lookupFile", "file_not_found", "file_not_found", publicError("resource_not_found", "file_not_found", "refresh_resource_state", "not_found")],
+  ["openFileLink", "file_link_expired", "file_link_expired", publicError("resource_state_invalid", "file_link_expired", "refresh_resource_state", "state_invalid")],
+  ["lookupUploadRequest", "upload_request_not_found", "upload_request_not_found", publicError("resource_not_found", "upload_request_not_found", "refresh_resource_state", "not_found")],
+  ["fulfillUploadRequest", "upload_request_expired", "upload_request_expired", publicError("resource_state_invalid", "upload_request_expired", "refresh_resource_state", "state_invalid")],
+  ["activatePrice", "price_archived", "price_archived", publicError("precondition_unmet", "price_archived", "satisfy_precondition", "bad_request")],
+  ["archiveProduct", "product_already_archived", "product_already_archived", publicError("precondition_unmet", "product_already_archived", "satisfy_precondition", "bad_request")],
 ];
 
 if (!existsSync(simile)) {
@@ -166,7 +188,7 @@ try {
   const inspection = JSON.parse(runSimile(["inspect", artifactPath, "--output", "json"]).stdout);
   assert.equal(inspection.operations, 135, "compiled public operation count drifted");
   assert.equal(inspection.publicExportSafe, true, "compiled artifact is not public-export safe");
-  assert.equal(inspection.providerAuthoredOutcomes, 21, "provider-authored outcome inventory drifted");
+  assert.equal(inspection.providerAuthoredOutcomes, 25, "provider-authored outcome inventory drifted");
   assert.equal(inspection.scenarioSelections, 37, "exact-outcome scenario inventory drifted");
   assert.equal(inspection.scenarioFaults, 5, "deterministic fault scenario inventory drifted");
   assert.equal(inspection.resources, 3, "abstract test-backend inventory drifted");
@@ -268,6 +290,7 @@ try {
     issuedCredential,
     isolatedCredential,
   );
+  const retryChecks = await verifyIdempotentLostResponse(registryEnvironment, issuedCredential);
 
   const operations = collectOperations();
   assert.equal(operations.length, 135, "OpenAPI public operation count drifted");
@@ -357,6 +380,8 @@ try {
   }
 
   for (const [operationId, [outcome, scenario, expected, requestBody]] of namedOutcomes) {
+    const exactExample = namedResponseExample(operationId, outcome);
+    assertPartial(exactExample, expected, `${operationId}.${outcome}.inventory`);
     const requestArguments = requestBody === undefined
       ? []
       : ["--request", JSON.stringify({ body: requestBody })];
@@ -371,7 +396,9 @@ try {
       "--output",
       "json",
     ]).stdout);
-    assertPartial(actual, expected, `${operationId}.${outcome}`);
+    // Why: a partial match would allow schema-valid but irrelevant optional fields to escape into
+    // a provider-authored result. Named outcomes are exact public fixtures, not loose examples.
+    assert.deepEqual(actual, exactExample, `${operationId}.${outcome} differs from its exact OpenAPI example`);
 
     const scenarioActual = JSON.parse(runSimile([
       "run",
@@ -385,7 +412,11 @@ try {
       "--output",
       "json",
     ]).stdout);
-    assertPartial(scenarioActual, expected, `${operationId}.${scenario}`);
+    assert.deepEqual(
+      scenarioActual,
+      exactExample,
+      `${operationId}.${scenario} differs from its exact OpenAPI example`,
+    );
   }
 
   for (const [operationId, outcome, scenario, expected] of providerOutcomes) {
@@ -400,7 +431,9 @@ try {
       "--output",
       "json",
     ]).stdout);
-    assertPartial(actual, expected, `${operationId}.${outcome}`);
+    // Why: provider-authored errors must preserve the entire public tuple and must not acquire
+    // random or superfluous fields merely because a broader schema would accept them.
+    assert.deepEqual(actual, expected, `${operationId}.${outcome} differs from its exact HCL body`);
 
     const scenarioActual = JSON.parse(runSimile([
       "run",
@@ -413,7 +446,7 @@ try {
       "--output",
       "json",
     ]).stdout);
-    assertPartial(scenarioActual, expected, `${operationId}.${scenario}`);
+    assert.deepEqual(scenarioActual, expected, `${operationId}.${scenario} differs from its exact HCL body`);
   }
 
   // Why: positive synthesis alone can hide a broadened schema; these payloads prove the repaired
@@ -458,6 +491,7 @@ try {
       `${authenticationChecks} authentication cases verified, ` +
       `${transportChecks} transport responses verified, ` +
       `${stateChecks} stateful product checks verified, ` +
+      `${retryChecks} idempotent lost-response checks verified, ` +
       `${audit.warnings} reviewed fidelity warnings, ` +
       `0 runtime synthesis gaps`,
   );
@@ -486,6 +520,32 @@ function collectOperations() {
     }
   }
   return operations;
+}
+
+function namedResponseExample(operationId, exampleName) {
+  for (const item of Object.values(document.paths ?? {})) {
+    for (const [method, operation] of Object.entries(item ?? {})) {
+      if (!methods.has(method) || operation?.operationId !== operationId) continue;
+      for (const response of Object.values(operation.responses ?? {})) {
+        const resolvedResponse = resolveLocalReference(response);
+        for (const media of Object.values(resolvedResponse?.content ?? {})) {
+          const example = media?.examples?.[exampleName];
+          if (example !== undefined) return structuredClone(resolveLocalReference(example).value);
+        }
+      }
+    }
+  }
+  throw new Error(`${operationId}.${exampleName} has no named OpenAPI response example`);
+}
+
+function resolveLocalReference(value) {
+  if (!value?.$ref) return value;
+  assert.match(value.$ref, /^#\//, `external reference ${value.$ref} cannot identify an exact outcome`);
+  return value.$ref
+    .slice(2)
+    .split("/")
+    .map((segment) => segment.replaceAll("~1", "/").replaceAll("~0", "~"))
+    .reduce((current, segment) => current?.[segment], document);
 }
 
 function runOperation(operationId, body, shouldSucceed = true) {
@@ -857,6 +917,110 @@ async function verifyStatefulProductWorkflow(environment, issuedCredential, isol
     assert.equal(orderLookupResponse.status, 200, "stateful order lookup failed");
     assert.deepEqual((await orderLookupResponse.json()).order, order, "order lookup did not replay stored state");
     checks += 1;
+
+    const rejectedOrder = async (number, productId, priceId, expected) => {
+      const response = await fetch(`${first.baseUrl}/orders/create`, {
+        method: "POST",
+        headers,
+        body: JSON.stringify({
+          number,
+          customer_data: { name: "Rejected Order Customer", email_address: "rejected@example.test" },
+          finalize: true,
+          execute_payment: false,
+          line_items: [{
+            type: "product",
+            product: { product_id: productId, price_id: priceId, quantity: 1 },
+          }],
+        }),
+      });
+      const body = await response.json();
+      assert.equal(response.status, 400, `${expected.code} selected an unexpected status`);
+      assert.deepEqual(body, expected, `${expected.code} returned the wrong public error tuple`);
+      checks += 1;
+    };
+
+    // Why: catalog references fail for materially different public reasons. Exercising real stored
+    // states proves the Simfile selects domain outcomes instead of returning emulator internals.
+    await rejectedOrder(
+      "SIMILE-MISSING-PRICE",
+      product.id,
+      "pr_missing_contract_price",
+      publicError("invalid_request_parameter", "price_not_found", "change_request_parameters", "invalid_request_parameter"),
+    );
+    await rejectedOrder(
+      "SIMILE-MISMATCHED-PRICE",
+      "prod_mismatched_contract_product",
+      price.id,
+      publicError("invalid_request_parameter", "invalid_line_items", "change_request_parameters", "invalid_request_parameter"),
+    );
+
+    const deactivatedResponse = await fetch(`${first.baseUrl}/prices/deactivate`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify({ price_id: price.id }),
+    });
+    assert.equal(deactivatedResponse.status, 200, "price deactivation fixture failed");
+    price = (await deactivatedResponse.json()).price;
+    assert.equal(price.active, false, "price deactivation did not produce an inactive snapshot");
+    checks += 1;
+    await rejectedOrder(
+      "SIMILE-INACTIVE-PRICE",
+      product.id,
+      price.id,
+      publicError("precondition_unmet", "price_inactive", "satisfy_precondition", "bad_request"),
+    );
+
+    const archivedPriceResponse = await fetch(`${first.baseUrl}/products/add_price`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify({
+        product_id: product.id,
+        label: "Archived contract price",
+        type: "fixed_amount",
+        fixed_amount: { currency: "ghs", value: 30000 },
+      }),
+    });
+    assert.equal(archivedPriceResponse.status, 200, "archived-price fixture creation failed");
+    const archivedPrice = (await archivedPriceResponse.json()).price;
+    const archiveResponse = await fetch(`${first.baseUrl}/prices/archive`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify({ price_id: archivedPrice.id }),
+    });
+    const archiveBody = await archiveResponse.text();
+    assert.equal(
+      archiveResponse.status,
+      200,
+      `price archive fixture failed: ${archiveBody}\n${first.output()}`,
+    );
+    const archived = JSON.parse(archiveBody).price;
+    assert.ok(archived.archived_at, "price archive returned no archived timestamp");
+    checks += 2;
+    await rejectedOrder(
+      "SIMILE-ARCHIVED-PRICE",
+      product.id,
+      archived.id,
+      publicError("precondition_unmet", "price_archived", "satisfy_precondition", "bad_request"),
+    );
+
+    const ordersPageResponse = await fetch(`${first.baseUrl}/orders/page`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify({ page_number: 1, page_size: 100 }),
+    });
+    assert.equal(ordersPageResponse.status, 200, "order page failed after rejected catalog requests");
+    const ordersPage = (await ordersPageResponse.json()).page;
+    const rejectedNumbers = new Set([
+      "SIMILE-MISSING-PRICE",
+      "SIMILE-MISMATCHED-PRICE",
+      "SIMILE-INACTIVE-PRICE",
+      "SIMILE-ARCHIVED-PRICE",
+    ]);
+    assert.ok(
+      !ordersPage.orders.some((candidate) => rejectedNumbers.has(candidate.number)),
+      "a state-projection error committed a rejected order",
+    );
+    checks += 1;
   } finally {
     await stopService(first.service);
   }
@@ -902,10 +1066,106 @@ async function verifyStatefulProductWorkflow(environment, issuedCredential, isol
   return checks;
 }
 
-async function startRegisteredService(environment) {
+async function verifyIdempotentLostResponse(environment, issuedCredential) {
+  const idempotencyKey = "contract-test-order-response-lost";
+  const headers = {
+    authorization: `Bearer ${issuedCredential}`,
+    "content-type": "application/json",
+    "idempotency-key": idempotencyKey,
+  };
+  const request = {
+    request_meta: { idempotency_key: idempotencyKey },
+    number: "SIMILE-LOST-RESPONSE-001",
+    finalize: true,
+    execute_payment: false,
+    customer_data: {
+      name: "Lost Response Customer",
+      email_address: "lost-response@example.test",
+      phone_number: "+233242057831",
+    },
+    line_items: [{
+      type: "product",
+      product: {
+        type: "physical",
+        name: "Idempotent order fixture",
+        quantity: 1,
+        price: { currency: "ghs", value: 20000 },
+      },
+    }],
+  };
+
+  const faulted = await startRegisteredService(environment, [
+    "--scenario",
+    "order_response_lost_after_commit",
+  ]);
+  try {
+    // Why: a disconnect-after-commit is only useful if it really deprives the caller of the first
+    // result while preserving the mutation for a safe retry.
+    await assert.rejects(
+      fetch(`${faulted.baseUrl}/orders/create`, {
+        method: "POST",
+        headers,
+        body: JSON.stringify(request),
+      }),
+      "lost-response scenario unexpectedly delivered the first order response",
+    );
+  } finally {
+    await stopService(faulted.service);
+  }
+
+  const recovered = await startRegisteredService(environment);
+  try {
+    // Why: process-local replay would give false confidence to clients that restart their local
+    // emulator between retry attempts. The durable registry must return the committed outcome.
+    const retry = await fetch(`${recovered.baseUrl}/orders/create`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify(request),
+    });
+    const retryText = await retry.text();
+    assert.equal(retry.status, 200, `idempotent retry failed after restart: ${retryText}`);
+    const order = JSON.parse(retryText).order;
+    assert.ok(order?.id, "idempotent retry returned no committed order");
+    assert.equal(order.number, request.number, "idempotent retry changed the committed order");
+
+    const lookup = await fetch(`${recovered.baseUrl}/orders/lookup`, {
+      method: "POST",
+      headers: {
+        authorization: `Bearer ${issuedCredential}`,
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({ order_id: order.id }),
+    });
+    assert.equal(lookup.status, 200, "committed order could not be looked up after lost response");
+    assert.deepEqual((await lookup.json()).order, order, "lost-response retry and stored order diverged");
+
+    const conflict = await fetch(`${recovered.baseUrl}/orders/create`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify({ ...request, number: "SIMILE-LOST-RESPONSE-CHANGED" }),
+    });
+    const conflictBody = await conflict.json();
+    assert.equal(conflict.status, 400, "changed request reused an idempotency key without conflict");
+    assert.deepEqual(
+      conflictBody,
+      publicError(
+        "invalid_request_parameter",
+        "idempotency_key_mismatch",
+        "change_request_parameters",
+        "idempotency_error",
+      ),
+      "idempotency conflict returned an unrelated public tuple",
+    );
+  } finally {
+    await stopService(recovered.service);
+  }
+  return 4;
+}
+
+async function startRegisteredService(environment, extraArguments = []) {
   const port = await availablePort();
   const baseUrl = `http://127.0.0.1:${port}`;
-  const service = spawn(simile, ["start", "inttegro", "--port", String(port)], {
+  const service = spawn(simile, ["start", "inttegro", "--port", String(port), ...extraArguments], {
     cwd: openapiDir,
     env: { ...process.env, SIMILE_COLOR: "never", ...environment },
     stdio: ["ignore", "pipe", "pipe"],

@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "npm run openapi:check && npm run smithy:check && npm run typescript:check && npm run typescript:compile && npm run lint:openapi && npm run test:typed-id-patterns && npm run test:response-fidelity && npm run test:error-contract && npm run test:operation-errors && npm run test:simile-soundness && npm run test:request-response-relations && npm run test:simile-service && npm run test:simile-coverage && node scripts/check-contract.mjs",
+    "test": "npm run openapi:check && npm run smithy:check && npm run typescript:check && npm run typescript:compile && npm run lint:openapi && npm run test:typed-id-patterns && npm run test:response-fidelity && npm run test:error-contract && npm run test:operation-errors && npm run test:simile-soundness && npm run test:request-response-relations && npm run test:simile-service && npm run test:simile-distribution && npm run test:simile-coverage && node scripts/check-contract.mjs",
     "test:error-contract": "node scripts/check-error-contract.mjs",
     "test:operation-errors": "node scripts/check-operation-error-contract.mjs",
     "test:typed-id-patterns": "node scripts/check-typed-id-patterns.mjs",
@@ -12,6 +12,7 @@
     "test:simile-soundness": "node scripts/check-simile-soundness.mjs",
     "test:request-response-relations": "node scripts/check-request-response-relations.mjs",
     "test:simile-service": "node scripts/check-simile-service.mjs",
+    "test:simile-distribution": "node scripts/check-simile-distribution.mjs",
     "test:simile-coverage": "node scripts/generate-simile-operation-coverage.mjs --check",
     "contract:update": "npm run openapi:bundle && npm run smithy:bundle && npm run typescript:bundle && npm run postman:generate && node scripts/check-contract.mjs --update",
     "openapi:bundle": "node scripts/bundle-openapi.mjs",

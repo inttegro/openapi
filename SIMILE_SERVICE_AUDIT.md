@@ -3,7 +3,7 @@
 ## Resolved inputs
 
 - Service and CLI name: `inttegro`
-- OpenAPI authority: `commerce.yml` (OpenAPI 3.0.3, `0.1.0-beta97`)
+- OpenAPI authority: `commerce.yml` (OpenAPI 3.0.3, `0.1.0-beta99`)
 - Service configuration: `simile/inttegro.simile.hcl`
 - Behavior overlays: `simile/principals.hcl`, `simile/behaviors.hcl`, `simile/errors.hcl`, `simile/state.hcl`, and `simile/faults.hcl`
 - Listener: `127.0.0.1:4242`
@@ -34,7 +34,7 @@ This pass corrected six contract defects:
 5. The generic search response could advertise financial-account search while returning product, order, payout, or customer projections. Five operation-specific response schemas now fix the advertised type, per-type totals, and result references; the shared sort object preserves the caller's concrete `field` and `direction` while enforcing relevance-descending semantics.
 6. Mobile-money tokenization reused a generic payment-method response and could synthesize another rail. Its response is now narrowed to the existing `mobile_money` shape while retaining the masked-number template and four-decimal-digit `last4` rule.
 
-This follow-up corrected seven further response-fidelity defects:
+This follow-up corrected eight further response-fidelity defects:
 
 1. Product shipment synthesis could mix delivery, download, render, service, and stream markers. The response is now an exact closed union, empty response-only custom data and invoice settings are excluded, and request/response projection no longer invents optional shipment or custom-data fields.
 2. Invoice and receipt delivery could return the wrong document kind, an incompatible order lifecycle state, or empty/overlapping channel results. Operation-specific refinements, distinct/disjoint channel constraints, and complete and partial named outcomes now enforce the public delivery semantics.
@@ -46,6 +46,9 @@ This follow-up corrected seven further response-fidelity defects:
    profile-scoped public state, proves that it belongs to the submitted product and remains usable,
    snapshots its amount into the line item, and reconciles the order total without requiring the
    caller to duplicate the price value.
+8. Price archival now returns a closed archived-price response whose public snapshot proves both
+   `active: false` and a non-null `archived_at`, so dependent workflows can distinguish archival
+   from ordinary deactivation after the resource is persisted.
 
 The hardening pass also binds tokenization responses to the submitted customer, payment-method type, and mobile-money network. The response schema independently proves that the displayed account number is masked and agrees with `last4`.
 
@@ -54,6 +57,13 @@ No public route, method, field name, status, content type, or request/response e
 The local setup declares the public application caller, three synthetic credential-lifecycle profiles, and one application-setup workflow. Setup creates a local application identity through `createApplication`, stores its generated bearer credential as sensitive profile data, and withholds that credential from command output. The fixture profiles provide deterministic active, revoked, and expired authentication states.
 
 The service also declares three portable Simile backends: one logical public-state namespace, one queue, and one scheduler. Twenty-nine explicitly authored effects record public resource snapshots or schedule only source-backed consequences. Three asynchronous units represent the operations documented as continuing after acceptance: Chime broadcast processing, refund processing, and file cleanup. Inttegro uses POST for reads, so the test gate requires zero convention-inferred effects; this prevents lookup operations from becoming false writes. Simile's conservative POST `/lookup` and `/page` read convention now returns the snapshots those authored effects commit.
+
+Catalog state projection now selects exact public order errors when a referenced price is missing,
+belongs to another product, is inactive, or is archived. These rejected requests commit no order.
+Mutation responses treat stored state as a baseline, fill newly required response evidence from the
+operation schema, and then apply only declared request-to-response bindings. Idempotency recovery is
+also exercised across a simulated disconnect after commit and a service restart; replay returns the
+committed order, while reuse with a changed request returns the exact public mismatch tuple.
 
 ## Soundness ownership
 
@@ -83,6 +93,7 @@ The final validation commands are:
 ```bash
 npm run lint:openapi
 npm run test:simile-service
+npm run test:simile-distribution
 npm run test:request-response-relations
 npm run postman:check
 npm test
@@ -104,17 +115,19 @@ SIMILE_HOME="$(mktemp -d)" simile register inttegro \
 Results:
 
 - Redocly: valid OpenAPI; five unused-component warnings. Two are the pre-existing balance-transaction bases; three retain the formerly shared search components so existing component consumers are not broken while operations use stricter route-specific schemas.
-- Simile compile: success with compiler 0.3.0, OpenAPI 3.0.3, service version `0.1.0-beta97`, 135 operations, three abstract resources, three async operations, one principal, and three fixture profiles.
-- Artifact inspection: format 23, 135 operations, one provider-authored state projection, 637 responses, 661 outcomes, 616 schema-synthesized outcomes, 21 provider-authored outcomes, 37 scenario selections, five scenario faults, 29 provider-authored effects, zero convention-inferred effects, two faults, two fault profiles, one security scheme, one principal, three fixture profiles, and `publicExportSafe: true`.
+- Simile compile: success with compiler 0.3.0, OpenAPI 3.0.3, service version `0.1.0-beta99`, 135 operations, three abstract resources, three async operations, one principal, and three fixture profiles.
+- Artifact inspection: format 24, 135 operations, one provider-authored state projection, 637 responses, 665 outcomes, 616 schema-synthesized outcomes, 25 provider-authored outcomes, 37 scenario selections, five scenario faults, 29 provider-authored effects, zero convention-inferred effects, two faults, two fault profiles, one security scheme, one principal, three fixture profiles, and `publicExportSafe: true`.
 - Fidelity audit: zero errors. Its 165 reviewed warnings comprise 107 operations whose remaining statuses intentionally use schema synthesis and 58 POST operations without effects. Of the latter, 55 are public reads expressed as POST; `sendOrderInvoice` and `sendOrderReceipt` depend on recipient data resolved from the referenced order, and `reconcileFileReferences` is keyed by both public resource type and ID. The HCL action language cannot construct those three effects from the operation payloads without guessing unavailable values or collapsing distinct resources, so they remain explicit rather than approximated.
 - Request/response synthesis: all 135 operations synthesized directly without fallback outcomes or request seeds. Four focused regressions additionally exercise zero-valued pagination, protected dynamic bounds, and high policy-version projection.
 - Request reachability: 122 operations carry 124 constructive success-payload relations; the remaining 13 operations match the exact reviewed exception inventory. All 124 relation maps are also preserved in both Smithy outputs.
 - Supplied requests: all request examples declared directly in OpenAPI replayed successfully, along with bank-account owner-source alternatives, a Dosh marker, bundle Buy links with catalog and special-offer prices, and a complete operating-policy capability snapshot; 16 valid supplied requests ran in total.
 - Negative requests: missing financial-account subtype data, missing financial-account owner data, an unsupported mobile-money network, and a contradictory Purchase Intent target/quantity payload were rejected.
-- Exact outcomes: all 17 runnable contract selections and all 19 provider-authored domain outcomes returned their expected public payload shape and values. These include complete and partial invoice/receipt delivery, create/update/lookup/cancel Buy-link lifecycle snapshots, and an activated operating-policy version. HTTP-adapter checks additionally proved non-empty binary delivery and exact 302/303 redirect `Location` headers.
+- Exact outcomes: all 17 runnable contract selections and all 19 directly exercised provider-authored domain outcomes returned their complete expected payloads with no unrelated optional fields. These include complete and partial invoice/receipt delivery, create/update/lookup/cancel Buy-link lifecycle snapshots, and an activated operating-policy version. HTTP-adapter checks additionally proved non-empty binary delivery and exact 302/303 redirect `Location` headers.
 - Composition root: `simile describe service inttegro --config ./simile/inttegro.simile.hcl` resolved the contract and all five modules, reporting 135 operations, 42 scenarios, three backends, three async units, two fault profiles, one application principal, three fixture profiles, and one setup workflow at `127.0.0.1:4242`.
 - Application setup: isolated registration created a named application profile, issued one redacted bearer credential, preserved the public application identifier, and selected the first profile without exposing sensitive values in setup or profile JSON.
-- Stateful HTTP behavior: 17 adapter checks exercised product creation, partial mutation with full-snapshot preservation, lookup, paging, product-price creation, Purchase Intent creation, and order creation from the stored `price_id`. The order line snapshot and total matched the resolved fixed amount and quantity. The same product, price, Purchase Intent, and order survived a service restart, while a second independently provisioned application could not read the first application's state before or after restart.
-- Full package gate: passed. OpenAPI, Smithy IDL/AST, TypeScript declarations, Insomnia, and Postman agree on all 135 operations; TypeScript compiles; every generated artifact is current; and the reviewed `0.1.0-beta97` contract lock matches.
+- Stateful HTTP behavior: 25 adapter checks exercised product creation, partial mutation with full-snapshot preservation, lookup, paging, product-price creation, Purchase Intent creation, and order creation from the stored `price_id`. The order line snapshot and total matched the resolved fixed amount and quantity. Missing, mismatched, inactive, and archived prices selected their exact public errors and did not create orders. The same product, price, Purchase Intent, and order survived a service restart, while a second independently provisioned application could not read the first application's state before or after restart.
+- Idempotent recovery: four adapter checks simulated a response lost after commit, restarted the service, replayed the same key and request to recover the committed order, looked that order up, and rejected a changed request under the same key with the exact `idempotency_key_mismatch` tuple.
+- Clean-room distribution: passed using only `commerce.yml` and the public `simile/` directory. The copied bundle compiled, registered, provisioned a caller, and served both a public and authenticated operation without retaining a path into the provider workspace.
+- Full package gate: passed. OpenAPI, Smithy IDL/AST, TypeScript declarations, Insomnia, and Postman agree on all 135 operations; TypeScript compiles; every generated artifact is current; and the reviewed `0.1.0-beta99` contract lock matches.
 
 The full contract gate additionally re-proves 118 typed-ID patterns, 312 public error codes across the declared error families, all 498 operation/status error mappings, 187 allow-listed cross-field relationships with 374 sound/unsound fixture payloads, generated Postman parity, deterministic OpenAPI/Smithy artifacts, and the contract lock.

@@ -10,6 +10,10 @@ service "inttegro" {
     path = "../commerce.yml"
   }
 
+  reporting {
+    endpoint = "https://reports.inttegro.dev/v1/reports"
+  }
+
   # Why: each module exposes one independently reviewable class of public test behavior while
   # routes, schemas, statuses, and wire payloads remain owned by the public OpenAPI contract.
   behaviors = [

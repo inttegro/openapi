@@ -2,6 +2,21 @@
 # operation-specific status and error tuple. Opaque scenarios select them without publishing the
 # private production conditions that cause the same observable result.
 
+# Why: replay conflicts are detected by Simile before provider behavior runs, but the customer must
+# still receive Inttegro's documented idempotency tuple rather than an emulator diagnostic.
+protocol_error "idempotency_conflict" {
+  description  = "The idempotency key was previously used with a different request."
+  statuses     = [400]
+  content_type = "application/json"
+  body = {
+    cause    = "invalid_request_parameter"
+    code     = "idempotency_key_mismatch"
+    fix_code = "change_request_parameters"
+    type     = "idempotency_error"
+    url      = "https://studio.inttegro.com/errors"
+  }
+}
+
 behavior "verifyOTP" {
   description = "Expose reviewed OTP lifecycle failures for integration tests."
 

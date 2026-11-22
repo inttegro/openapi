@@ -157,30 +157,81 @@ effect "mutate_customer" {
 # stored public price lets Simile snapshot the same amount and reconcile the order total while the
 # caller's request remains the contract-valid price_id branch.
 behavior "createOrder" {
+  # Why: a state projection must fail with the same public domain result as the API instead of a
+  # Simile implementation error; the conditions remain public and provider-neutral.
+  outcome "price_not_found" {
+    status = 400
+    body = {
+      cause    = "invalid_request_parameter"
+      code     = "price_not_found"
+      fix_code = "change_request_parameters"
+      type     = "invalid_request_parameter"
+      url      = "https://studio.inttegro.com/errors"
+    }
+  }
+
+  outcome "invalid_line_items" {
+    status = 400
+    body = {
+      cause    = "invalid_request_parameter"
+      code     = "invalid_line_items"
+      fix_code = "change_request_parameters"
+      type     = "invalid_request_parameter"
+      url      = "https://studio.inttegro.com/errors"
+    }
+  }
+
+  outcome "price_archived" {
+    status = 400
+    body = {
+      cause    = "precondition_unmet"
+      code     = "price_archived"
+      fix_code = "satisfy_precondition"
+      type     = "bad_request"
+      url      = "https://studio.inttegro.com/errors"
+    }
+  }
+
+  outcome "price_inactive" {
+    status = 400
+    body = {
+      cause    = "precondition_unmet"
+      code     = "price_inactive"
+      fix_code = "satisfy_precondition"
+      type     = "bad_request"
+      url      = "https://studio.inttegro.com/errors"
+    }
+  }
+
   resolve "db.resources" {
     collection = "prices"
     key        = "/line_items/*/product/price_id"
     select     = "/fixed_amount"
     into       = "/line_items/*/product/price"
+    missing_outcome = "price_not_found"
 
     where {
       stored  = "/product_id"
       request = "/line_items/*/product/product_id"
+      otherwise = "invalid_line_items"
     }
 
     where {
       stored = "/type"
       equals = "fixed_amount"
-    }
-
-    where {
-      stored = "/active"
-      equals = true
+      otherwise = "invalid_line_items"
     }
 
     where {
       stored = "/archived_at"
       state  = "null-or-absent"
+      otherwise = "price_archived"
+    }
+
+    where {
+      stored = "/active"
+      equals = true
+      otherwise = "price_inactive"
     }
   }
 }
