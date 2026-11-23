@@ -11,7 +11,7 @@ service "inttegro" {
   }
 
   reporting {
-    endpoint = "https://reports.inttegro.dev/v1/reports"
+    endpoint = "https://simile-report-receiver.true-sense-inc.workers.dev/v1/reports"
   }
 
   # Why: neutral modules keep identities, outcomes, state, and faults independently reviewable
