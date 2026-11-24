@@ -28,6 +28,10 @@ const synthesisRegressions = [
   ["pagePrices", { page_number: 0 }],
   ["lookupChildrenPolicy", { version: 100 }],
   ["lookupOperatingPolicy", { operating_policy_id: "op_example", version: 100 }],
+  ["pagePurchaseIntents", { page_number: 1, page_size: 20 }],
+  ["schedulePayout", { destination_id: "fa_example", reference: "PAYOUT-TEST", max_amount: 25000 }],
+  ["lookupPayout", { payout_id: "po_example" }],
+  ["cancelPayout", { payout_id: "po_example" }],
 ];
 
 const namedOutcomes = [
@@ -285,6 +289,7 @@ try {
   // preserves public routes while enforcing active, revoked, expired, and missing credentials.
   const authenticationChecks = await verifyAuthentication(registryEnvironment, issuedCredential);
   const transportChecks = await verifyFileDeliveryTransport(registryEnvironment, issuedCredential);
+  const schedulerChecks = await verifySchedulerWorkflow(registryEnvironment, issuedCredential);
   const stateChecks = await verifyStatefulProductWorkflow(
     registryEnvironment,
     issuedCredential,
@@ -490,6 +495,7 @@ try {
       `${invalidRequests.length} invalid requests rejected, ` +
       `${authenticationChecks} authentication cases verified, ` +
       `${transportChecks} transport responses verified, ` +
+      `${schedulerChecks} scheduler checks verified, ` +
       `${stateChecks} stateful product checks verified, ` +
       `${retryChecks} idempotent lost-response checks verified, ` +
       `${audit.warnings} reviewed fidelity warnings, ` +
@@ -694,6 +700,63 @@ async function verifyFileDeliveryTransport(environment, issuedCredential) {
   return 3;
 }
 
+async function verifySchedulerWorkflow(environment, issuedCredential) {
+  const service = await startRegisteredService(environment);
+  const executeAfter = new Date(Date.now() + 86_400_000).toISOString();
+  try {
+    const response = await fetch(`${service.baseUrl}/payouts/schedule`, {
+      method: "POST",
+      headers: {
+        authorization: `Bearer ${issuedCredential}`,
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({
+        destination_id: "fa_scheduler_contract",
+        execute_after: executeAfter,
+        max_amount: 25015,
+        reference: "SIMILE-SCHEDULER-CONTRACT",
+      }),
+    });
+    const responseText = await response.text();
+    assert.equal(
+      response.status,
+      200,
+      `payout scheduling did not commit its declared scheduler effect: ${responseText}\n${service.output()}`,
+    );
+    const payout = JSON.parse(responseText).payout;
+    assert.equal(
+      payout.destination_id,
+      "fa_scheduler_contract",
+      "scheduled payout changed its destination",
+    );
+    assert.equal(payout.execute_after, executeAfter, "scheduled payout changed its execution time");
+    assert.equal(payout.max_amount?.value, 25015, "scheduled payout changed its amount limit");
+    assert.equal(
+      payout.reference,
+      "SIMILE-SCHEDULER-CONTRACT",
+      "scheduled payout changed its reference",
+    );
+    return 5;
+  } finally {
+    await stopService(service.service);
+  }
+}
+
+function assertTimestampWithinRequest(value, startedAt, finishedAt, field) {
+  const timestamp = Date.parse(value);
+  // RFC 3339 output trims insignificant fractional zeros; keep the assertion strict while
+  // allowing the resulting millisecond boundary on fast loopback requests.
+  const precisionTolerance = 5;
+  assert.ok(
+    Number.isFinite(timestamp),
+    `${field} was not a valid date-time: ${String(value)}`,
+  );
+  assert.ok(
+    timestamp >= startedAt - precisionTolerance && timestamp <= finishedAt + precisionTolerance,
+    `${field} ${value} fell outside its request window ${new Date(startedAt).toISOString()}–${new Date(finishedAt).toISOString()}`,
+  );
+}
+
 async function verifyStatefulProductWorkflow(environment, issuedCredential, isolatedCredential) {
   const headers = {
     authorization: `Bearer ${issuedCredential}`,
@@ -706,19 +769,29 @@ async function verifyStatefulProductWorkflow(environment, issuedCredential, isol
   let order;
   let checks = 0;
   try {
+    const createStartedAt = Date.now();
     const createdResponse = await fetch(`${first.baseUrl}/products/create`, {
       method: "POST",
       headers,
       body: JSON.stringify({ type: "digital", name: "Stateful integration guide", publish: true }),
     });
+    const createFinishedAt = Date.now();
     assert.equal(createdResponse.status, 200, "stateful product creation failed");
     const created = await createdResponse.json();
     product = created.product;
     assert.ok(product?.id, "stateful product creation returned no identifier");
-    checks += 1;
+    assertTimestampWithinRequest(
+      product.created_at,
+      createStartedAt,
+      createFinishedAt,
+      "product.created_at",
+    );
+    assert.equal(product.published_at, product.created_at, "published product did not use its creation clock");
+    checks += 3;
 
     // Why: an update must preserve identity and request-owned fields while staying within its
     // intentionally narrower response contract; full-field preservation is checked by lookup.
+    const updateStartedAt = Date.now();
     const updatedResponse = await fetch(`${first.baseUrl}/products/update`, {
       method: "POST",
       headers,
@@ -728,6 +801,7 @@ async function verifyStatefulProductWorkflow(environment, issuedCredential, isol
         description: "Exercises mutation replay and durable state.",
       }),
     });
+    const updateFinishedAt = Date.now();
     const updatedBody = await updatedResponse.text();
     assert.equal(
       updatedResponse.status,
@@ -739,8 +813,14 @@ async function verifyStatefulProductWorkflow(environment, issuedCredential, isol
     assert.equal(updated.name, "Stateful integration guide, second edition", "product update lost the new name");
     assert.equal(updated.type, product.type, "product update changed an untouched product type");
     assert.equal(updated.active, undefined, "product update escaped its narrow public response shape");
+    assertTimestampWithinRequest(
+      updated.updated_at,
+      updateStartedAt,
+      updateFinishedAt,
+      "product.updated_at",
+    );
     product = { ...product, ...updated };
-    checks += 1;
+    checks += 2;
 
     // Why: a useful emulator must return the snapshot committed by creation rather than synthesize
     // an unrelated resource merely because the lookup response schema permits one.
@@ -786,6 +866,7 @@ async function verifyStatefulProductWorkflow(environment, issuedCredential, isol
 
     // Why: resource IDs returned by one operation must remain usable by dependent operations; a
     // schema-valid but unrelated price would make the emulator unsuitable for workflow testing.
+    const priceStartedAt = Date.now();
     const priceResponse = await fetch(`${first.baseUrl}/products/add_price`, {
       method: "POST",
       headers,
@@ -796,12 +877,19 @@ async function verifyStatefulProductWorkflow(environment, issuedCredential, isol
         fixed_amount: { currency: "ghs", value: 20000 },
       }),
     });
+    const priceFinishedAt = Date.now();
     assert.equal(priceResponse.status, 200, "stateful product price creation failed");
     price = (await priceResponse.json()).price;
     assert.ok(price?.id, "stateful product price creation returned no identifier");
     assert.equal(price.product_id, product.id, "created price did not retain its product reference");
     assert.deepEqual(price.fixed_amount, { currency: "ghs", value: 20000 }, "created price changed its amount");
-    checks += 1;
+    assertTimestampWithinRequest(
+      price.created_at,
+      priceStartedAt,
+      priceFinishedAt,
+      "price.created_at",
+    );
+    checks += 2;
 
     const priceLookupResponse = await fetch(`${first.baseUrl}/prices/lookup`, {
       method: "POST",

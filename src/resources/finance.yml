@@ -1214,6 +1214,8 @@ paths:
                             x-simile-from-request:
                                 bindings:
                                     - { from: /destination_id, to: /payout/destination_id }
+                                    - { from: /execute_after, to: /payout/execute_after }
+                                    - { from: /max_amount, to: /payout/max_amount/value }
                                     - { from: /reference, to: /payout/reference }
                 '400':
                     description: Bad request - invalid schedule parameters
@@ -3323,6 +3325,8 @@ components:
                 - status
             # Payout status, terminal evidence, and caller-safe explanations must stay synchronized.
             x-simile-constraints:
+                - ordered:
+                      paths: [/initiated_at, /scheduled_at, /execute_after]
                 - ordered:
                       paths: [/initiated_at, /scheduled_at, /sent_at, /succeeded_at]
                 - ordered:

@@ -1717,6 +1717,14 @@ export interface PayoutsResponseRelations {
             readonly "to": "/payout/destination_id";
           },
           {
+            readonly "from": "/execute_after";
+            readonly "to": "/payout/execute_after";
+          },
+          {
+            readonly "from": "/max_amount";
+            readonly "to": "/payout/max_amount/value";
+          },
+          {
             readonly "from": "/reference";
             readonly "to": "/payout/reference";
           },

@@ -252,6 +252,7 @@ export interface SchemaSoundness {
     Aggregate<Select<PaymentMethodPageResponse, readonly ["page"]>, readonly ["size"], "count", readonly ["payment_methods", "*"], never>,
   ];
   readonly "Payout": readonly [
+    Ordered<Payout, readonly [readonly ["initiated_at"], readonly ["scheduled_at"], readonly ["execute_after"]]>,
     Ordered<Payout, readonly [readonly ["initiated_at"], readonly ["scheduled_at"], readonly ["sent_at"], readonly ["succeeded_at"]]>,
     Ordered<Payout, readonly [readonly ["initiated_at"], readonly ["scheduled_at"], readonly ["sent_at"], readonly ["failed_at"]]>,
     Ordered<Payout, readonly [readonly ["initiated_at"], readonly ["scheduled_at"], readonly ["canceled_at"]]>,

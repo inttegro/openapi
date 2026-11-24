@@ -6,8 +6,8 @@ info:
     description: Machine-readable reference for the public Inttegro API
     # Why: contract and client artifacts are reviewed as one immutable bundle;
     # changing soundness rules or executable examples requires a new bundle identity.
-    version: 0.1.0-beta100
-    x-inttegro-collection-version: 0.1.0-beta100
+    version: 0.1.0-beta101
+    x-inttegro-collection-version: 0.1.0-beta101
     contact:
         name: Inttegro Engineering
         url: "https://inttegro.com"
@@ -8189,6 +8189,8 @@ paths:
                             x-simile-from-request:
                                 bindings:
                                     - { from: /destination_id, to: /payout/destination_id }
+                                    - { from: /execute_after, to: /payout/execute_after }
+                                    - { from: /max_amount, to: /payout/max_amount/value }
                                     - { from: /reference, to: /payout/reference }
                 '400':
                     description: Bad request - invalid schedule parameters
@@ -25592,6 +25594,8 @@ components:
                 - status
             # Payout status, terminal evidence, and caller-safe explanations must stay synchronized.
             x-simile-constraints:
+                - ordered:
+                      paths: [/initiated_at, /scheduled_at, /execute_after]
                 - ordered:
                       paths: [/initiated_at, /scheduled_at, /sent_at, /succeeded_at]
                 - ordered:

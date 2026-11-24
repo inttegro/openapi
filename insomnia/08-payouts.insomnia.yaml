@@ -52,6 +52,12 @@ collection:
           insomnia.test('Returns payout.id', () => {
             insomnia.expect(payout_id).to.be.a('string').and.not.be.empty;
           });
+          insomnia.test('Preserves the requested payout schedule', () => {
+            insomnia.expect(jsonBody?.payout?.destination_id).to.equal(insomnia.variables.get('financial_account_id'));
+            insomnia.expect(jsonBody?.payout?.reference).to.equal('PAYOUT-APR-15');
+            insomnia.expect(jsonBody?.payout?.max_amount?.value).to.equal(250000);
+            insomnia.expect(jsonBody?.payout?.execute_after).to.equal(insomnia.variables.get('future_timestamp'));
+          });
           if (payout_id) insomnia.globals.set("payout_id", payout_id);
         }
   - name: Lookup a payout

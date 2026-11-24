@@ -2,7 +2,7 @@
   "info": {
     "name": "Inttegro API — Payouts",
     "description": "Configure, schedule, retrieve, and cancel payouts. Uses the shared Inttegro API global environment.\n\nGenerated from insomnia/08-payouts.insomnia.yaml. Edit the Insomnia source and run npm run postman:generate.",
-    "version": "0.1.0-beta100",
+    "version": "0.1.0-beta101",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
@@ -50,6 +50,12 @@
                   "  const payout_id = jsonBody?.payout?.id;",
                   "  pm.test('Returns payout.id', () => {",
                   "    pm.expect(payout_id).to.be.a('string').and.not.be.empty;",
+                  "  });",
+                  "  pm.test('Preserves the requested payout schedule', () => {",
+                  "    pm.expect(jsonBody?.payout?.destination_id).to.equal(pm.variables.get('financial_account_id'));",
+                  "    pm.expect(jsonBody?.payout?.reference).to.equal('PAYOUT-APR-15');",
+                  "    pm.expect(jsonBody?.payout?.max_amount?.value).to.equal(250000);",
+                  "    pm.expect(jsonBody?.payout?.execute_after).to.equal(pm.variables.get('future_timestamp'));",
                   "  });",
                   "  if (payout_id) pm.environment.set(\"payout_id\", payout_id);",
                   "}"

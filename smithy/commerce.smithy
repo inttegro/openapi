@@ -33,14 +33,14 @@ structure untagged {}
 
 
 @collectionVersion(
-"0.1.0-beta100"
+"0.1.0-beta101"
 )
 @auth([
     httpBearerAuth
 ])
 @httpBearerAuth
 service Inttegro {
-    version: "0.1.0-beta100"
+    version: "0.1.0-beta101"
     operations: [
         activatePaymentMethod
         activatePrice
