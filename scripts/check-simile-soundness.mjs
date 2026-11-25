@@ -164,7 +164,7 @@ function schemaSynthesisSeed(location) {
       document_kind: "invoice",
       document_url: "https://pages.inttegro.com/invoices/or_soundness",
       failed_channels: ["sms"],
-      failures: [{ channel: "sms", error: "Delivery was not accepted" }],
+      failures: [{ channel: "sms" }],
       sent_channels: ["email"],
     };
   }
